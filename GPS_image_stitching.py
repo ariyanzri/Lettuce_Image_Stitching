@@ -7,7 +7,6 @@ def convert_to_gray(img):
 	coefficients = [-1,1,2] 
 	m = np.array(coefficients).reshape((1,3))
 	img_g = cv2.transform(img, m)
-	# img_g = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 	return img_g
 
@@ -16,12 +15,9 @@ def load_preprocess_image(address):
 	img = img.astype('uint8')
 	img_g = convert_to_gray(img)
 
-	# blur = cv2.GaussianBlur(img_g,(7,7),0)
-	# img_g = cv2.addWeighted(blur,1.7,img_g,-0.7,0)
-
 	return img, img_g
 
-def detect_SIFT_key_points(img,x1,y1,x2,y2,n):
+def detect_SIFT_key_points(img,x1,y1,x2,y2,n,show=False):
 
 	sift = cv2.xfeatures2d.SIFT_create()
 	main_img = img.copy()
@@ -33,13 +29,15 @@ def detect_SIFT_key_points(img,x1,y1,x2,y2,n):
 		kp_n.append(cv2.KeyPoint(k.pt[0]+x1,k.pt[1]+y1,k.size))
 
 	kp = kp_n
-	img_res = main_img
-	img_res = cv2.drawKeypoints(img_res,kp_n,img_res)
-	ratio = img_res.shape[0]/img_res.shape[1]
-	cv2.rectangle(img_res,(x1,y1),(x2,y2),(0,0,255),10)
-	img_res = cv2.resize(img_res, (500, int(500*ratio))) 
-	cv2.imshow('fig {0}'.format(n),img_res)
-	cv2.waitKey(0)	
+
+	if show:
+		img_res = main_img
+		img_res = cv2.drawKeypoints(img_res,kp_n,img_res)
+		ratio = img_res.shape[0]/img_res.shape[1]
+		cv2.rectangle(img_res,(x1,y1),(x2,y2),(0,0,255),10)
+		img_res = cv2.resize(img_res, (500, int(500*ratio))) 
+		cv2.imshow('fig {0}'.format(n),img_res)
+		cv2.waitKey(0)	
 
 	return kp_n,desc
 
@@ -69,8 +67,8 @@ def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2):
 	dst = np.append(dst,np.array([[ov_2_on_1[2],ov_2_on_1[3]]]).reshape(-1,1,2),axis=0)
 	src = np.append(src,np.array([[ov_1_on_2[0],ov_1_on_2[1]]]).reshape(-1,1,2),axis=0)
 	src = np.append(src,np.array([[ov_1_on_2[2],ov_1_on_2[3]]]).reshape(-1,1,2),axis=0)
-	# print(src)
-	# print(dst)
+	
+
 	# H, masked = cv2.findHomography(dst, src, cv2.RANSAC, 3)
 	# src = np.pad(src,[(0,0),(0,0),(0,1)],constant_values=1)
 	# dst = np.pad(dst,[(0,0),(0,0),(0,1)],constant_values=1)
@@ -80,7 +78,7 @@ def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2):
 	H[0:2,0:2] = np.array([[1,0],[0,1]])
 	return H
 	
-def stitch(rgb_img1,rgb_img2,img1,img2,H):
+def stitch(rgb_img1,rgb_img2,img1,img2,H,show=False,write_out=True):
 	T = np.array([[1,0,rgb_img1.shape[1]],[0,1,rgb_img1.shape[0]],[0,0,1]])
 
 	H = T.dot(H)
@@ -101,9 +99,13 @@ def stitch(rgb_img1,rgb_img2,img1,img2,H):
 	x, y, w, h = cv2.boundingRect(coords) 
 	dst = dst[y:y+h, x:x+w,:]
 	
-	cv2.imshow('fig',dst2)
-	cv2.waitKey(0)
-	cv2.imwrite('output.jpg',dst)
+	if show:
+		cv2.imshow('fig',dst2)
+		cv2.waitKey(0)
+
+	if write_out:
+		cv2.imwrite('output.jpg',dst)
+
 	return dst
 
 def hconcat_resize_min(im_list, interpolation=cv2.INTER_CUBIC):
@@ -129,7 +131,6 @@ class Patch_GPS_coordinate:
 	def __str__(self):
 		return '---------------------------\nUL:{0}\nUR:{1}\nLL:{2}\nLR:{3}\n---------------------------\n'.format(self.UL_coord,self.UR_coord,self.LL_coord,self.LR_coord)
 
-
 class Patch:
 	def __init__(self,name,rgb_img,img,coords):
 		self.name = name
@@ -146,7 +147,7 @@ class Patch:
 		else:
 			return False
 
-	def get_overlap_rectangle(self,patch):
+	def get_overlap_rectangle(self,patch,increase_size=False):
 		p1_x = 0
 		p1_y = 0
 		p2_x = self.size[1]
@@ -164,17 +165,18 @@ class Patch:
 			p2_x = int(((patch.GPS_coords.LR_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
 			p2_y = int(((patch.GPS_coords.LR_coord[1]-self.GPS_coords.UR_coord[1]) / (self.GPS_coords.LR_coord[1]-self.GPS_coords.UR_coord[1]))*self.size[0])
 
-		# if p1_x>0+self.size[1]/10:
-		# 	p1_x-=self.size[1]/10
+		if increase_size:
+			if p1_x>0+self.size[1]/10:
+				p1_x-=self.size[1]/10
 
-		# if p2_x<9*self.size[1]/10:
-		# 	p2_x+=self.size[1]/10
+			if p2_x<9*self.size[1]/10:
+				p2_x+=self.size[1]/10
 
-		# if p1_y>0+self.size[0]/10:
-		# 	p1_y-=self.size[0]/10
+			if p1_y>0+self.size[0]/10:
+				p1_y-=self.size[0]/10
 
-		# if p2_y<9*self.size[0]/10:
-		# 	p2_y+=self.size[0]/10
+			if p2_y<9*self.size[0]/10:
+				p2_y+=self.size[0]/10
 
 		if detect_overlap == False:
 			return 0,0,0,0
@@ -214,13 +216,11 @@ def read_all_data():
 
 	return patches
 	
-
 def draw_GPS_coords_on_patch(patch,coord):
 	if patch.GPS_coords.is_coord_inside(coord):
 		x = int(((coord[0]-patch.GPS_coords.UL_coord[0]) / (patch.GPS_coords.UR_coord[0]-patch.GPS_coords.UL_coord[0]))*patch.size[1])
 		y = int(((coord[1]-patch.GPS_coords.UR_coord[1]) / (patch.GPS_coords.LR_coord[1]-patch.GPS_coords.UR_coord[1]))*patch.size[0])
 		cv2.circle(patch.img,(x,y),20,(0,0,255),thickness=-1)
-
 
 def get_orientation(p1,p2,o1,o2):
 
@@ -254,7 +254,6 @@ def get_orientation(p1,p2,o1,o2):
 
 	return 'else'
 
-
 def find_stitched_coords(coord1,coord2):
 	min_dim_0 = min(coord1.UL_coord[0],coord1.UR_coord[0],coord2.UL_coord[0],coord2.UR_coord[0])
 	max_dim_0 = max(coord1.UL_coord[0],coord1.UR_coord[0],coord2.UL_coord[0],coord2.UR_coord[0])
@@ -262,12 +261,12 @@ def find_stitched_coords(coord1,coord2):
 	max_dim_1 = max(coord1.UL_coord[1],coord1.LL_coord[1],coord2.UL_coord[1],coord2.LL_coord[1])
 
 	coord = Patch_GPS_coordinate((min_dim_0,max_dim_1),(max_dim_0,max_dim_1),(min_dim_0,min_dim_1),(max_dim_0,min_dim_1),((min_dim_0+max_dim_0)/2,(min_dim_1+max_dim_1)/2))
-	# print(coord)
 
 	return coord
 
 def stitch_complete(patches):
 	patches_tmp = patches.copy()
+
 	i = 0
 
 	while len(patches_tmp)>1:
@@ -279,7 +278,7 @@ def stitch_complete(patches):
 		overlaps = [p_n for p_n in patches_tmp if (p.has_overlap(p_n) or p_n.has_overlap(p))]
 
 		if len(overlaps) == 0:
-			print('No overlaps for {0}. push back...'.format(p.name))
+			print('Type1 >>> No overlaps for {0}. push back...'.format(p.name))
 			patches_tmp.insert(0,p)
 			p.used_in_alg = False
 			continue
@@ -288,23 +287,12 @@ def stitch_complete(patches):
 
 		ov_2_on_1 = p.get_overlap_rectangle(p2)
 		ov_1_on_2 = p2.get_overlap_rectangle(p)
-		
-		# print(ov_2_on_1)
-		# print(ov_1_on_2)
-		
-		# imgtmp1 = p.img
-		# imgtmp2 = p2.img
-		# ratio1 = imgtmp1.shape[0]/imgtmp1.shape[1]
-		# ratio2 = imgtmp2.shape[0]/imgtmp2.shape[1]
-		# imgtmp1 = cv2.resize(imgtmp1, (500, int(500*ratio1))) 
-		# imgtmp2 = cv2.resize(imgtmp2, (500, int(500*ratio2))) 
-
-		# cv2.imshow('fig1',imgtmp1)
-		
 
 		if (ov_2_on_1[0] == 0 and ov_2_on_1[1] == 0 and ov_2_on_1[2] == 0 and ov_2_on_1[3] == 0)\
 		or (ov_1_on_2[0] == 0 and ov_1_on_2[1] == 0 and ov_1_on_2[2] == 0 and ov_1_on_2[3] == 0):
-			print('No overlaps for {0}. push back...'.format(p.name))
+			print('Type2 >>> No overlaps for {0}. push back...'.format(p.name))
+			print(ov_2_on_1)
+			print(ov_1_on_2)
 			patches_tmp.insert(0,p)
 			p.used_in_alg = False
 			continue
@@ -313,7 +301,7 @@ def stitch_complete(patches):
 		avg_overlap_2 = np.mean(p.img[ov_1_on_2[1]:ov_1_on_2[3],ov_1_on_2[0]:ov_1_on_2[2]])
 
 		if avg_overlap_1 == 0 or avg_overlap_2 == 0:
-			print('No useful (non-blank) overlap for {0}. push back...'.format(p.name))
+			print('Type3 >>> No overlap for {0}. push back...'.format(p.name))
 			patches_tmp.insert(0,p)
 			p.used_in_alg = False
 			continue
@@ -338,7 +326,7 @@ def stitch_complete(patches):
 
 		i+=1
 
-	print(len(patches_tmp))
+	
 	for p in patches_tmp:
 		ratio = p.rgb_img.shape[0]/p.rgb_img.shape[1]
 		img_res = cv2.resize(p.rgb_img, (700, int(700*ratio))) 
@@ -346,8 +334,8 @@ def stitch_complete(patches):
 		cv2.waitKey(0)	
 
 
-rgb_img1,img1 = load_preprocess_image('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures/1a9de2f7-e67e-4283-a5e8-16d694a2258a_right.tif')
-rgb_img2,img2 = load_preprocess_image('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures/1cb7e153-12b6-44f1-a834-720eca1117b3_right.tif')
+# rgb_img1,img1 = load_preprocess_image('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures/1a9de2f7-e67e-4283-a5e8-16d694a2258a_right.tif')
+# rgb_img2,img2 = load_preprocess_image('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures/1cb7e153-12b6-44f1-a834-720eca1117b3_right.tif')
 
 # rgb_img1,img1 = load_preprocess_image('/home/ariyan/Desktop/a.png')
 # rgb_img2,img2 = load_preprocess_image('/home/ariyan/Desktop/b.png')
