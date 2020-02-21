@@ -4,10 +4,10 @@ import matplotlib.pyplot as plt
 
 def convert_to_gray(img):
 	
-	coefficients = [0.0,1,0.0] 
-	# m = np.array(coefficients).reshape((1,3))
-	# img_g = cv2.transform(img, m)
-	img_g = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+	coefficients = [-1,1,2] 
+	m = np.array(coefficients).reshape((1,3))
+	img_g = cv2.transform(img, m)
+	# img_g = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 	return img_g
 
@@ -75,7 +75,7 @@ def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2):
 	# src = np.pad(src,[(0,0),(0,0),(0,1)],constant_values=1)
 	# dst = np.pad(dst,[(0,0),(0,0),(0,1)],constant_values=1)
 
-	H, masked = cv2.estimateAffinePartial2D(dst, src)
+	H, masked = cv2.estimateAffinePartial2D(dst, src, maxIters = 9000, confidence = 0.999, refineIters = 15)
 	H = np.append(H,np.array([[0,0,1]]),axis=0)
 	H[0:2,0:2] = np.array([[1,0],[0,1]])
 	return H
