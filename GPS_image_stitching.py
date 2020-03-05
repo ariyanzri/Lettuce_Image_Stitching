@@ -1,6 +1,8 @@
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
+import random
+import math
 
 def convert_to_gray(img):
 	
@@ -10,15 +12,22 @@ def convert_to_gray(img):
 
 	return img_g
 
+def adjust_gamma(image, gamma=1.0):
+
+	invGamma = 1.0 / gamma
+	table = np.array([((i / 255.0) ** invGamma) * 255 for i in np.arange(0, 256)]).astype("uint8")
+	
+	return cv2.LUT(image, table)
+
 def load_preprocess_image(address):
 	img = cv2.imread(address)
+	# img = adjust_gamma(img,1.2)
 	img = img.astype('uint8')
 	img_g = convert_to_gray(img)
 
 	return img, img_g
 
 def detect_SIFT_key_points(img,x1,y1,x2,y2,n,show=False):
-
 	sift = cv2.xfeatures2d.SIFT_create()
 	main_img = img.copy()
 	img = img[y1:y2,x1:x2]
@@ -31,15 +40,18 @@ def detect_SIFT_key_points(img,x1,y1,x2,y2,n,show=False):
 	kp = kp_n
 
 	if show:
-		img_res = main_img
+		img_res = main_img.copy()
 		img_res = cv2.drawKeypoints(img_res,kp_n,img_res)
 		ratio = img_res.shape[0]/img_res.shape[1]
-		cv2.rectangle(img_res,(x1,y1),(x2,y2),(0,0,255),10)
+		cv2.rectangle(img_res,(x1,y1),(x2,y2),(0,0,255),20)
 		img_res = cv2.resize(img_res, (500, int(500*ratio))) 
 		cv2.imshow('fig {0}'.format(n),img_res)
 		cv2.waitKey(0)	
 
 	return kp_n,desc
+
+def matched_distance(p1,p2):
+	return math.sqrt(np.sum((p1-p2)**2))
 
 def get_good_matches(desc1,desc2):
 	bf = cv2.BFMatcher()
@@ -53,44 +65,201 @@ def get_good_matches(desc1,desc2):
 
 	return matches
 
-def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2):	
-	dst = np.array([[ov_2_on_1[0],ov_2_on_1[3]]]).reshape(-1,1,2)
-	dst = np.append(dst,np.array([[ov_2_on_1[2],ov_2_on_1[1]]]).reshape(-1,1,2),axis=0)
-	src = np.array([[ov_1_on_2[0],ov_1_on_2[3]]]).reshape(-1,1,2)
-	src = np.append(src,np.array([[ov_1_on_2[2],ov_1_on_2[1]]]).reshape(-1,1,2),axis=0)
+def find_homography_gps_only(ov_2_on_1,ov_1_on_2):	
 
+	dst = [[ov_2_on_1[0],ov_2_on_1[3]] , [ov_2_on_1[2],ov_2_on_1[1]] , [ov_2_on_1[0],ov_2_on_1[1]]]
+	src = [[ov_1_on_2[0],ov_1_on_2[3]] , [ov_1_on_2[2],ov_1_on_2[1]] , [ov_1_on_2[0],ov_1_on_2[1]]]
+	
+	dst = np.float32(dst)
+	src = np.float32(src)
+	
+	H = cv2.getAffineTransform(dst, src)
+	
+	H = np.append(H,np.array([[0,0,1]]),axis=0)
+	H[0:2,0:2] = np.array([[1,0],[0,1]])
+	return H
+
+def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2,add_gps):	
+	if add_gps:
+		dst = np.array([[ov_2_on_1[0],ov_2_on_1[3]]]).reshape(-1,1,2)
+		dst = np.append(dst,np.array([[ov_2_on_1[2],ov_2_on_1[1]]]).reshape(-1,1,2),axis=0)
+		src = np.array([[ov_1_on_2[0],ov_1_on_2[3]]]).reshape(-1,1,2)
+		src = np.append(src,np.array([[ov_1_on_2[2],ov_1_on_2[1]]]).reshape(-1,1,2),axis=0)
+		dst = np.append(dst,np.array([[ov_2_on_1[0],ov_2_on_1[1]]]).reshape(-1,1,2),axis=0)
+		dst = np.append(dst,np.array([[ov_2_on_1[2],ov_2_on_1[3]]]).reshape(-1,1,2),axis=0)
+		src = np.append(src,np.array([[ov_1_on_2[0],ov_1_on_2[1]]]).reshape(-1,1,2),axis=0)
+		src = np.append(src,np.array([[ov_1_on_2[2],ov_1_on_2[3]]]).reshape(-1,1,2),axis=0)
+		
 	if len(matches)>0:
 		src = np.float32([ kp1[m.queryIdx].pt for m in matches[:,0] ]).reshape(-1,1,2)
 		dst = np.float32([ kp2[m.trainIdx].pt for m in matches[:,0] ]).reshape(-1,1,2)
-
-	dst = np.append(dst,np.array([[ov_2_on_1[0],ov_2_on_1[1]]]).reshape(-1,1,2),axis=0)
-	dst = np.append(dst,np.array([[ov_2_on_1[2],ov_2_on_1[3]]]).reshape(-1,1,2),axis=0)
-	src = np.append(src,np.array([[ov_1_on_2[0],ov_1_on_2[1]]]).reshape(-1,1,2),axis=0)
-	src = np.append(src,np.array([[ov_1_on_2[2],ov_1_on_2[3]]]).reshape(-1,1,2),axis=0)
-	
+	else:
+		return None,0
 
 	# H, masked = cv2.findHomography(dst, src, cv2.RANSAC, 3)
 	# src = np.pad(src,[(0,0),(0,0),(0,1)],constant_values=1)
 	# dst = np.pad(dst,[(0,0),(0,0),(0,1)],constant_values=1)
 
 	H, masked = cv2.estimateAffinePartial2D(dst, src, maxIters = 9000, confidence = 0.999, refineIters = 15)
+	
 	H = np.append(H,np.array([[0,0,1]]),axis=0)
 	H[0:2,0:2] = np.array([[1,0],[0,1]])
-	return H
+	return H,np.sum(masked)/len(masked)
 	
-def stitch(rgb_img1,rgb_img2,img1,img2,H,overlap,show=False,write_out=True):
+def is_point_inside(p1_1,p1_2,p1_3,p1_4,p2):
+	if p2[0]>=p1_1[0] and p2[0]<=p1_2[0] and p2[1]>=p1_1[1] and p2[1]<=p1_3[1]:
+		return True
+	else:
+		return False
+
+def get_overlapped_region(dst,rgb_img1,rgb_img2,H):
+	c1 = [0,0,1]
+	c2 = [rgb_img1.shape[1],0,1]
+	c3 = [0,rgb_img1.shape[0],1]
+	c4 = [rgb_img1.shape[1],rgb_img1.shape[0],1]
+
+	c1 = H.dot(c1).astype(int)
+	c2 = H.dot(c2).astype(int)
+	c3 = H.dot(c3).astype(int)
+	c4 = H.dot(c4).astype(int)
+
+	c2_1 = [rgb_img1.shape[1],rgb_img1.shape[0],1]
+	c2_2 = [rgb_img1.shape[1]+rgb_img2.shape[1],rgb_img1.shape[0],1]
+	c2_3 = [rgb_img1.shape[1],rgb_img1.shape[0]+rgb_img2.shape[0],1]
+	c2_4 = [rgb_img1.shape[1]+rgb_img2.shape[1],rgb_img1.shape[0]+rgb_img2.shape[0],1]
+	
+	p1_x = c2_1[0]
+	p1_y = c2_1[1]
+	p2_x = c2_4[0]
+	p2_y = c2_4[1]
+
+	# print(c2_1,c2_2,c2_3,c2_4)
+	# print(c1,c2,c3,c4)
+
+	if is_point_inside(c2_1,c2_2,c2_3,c2_4,c1):
+		p1_x = c1[0]
+		p1_y = c1[1]
+		# print('UL of img1')
+
+	if is_point_inside(c1,c2,c3,c4,c2_4):
+		p1_x = c1[0]
+		p1_y = c1[1]
+		# print('LR of img2')
+	
+	if is_point_inside(c2_1,c2_2,c2_3,c2_4,c4):
+		p2_y = c4[1]
+		p2_x = c4[0]
+		# print('LR of img1')
+
+	if is_point_inside(c1,c2,c3,c4,c2_1):
+		p2_y = c4[1]
+		p2_x = c4[0]
+		# print('UL of img2')
+
+	if is_point_inside(c2_1,c2_2,c2_3,c2_4,c2):
+		p2_x = c2[0]
+		p1_y = c2[1]
+		# print('UR of img1')
+
+	if is_point_inside(c1,c2,c3,c4,c2_3):
+		p2_x = c2[0]
+		p1_y = c2[1]
+		# print('LL of img2')
+
+	if is_point_inside(c2_1,c2_2,c2_3,c2_4,c3):
+		p1_x = c3[0]
+		p2_y = c3[1]
+		# print('LL of img1')
+
+	if is_point_inside(c1,c2,c3,c4,c2_2):
+		p1_x = c3[0]
+		p2_y = c3[1]
+		# print('UR of img2')
+
+	# cv2.rectangle(dst,(p1_x,p1_y),(p2_x,p2_y),(0,0,255),20)
+
+	return np.copy(dst[p1_y:p2_y,p1_x:p2_x]),(p1_x,p1_y,p2_x,p2_y)
+
+def revise_homography(H,rgb_img1,rgb_img2,img1,img2,move_steps,mse,length_rev):
+	main_H = np.copy(H)
+	min_H = np.copy(H)
+	min_MSE = mse
+
+	for r in range(0,length_rev):
+		i = random.randint(-move_steps,move_steps+1)
+		j = random.randint(-move_steps,move_steps+1)
+
+		H = np.copy(main_H)
+		H[0,2]+=i
+		H[1,2]+=j
+
+		dst = cv2.warpPerspective(rgb_img1, H,(rgb_img2.shape[1] + 2*rgb_img1.shape[1], rgb_img2.shape[0]+2*rgb_img1.shape[0]))
+		overlap1,pnts = get_overlapped_region(dst,rgb_img1,rgb_img2,H)
+
+		dst[rgb_img1.shape[0]:rgb_img1.shape[0]+rgb_img2.shape[0], rgb_img1.shape[1]:rgb_img1.shape[1]+rgb_img2.shape[1]] = rgb_img2
+		overlap2,pnts = get_overlapped_region(dst,rgb_img1,rgb_img2,H)
+		
+		MSE = np.mean((overlap1-overlap2)**2)
+
+		if MSE<min_MSE:
+			min_MSE=MSE
+			min_H = H 	
+
+
+	return min_H
+
+def stitch(rgb_img1,rgb_img2,img1,img2,H,overlap,show=False,write_out=False,apply_average=False,revise_h=False,revise_move_steps=20,length_rev=100):
 	T = np.array([[1,0,rgb_img1.shape[1]],[0,1,rgb_img1.shape[0]],[0,0,1]])
 
 	H = T.dot(H)
+	# H = np.eye(3)
 
 	# rgb_img2[overlap[1]:overlap[3],overlap[0]:overlap[2],:] = 0
 
 	dst = cv2.warpPerspective(rgb_img1, H,(rgb_img2.shape[1] + 2*rgb_img1.shape[1], rgb_img2.shape[0]+2*rgb_img1.shape[0]))
+	overlap1,pnts = get_overlapped_region(dst,rgb_img1,rgb_img2,H)
+
 	dst[rgb_img1.shape[0]:rgb_img1.shape[0]+rgb_img2.shape[0], rgb_img1.shape[1]:rgb_img1.shape[1]+rgb_img2.shape[1]] = rgb_img2
+	overlap2,pnts = get_overlapped_region(dst,rgb_img1,rgb_img2,H)
 	
+	mse_overlap1 = overlap1.copy()
+	mse_overlap1[overlap1==0] = overlap2[overlap1==0]
+	mse_overlap2 = overlap2.copy()
+	mse_overlap2[overlap2==0] = overlap1[overlap2==0]
+
+	MSE = np.mean((mse_overlap1-mse_overlap2)**2)
+
+	if revise_h:
+		H = revise_homography(H,rgb_img1,rgb_img2,img1,img2,revise_move_steps,MSE,length_rev)
+
+		dst = cv2.warpPerspective(rgb_img1, H,(rgb_img2.shape[1] + 2*rgb_img1.shape[1], rgb_img2.shape[0]+2*rgb_img1.shape[0]))
+		overlap1,pnts = get_overlapped_region(dst,rgb_img1,rgb_img2,H)
+
+		dst[rgb_img1.shape[0]:rgb_img1.shape[0]+rgb_img2.shape[0], rgb_img1.shape[1]:rgb_img1.shape[1]+rgb_img2.shape[1]] = rgb_img2
+		overlap2,pnts = get_overlapped_region(dst,rgb_img1,rgb_img2,H)
+		
+		mse_overlap1 = overlap1.copy()
+		mse_overlap1[overlap1==0] = overlap2[overlap1==0]
+		mse_overlap2 = overlap2.copy()
+		mse_overlap2[overlap2==0] = overlap1[overlap2==0]
+		
+		MSE = np.mean((mse_overlap1-mse_overlap2)**2)
+
+	overlap1[overlap1==0]=overlap2[overlap1==0]
+	overlap2[overlap2==0]=overlap1[overlap2==0]
+	
+	dst[pnts[1]:pnts[3],pnts[0]:pnts[2]] = overlap2
+
+	if apply_average:
+
+		final_average = ((overlap1+overlap2)/2).astype('uint8')
+		dst[pnts[1]:pnts[3],pnts[0]:pnts[2]] = final_average
+
 	ratio = dst.shape[0]/dst.shape[1]
-	dst2 = cv2.resize(dst, (750, int(750*ratio))) 
+	dst2 = cv2.resize(dst, (1300, int(1300*ratio))) 
 	
+	print('\tMSE: {0}'.format(MSE))
+
 	gray = convert_to_gray(dst2)
 	coords = cv2.findNonZero(gray) 
 	x, y, w, h = cv2.boundingRect(coords) 
@@ -108,7 +277,7 @@ def stitch(rgb_img1,rgb_img2,img1,img2,H,overlap,show=False,write_out=True):
 	if write_out:
 		cv2.imwrite('output.jpg',dst)
 
-	return dst
+	return dst,MSE
 
 def hconcat_resize_min(im_list, interpolation=cv2.INTER_CUBIC):
     h_min = min(im.shape[0] for im in im_list)
@@ -132,7 +301,7 @@ class Patch_GPS_coordinate:
 
 	def __str__(self):
 		return '---------------------------\nUL:{0}\nUR:{1}\nLL:{2}\nLR:{3}\n---------------------------\n'.format(self.UL_coord,self.UR_coord,self.LL_coord,self.LR_coord)
-
+	
 class Patch:
 	def __init__(self,name,rgb_img,img,coords):
 		self.name = name
@@ -142,6 +311,7 @@ class Patch:
 		self.size = np.shape(img)
 		self.used_in_alg = True
 
+
 	def has_overlap(self,p):
 		if self.GPS_coords.is_coord_inside(p.GPS_coords.UL_coord) or self.GPS_coords.is_coord_inside(p.GPS_coords.UR_coord) or\
 			self.GPS_coords.is_coord_inside(p.GPS_coords.LL_coord) or self.GPS_coords.is_coord_inside(p.GPS_coords.LR_coord):
@@ -149,7 +319,7 @@ class Patch:
 		else:
 			return False
 
-	def get_overlap_rectangle(self,patch,increase_size=False):
+	def get_overlap_rectangle(self,patch,increase_size=True):
 		p1_x = 0
 		p1_y = 0
 		p2_x = self.size[1]
@@ -157,25 +327,57 @@ class Patch:
 
 		detect_overlap = False
 
-		if self.GPS_coords.is_coord_inside(patch.GPS_coords.UL_coord):
+		# if self.GPS_coords.is_coord_inside(patch.GPS_coords.UL_coord):
+		# 	detect_overlap = True
+		# 	p1_x = int(((patch.GPS_coords.UL_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
+		# 	p1_y = int(((patch.GPS_coords.UL_coord[1]-self.GPS_coords.UL_coord[1]) / (self.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]))*self.size[0])
+		
+		# if self.GPS_coords.is_coord_inside(patch.GPS_coords.LR_coord):
+		# 	detect_overlap = True
+		# 	p2_x = int(((patch.GPS_coords.LR_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
+		# 	p2_y = int(((patch.GPS_coords.LR_coord[1]-self.GPS_coords.UL_coord[1]) / (self.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]))*self.size[0])
+
+		# if self.GPS_coords.is_coord_inside(patch.GPS_coords.UR_coord):
+		# 	detect_overlap = True
+		# 	p2_x = int(((patch.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
+		# 	p1_y = int(((patch.GPS_coords.UR_coord[1]-self.GPS_coords.UL_coord[1]) / (self.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]))*self.size[0])
+
+		# if self.GPS_coords.is_coord_inside(patch.GPS_coords.LL_coord):
+		# 	detect_overlap = True
+		# 	p1_x = int(((patch.GPS_coords.LL_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
+		# 	p2_y = int(((patch.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]) / (self.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]))*self.size[0])
+
+		if patch.GPS_coords.UL_coord[1]>=self.GPS_coords.LL_coord[1] and patch.GPS_coords.UL_coord[1]<=self.GPS_coords.UL_coord[1]:
 			detect_overlap = True
-			p1_x = int(((patch.GPS_coords.UL_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
+			# print(patch.name+' upper border is inside')
+			# p1_x = int(((patch.GPS_coords.UL_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
 			p1_y = int(((patch.GPS_coords.UL_coord[1]-self.GPS_coords.UL_coord[1]) / (self.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]))*self.size[0])
 		
-		if self.GPS_coords.is_coord_inside(patch.GPS_coords.LR_coord):
+		if patch.GPS_coords.LL_coord[1]>=self.GPS_coords.LL_coord[1] and patch.GPS_coords.LL_coord[1]<=self.GPS_coords.UL_coord[1]:
 			detect_overlap = True
-			p2_x = int(((patch.GPS_coords.LR_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
+			# print(patch.name+' lower border is inside')
+			# p2_x = int(((patch.GPS_coords.LR_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
 			p2_y = int(((patch.GPS_coords.LR_coord[1]-self.GPS_coords.UL_coord[1]) / (self.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]))*self.size[0])
 
-		if self.GPS_coords.is_coord_inside(patch.GPS_coords.UR_coord):
+		if patch.GPS_coords.UR_coord[0]<=self.GPS_coords.UR_coord[0] and patch.GPS_coords.UR_coord[0]>=self.GPS_coords.UL_coord[0]:
 			detect_overlap = True
+			# print(patch.name+' right border is inside')
 			p2_x = int(((patch.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
-			p1_y = int(((patch.GPS_coords.UR_coord[1]-self.GPS_coords.UL_coord[1]) / (self.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]))*self.size[0])
+			# p1_y = int(((patch.GPS_coords.UR_coord[1]-self.GPS_coords.UL_coord[1]) / (self.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]))*self.size[0])
 
-		if self.GPS_coords.is_coord_inside(patch.GPS_coords.LL_coord):
+		if patch.GPS_coords.UL_coord[0]<=self.GPS_coords.UR_coord[0] and patch.GPS_coords.UL_coord[0]>=self.GPS_coords.UL_coord[0]:
 			detect_overlap = True
+			# print(patch.name+' left border is inside')
 			p1_x = int(((patch.GPS_coords.LL_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
-			p2_y = int(((patch.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]) / (self.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]))*self.size[0])
+			# p2_y = int(((patch.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]) / (self.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]))*self.size[0])
+
+		if patch.GPS_coords.is_coord_inside(self.GPS_coords.UL_coord) and patch.GPS_coords.is_coord_inside(self.GPS_coords.UR_coord) and \
+		patch.GPS_coords.is_coord_inside(self.GPS_coords.LL_coord) and patch.GPS_coords.is_coord_inside(self.GPS_coords.LR_coord):
+			p1_x = 0
+			p1_y = 0
+			p2_x = self.size[1]
+			p2_y = self.size[0]
+			detect_overlap = True
 
 		if increase_size:
 			if p1_x>0+self.size[1]/10:
@@ -311,98 +513,214 @@ def choose_patch_with_largest_overlap(patches):
 
 	return max_p
 
-
-def get_best_overlap(p,overlaps):
-	max_f = 0
+def get_best_overlap(p,overlaps,increase_size=True):
+	max_f = -1
 	max_p = None
 
 	for p_ov in overlaps:
-		rect_on_1 = p.get_overlap_rectangle(p_ov)
-		rect_on_2 = p_ov.get_overlap_rectangle(p)
+		rect_on_1 = p.get_overlap_rectangle(p_ov,increase_size)
+		rect_on_2 = p_ov.get_overlap_rectangle(p,increase_size)
 		f = (rect_on_1[2]-rect_on_1[0])*(rect_on_1[3]-rect_on_1[1])
-		f += abs(np.mean(p.img[rect_on_1[1]:rect_on_1[3],rect_on_1[0]:rect_on_1[2]])-np.mean(p_ov.img[rect_on_2[1]:rect_on_2[3],rect_on_2[0]:rect_on_2[2]]))*-1
+		# f += abs(np.mean(p.img[rect_on_1[1]:rect_on_1[3],rect_on_1[0]:rect_on_1[2]])-np.mean(p_ov.img[rect_on_2[1]:rect_on_2[3],rect_on_2[0]:rect_on_2[2]]))*-1
 		if f>max_f:
 			max_f = f
 			max_p = p_ov
 
 	return max_p,max_f
 
+def Get_GPS_Error(H,ov_1_on_2,ov_2_on_1):
+	p2 = np.array([[ov_1_on_2[0],ov_1_on_2[1]]])
+	p1 = np.array([[ov_2_on_1[0],ov_2_on_1[1]]])
+	
+	p1_translated = H.dot([p1[0,0],p1[0,1],1])
 
-def stitch_complete(patches):
+	# return int(matched_distance(p2,np.array([p1_translated[0],p1_translated[1]])))
+	return int(abs(p2[0,0]-p1_translated[0])),int(abs(p2[0,1]-p1_translated[1]))
+
+def stitch_complete(patches,show,show2):
 	patches_tmp = patches.copy()
 
 	i = 0
 
-	while len(patches_tmp)>1:
-		# p = patches_tmp.pop()
-		p = choose_patch_with_largest_overlap(patches_tmp)
+	len_no_change = 0
 
-		patches_tmp.remove(p)
+	while len(patches_tmp)>1 and len_no_change<len(patches_tmp):
+		p = patches_tmp.pop()
+		len_no_change+=1
 
-		if p.used_in_alg == False:
-			break
+		# p = choose_patch_with_largest_overlap(patches_tmp)
+		# patches_tmp.remove(p)
 
 		overlaps = [p_n for p_n in patches_tmp if (p.has_overlap(p_n) or p_n.has_overlap(p))]
 
 		if len(overlaps) == 0:
 			print('Type1 >>> No overlaps for {0}. push back...'.format(p.name))
 			patches_tmp.insert(0,p)
-			p.used_in_alg = False
 			continue
 
 		p2,f_grbg = get_best_overlap(p,overlaps)
 		# p2 = overlaps[0]
-
+		
 		ov_2_on_1 = p.get_overlap_rectangle(p2)
 		ov_1_on_2 = p2.get_overlap_rectangle(p)
-		print(ov_2_on_1)
-		print(ov_1_on_2)
+		
 		if (ov_2_on_1[0] == 0 and ov_2_on_1[1] == 0 and ov_2_on_1[2] == 0 and ov_2_on_1[3] == 0)\
 		or (ov_1_on_2[0] == 0 and ov_1_on_2[1] == 0 and ov_1_on_2[2] == 0 and ov_1_on_2[3] == 0):
-			print('Type2 >>> No overlaps for {0}. push back...'.format(p.name))
-			print(p.GPS_coords)
-			print(p2.GPS_coords)
+			print('Type2 >>> Empty overlap for {0}. push back...'.format(p.name))
 			patches_tmp.insert(0,p)
-			p.used_in_alg = False
+			
+			# print(ov_2_on_1)
+			# print(ov_1_on_2)
+			# print(p.GPS_coords)
+			# print(p2.GPS_coords)
+			# cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
+			# cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
+			# cv2.resizeWindow('fig1', 600,600)
+			# cv2.resizeWindow('fig2', 600,600)
+			# cv2.imshow('fig1',p.rgb_img)
+			# cv2.imshow('fig2',p2.rgb_img)
+			# cv2.waitKey(0)
 			continue
 
-		avg_overlap_1 = np.mean(p.img[ov_2_on_1[1]:ov_2_on_1[3],ov_2_on_1[0]:ov_2_on_1[2]])
-		avg_overlap_2 = np.mean(p.img[ov_1_on_2[1]:ov_1_on_2[3],ov_1_on_2[0]:ov_1_on_2[2]])
+		avg_overlap_1 = np.sum(p.img[ov_2_on_1[1]:ov_2_on_1[3],ov_2_on_1[0]:ov_2_on_1[2]])
+		avg_overlap_2 = np.sum(p.img[ov_1_on_2[1]:ov_1_on_2[3],ov_1_on_2[0]:ov_1_on_2[2]])
 
-		if avg_overlap_1 == 0 or avg_overlap_2 == 0:
-			print('Type3 >>> No overlap for {0}. push back...'.format(p.name))
-			patches_tmp.insert(0,p)
-			p.used_in_alg = False
-			continue
+		# if avg_overlap_1 == 0 or avg_overlap_2 == 0:
+		# 	print('Type3 >>> Blank overlap for {0}. push back...'.format(p.name))
+		# 	patches_tmp.insert(0,p)
+		# 	continue
 
-		p2.used_in_alg = True
 		patches_tmp.remove(p2)
 		
-		kp1,desc1 = detect_SIFT_key_points(p.img,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],1,True)
-		kp2,desc2 = detect_SIFT_key_points(p2.img,ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],2,True)
+		kp1,desc1 = detect_SIFT_key_points(p.img,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],1,show)
+		kp2,desc2 = detect_SIFT_key_points(p2.img,ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],2,show)
 
 		matches = get_good_matches(desc2,desc1)
 
-		H = find_homography(matches,kp2,kp1,ov_2_on_1,ov_1_on_2)
+		H,percentage_inliers = find_homography(matches,kp2,kp1,ov_2_on_1,ov_1_on_2,False)
 
-		result = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,H,ov_1_on_2,True)
+		print('----Number of matches: {0}\n\tPercentage Iliers: {1}'.format(len(matches),percentage_inliers))
+
+		if percentage_inliers<=0.1 or len(matches) < 40:
+			patches_tmp.insert(0,p)
+			patches_tmp.insert(0,p2)
+			print('\t*** Not enough inliers ...')
+			continue
+
+		gps_err = Get_GPS_Error(H,ov_1_on_2,ov_2_on_1)
+		
+		if gps_err[0] > (ov_1_on_2[2]-ov_1_on_2[0])/2 and \
+		gps_err[1] > (ov_1_on_2[3]-ov_1_on_2[1])/2:
+			patches_tmp.insert(0,p)
+			patches_tmp.insert(0,p2)
+			print('*** High GPS error ...')
+			continue
+
+
+		result, MSE = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,H,ov_1_on_2,show)
+
+		if MSE > 90:
+			patches_tmp.insert(0,p)
+			patches_tmp.insert(0,p2)
+			print('\t*** High MSE ...')
+			continue
+
+		len_no_change = 0
 		
 		stitched_coords = find_stitched_coords(p.GPS_coords,p2.GPS_coords)
 
 		new_patch = Patch('New_{0}'.format(i),result,convert_to_gray(result),stitched_coords)
 
-		# tmpimg = draw_GPS_coords_on_patch(new_patch,stitched_coords.LL_coord,stitched_coords.LR_coord,stitched_coords.UL_coord,stitched_coords.UR_coord)
-		# ratio = tmpimg.shape[0]/tmpimg.shape[1]
-		# tmpimg = cv2.resize(tmpimg, (450, int(450*ratio))) 
-		# cv2.imshow('figgg',tmpimg)
-		# cv2.waitKey(0)
+		patches_tmp.append(new_patch)
+
+		i+=1
+
+	print('############ Stitching based on GPS only ############')
+
+	len_no_change = 0 
+
+	while len(patches_tmp)>1 and len_no_change<len(patches_tmp):
+		p = patches_tmp.pop()
+		len_no_change+=1
+
+		overlaps = [p_n for p_n in patches_tmp if (p.has_overlap(p_n) or p_n.has_overlap(p))]
+
+		if len(overlaps) == 0:
+			print('Type1 >>> No overlaps for {0}. push back...'.format(p.name))
+			patches_tmp.insert(0,p)
+			continue
+
+		p2,f_grbg = get_best_overlap(p,overlaps,increase_size=False)
+		# p2 = overlaps[0]
+		
+		ov_2_on_1 = p.get_overlap_rectangle(p2,increase_size=False)
+		ov_1_on_2 = p2.get_overlap_rectangle(p,increase_size=False)
+		
+		if (ov_2_on_1[0] == 0 and ov_2_on_1[1] == 0 and ov_2_on_1[2] == 0 and ov_2_on_1[3] == 0)\
+		or (ov_1_on_2[0] == 0 and ov_1_on_2[1] == 0 and ov_1_on_2[2] == 0 and ov_1_on_2[3] == 0):
+			print('Type2 >>> Empty overlap for {0}. push back...'.format(p.name))
+			patches_tmp.insert(0,p)
+			
+			# print(ov_2_on_1)
+			# print(ov_1_on_2)
+			# print(p.GPS_coords)
+			# print(p2.GPS_coords)
+			# cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
+			# cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
+			# cv2.resizeWindow('fig1', 600,600)
+			# cv2.resizeWindow('fig2', 600,600)
+			# img_res1 = p.rgb_img
+			# img_res2 = p2.rgb_img
+			# cv2.rectangle(img_res1,(ov_2_on_1[0],ov_2_on_1[1]),(ov_2_on_1[2],ov_2_on_1[3]),(0,0,255),20)
+			# cv2.rectangle(img_res2,(ov_1_on_2[0],ov_1_on_2[1]),(ov_1_on_2[2],ov_1_on_2[3]),(0,0,255),20)
+			# cv2.imshow('fig1',img_res1)
+			# cv2.imshow('fig2',img_res2)
+			# cv2.waitKey(0)
+			continue
+
+		avg_overlap_1 = np.sum(p.img[ov_2_on_1[1]:ov_2_on_1[3],ov_2_on_1[0]:ov_2_on_1[2]])
+		avg_overlap_2 = np.sum(p.img[ov_1_on_2[1]:ov_1_on_2[3],ov_1_on_2[0]:ov_1_on_2[2]])
+
+		patches_tmp.remove(p2)
+
+		kp1,desc1 = detect_SIFT_key_points(p.img,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],1,show2)
+		kp2,desc2 = detect_SIFT_key_points(p2.img,ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],2,show2)
+
+		matches = get_good_matches(desc2,desc1)
+
+		H,percentage_inliers = find_homography(matches,kp2,kp1,ov_2_on_1,ov_1_on_2,True)
+		
+		print('----Number of matches: {0}\n\tPercentage Iliers: {1}'.format(len(matches),percentage_inliers))
+
+		if percentage_inliers==0 or H is None:
+			H = find_homography_gps_only(ov_2_on_1,ov_1_on_2)
+		else:
+			gps_err = Get_GPS_Error(H,ov_1_on_2,ov_2_on_1)
+		
+		if gps_err[0] > (ov_1_on_2[2]-ov_1_on_2[0])/2 and \
+		gps_err[1] > (ov_1_on_2[3]-ov_1_on_2[1])/2:
+			H = find_homography_gps_only(ov_2_on_1,ov_1_on_2)
+
+		import gc
+		gc.collect()
+
+		result, MSE = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,H,ov_1_on_2,show2)
+
+		len_no_change = 0
+
+		stitched_coords = find_stitched_coords(p.GPS_coords,p2.GPS_coords)
+
+		new_patch = Patch('New_{0}'.format(i),result,convert_to_gray(result),stitched_coords)
 
 		patches_tmp.append(new_patch)
 
 		i+=1
 
-	
-	for p in patches_tmp:
+	return patches_tmp
+
+def show_and_save_final_patches(patches):
+	for p in patches:
+		cv2.imwrite('{0}.jpg'.format(p.name),p.rgb_img)
 		ratio = p.rgb_img.shape[0]/p.rgb_img.shape[1]
 		img_res = cv2.resize(p.rgb_img, (700, int(700*ratio))) 
 		cv2.imshow('fig',img_res)
@@ -436,5 +754,5 @@ def stitch_complete(patches):
 # stitch(rgb_img2,rgb_img1,img2,img1,H)
 
 patches = read_all_data()
-stitch_complete(patches)
-
+final_patches = stitch_complete(patches,False,True)
+show_and_save_final_patches(final_patches)
