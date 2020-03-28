@@ -65,18 +65,28 @@ def get_good_matches(desc1,desc2):
 
 	return matches
 
-def find_homography_gps_only(ov_2_on_1,ov_1_on_2):	
+def find_homography_gps_only(ov_2_on_1,ov_1_on_2,p1,p2):	
 
-	dst = [[ov_2_on_1[0],ov_2_on_1[3]] , [ov_2_on_1[2],ov_2_on_1[1]] , [ov_2_on_1[0],ov_2_on_1[1]]]
-	src = [[ov_1_on_2[0],ov_1_on_2[3]] , [ov_1_on_2[2],ov_1_on_2[1]] , [ov_1_on_2[0],ov_1_on_2[1]]]
+	# dst = [[ov_2_on_1[0],ov_2_on_1[3]] , [ov_2_on_1[2],ov_2_on_1[1]] , [ov_2_on_1[0],ov_2_on_1[1]]]
+	# src = [[ov_1_on_2[0],ov_1_on_2[3]] , [ov_1_on_2[2],ov_1_on_2[1]] , [ov_1_on_2[0],ov_1_on_2[1]]]
 	
-	dst = np.float32(dst)
-	src = np.float32(src)
+	# dst = np.float32(dst)
+	# src = np.float32(src)
 	
-	H = cv2.getAffineTransform(dst, src)
+	# H = cv2.getAffineTransform(dst, src)
 	
-	H = np.append(H,np.array([[0,0,1]]),axis=0)
-	H[0:2,0:2] = np.array([[1,0],[0,1]])
+	# H = np.append(H,np.array([[0,0,1]]),axis=0)
+	# H[0:2,0:2] = np.array([[1,0],[0,1]])
+	# return H
+
+	ratio = ((p1.GPS_coords.UR_coord[0]-p1.GPS_coords.UL_coord[0])/p1.size[1],-(p1.GPS_coords.UL_coord[1]-p1.GPS_coords.LL_coord[1])/p1.size[0])
+
+	diff_GPS = ((p1.GPS_coords.UL_coord[0]-p2.GPS_coords.UL_coord[0])/ratio[0],(p1.GPS_coords.UL_coord[1]-p2.GPS_coords.UL_coord[1])/ratio[1])
+
+	H = np.eye(3)
+	H[0,2] = diff_GPS[0]
+	H[1,2] = diff_GPS[1]
+	# print(H)
 	return H
 
 def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2,add_gps):	
@@ -221,13 +231,16 @@ def stitch(rgb_img1,rgb_img2,img1,img2,H,overlap,show=False,write_out=False,appl
 
 	dst[rgb_img1.shape[0]:rgb_img1.shape[0]+rgb_img2.shape[0], rgb_img1.shape[1]:rgb_img1.shape[1]+rgb_img2.shape[1]] = rgb_img2
 	overlap2,pnts = get_overlapped_region(dst,rgb_img1,rgb_img2,H)
-	
+
 	mse_overlap1 = overlap1.copy()
 	mse_overlap1[overlap1==0] = overlap2[overlap1==0]
 	mse_overlap2 = overlap2.copy()
 	mse_overlap2[overlap2==0] = overlap1[overlap2==0]
 
 	MSE = np.mean((mse_overlap1-mse_overlap2)**2)
+
+	del mse_overlap1
+	del mse_overlap2
 
 	if revise_h:
 		H = revise_homography(H,rgb_img1,rgb_img2,img1,img2,revise_move_steps,MSE,length_rev)
@@ -244,6 +257,9 @@ def stitch(rgb_img1,rgb_img2,img1,img2,H,overlap,show=False,write_out=False,appl
 		mse_overlap2[overlap2==0] = overlap1[overlap2==0]
 		
 		MSE = np.mean((mse_overlap1-mse_overlap2)**2)
+		
+		del mse_overlap1
+		del mse_overlap2
 
 	overlap1[overlap1==0]=overlap2[overlap1==0]
 	overlap2[overlap2==0]=overlap1[overlap2==0]
@@ -309,7 +325,7 @@ class Patch:
 		self.img = img
 		self.GPS_coords = coords
 		self.size = np.shape(img)
-		self.used_in_alg = True
+		self.GPS_Corrected = False
 
 
 	def has_overlap(self,p):
@@ -537,6 +553,41 @@ def Get_GPS_Error(H,ov_1_on_2,ov_2_on_1):
 	# return int(matched_distance(p2,np.array([p1_translated[0],p1_translated[1]])))
 	return int(abs(p2[0,0]-p1_translated[0])),int(abs(p2[0,1]-p1_translated[1]))
 
+def get_new_GPS_Coords(p1,p2,H):
+
+	rgb_img1 = p1.rgb_img
+	rgb_img2 = p2.rgb_img
+
+	c1 = [0,0,1]
+	
+	c1 = H.dot(c1).astype(int)
+	
+	# print(c1)
+
+	diff_x = -c1[0]
+	diff_y = -c1[1]
+
+	gps_scale_x = (p2.GPS_coords.UR_coord[0] - p2.GPS_coords.UL_coord[0])/(p2.size[1])
+	gps_scale_y = (p2.GPS_coords.LL_coord[1] - p2.GPS_coords.UL_coord[1])/(p2.size[0])
+
+	diff_x = diff_x*gps_scale_x
+	diff_y = diff_y*gps_scale_y
+
+	# print(diff_x,diff_y)
+	# print(p1.GPS_coords.UL_coord)
+	new_UL = (round(p2.GPS_coords.UL_coord[0]-diff_x,7),round(p2.GPS_coords.UL_coord[1]-diff_y,7))
+	# print(new_UL)
+	diff_UL = (p1.GPS_coords.UL_coord[0]-new_UL[0],p1.GPS_coords.UL_coord[1]-new_UL[1])
+
+	new_UR = (p1.GPS_coords.UR_coord[0]-diff_UL[0],p1.GPS_coords.UR_coord[1]-diff_UL[1])
+	new_LL = (p1.GPS_coords.LL_coord[0]-diff_UL[0],p1.GPS_coords.LL_coord[1]-diff_UL[1])
+	new_LR = (p1.GPS_coords.LR_coord[0]-diff_UL[0],p1.GPS_coords.LR_coord[1]-diff_UL[1])
+	new_center = (p1.GPS_coords.Center[0]-diff_UL[0],p1.GPS_coords.Center[1]-diff_UL[1])
+
+	new_coords = Patch_GPS_coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+
+	return new_coords
+
 def stitch_complete(patches,show,show2):
 	patches_tmp = patches.copy()
 
@@ -633,6 +684,9 @@ def stitch_complete(patches,show,show2):
 
 		patches_tmp.append(new_patch)
 
+		del p
+		del p2
+
 		i+=1
 
 	print('############ Stitching based on GPS only ############')
@@ -701,9 +755,6 @@ def stitch_complete(patches,show,show2):
 		gps_err[1] > (ov_1_on_2[3]-ov_1_on_2[1])/2:
 			H = find_homography_gps_only(ov_2_on_1,ov_1_on_2)
 
-		import gc
-		gc.collect()
-
 		result, MSE = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,H,ov_1_on_2,show2)
 
 		len_no_change = 0
@@ -713,6 +764,154 @@ def stitch_complete(patches,show,show2):
 		new_patch = Patch('New_{0}'.format(i),result,convert_to_gray(result),stitched_coords)
 
 		patches_tmp.append(new_patch)
+
+		del p
+		del p2
+
+		i+=1
+
+	return patches_tmp
+
+def correct_GPS_coords(patches,show,show2):
+
+	patches_tmp = patches.copy()
+
+	i = 0
+
+	best_f = 0
+	best_p = patches_tmp[0]
+
+	for p in patches_tmp:
+		overlaps = [p_n for p_n in patches_tmp if (p.has_overlap(p_n) or p_n.has_overlap(p))]
+		f = len(overlaps)
+
+		if f>best_f:
+			best_f = f
+			best_p = p
+
+	best_p.GPS_Corrected = True
+
+	while True:
+
+		not_corrected_patches = [p for p in patches_tmp if p.GPS_Corrected == False]
+		if len(not_corrected_patches) == 0:
+			break
+
+		p = not_corrected_patches[-1]
+		patches_tmp.remove(p)
+
+		overlaps = [p_n for p_n in patches_tmp if ((p_n.GPS_Corrected) and (p.has_overlap(p_n) or p_n.has_overlap(p)))]
+
+		if len(overlaps) == 0:
+			print('Type1 >>> No overlaps for {0}. push back...'.format(p.name))
+			patches_tmp.insert(0,p)
+			continue
+
+		p2,f_grbg = get_best_overlap(p,overlaps)
+		
+		ov_2_on_1 = p.get_overlap_rectangle(p2)
+		ov_1_on_2 = p2.get_overlap_rectangle(p)
+		
+		if (ov_2_on_1[0] == 0 and ov_2_on_1[1] == 0 and ov_2_on_1[2] == 0 and ov_2_on_1[3] == 0)\
+		or (ov_1_on_2[0] == 0 and ov_1_on_2[1] == 0 and ov_1_on_2[2] == 0 and ov_1_on_2[3] == 0):
+			print('Type2 >>> Empty overlap for {0}. push back...'.format(p.name))
+			patches_tmp.insert(0,p)
+			
+			continue
+
+		patches_tmp.insert(0,p)
+
+		kp1,desc1 = detect_SIFT_key_points(p.img,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],1,show)
+		kp2,desc2 = detect_SIFT_key_points(p2.img,ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],2,show)
+
+		matches = get_good_matches(desc2,desc1)
+
+		H,percentage_inliers = find_homography(matches,kp2,kp1,ov_2_on_1,ov_1_on_2,False)
+
+		print('----Number of matches: {0}\n\tPercentage Iliers: {1}'.format(len(matches),percentage_inliers))
+
+		if percentage_inliers<=0.1 or len(matches) < 40:
+			patches_tmp.insert(0,p)
+			patches_tmp.insert(0,p2)
+			print('\t*** Not enough inliers ...')
+			continue
+
+		gps_err = Get_GPS_Error(H,ov_1_on_2,ov_2_on_1)
+		
+		if gps_err[0] > (ov_1_on_2[2]-ov_1_on_2[0])/2 and \
+		gps_err[1] > (ov_1_on_2[3]-ov_1_on_2[1])/2:
+			patches_tmp.insert(0,p)
+			patches_tmp.insert(0,p2)
+			print('*** High GPS error ...')
+			continue
+
+		if show2:
+			G = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
+			result, MSE = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,G,ov_1_on_2,show2)
+
+		p.GPS_coords = get_new_GPS_Coords(p,p2,H)
+		p.GPS_Corrected = True
+
+		print('GPC corrected for {0}.'.format(p.name))
+
+		if show2:
+			ov_2_on_1 = p.get_overlap_rectangle(p2)
+			ov_1_on_2 = p2.get_overlap_rectangle(p)
+
+			G = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
+			result, MSE = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,G,ov_1_on_2,show2)
+
+	return patches_tmp
+
+def stitch_based_on_corrected_GPS(patches,show):
+	patches_tmp = patches.copy()
+
+	i = 0
+
+	len_no_change = 0
+
+	while len(patches_tmp)>1 and len_no_change<len(patches_tmp):
+		p = patches_tmp.pop()
+		len_no_change+=1
+
+		# p = choose_patch_with_largest_overlap(patches_tmp)
+		# patches_tmp.remove(p)
+
+		overlaps = [p_n for p_n in patches_tmp if (p.has_overlap(p_n) or p_n.has_overlap(p))]
+
+		if len(overlaps) == 0:
+			print('Type1 >>> No overlaps for {0}. push back...'.format(p.name))
+			patches_tmp.insert(0,p)
+			continue
+
+		p2,f_grbg = get_best_overlap(p,overlaps)
+		
+		ov_2_on_1 = p.get_overlap_rectangle(p2)
+		ov_1_on_2 = p2.get_overlap_rectangle(p)
+		
+		if (ov_2_on_1[0] == 0 and ov_2_on_1[1] == 0 and ov_2_on_1[2] == 0 and ov_2_on_1[3] == 0)\
+		or (ov_1_on_2[0] == 0 and ov_1_on_2[1] == 0 and ov_1_on_2[2] == 0 and ov_1_on_2[3] == 0):
+			print('Type2 >>> Empty overlap for {0}. push back...'.format(p.name))
+			patches_tmp.insert(0,p)
+			
+			continue
+
+		patches_tmp.remove(p2)
+		
+		H = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
+
+		result, MSE = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,H,ov_1_on_2,show)
+
+		len_no_change = 0
+		
+		stitched_coords = find_stitched_coords(p.GPS_coords,p2.GPS_coords)
+
+		new_patch = Patch('New_{0}'.format(i),result,convert_to_gray(result),stitched_coords)
+
+		patches_tmp.append(new_patch)
+
+		del p
+		del p2
 
 		i+=1
 
@@ -754,5 +953,8 @@ def show_and_save_final_patches(patches):
 # stitch(rgb_img2,rgb_img1,img2,img1,H)
 
 patches = read_all_data()
-final_patches = stitch_complete(patches,False,True)
+# final_patches = stitch_complete(patches,True,True)
+final_patches = correct_GPS_coords(patches,False,True)
+final_patches = stitch_based_on_corrected_GPS(final_patches,False)
+
 show_and_save_final_patches(final_patches)
