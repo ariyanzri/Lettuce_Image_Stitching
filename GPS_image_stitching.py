@@ -473,8 +473,7 @@ def parallel_patch_creator(address,filename,coord):
 	rgb,img = load_preprocess_image('{0}/{1}'.format(address,filename))
 	kp,desc = detect_SIFT_key_points(img,0,0,img.shape[1],img.shape[0],filename,False)
 	kp_tmp = [(p.pt, p.size, p.angle, p.response, p.octave, p.class_id) for p in kp]     
-	print(sys.getsizeof(rgb))
-	print(sys.getsizeof(img))  
+	
 	print('Patch created and SIFT generated for {0}'.format(filename))
 
 	return Patch(filename,None,None,coord,kp_tmp,desc,np.shape(img))
