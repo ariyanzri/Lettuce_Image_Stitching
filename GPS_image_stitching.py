@@ -480,7 +480,9 @@ def parallel_patch_creator(address,filename,coord):
 	p = Patch(filename,None,None,coord,kp_tmp,desc,size)
 	del img
 	del rgb
-
+	print(gc.get_count())
+	gc.collect()
+	print(gc.get_count())
 	return p
 
 def parallel_patch_creator_helper(args):
@@ -489,48 +491,7 @@ def parallel_patch_creator_helper(args):
 
 def read_all_data_on_server(patches_address,metadatafile_address):
 
-	patches = []
-
-	with open(metadatafile_address) as f:
-		lines = f.read()
-		lines = lines.replace('"','')
-
-		for l in lines.split('\n'):
-			if l == '':
-				break
-			if l == 'Filename,Upper left,Lower left,Upper right,Lower right,Center' or l == 'name,upperleft,lowerleft,uperright,lowerright,center':
-				continue
-
-			features = l.split(',')
-
-			filename = features[0]
-			upper_left = (float(features[1]),float(features[2]))
-			lower_left = (float(features[3]),float(features[4]))
-			upper_right = (float(features[5]),float(features[6]))
-			lower_right = (float(features[7]),float(features[8]))
-			center = (float(features[9]),float(features[10]))
-
-			print('{0}/{1}'.format(patches_address,filename))
-			rgb,img = load_preprocess_image('{0}/{1}'.format(patches_address,filename))
-			kp,desc = detect_SIFT_key_points(img,0,0,img.shape[1],img.shape[0],filename,False)
-			
-
-			coord = Patch_GPS_coordinate(upper_left,upper_right,lower_left,lower_right,center)
-			size = np.shape(img)
-
-			patch = Patch(filename,None,None,coord,kp,desc,size)
-			del img,rgb
-			print(gc.get_count())
-			gc.collect()
-			print(gc.get_count())
-			patches.append(patch)
-
-	return patches
-
-	# ----------------- parallelism SIFT detecting --------------------------
-
-	
-	# args_list = []
+	# patches = []
 
 	# with open(metadatafile_address) as f:
 	# 	lines = f.read()
@@ -551,20 +512,58 @@ def read_all_data_on_server(patches_address,metadatafile_address):
 	# 		lower_right = (float(features[7]),float(features[8]))
 	# 		center = (float(features[9]),float(features[10]))
 
+	# 		print('{0}/{1}'.format(patches_address,filename))
+	# 		rgb,img = load_preprocess_image('{0}/{1}'.format(patches_address,filename))
+	# 		kp,desc = detect_SIFT_key_points(img,0,0,img.shape[1],img.shape[0],filename,False)
+			
+
 	# 		coord = Patch_GPS_coordinate(upper_left,upper_right,lower_left,lower_right,center)
+	# 		size = np.shape(img)
+
+	# 		patch = Patch(filename,None,None,coord,kp,desc,size)
 			
-	# 		args_list.append((patches_address,filename,coord))
+	# 		patches.append(patch)
+
+	# return patches
+
+	# ----------------- parallelism SIFT detecting --------------------------
+
+	
+	args_list = []
+
+	with open(metadatafile_address) as f:
+		lines = f.read()
+		lines = lines.replace('"','')
+
+		for l in lines.split('\n'):
+			if l == '':
+				break
+			if l == 'Filename,Upper left,Lower left,Upper right,Lower right,Center' or l == 'name,upperleft,lowerleft,uperright,lowerright,center':
+				continue
+
+			features = l.split(',')
+
+			filename = features[0]
+			upper_left = (float(features[1]),float(features[2]))
+			lower_left = (float(features[3]),float(features[4]))
+			upper_right = (float(features[5]),float(features[6]))
+			lower_right = (float(features[7]),float(features[8]))
+			center = (float(features[9]),float(features[10]))
+
+			coord = Patch_GPS_coordinate(upper_left,upper_right,lower_left,lower_right,center)
+			
+			args_list.append((patches_address,filename,coord))
 			
 
-	# 	processes = multiprocessing.Pool(4)
-	# 	results = processes.map(parallel_patch_creator_helper,args_list)
+		processes = multiprocessing.Pool(4)
+		results = processes.map(parallel_patch_creator_helper,args_list)
 
-	# 	for r in results:
-	# 		tmp_kp = [cv2.KeyPoint(x=p[0][0],y=p[0][1],_size=p[1], _angle=p[2],_response=p[3], _octave=p[4], _class_id=p[5]) for p in r.Keypoints_location] 
-	# 		r.Keypoints_location = tmp_kp
+		for r in results:
+			tmp_kp = [cv2.KeyPoint(x=p[0][0],y=p[0][1],_size=p[1], _angle=p[2],_response=p[3], _octave=p[4], _class_id=p[5]) for p in r.Keypoints_location] 
+			r.Keypoints_location = tmp_kp
 
 
-	# return results
+	return results
 	
 def draw_GPS_coords_on_patch(patch,coord1,coord2,coord3,coord4):
 	img = patch.rgb_img.copy()
