@@ -473,10 +473,14 @@ def parallel_patch_creator(address,filename,coord):
 	rgb,img = load_preprocess_image('{0}/{1}'.format(address,filename))
 	kp,desc = detect_SIFT_key_points(img,0,0,img.shape[1],img.shape[0],filename,False)
 	kp_tmp = [(p.pt, p.size, p.angle, p.response, p.octave, p.class_id) for p in kp]     
-	
-	print('Patch created and SIFT generated for {0}'.format(filename))
 
-	return Patch(filename,None,None,coord,kp_tmp,desc,np.shape(img))
+	print('Patch created and SIFT generated for {0}'.format(filename))
+	size = np.shape(img)
+	p = Patch(filename,None,None,coord,kp_tmp,desc,size)
+	del img
+	del rgb
+
+	return p
 
 def parallel_patch_creator_helper(args):
 
@@ -553,6 +557,7 @@ def read_all_data_on_server(patches_address,metadatafile_address):
 		for r in results:
 			tmp_kp = [cv2.KeyPoint(x=p[0][0],y=p[0][1],_size=p[1], _angle=p[2],_response=p[3], _octave=p[4], _class_id=p[5]) for p in r.Keypoints_location] 
 			r.Keypoints_location = tmp_kp
+
 
 	return results
 	
@@ -1063,16 +1068,16 @@ def save_coordinates(final_patches,filename):
 
 def main():
 
-	# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
+	patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
 	# final_patches = stitch_complete(patches,True,True)
 	# final_patches = correct_GPS_coords(patches,False,False)
 	# final_patches = stitch_based_on_corrected_GPS(patches,True)
 	# save_coordinates(final_patches,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
 	# show_and_save_final_patches(final_patches)
 
-	patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv')
-	final_patches = correct_GPS_coords(patches,False,False)
-	save_coordinates(final_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
+	# patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv')
+	# final_patches = correct_GPS_coords(patches,False,False)
+	# save_coordinates(final_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
 
 def report_time(start,end):
 	print('Start date time: {0}\nEnd date time: {1}\nTotal running time: {2}.'.format(start,end,end-start))
