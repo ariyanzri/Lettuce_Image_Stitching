@@ -1061,6 +1061,6 @@ def save_coordinates(final_patches,filename):
 # save_coordinates(final_patches,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords3.txt')
 # show_and_save_final_patches(final_patches)
 
-patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020_01_08_coordinates.csv')
+patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv')
 final_patches = correct_GPS_coords(patches,False,False)
-save_coordinates(final_patches,'/data/plant/full_scans/metadata/2020_01_08_coordinates_CORRECTED.csv')
+save_coordinates(final_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
