@@ -3,6 +3,7 @@ import cv2
 import matplotlib.pyplot as plt
 import random
 import math
+import multiprocessing
 
 def convert_to_gray(img):
 	
@@ -26,6 +27,20 @@ def load_preprocess_image(address):
 	img_g = convert_to_gray(img)
 
 	return img, img_g
+
+def choose_SIFT_key_points(patch,x1,y1,x2,y2):
+	kp = []
+	desc = []
+
+	for i,k in enumerate(patch.Keypoints_location):
+		if k.pt[0]>= x1 and k.pt[0]<=x2 and k.pt[1]>=y1 and k.pt[1]<=y2:
+			kp.append(k)
+
+			desc.append(list(np.array(patch.Keypoints_desc[i,:])))
+
+	desc = np.array(desc)
+	
+	return kp,desc
 
 def detect_SIFT_key_points(img,x1,y1,x2,y2,n,show=False):
 	sift = cv2.xfeatures2d.SIFT_create()
@@ -51,6 +66,7 @@ def detect_SIFT_key_points(img,x1,y1,x2,y2,n,show=False):
 	return kp_n,desc
 
 def matched_distance(p1,p2):
+
 	return math.sqrt(np.sum((p1-p2)**2))
 
 def get_good_matches(desc1,desc2):
@@ -319,14 +335,19 @@ class Patch_GPS_coordinate:
 		return '---------------------------\nUL:{0}\nUR:{1}\nLL:{2}\nLR:{3}\n---------------------------\n'.format(self.UL_coord,self.UR_coord,self.LL_coord,self.LR_coord)
 	
 class Patch:
-	def __init__(self,name,rgb_img,img,coords):
+
+	def __init__(self,name,rgb_img,img,coords,kp=None,desc=None,size=None):
 		self.name = name
 		self.rgb_img = rgb_img
 		self.img = img
 		self.GPS_coords = coords
-		self.size = np.shape(img)
+		if size == None:
+			self.size = np.shape(img)
+		else:
+			self.size = size
 		self.GPS_Corrected = False
-
+		self.Keypoints_location = kp
+		self.Keypoints_desc = desc
 
 	def has_overlap(self,p):
 		if self.GPS_coords.is_coord_inside(p.GPS_coords.UL_coord) or self.GPS_coords.is_coord_inside(p.GPS_coords.UR_coord) or\
@@ -445,6 +466,91 @@ def read_all_data():
 				patch[0].GPS_coords = coord
 
 	return patches
+
+def parallel_patch_creator(address,filename,coord):
+	rgb,img = load_preprocess_image('{0}/{1}'.format(address,filename))
+	kp,desc = detect_SIFT_key_points(img,0,0,img.shape[1],img.shape[0],filename,False)
+
+	return Patch(filename,None,None,coord,kp,desc,np.shape(img))
+
+def parallel_patch_creator_helper(args):
+
+	return parallel_patch_creator(*args)
+
+def read_all_data_on_server(patches_address,metadatafile_address):
+
+	patches = []
+
+	with open(metadatafile_address) as f:
+		lines = f.read()
+		lines = lines.replace('"','')
+
+		for l in lines.split('\n'):
+			if l == '':
+				break
+			if l == 'Filename,Upper left,Lower left,Upper right,Lower right,Center' or l == 'name,upperleft,lowerleft,uperright,lowerright,center':
+				continue
+
+			features = l.split(',')
+
+			filename = features[0]
+			upper_left = (float(features[1]),float(features[2]))
+			lower_left = (float(features[3]),float(features[4]))
+			upper_right = (float(features[5]),float(features[6]))
+			lower_right = (float(features[7]),float(features[8]))
+			center = (float(features[9]),float(features[10]))
+
+
+			rgb,img = load_preprocess_image('{0}/{1}'.format(patches_address,filename))
+			kp,desc = detect_SIFT_key_points(img,0,0,img.shape[1],img.shape[0],filename,False)
+			
+
+			coord = Patch_GPS_coordinate(upper_left,upper_right,lower_left,lower_right,center)
+
+			patch = Patch(filename,None,None,coord,kp,desc,np.shape(img))
+			
+			patches.append(patch)
+
+	return patches
+
+	# ----------------- parallelism SIFT detecting --------------------------
+
+	# patches = {}
+	# args_list = []
+
+	# with open(metadatafile_address) as f:
+	# 	lines = f.read()
+	# 	lines = lines.replace('"','')
+
+	# 	for l in lines.split('\n'):
+	# 		if l == '':
+	# 			break
+	# 		if l == 'Filename,Upper left,Lower left,Upper right,Lower right,Center' or l == 'name,upperleft,lowerleft,uperright,lowerright,center':
+	# 			continue
+
+	# 		features = l.split(',')
+
+	# 		filename = features[0]
+	# 		upper_left = (float(features[1]),float(features[2]))
+	# 		lower_left = (float(features[3]),float(features[4]))
+	# 		upper_right = (float(features[5]),float(features[6]))
+	# 		lower_right = (float(features[7]),float(features[8]))
+	# 		center = (float(features[9]),float(features[10]))
+
+	# 		coord = Patch_GPS_coordinate(upper_left,upper_right,lower_left,lower_right,center)
+			
+	# 		args_list.append((patches_address,filename,coord))
+			
+
+	# 	processes = multiprocessing.Pool(4)
+	# 	results = processes.map(parallel_patch_creator_helper,args_list)
+	# 	print(results)
+	# 	# for r in results:
+	# 	# 	patches[r[2]].Keypoints_location = r[0]
+	# 	# 	patches[r[2]].Keypoints_desc = r[1]
+
+
+	# return list(patches.values())
 	
 def draw_GPS_coords_on_patch(patch,coord1,coord2,coord3,coord4):
 	img = patch.rgb_img.copy()
@@ -821,8 +927,11 @@ def correct_GPS_coords(patches,show,show2):
 
 		patches_tmp.insert(0,p)
 
-		kp1,desc1 = detect_SIFT_key_points(p.img,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],1,show)
-		kp2,desc2 = detect_SIFT_key_points(p2.img,ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],2,show)
+		# kp1,desc1 = detect_SIFT_key_points(p.img,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],1,show)
+		# kp2,desc2 = detect_SIFT_key_points(p2.img,ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],2,show)
+
+		kp1,desc1 = choose_SIFT_key_points(p,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3])
+		kp2,desc2 = choose_SIFT_key_points(p2,ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3])
 
 		matches = get_good_matches(desc2,desc1)
 
@@ -925,36 +1034,33 @@ def show_and_save_final_patches(patches):
 		cv2.imshow('fig',img_res)
 		cv2.waitKey(0)	
 
+def save_coordinates(final_patches,filename):
+	
+	final_results = 'Filename,Upper left,Lower left,Upper right,Lower right,Center\n'
 
-# rgb_img1,img1 = load_preprocess_image('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures/1a9de2f7-e67e-4283-a5e8-16d694a2258a_right.tif')
-# rgb_img2,img2 = load_preprocess_image('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures/1cb7e153-12b6-44f1-a834-720eca1117b3_right.tif')
+	for p in patches:
+		p.GPS_coords.UL_coord = (round(p.GPS_coords.UL_coord[0],7),round(p.GPS_coords.UL_coord[1],7))
+		p.GPS_coords.LL_coord = (round(p.GPS_coords.LL_coord[0],7),round(p.GPS_coords.LL_coord[1],7))
+		p.GPS_coords.UR_coord = (round(p.GPS_coords.UR_coord[0],7),round(p.GPS_coords.UR_coord[1],7))
+		p.GPS_coords.LR_coord = (round(p.GPS_coords.LR_coord[0],7),round(p.GPS_coords.LR_coord[1],7))
+		p.GPS_coords.Center = (round(p.GPS_coords.Center[0],7),round(p.GPS_coords.Center[1],7))
 
-# rgb_img1,img1 = load_preprocess_image('/home/ariyan/Desktop/a.png')
-# rgb_img2,img2 = load_preprocess_image('/home/ariyan/Desktop/b.png')
+		final_results += '{:s},"{:.7f},{:.7f}","{:.7f},{:.7f}","{:.7f},{:.7f}","{:.7f},{:.7f}","{:.7f},{:.7f}"\n'\
+		.format(p.name,p.GPS_coords.UL_coord[0],p.GPS_coords.UL_coord[1],p.GPS_coords.LL_coord[0],p.GPS_coords.LL_coord[1],p.GPS_coords.UR_coord[0],p.GPS_coords.UR_coord[1]\
+			,p.GPS_coords.LR_coord[0],p.GPS_coords.LR_coord[1],p.GPS_coords.Center[0],p.GPS_coords.Center[1])
 
-# kp1,desc1 = detect_SIFT_key_points(img1,int(np.shape(img1)[1]/2)+240,0,np.shape(img1)[1],np.shape(img1)[0])
-# kp2,desc2 = detect_SIFT_key_points(img2,0,0,int(np.shape(img2)[1]/2)-300,np.shape(img2)[0])
-# kp1,desc1 = detect_SIFT_key_points(img1,0,0,np.shape(img1)[1],np.shape(img1)[0])
-# kp2,desc2 = detect_SIFT_key_points(img2,0,0,np.shape(img2)[1],np.shape(img2)[0])
+	final_results = final_results.replace('(','"').replace(')','"')
 
-# matches = get_good_matches(desc1,desc2)
-# imm = hconcat_resize_min([img1,img2])
+	with open(filename,'w') as f:
+		f.write(final_results)
 
-
-# H = find_homography(matches,kp1,kp2)
-
-
-# # for m in matches[:,0]:
-# # 	cv2.line(imm,(int(kp1[m.queryIdx].pt[0]),int(kp1[m.queryIdx].pt[1])),(int(kp2[m.trainIdx].pt[0])+np.shape(img2)[1],int(kp2[m.trainIdx].pt[1])),(120,0,250))
-
-# # cv2.imshow('fig2',imm)
-# # cv2.waitKey(0)
-
-# stitch(rgb_img2,rgb_img1,img2,img1,H)
-
-patches = read_all_data()
+# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt')
 # final_patches = stitch_complete(patches,True,True)
-final_patches = correct_GPS_coords(patches,False,True)
-final_patches = stitch_based_on_corrected_GPS(final_patches,False)
+# final_patches = correct_GPS_coords(patches,False,False)
+# final_patches = stitch_based_on_corrected_GPS(patches,True)
+# save_coordinates(final_patches,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords3.txt')
+# show_and_save_final_patches(final_patches)
 
-show_and_save_final_patches(final_patches)
+patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020_01_08_coordinates.csv')
+final_patches = correct_GPS_coords(patches,False,False)
+save_coordinates(final_patches,'/data/plant/full_scans/metadata/2020_01_08_coordinates_CORRECTED.csv')
