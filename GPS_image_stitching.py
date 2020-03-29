@@ -6,6 +6,7 @@ import math
 import multiprocessing
 import datetime
 import sys
+import gc
 
 def convert_to_gray(img):
 	
@@ -515,9 +516,13 @@ def read_all_data_on_server(patches_address,metadatafile_address):
 			
 
 			coord = Patch_GPS_coordinate(upper_left,upper_right,lower_left,lower_right,center)
+			size = np.shape(img)
 
-			patch = Patch(filename,None,None,coord,kp,desc,np.shape(img))
-			
+			patch = Patch(filename,None,None,coord,kp,desc,size)
+			del img,rgb
+			print(gc.get_count())
+			gc.collect()
+			print(gc.get_count())
 			patches.append(patch)
 
 	return patches
