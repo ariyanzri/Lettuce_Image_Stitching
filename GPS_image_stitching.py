@@ -500,7 +500,7 @@ def read_all_data_on_server(patches_address,metadatafile_address):
 			lower_right = (float(features[7]),float(features[8]))
 			center = (float(features[9]),float(features[10]))
 
-
+			print('{0}/{1}'.format(patches_address,filename))
 			rgb,img = load_preprocess_image('{0}/{1}'.format(patches_address,filename))
 			kp,desc = detect_SIFT_key_points(img,0,0,img.shape[1],img.shape[0],filename,False)
 			
