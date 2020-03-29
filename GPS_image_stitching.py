@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 import random
 import math
 import multiprocessing
+import datetime
+import sys
 
 def convert_to_gray(img):
 	
@@ -470,7 +472,9 @@ def read_all_data():
 def parallel_patch_creator(address,filename,coord):
 	rgb,img = load_preprocess_image('{0}/{1}'.format(address,filename))
 	kp,desc = detect_SIFT_key_points(img,0,0,img.shape[1],img.shape[0],filename,False)
-	kp_tmp = [(p.pt, p.size, p.angle, p.response, p.octave, p.class_id) for p in kp]       
+	kp_tmp = [(p.pt, p.size, p.angle, p.response, p.octave, p.class_id) for p in kp]     
+	print(sys.getsizeof(rgb))
+	print(sys.getsizeof(img))  
 	print('Patch created and SIFT generated for {0}'.format(filename))
 
 	return Patch(filename,None,None,coord,kp_tmp,desc,np.shape(img))
@@ -544,7 +548,7 @@ def read_all_data_on_server(patches_address,metadatafile_address):
 			args_list.append((patches_address,filename,coord))
 			
 
-		processes = multiprocessing.Pool(24)
+		processes = multiprocessing.Pool(4)
 		results = processes.map(parallel_patch_creator_helper,args_list)
 
 		for r in results:
@@ -881,6 +885,8 @@ def stitch_complete(patches,show,show2):
 
 def correct_GPS_coords(patches,show,show2):
 
+	compute_neighbors(patches)
+
 	patches_tmp = patches.copy()
 
 	i = 0
@@ -962,6 +968,7 @@ def correct_GPS_coords(patches,show,show2):
 		p.GPS_coords = get_new_GPS_Coords(p,p2,H)
 		p.GPS_Corrected = True
 
+
 		print('GPC corrected for {0}.'.format(p.name))
 
 		if show2:
@@ -1039,7 +1046,7 @@ def save_coordinates(final_patches,filename):
 	
 	final_results = 'Filename,Upper left,Lower left,Upper right,Lower right,Center\n'
 
-	for p in patches:
+	for p in final_patches:
 		p.GPS_coords.UL_coord = (round(p.GPS_coords.UL_coord[0],7),round(p.GPS_coords.UL_coord[1],7))
 		p.GPS_coords.LL_coord = (round(p.GPS_coords.LL_coord[0],7),round(p.GPS_coords.LL_coord[1],7))
 		p.GPS_coords.UR_coord = (round(p.GPS_coords.UR_coord[0],7),round(p.GPS_coords.UR_coord[1],7))
@@ -1055,13 +1062,23 @@ def save_coordinates(final_patches,filename):
 	with open(filename,'w') as f:
 		f.write(final_results)
 
-# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
-# final_patches = stitch_complete(patches,True,True)
-# final_patches = correct_GPS_coords(patches,False,False)
-# final_patches = stitch_based_on_corrected_GPS(patches,True)
-# save_coordinates(final_patches,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
-# show_and_save_final_patches(final_patches)
+def main():
 
-patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv')
-final_patches = correct_GPS_coords(patches,False,False)
-save_coordinates(final_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
+	patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
+	# final_patches = stitch_complete(patches,True,True)
+	final_patches = correct_GPS_coords(patches,False,False)
+	# final_patches = stitch_based_on_corrected_GPS(patches,True)
+	save_coordinates(final_patches,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
+	# show_and_save_final_patches(final_patches)
+
+	# patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv')
+	# final_patches = correct_GPS_coords(patches,False,False)
+	# save_coordinates(final_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
+
+def report_time(start,end):
+	print('Start date time: {0}\nEnd date time: {1}\nTotal running time: {2}.'.format(start,end,end-start))
+
+start_time = datetime.datetime.now()
+main()
+end_time = datetime.datetime.now()
+report_time(start_time,end_time)
