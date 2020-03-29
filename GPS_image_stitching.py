@@ -472,7 +472,7 @@ def parallel_patch_creator(address,filename,coord):
 	kp,desc = detect_SIFT_key_points(img,0,0,img.shape[1],img.shape[0],filename,False)
 	kp_tmp = [(p.pt, p.size, p.angle, p.response, p.octave, p.class_id) for p in kp]       
 	print('Patch created and SIFT generated for {0}'.format(filename))
-	
+
 	return Patch(filename,None,None,coord,kp_tmp,desc,np.shape(img))
 
 def parallel_patch_creator_helper(args):
@@ -544,7 +544,7 @@ def read_all_data_on_server(patches_address,metadatafile_address):
 			args_list.append((patches_address,filename,coord))
 			
 
-		processes = multiprocessing.Pool(4)
+		processes = multiprocessing.Pool(24)
 		results = processes.map(parallel_patch_creator_helper,args_list)
 
 		for r in results:
