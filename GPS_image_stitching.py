@@ -566,7 +566,7 @@ def read_all_data_on_server(patches_address,metadatafile_address):
 			r.Keypoints_location = tmp_kp
 			results.append(r)
 			gc.collect()
-			print(globals())
+			
 
 
 		# results = processes.map(parallel_patch_creator_helper,args_list)
