@@ -33,15 +33,17 @@ def load_preprocess_image(address):
 
 	return img, img_g
 
-def choose_SIFT_key_points(patch,x1,y1,x2,y2):
+def choose_SIFT_key_points(patch,x1,y1,x2,y2,SIFT_address):
 	kp = []
 	desc = []
 
-	for i,k in enumerate(patch.Keypoints_location):
+	(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_address,patch.name.replace('.tif','')), "rb"))
+
+	for i,k in enumerate(kp_tmp):
 		if k[0]>= x1 and k[0]<=x2 and k[1]>=y1 and k[1]<=y2:
 			kp.append(k)
 
-			desc.append(list(np.array(patch.Keypoints_desc[i,:])))
+			desc.append(list(np.array(desc_tmp[i,:])))
 
 	desc = np.array(desc)
 	
@@ -359,6 +361,18 @@ class Patch:
 		else:
 			return False
 
+	def get_size_of(self):
+		print(sys.getsizeof(self.name))
+		print(sys.getsizeof(self.rgb_img))
+		print(sys.getsizeof(self.img))
+		print(sys.getsizeof(self.GPS_coords))
+		print(sys.getsizeof(self.size))
+		print(sys.getsizeof(self.GPS_Corrected))
+		print(sys.getsizeof(self.Keypoints_location[0][0]))
+		print(sys.getsizeof(self.Keypoints_desc[0][0]))
+
+		print(len(self.Keypoints_desc[0]))
+
 	def get_overlap_rectangle(self,patch,increase_size=True):
 		p1_x = 0
 		p1_y = 0
@@ -477,27 +491,29 @@ def read_all_data():
 
 	return patches
 
-def parallel_patch_creator(address,filename,coord):
+def parallel_patch_creator(address,filename,coord,SIFT_address):
 	rgb,img = load_preprocess_image('{0}/{1}'.format(address,filename))
 	kp,desc = detect_SIFT_key_points(img,0,0,img.shape[1],img.shape[0],filename,False)
 	# *** kp_tmp = [(p.pt, p.size, p.angle, p.response, p.octave, p.class_id) for p in kp]
-	kp_tmp = [(p.pt[0], p.pt[1]) for p in kp]
+	kp_tmp = [(int(p.pt[0]), int(p.pt[1])) for p in kp]
 
 	print('Patch created and SIFT generated for {0}'.format(filename))
+
 	sys.stdout.flush()
 	size = np.shape(img)
 
-	del rgb,img
+	pickle.dump((kp_tmp,desc), open('{0}/{1}_SIFT.data'.format(SIFT_address,filename.replace('.tif','')), "wb"))
 
-	p = Patch(filename,None,None,coord,kp_tmp,desc,size)
+	p = Patch(filename,None,None,coord,None,None,size)
 	
+	del rgb,img,kp,kp_tmp,desc
 	return p
 
 def parallel_patch_creator_helper(args):
 
 	return parallel_patch_creator(*args)
 
-def read_all_data_on_server(patches_address,metadatafile_address):
+def read_all_data_on_server(patches_address,metadatafile_address,SIFT_address):
 
 	# patches = []
 
@@ -561,32 +577,10 @@ def read_all_data_on_server(patches_address,metadatafile_address):
 
 			coord = Patch_GPS_coordinate(upper_left,upper_right,lower_left,lower_right,center)
 			
-			args_list.append((patches_address,filename,coord))
+			args_list.append((patches_address,filename,coord,SIFT_address))
 
-		i = 0
-		while len(args_list)>0:
-			new_arglist = args_list[:1000]
-			del args_list[:1000]
-
-			processes = multiprocessing.Pool(20)
-			results = processes.map(parallel_patch_creator_helper,new_arglist)
-			with open('tmp_{0}.data'.format(i), 'wb') as filehandle:
-			    pickle.dump(results, filehandle)
-			    i+=1
-
-			processes.close()
-
-	results = []
-	
-	i-=1
-	while i>=0:
-		with open('tmp_{0}.data'.format(i), 'rb') as filehandle:
-		    rs = pickle.load(filehandle)
-		    results = results+rs
-		os.remove('tmp_{0}.data'.format(i))
-		i-=1
-
-		# processes = multiprocessing.Pool(24)
+		
+		processes = multiprocessing.Pool(24)
 		
 		# iterable = processes.imap(parallel_patch_creator_helper,args_list)
 		# results = []
@@ -599,7 +593,7 @@ def read_all_data_on_server(patches_address,metadatafile_address):
 			
 
 
-		# results = processes.map(parallel_patch_creator_helper,args_list)
+		results = processes.map(parallel_patch_creator_helper,args_list)
 
 		# for r in results:
 		# 	tmp_kp = [cv2.KeyPoint(x=p[0][0],y=p[0][1],_size=p[1], _angle=p[2],_response=p[3], _octave=p[4], _class_id=p[5]) for p in r.Keypoints_location] 
@@ -934,7 +928,7 @@ def stitch_complete(patches,show,show2):
 
 	return patches_tmp
 
-def correct_GPS_coords(patches,show,show2):
+def correct_GPS_coords(patches,show,show2,SIFT_address):
 
 	patches_tmp = patches.copy()
 
@@ -986,8 +980,8 @@ def correct_GPS_coords(patches,show,show2):
 		# kp1,desc1 = detect_SIFT_key_points(p.img,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],1,show)
 		# kp2,desc2 = detect_SIFT_key_points(p2.img,ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],2,show)
 
-		kp1,desc1 = choose_SIFT_key_points(p,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3])
-		kp2,desc2 = choose_SIFT_key_points(p2,ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3])
+		kp1,desc1 = choose_SIFT_key_points(p,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],SIFT_address)
+		kp2,desc2 = choose_SIFT_key_points(p2,ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],SIFT_address)
 
 		matches = get_good_matches(desc2,desc1)
 
@@ -1113,17 +1107,17 @@ def save_coordinates(final_patches,filename):
 
 def main():
 
-	# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt')
+	# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')
 	# patches = read_all_data()
 
 	# final_patches = stitch_complete(patches,True,True)
-	# final_patches = correct_GPS_coords(patches,False,False)
+	# final_patches = correct_GPS_coords(patches,False,False,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')
 	# final_patches = stitch_based_on_corrected_GPS(patches,True)
 	# save_coordinates(final_patches,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
 	# show_and_save_final_patches(final_patches)
 
-	patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv')
-	final_patches = correct_GPS_coords(patches,False,False)
+	patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT')
+	final_patches = correct_GPS_coords(patches,False,False,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
 	save_coordinates(final_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
 
 def report_time(start,end):
