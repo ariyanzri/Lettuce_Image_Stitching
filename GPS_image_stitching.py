@@ -477,10 +477,10 @@ def read_all_data():
 
 	return patches
 
-def parallel_patch_creator(address,filename,coord,SIFT_address):
+def parallel_patch_creator(address,filename,coord,SIFT_address,calc_SIFT=True):
 	rgb,img = load_preprocess_image('{0}/{1}'.format(address,filename))
 	
-	if not os.path.exists('{0}/{1}_SIFT.data'.format(SIFT_address,filename.replace('.tif',''))):
+	if calc_SIFT:
 		kp,desc = detect_SIFT_key_points(img,0,0,img.shape[1],img.shape[0],filename,False)
 		# *** kp_tmp = [(p.pt, p.size, p.angle, p.response, p.octave, p.class_id) for p in kp]
 		kp_tmp = [(int(p.pt[0]), int(p.pt[1])) for p in kp]
@@ -501,7 +501,7 @@ def parallel_patch_creator_helper(args):
 
 	return parallel_patch_creator(*args)
 
-def read_all_data_on_server(patches_address,metadatafile_address,SIFT_address):
+def read_all_data_on_server(patches_address,metadatafile_address,SIFT_address,calc_SIFT=True):
 
 	# patches = []
 
@@ -565,7 +565,7 @@ def read_all_data_on_server(patches_address,metadatafile_address,SIFT_address):
 
 			coord = Patch_GPS_coordinate(upper_left,upper_right,lower_left,lower_right,center)
 			
-			args_list.append((patches_address,filename,coord,SIFT_address))
+			args_list.append((patches_address,filename,coord,SIFT_address,calc_SIFT))
 
 		
 		processes = multiprocessing.Pool(28)
@@ -1208,7 +1208,7 @@ def main():
 	# save_coordinates(final_patches,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
 	# show_and_save_final_patches(final_patches)
 
-	patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT')
+	patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
 	final_patches = correct_GPS_coords(patches,False,False,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
 	save_coordinates(final_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
 
