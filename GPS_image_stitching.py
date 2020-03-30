@@ -477,7 +477,7 @@ def read_all_data():
 
 	return patches
 
-def parallel_patch_creator(address,filename,coord,SIFT_address,calc_SIFT=True):
+def parallel_patch_creator(address,filename,coord,SIFT_address,calc_SIFT):
 	rgb,img = load_preprocess_image('{0}/{1}'.format(address,filename))
 	
 	if calc_SIFT:
@@ -501,7 +501,7 @@ def parallel_patch_creator_helper(args):
 
 	return parallel_patch_creator(*args)
 
-def read_all_data_on_server(patches_address,metadatafile_address,SIFT_address,calc_SIFT=True):
+def read_all_data_on_server(patches_address,metadatafile_address,SIFT_address,calc_SIFT):
 
 	# patches = []
 
@@ -1022,8 +1022,6 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 	patches_tmp = patches.copy()
 	not_corrected_patches = []
 
-	i = 0
-
 	best_f = 0
 	best_p = patches_tmp[0]
 
@@ -1040,7 +1038,11 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 	best_p.GPS_Corrected = True
 	not_corrected_patches = not_corrected_patches+best_p.overlaps
 
+	number_of_iterations_without_change = 0
+
 	while True:
+
+		# random.shuffle(not_corrected_patches)
 
 		sys.stdout.flush()
 
@@ -1050,11 +1052,12 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 
 		p = not_corrected_patches.pop()
 
-		overlaps = [p_n for p_n in p.overlaps if ((p_n.GPS_Corrected))]
+		overlaps = [p_n for p_n in p.overlaps if p_n.GPS_Corrected]
 
 		if len(overlaps) == 0:
 			print('Type1 >>> No corrected overlaps for {0}. push back...'.format(p.name))
 			not_corrected_patches.insert(0,p)
+			number_of_iterations_without_change+=1
 			continue
 
 		p2,f_grbg = get_best_overlap(p,overlaps)
@@ -1066,7 +1069,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 		or (ov_1_on_2[0] == 0 and ov_1_on_2[1] == 0 and ov_1_on_2[2] == 0 and ov_1_on_2[3] == 0):
 			print('Type2 >>> Empty overlap for {0}. push back...'.format(p.name))
 			not_corrected_patches.insert(0,p)
-			
+			number_of_iterations_without_change+=1
 			continue
 
 		# kp1,desc1 = detect_SIFT_key_points(p.img,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],1,show)
@@ -1081,18 +1084,22 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 
 		print('----Number of matches: {0}\n\tPercentage Iliers: {1}'.format(len(matches),percentage_inliers))
 
-		if percentage_inliers<=0.1 or len(matches) < 40:
+		if (number_of_iterations_without_change<=len(not_corrected_patches)) and (percentage_inliers<=0.1 or len(matches) < 40):
 			not_corrected_patches.insert(0,p)
 			print('\t*** Not enough inliers ...')
+			number_of_iterations_without_change+=1
 			continue
 
 		gps_err = Get_GPS_Error(H,ov_1_on_2,ov_2_on_1)
 		
-		if gps_err[0] > (ov_1_on_2[2]-ov_1_on_2[0])/2 and \
-		gps_err[1] > (ov_1_on_2[3]-ov_1_on_2[1])/2:
-			not_corrected_patches.insert(0,p)
-			print('*** High GPS error ...')
-			continue
+		if gps_err[0] > (ov_1_on_2[2]-ov_1_on_2[0])/2 and gps_err[1] > (ov_1_on_2[3]-ov_1_on_2[1])/2:
+			if (number_of_iterations_without_change<=len(not_corrected_patches)):
+				not_corrected_patches.insert(0,p)
+				print('*** High GPS error ...')
+				number_of_iterations_without_change+=1
+				continue
+			else:
+				H = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
 
 		if show2:
 			G = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
@@ -1103,6 +1110,8 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 		not_corrected_patches = list(set(not_corrected_patches + [p_n for p_n in p.overlaps if not p_n.GPS_Corrected]))
 
 		print('GPC corrected for {0}.'.format(p.name))
+
+		number_of_iterations_without_change = 0
 
 		if show2:
 			ov_2_on_1 = p.get_overlap_rectangle(p2)
@@ -1198,7 +1207,7 @@ def save_coordinates(final_patches,filename):
 
 def main():
 
-	# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')
+	# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT',True)
 	# patches = read_all_data()
 
 	# final_patches = stitch_complete(patches,True,True)
@@ -1209,7 +1218,7 @@ def main():
 	# show_and_save_final_patches(final_patches)
 
 	patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
-	final_patches = correct_GPS_coords(patches,False,False,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
+	final_patches = correct_GPS_coords_new_code(patches,False,False,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
 	save_coordinates(final_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
 
 def report_time(start,end):
