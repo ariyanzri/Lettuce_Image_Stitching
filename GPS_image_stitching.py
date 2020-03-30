@@ -480,7 +480,7 @@ def parallel_patch_creator(address,filename,coord):
 	size = np.shape(img)
 
 	del rgb,img
-	
+
 	p = Patch(filename,None,None,coord,kp_tmp,desc,size)
 	
 	return p
@@ -566,8 +566,7 @@ def read_all_data_on_server(patches_address,metadatafile_address):
 			r.Keypoints_location = tmp_kp
 			results.append(r)
 			gc.collect()
-
-			print('{0} MB'.format(sys.getsizeof(results)/(1024**2.0)))
+			print(globals())
 
 
 		# results = processes.map(parallel_patch_creator_helper,args_list)
