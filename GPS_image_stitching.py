@@ -555,7 +555,7 @@ def read_all_data_on_server(patches_address,metadatafile_address):
 			args_list.append((patches_address,filename,coord))
 			
 
-		processes = multiprocessing.Pool(24)
+		processes = multiprocessing.Pool(16)
 		
 		iterable = processes.imap(parallel_patch_creator_helper,args_list)
 		results = []
