@@ -478,11 +478,7 @@ def parallel_patch_creator(address,filename,coord):
 	print('Patch created and SIFT generated for {0}'.format(filename))
 	size = np.shape(img)
 	p = Patch(filename,None,None,coord,kp_tmp,desc,size)
-	del img
-	del rgb
-	print(gc.get_count())
-	gc.collect()
-	print(gc.get_count())
+	
 	return p
 
 def parallel_patch_creator_helper(args):
@@ -555,12 +551,22 @@ def read_all_data_on_server(patches_address,metadatafile_address):
 			args_list.append((patches_address,filename,coord))
 			
 
-		processes = multiprocessing.Pool(4)
-		results = processes.map(parallel_patch_creator_helper,args_list)
-
-		for r in results:
+		processes = multiprocessing.Pool(24)
+		
+		iterable = processes.imap(parallel_patch_creator_helper,args_list)
+		results = []
+		for arg in args_list:
+			r = next(iterable)
 			tmp_kp = [cv2.KeyPoint(x=p[0][0],y=p[0][1],_size=p[1], _angle=p[2],_response=p[3], _octave=p[4], _class_id=p[5]) for p in r.Keypoints_location] 
 			r.Keypoints_location = tmp_kp
+			results.append(r)
+
+
+		# results = processes.map(parallel_patch_creator_helper,args_list)
+
+		# for r in results:
+		# 	tmp_kp = [cv2.KeyPoint(x=p[0][0],y=p[0][1],_size=p[1], _angle=p[2],_response=p[3], _octave=p[4], _class_id=p[5]) for p in r.Keypoints_location] 
+		# 	r.Keypoints_location = tmp_kp
 
 
 	return results
@@ -1084,6 +1090,7 @@ def main():
 	save_coordinates(final_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
 
 def report_time(start,end):
+	print('-----------------------------------------------------------')
 	print('Start date time: {0}\nEnd date time: {1}\nTotal running time: {2}.'.format(start,end,end-start))
 
 start_time = datetime.datetime.now()
