@@ -7,6 +7,8 @@ import multiprocessing
 import datetime
 import sys
 import gc
+import pickle
+import os
 
 def convert_to_gray(img):
 	
@@ -439,32 +441,39 @@ def read_all_data():
 
 	patches = []
 
-	with open('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/files.txt') as f:
-		lines = f.read()
-		for l in lines.split('\n'):
-			if l == '':
-				break
+	# with open('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/files.txt') as f:
+	# 	lines = f.read()
+	# 	for l in lines.split('\n'):
+	# 		if l == '':
+	# 			break
 
-			rgb,img = load_preprocess_image('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures/{0}.tif'.format(l))
-			patches.append(Patch(l,rgb,img,None))
+	# 		rgb,img = load_preprocess_image('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures/{0}.tif'.format(l))
+	# 		patches.append(Patch(l,rgb,img,None))
 	
-	with open('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt') as f:
+	with open('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt') as f:
 		lines = f.read()
+		lines = lines.replace('"','')
+
 		for l in lines.split('\n'):
 			if l == '':
 				break
+			if l == 'Filename,Upper left,Lower left,Upper right,Lower right,Center' or l == 'name,upperleft,lowerleft,uperright,lowerright,center':
+				continue
 
 			features = l.split(',')
 
-			patch = [p for p in patches if p.name == features[0]]
-			if len(patch) != 0:
-				coord = Patch_GPS_coordinate((float(features[1].split(';')[0]),float(features[1].split(';')[1])),\
-					(float(features[3].split(';')[0]),float(features[3].split(';')[1])),\
-					(float(features[2].split(';')[0]),float(features[2].split(';')[1])),\
-					(float(features[4].split(';')[0]),float(features[4].split(';')[1])),\
-					(float(features[5].split(';')[0]),float(features[5].split(';')[1])))
+			rgb,img = load_preprocess_image('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures/{0}'.format(features[0]))
 
-				patch[0].GPS_coords = coord
+			upper_left = (float(features[1]),float(features[2]))
+			lower_left = (float(features[3]),float(features[4]))
+			upper_right = (float(features[5]),float(features[6]))
+			lower_right = (float(features[7]),float(features[8]))
+			center = (float(features[9]),float(features[10]))
+
+			coord = Patch_GPS_coordinate(upper_left,upper_right,lower_left,lower_right,center)
+
+			patch = Patch(l,rgb,img,coord)
+			patches.append(patch)
 
 	return patches
 
@@ -553,9 +562,31 @@ def read_all_data_on_server(patches_address,metadatafile_address):
 			coord = Patch_GPS_coordinate(upper_left,upper_right,lower_left,lower_right,center)
 			
 			args_list.append((patches_address,filename,coord))
-			
 
-		processes = multiprocessing.Pool(24)
+		i = 0
+		while len(args_list)>0:
+			new_arglist = args_list[:1000]
+			del args_list[:1000]
+
+			processes = multiprocessing.Pool(20)
+			results = processes.map(parallel_patch_creator_helper,new_arglist)
+			with open('tmp_{0}.data'.format(i), 'wb') as filehandle:
+			    pickle.dump(results, filehandle)
+			    i+=1
+
+			processes.close()
+
+	results = []
+	
+	i-=1
+	while i>=0:
+		with open('tmp_{0}.data'.format(i), 'rb') as filehandle:
+		    rs = pickle.load(filehandle)
+		    results = results+rs
+		os.remove('tmp_{0}.data'.format(i))
+		i-=1
+
+		# processes = multiprocessing.Pool(24)
 		
 		# iterable = processes.imap(parallel_patch_creator_helper,args_list)
 		# results = []
@@ -568,7 +599,7 @@ def read_all_data_on_server(patches_address,metadatafile_address):
 			
 
 
-		results = processes.map(parallel_patch_creator_helper,args_list)
+		# results = processes.map(parallel_patch_creator_helper,args_list)
 
 		# for r in results:
 		# 	tmp_kp = [cv2.KeyPoint(x=p[0][0],y=p[0][1],_size=p[1], _angle=p[2],_response=p[3], _octave=p[4], _class_id=p[5]) for p in r.Keypoints_location] 
@@ -1082,7 +1113,9 @@ def save_coordinates(final_patches,filename):
 
 def main():
 
-	# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
+	# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt')
+	# patches = read_all_data()
+
 	# final_patches = stitch_complete(patches,True,True)
 	# final_patches = correct_GPS_coords(patches,False,False)
 	# final_patches = stitch_based_on_corrected_GPS(patches,True)
