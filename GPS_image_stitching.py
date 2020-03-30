@@ -476,6 +476,7 @@ def parallel_patch_creator(address,filename,coord):
 	kp_tmp = [(p.pt, p.size, p.angle, p.response, p.octave, p.class_id) for p in kp]     
 
 	print('Patch created and SIFT generated for {0}'.format(filename))
+	sys.stdout.flush()
 	size = np.shape(img)
 	p = Patch(filename,None,None,coord,kp_tmp,desc,size)
 	
