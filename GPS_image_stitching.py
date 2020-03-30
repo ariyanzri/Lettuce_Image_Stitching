@@ -486,10 +486,9 @@ def parallel_patch_creator(address,filename,coord,SIFT_address,calc_SIFT):
 		kp_tmp = [(int(p.pt[0]), int(p.pt[1])) for p in kp]
 		pickle.dump((kp_tmp,desc), open('{0}/{1}_SIFT.data'.format(SIFT_address,filename.replace('.tif','')), "wb"))
 		del kp,kp_tmp,desc
-		sys.stdout.flush()
 		
 	print('Patch created and SIFT generated for {0}'.format(filename))
-
+	sys.stdout.flush()
 	
 	size = np.shape(img)
 
@@ -588,8 +587,6 @@ def read_all_data_on_server(patches_address,metadatafile_address,SIFT_address,ca
 		# 	tmp_kp = [cv2.KeyPoint(x=p[0][0],y=p[0][1],_size=p[1], _angle=p[2],_response=p[3], _octave=p[4], _class_id=p[5]) for p in r.Keypoints_location] 
 		# 	r.Keypoints_location = tmp_kp
 
-	sys.stdout.flush()
-	
 	return results
 	
 def draw_GPS_coords_on_patch(patch,coord1,coord2,coord3,coord4):
