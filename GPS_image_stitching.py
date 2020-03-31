@@ -1130,7 +1130,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 			print(result_string)
 			number_of_iterations_without_change+=1
 			p.area_score*=0.9
-			visualize_single_run(H,p,p2,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],SIFT_address)
+			# visualize_single_run(H,p,p2,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],SIFT_address)
 			continue
 
 		gps_err = Get_GPS_Error(H,ov_1_on_2,ov_2_on_1)
@@ -1142,7 +1142,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 				print(result_string)
 				number_of_iterations_without_change+=1
 				p.area_score*=0.9
-				visualize_single_run(H,p,p2,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],SIFT_address)
+				# visualize_single_run(H,p,p2,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],SIFT_address)
 				continue
 			else:
 				H = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
