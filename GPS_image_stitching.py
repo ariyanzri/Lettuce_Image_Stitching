@@ -310,7 +310,7 @@ def stitch(rgb_img1,rgb_img2,img1,img2,H,overlap,show=False,write_out=False,appl
 	dst = dst[y:y+h, x:x+w,:]
 	
 	if show:
-		cv2.imshow('fig',dst2)
+		cv2.imshow('fig 3',dst2)
 		cv2.waitKey(0)
 
 	if write_out:
@@ -1030,6 +1030,9 @@ def correct_GPS_coords(patches,show,show2,SIFT_address):
 	return patches_tmp
 
 def visualize_single_run(H,p,p2,x1,y1,x2,y2,x11,y11,x22,y22,SIFT_address):
+	print(p.name)
+	print(p2.name)
+	
 	img1,black1 = load_preprocess_image('{0}/{1}'.format(SIFT_address.replace('SIFT','bin2tif_out'),p.name))
 	img2,black2 = load_preprocess_image('{0}/{1}'.format(SIFT_address.replace('SIFT','bin2tif_out'),p2.name))
 
@@ -1045,7 +1048,6 @@ def visualize_single_run(H,p,p2,x1,y1,x2,y2,x11,y11,x22,y22,SIFT_address):
 	cv2.imshow('fig {0}'.format(1),img2)
 	cv2.waitKey(0)	
 
-
 	stitch(img1,img2,black1,black2,H,(x11,y11,x22,y22),True)
 
 
@@ -1058,7 +1060,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 	best_p = patches_tmp[0]
 
 	for p in patches_tmp:
-		overlaps = [p_n for p_n in patches_tmp if p_n!=p and (p.has_overlap(p_n) or p_n.has_overlap(p))]
+		overlaps = [p_n for p_n in patches_tmp if p_n.name != p.name and (p.has_overlap(p_n) or p_n.has_overlap(p))]
 		p.overlaps = overlaps
 		p.claculate_area_score()
 
@@ -1129,6 +1131,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 			print(result_string)
 			number_of_iterations_without_change+=1
 			p.area_score*=0.9
+			visualize_single_run(H,p,p2,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],SIFT_address)
 			continue
 
 		gps_err = Get_GPS_Error(H,ov_1_on_2,ov_2_on_1)
@@ -1140,6 +1143,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 				print(result_string)
 				number_of_iterations_without_change+=1
 				p.area_score*=0.9
+				visualize_single_run(H,p,p2,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],SIFT_address)
 				continue
 			else:
 				H = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
