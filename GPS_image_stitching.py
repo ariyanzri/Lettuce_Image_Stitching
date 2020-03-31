@@ -9,6 +9,8 @@ import sys
 import gc
 import pickle
 import os
+import threading
+from heapq import heappush, heappop, heapify
 
 def convert_to_gray(img):
 	
@@ -351,6 +353,16 @@ class Patch:
 		else:
 			self.size = size
 		self.GPS_Corrected = False
+		self.area_score = 0
+		self.overlaps = None
+
+	def claculate_area_score(self):
+		score = 0
+		for n in self.overlaps:
+			overlap_rect = self.get_overlap_rectangle(n,False)
+			score+=abs(overlap_rect[2]-overlap_rect[0])*abs(overlap_rect[3]-overlap_rect[1])
+
+		self.area_score = -1*score
 
 	def has_overlap(self,p):
 		if self.GPS_coords.is_coord_inside(p.GPS_coords.UL_coord) or self.GPS_coords.is_coord_inside(p.GPS_coords.UR_coord) or\
@@ -483,7 +495,7 @@ def parallel_patch_creator(address,filename,coord,SIFT_address,calc_SIFT):
 	if calc_SIFT:
 		kp,desc = detect_SIFT_key_points(img,0,0,img.shape[1],img.shape[0],filename,False)
 		# *** kp_tmp = [(p.pt, p.size, p.angle, p.response, p.octave, p.class_id) for p in kp]
-		kp_tmp = [(int(p.pt[0]), int(p.pt[1])) for p in kp]
+		kp_tmp = [(p.pt[0], p.pt[1]) for p in kp]
 		pickle.dump((kp_tmp,desc), open('{0}/{1}_SIFT.data'.format(SIFT_address,filename.replace('.tif','')), "wb"))
 		del kp,kp_tmp,desc
 		
@@ -568,7 +580,7 @@ def read_all_data_on_server(patches_address,metadatafile_address,SIFT_address,ca
 			args_list.append((patches_address,filename,coord,SIFT_address,calc_SIFT))
 
 		
-		processes = multiprocessing.Pool(28)
+		processes = multiprocessing.Pool(4)
 		
 		# iterable = processes.imap(parallel_patch_creator_helper,args_list)
 		# results = []
@@ -582,6 +594,7 @@ def read_all_data_on_server(patches_address,metadatafile_address,SIFT_address,ca
 
 
 		results = processes.map(parallel_patch_creator_helper,args_list)
+		processes.close()
 
 		# for r in results:
 		# 	tmp_kp = [cv2.KeyPoint(x=p[0][0],y=p[0][1],_size=p[1], _angle=p[2],_response=p[3], _octave=p[4], _class_id=p[5]) for p in r.Keypoints_location] 
@@ -1027,6 +1040,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 	for p in patches_tmp:
 		overlaps = [p_n for p_n in patches_tmp if p_n!=p and (p.has_overlap(p_n) or p_n.has_overlap(p))]
 		p.overlaps = overlaps
+		p.claculate_area_score()
 
 		f = len(overlaps)
 
@@ -1035,12 +1049,15 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 			best_p = p
 
 	best_p.GPS_Corrected = True
-	not_corrected_patches = not_corrected_patches+best_p.overlaps
+	not_corrected_patches = not_corrected_patches+[(t.area_score,t) for t in best_p.overlaps]
+
+	heapify(not_corrected_patches)
 
 	number_of_iterations_without_change = 0
 
 	while True:
 
+		result_string = ''
 		# random.shuffle(not_corrected_patches)
 
 		sys.stdout.flush()
@@ -1049,13 +1066,15 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 		if len(not_corrected_patches) == 0:
 			break
 
-		p = not_corrected_patches.pop()
+		sc_tmp,p = heappop(not_corrected_patches)
+		result_string+='Patch {0}'.format(p.name)
 
 		overlaps = [p_n for p_n in p.overlaps if p_n.GPS_Corrected]
 
 		if len(overlaps) == 0:
-			print('Type1 >>> No corrected overlaps for {0}. push back...'.format(p.name))
-			not_corrected_patches.insert(0,p)
+			result_string+=' <ERR: No overlaps>'
+			print(result_string)
+			heappush(not_corrected_patches,(p.area_score,p))
 			number_of_iterations_without_change+=1
 			continue
 
@@ -1066,8 +1085,9 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 		
 		if (ov_2_on_1[0] == 0 and ov_2_on_1[1] == 0 and ov_2_on_1[2] == 0 and ov_2_on_1[3] == 0)\
 		or (ov_1_on_2[0] == 0 and ov_1_on_2[1] == 0 and ov_1_on_2[2] == 0 and ov_1_on_2[3] == 0):
-			print('Type2 >>> Empty overlap for {0}. push back...'.format(p.name))
-			not_corrected_patches.insert(0,p)
+			result_string+=' <ERR: Empty overlap>'
+			print(result_string)
+			heappush(not_corrected_patches,(p.area_score,p))
 			number_of_iterations_without_change+=1
 			continue
 
@@ -1081,20 +1101,23 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 
 		H,percentage_inliers = find_homography(matches,kp2,kp1,ov_2_on_1,ov_1_on_2,False)
 
-		print('----Number of matches: {0}\n\tPercentage Iliers: {1}'.format(len(matches),percentage_inliers))
+		percentage_inliers = round(percentage_inliers*100,2)
 
-		if (number_of_iterations_without_change<=len(not_corrected_patches)) and (percentage_inliers<=0.1 or len(matches) < 40):
-			not_corrected_patches.insert(0,p)
-			print('\t*** Not enough inliers ...')
+		if (number_of_iterations_without_change<=len(not_corrected_patches)) and (percentage_inliers<=10 or len(matches) < 40):
+			heappush(not_corrected_patches,(p.area_score,p))
+			result_string+=' <ERR: Low inliers> --> ({0},{1}%)'.format(len(matches),percentage_inliers)
+			print(result_string)
 			number_of_iterations_without_change+=1
+			p.area_score*=0.9
 			continue
 
 		gps_err = Get_GPS_Error(H,ov_1_on_2,ov_2_on_1)
 		
 		if gps_err[0] > (ov_1_on_2[2]-ov_1_on_2[0])/2 and gps_err[1] > (ov_1_on_2[3]-ov_1_on_2[1])/2:
 			if (number_of_iterations_without_change<=len(not_corrected_patches)):
-				not_corrected_patches.insert(0,p)
-				print('*** High GPS error ...')
+				heappush(not_corrected_patches,(p.area_score,p))
+				result_string+=' <ERR: High GPS error> --> ({0},{1}%,<{2},{3}>)'.format(len(matches),percentage_inliers,gps_err[0],gps_err[1])
+				print(result_string)
 				number_of_iterations_without_change+=1
 				continue
 			else:
@@ -1104,11 +1127,22 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 			G = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
 			result, MSE = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,G,ov_1_on_2,show2)
 
+		if number_of_iterations_without_change>len(not_corrected_patches):
+			result_string+=' <OK: Relax mode> --> ({0},{1}%)'.format(len(matches),percentage_inliers)
+		else:
+			result_string+=' <OK: Perfect mode> --> ({0},{1}%)'.format(len(matches),percentage_inliers)
+
 		p.GPS_coords = get_new_GPS_Coords(p,p2,H)
 		p.GPS_Corrected = True
-		not_corrected_patches = list(set(not_corrected_patches + [p_n for p_n in p.overlaps if not p_n.GPS_Corrected]))
+		
+		# not_corrected_patches = list(set(not_corrected_patches + [p_n for p_n in p.overlaps if not p_n.GPS_Corrected]))
+		for p_n in p.overlaps:
+			p_n.claculate_area_score()
 
-		print('GPC corrected for {0}.'.format(p.name))
+			if not p_n.GPS_Corrected and p_n not in [t[1] for t in not_corrected_patches]:
+				heappush(not_corrected_patches,(p_n.area_score,p_n))
+
+		print(result_string)
 
 		number_of_iterations_without_change = 0
 
@@ -1118,6 +1152,141 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 
 			G = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
 			result, MSE = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,G,ov_1_on_2,show2)
+
+	return patches_tmp
+
+def correct_GPS_parallel_inner_function(p,SIFT_address,show2,relaxed_mode):
+
+	overlaps = [p_n for p_n in p.overlaps if p_n.GPS_Corrected]
+
+	if len(overlaps) == 0:
+		print('Type1 >>> No corrected overlaps for {0}. push back...'.format(p.name))
+		sys.stdout.flush()
+		return [p]
+
+	p2,f_grbg = get_best_overlap(p,overlaps)
+	
+	ov_2_on_1 = p.get_overlap_rectangle(p2)
+	ov_1_on_2 = p2.get_overlap_rectangle(p)
+	
+	if (ov_2_on_1[0] == 0 and ov_2_on_1[1] == 0 and ov_2_on_1[2] == 0 and ov_2_on_1[3] == 0)\
+	or (ov_1_on_2[0] == 0 and ov_1_on_2[1] == 0 and ov_1_on_2[2] == 0 and ov_1_on_2[3] == 0):
+		print('Type2 >>> Empty overlap for {0}. push back...'.format(p.name))
+		sys.stdout.flush()
+		return [p]
+
+	kp1,desc1 = choose_SIFT_key_points(p,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],SIFT_address)
+	kp2,desc2 = choose_SIFT_key_points(p2,ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],SIFT_address)
+
+	matches = get_good_matches(desc2,desc1)
+
+	H,percentage_inliers = find_homography(matches,kp2,kp1,ov_2_on_1,ov_1_on_2,False)
+
+	print('----Number of matches: {0}\n\tPercentage Iliers: {1}'.format(len(matches),percentage_inliers))
+	sys.stdout.flush()
+
+	if not relaxed_mode and (percentage_inliers<=0.1 or len(matches) < 40):
+		print('\t*** Not enough inliers ...')
+		sys.stdout.flush()
+		return [p]
+
+	gps_err = Get_GPS_Error(H,ov_1_on_2,ov_2_on_1)
+	
+	if gps_err[0] > (ov_1_on_2[2]-ov_1_on_2[0])/2 and gps_err[1] > (ov_1_on_2[3]-ov_1_on_2[1])/2:
+		if relaxed_mode:
+			H = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
+		else:
+			print('*** High GPS error ...')
+			sys.stdout.flush()
+			return [p]
+		
+
+	if show2:
+		G = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
+		result, MSE = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,G,ov_1_on_2,show2)
+
+	p.GPS_coords = get_new_GPS_Coords(p,p2,H)
+	p.GPS_Corrected = True
+
+	print('GPC corrected for {0}.'.format(p.name))
+	sys.stdout.flush()
+
+	if show2:
+		ov_2_on_1 = p.get_overlap_rectangle(p2)
+		ov_1_on_2 = p2.get_overlap_rectangle(p)
+
+		G = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
+		result, MSE = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,G,ov_1_on_2,show2)
+	
+	return [p_n for p_n in p.overlaps if not p_n.GPS_Corrected]
+
+def correct_GPS_parallel_inner_function_helper(args):
+	return correct_GPS_parallel_inner_function(*args)
+
+def correct_GPS_coords_new_code_parallel(patches,show,show2,SIFT_address):
+
+	patches_tmp = patches.copy()
+
+	not_corrected_patches =[]
+	
+	best_f = 0
+	best_p = patches_tmp[0]
+
+	for p in patches_tmp:
+		overlaps = [p_n for p_n in patches_tmp if p_n!=p and (p.has_overlap(p_n) or p_n.has_overlap(p))]
+		p.overlaps = overlaps
+
+		f = len(overlaps)
+
+		if f>best_f:
+			best_f = f
+			best_p = p
+
+	best_p.GPS_Corrected = True
+	not_corrected_patches = not_corrected_patches+best_p.overlaps
+
+	number_of_iterations_without_change = 0
+	max_nodes = 4
+	relaxed_mode = False
+
+	while True:
+		print(len([p.name for p in not_corrected_patches]))
+		# random.shuffle(not_corrected_patches)
+
+		# not_corrected_patches = [p for p in patches_tmp if p.GPS_Corrected == False]
+		if len(not_corrected_patches) == 0 :
+			break
+
+		pool_size = min(max_nodes,len(not_corrected_patches))
+
+		if number_of_iterations_without_change>len(not_corrected_patches)/pool_size:
+			relaxed_mode = True
+
+		processes = multiprocessing.Pool(pool_size)
+
+		args = []
+		
+		for i in range(0,pool_size):
+			args.append((not_corrected_patches.pop(),SIFT_address,show2,relaxed_mode))
+		
+		results = processes.map(correct_GPS_parallel_inner_function_helper,args)
+
+		number_of_iterations_without_change+=1
+
+		for r in results:
+			if len(r)>1:
+				number_of_iterations_without_change = 0
+
+			for it in r:
+				if it.name not in [p.name for p in not_corrected_patches]:
+					not_corrected_patches.insert(0,it)
+
+		# not_corrected_patches = list(set(not_corrected_patches+results))
+
+		processes.close()
+
+
+		
 
 	return patches_tmp
 
@@ -1206,19 +1375,20 @@ def save_coordinates(final_patches,filename):
 
 def main():
 
-	# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT',True)
-	# patches = read_all_data()
+	# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT',False)
+	patches = read_all_data()
 
 	# final_patches = stitch_complete(patches,True,True)
 	# final_patches = correct_GPS_coords(patches,False,False,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')
 	# final_patches = correct_GPS_coords_new_code(patches,False,False,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')
-	# final_patches = stitch_based_on_corrected_GPS(patches,True)
+	# final_patches = correct_GPS_coords_new_code_parallel(patches,False,False,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')
+	final_patches = stitch_based_on_corrected_GPS(patches,True)
 	# save_coordinates(final_patches,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
-	# show_and_save_final_patches(final_patches)
+	show_and_save_final_patches(final_patches)
 
-	patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
-	final_patches = correct_GPS_coords_new_code(patches,False,False,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
-	save_coordinates(final_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
+	# patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
+	# final_patches = correct_GPS_coords_new_code(patches,False,False,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
+	# save_coordinates(final_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
 
 def report_time(start,end):
 	print('-----------------------------------------------------------')
