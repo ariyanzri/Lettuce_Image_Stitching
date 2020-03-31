@@ -1,6 +1,5 @@
 import numpy as np
 import cv2
-import matplotlib.pyplot as plt
 import random
 import math
 import multiprocessing
@@ -1032,7 +1031,7 @@ def correct_GPS_coords(patches,show,show2,SIFT_address):
 def visualize_single_run(H,p,p2,x1,y1,x2,y2,x11,y11,x22,y22,SIFT_address):
 	print(p.name)
 	print(p2.name)
-	
+
 	img1,black1 = load_preprocess_image('{0}/{1}'.format(SIFT_address.replace('SIFT','bin2tif_out'),p.name))
 	img2,black2 = load_preprocess_image('{0}/{1}'.format(SIFT_address.replace('SIFT','bin2tif_out'),p2.name))
 
