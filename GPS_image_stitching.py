@@ -499,7 +499,7 @@ def parallel_patch_creator(address,filename,coord,SIFT_address,calc_SIFT):
 		pickle.dump((kp_tmp,desc), open('{0}/{1}_SIFT.data'.format(SIFT_address,filename.replace('.tif','')), "wb"))
 		del kp,kp_tmp,desc
 		
-	print('Patch created and SIFT generated for {0}'.format(filename))
+	# print('Patch created and SIFT generated for {0}'.format(filename))
 	sys.stdout.flush()
 	
 	size = np.shape(img)
@@ -1029,6 +1029,26 @@ def correct_GPS_coords(patches,show,show2,SIFT_address):
 
 	return patches_tmp
 
+def visualize_single_run(H,p,p2,x1,y1,x2,y2,x11,y11,x22,y22,SIFT_address):
+	img1,black1 = load_preprocess_image('{0}/{1}'.format(SIFT_address.replace('SIFT','bin2tif_out'),p.name))
+	img2,black2 = load_preprocess_image('{0}/{1}'.format(SIFT_address.replace('SIFT','bin2tif_out'),p2.name))
+
+	ratio = img1.shape[0]/img1.shape[1]
+	cv2.rectangle(img1,(x1,y1),(x2,y2),(0,0,255),20)
+	img1 = cv2.resize(img1, (500, int(500*ratio))) 
+
+	ratio = img2.shape[0]/img2.shape[1]
+	cv2.rectangle(img2,(x11,y11),(x22,y22),(0,0,255),20)
+	img2 = cv2.resize(img2, (500, int(500*ratio))) 
+
+	cv2.imshow('fig {0}'.format(1),img1)
+	cv2.imshow('fig {0}'.format(1),img2)
+	cv2.waitKey(0)	
+
+
+	stitch(img1,img2,black1,black2,H,(x11,y11,x22,y22),True)
+
+
 def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 
 	patches_tmp = patches.copy()
@@ -1119,6 +1139,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 				result_string+=' <ERR: High GPS error> --> ({0},{1}%,<{2},{3}>)'.format(len(matches),percentage_inliers,gps_err[0],gps_err[1])
 				print(result_string)
 				number_of_iterations_without_change+=1
+				p.area_score*=0.9
 				continue
 			else:
 				H = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
