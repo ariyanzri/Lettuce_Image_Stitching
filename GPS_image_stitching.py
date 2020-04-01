@@ -355,6 +355,15 @@ class Patch:
 		self.area_score = 0
 		self.overlaps = None
 
+	def __le__(self,other):
+		return (self.area_score<=other.area_score)
+
+	def __lt__(self,other):
+		return (self.area_score<other.area_score)
+
+	def __eq__(self,other):
+		return (self.name == other.name)
+
 	def claculate_area_score(self):
 		score = 0
 		for n in self.overlaps:
@@ -1044,7 +1053,7 @@ def visualize_single_run(H,p,p2,x1,y1,x2,y2,x11,y11,x22,y22,SIFT_address):
 	img2 = cv2.resize(img2, (500, int(500*ratio))) 
 
 	cv2.imshow('fig {0}'.format(1),img1)
-	cv2.imshow('fig {0}'.format(1),img2)
+	cv2.imshow('fig {0}'.format(2),img2)
 	cv2.waitKey(0)	
 
 	stitch(img1,img2,black1,black2,H,(x11,y11,x22,y22),True)
@@ -1070,7 +1079,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 			best_p = p
 
 	best_p.GPS_Corrected = True
-	not_corrected_patches = not_corrected_patches+[(t.area_score,t) for t in best_p.overlaps]
+	not_corrected_patches = not_corrected_patches+[t for t in best_p.overlaps]
 
 	heapify(not_corrected_patches)
 
@@ -1087,7 +1096,8 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 		if len(not_corrected_patches) == 0:
 			break
 
-		sc_tmp,p = heappop(not_corrected_patches)
+		p = heappop(not_corrected_patches)
+
 		result_string+='Patch {0}'.format(p.name)
 
 		overlaps = [p_n for p_n in p.overlaps if p_n.GPS_Corrected]
@@ -1095,7 +1105,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 		if len(overlaps) == 0:
 			result_string+=' <ERR: No overlaps>'
 			print(result_string)
-			heappush(not_corrected_patches,(p.area_score,p))
+			heappush(not_corrected_patches,p)
 			number_of_iterations_without_change+=1
 			continue
 
@@ -1108,7 +1118,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 		or (ov_1_on_2[0] == 0 and ov_1_on_2[1] == 0 and ov_1_on_2[2] == 0 and ov_1_on_2[3] == 0):
 			result_string+=' <ERR: Empty overlap>'
 			print(result_string)
-			heappush(not_corrected_patches,(p.area_score,p))
+			heappush(not_corrected_patches,p)
 			number_of_iterations_without_change+=1
 			continue
 
@@ -1125,7 +1135,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 		percentage_inliers = round(percentage_inliers*100,2)
 
 		if (number_of_iterations_without_change<=len(not_corrected_patches)) and (percentage_inliers<=10 or len(matches) < 40):
-			heappush(not_corrected_patches,(p.area_score,p))
+			heappush(not_corrected_patches,p)
 			result_string+=' <ERR: Low inliers> --> ({0},{1}%)'.format(len(matches),percentage_inliers)
 			print(result_string)
 			number_of_iterations_without_change+=1
@@ -1137,7 +1147,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 		
 		if gps_err[0] > (ov_1_on_2[2]-ov_1_on_2[0])/2 and gps_err[1] > (ov_1_on_2[3]-ov_1_on_2[1])/2:
 			if (number_of_iterations_without_change<=len(not_corrected_patches)):
-				heappush(not_corrected_patches,(p.area_score,p))
+				heappush(not_corrected_patches,p)
 				result_string+=' <ERR: High GPS error> --> ({0},{1}%,<{2},{3}>)'.format(len(matches),percentage_inliers,gps_err[0],gps_err[1])
 				print(result_string)
 				number_of_iterations_without_change+=1
@@ -1163,8 +1173,8 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 		for p_n in p.overlaps:
 			p_n.claculate_area_score()
 
-			if not p_n.GPS_Corrected and p_n not in [t[1] for t in not_corrected_patches]:
-				heappush(not_corrected_patches,(p_n.area_score,p_n))
+			if (not p_n.GPS_Corrected) and (p_n not in [t for t in not_corrected_patches]):
+				heappush(not_corrected_patches,p_n)
 
 		print(result_string)
 
@@ -1371,7 +1381,7 @@ def stitch_based_on_corrected_GPS(patches,show):
 
 def show_and_save_final_patches(patches):
 	for p in patches:
-		cv2.imwrite('{0}.jpg'.format(p.name),p.rgb_img)
+		# cv2.imwrite('{0}.jpg'.format(p.name),p.rgb_img)
 		ratio = p.rgb_img.shape[0]/p.rgb_img.shape[1]
 		img_res = cv2.resize(p.rgb_img, (700, int(700*ratio))) 
 		cv2.imshow('fig',img_res)
@@ -1400,15 +1410,16 @@ def save_coordinates(final_patches,filename):
 def main():
 
 	# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT',False)
+	# final_patches = correct_GPS_coords_new_code(patches,False,False,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')
+	# save_coordinates(final_patches,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
+	
 	# patches = read_all_data()
+	# final_patches = stitch_based_on_corrected_GPS(patches,True)
+	# show_and_save_final_patches(final_patches)
 
 	# final_patches = stitch_complete(patches,True,True)
 	# final_patches = correct_GPS_coords(patches,False,False,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')
-	# final_patches = correct_GPS_coords_new_code(patches,False,False,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')
-	# final_patches = correct_GPS_coords_new_code_parallel(patches,False,False,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')
-	# final_patches = stitch_based_on_corrected_GPS(patches,True)
-	# save_coordinates(final_patches,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
-	# show_and_save_final_patches(final_patches)
+	# final_patches = correct_GPS_coords_new_code_parallel(patches,False,False,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')	
 
 	patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
 	final_patches = correct_GPS_coords_new_code(patches,False,False,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
