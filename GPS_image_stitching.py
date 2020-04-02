@@ -9,7 +9,6 @@ import gc
 import pickle
 import os
 import threading
-import matplotlib.pyplot as plt
 from heapq import heappush, heappop, heapify
 
 def convert_to_gray(img):
@@ -1448,11 +1447,28 @@ def group_images_by_nearest_lid(lids,patches):
 
 	return list_all_groups
 
-def plot_groups(groups,lids):
+def plot_groups(address,lids):
+	import matplotlib.pyplot as plt
+
+	data = np.load(address)
+	plt.axis('equal')
+
+	for d in data:
+		if d[5]==1:
+			plt.scatter(d[0],d[1],color=(d[2],d[3],d[4]),marker='+')
+		else:
+			plt.scatter(d[0],d[1],color=(d[2],d[3],d[4]))
+			
+
+	plt.show()
+
+def save_group_data(groups,lids,n,address):
+	
+	data = np.zeros((n,6))
+	i = 0
+
 	not_used_colors = [(26,188,156),(46,204,113),(52,152,219),(155,89,182),(52,73,94),(22,160,133),(39,174,96),(41,128,185),(142,68,173),(44,62,80)\
 	,(241,196,15),(230,126,34),(231,76,60),(236,240,241),(149,165,166),(243,156,18),(211,84,0),(192,57,43),(189,195,199),(127,140,141)]
-
-	plt.axis('equal')
 
 	colors = {}
 	for g in groups:
@@ -1461,13 +1477,19 @@ def plot_groups(groups,lids):
 
 	for g in groups:
 		for p in groups[g]:
+			data[i,0] = p.GPS_coords.Center[0]*1000 
+			data[i,1] = p.GPS_coords.Center[1]*1000
+			data[i,2] = colors[g][0]
+			data[i,3] = colors[g][1]
+			data[i,4] = colors[g][2]
+
 			if p.GPS_coords.is_coord_inside(lids[g]):
-				plt.scatter(p.GPS_coords.Center[0]*1000,p.GPS_coords.Center[1]*1000,color=colors[g],marker='+')
-				continue
-
-			plt.scatter(p.GPS_coords.Center[0]*1000,p.GPS_coords.Center[1]*1000,color=colors[g])
-
-	plt.show()
+				data[i,5] = 1
+			else:
+				data[i,5] = 0
+			i+=1
+	
+	np.save(address,data)
 
 def get_lids(address):
 	lids = {}
@@ -1497,7 +1519,8 @@ def main():
 	
 	# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT',False)
 	# lids = get_lids('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/lids.txt')
-	# plot_groups(group_images_by_nearest_lid(lids,patches),lids)
+	# save_group_data(group_images_by_nearest_lid(lids,patches),lids,len(patches),'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/plt.npy')
+	# plot_groups('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/plt.npy',lids)
 
 	# patches = read_all_data()
 	# final_patches = stitch_based_on_corrected_GPS(patches,True)
@@ -1513,7 +1536,9 @@ def main():
 
 	patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
 	lids = get_lids('/data/plant/full_scans/2020-01-08-rgb/lids.txt')
-	plot_groups(group_images_by_nearest_lid(lids,patches),lids)
+	save_group_data(group_images_by_nearest_lid(lids,patches),lids,len(patches),'/data/plant/full_scans/2020-01-08-rgb/plt.npy')
+	# plot_groups('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/plt.npy',lids)
+
 
 def report_time(start,end):
 	print('-----------------------------------------------------------')
