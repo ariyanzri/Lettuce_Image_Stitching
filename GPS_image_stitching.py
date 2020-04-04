@@ -405,11 +405,13 @@ class Patch:
 
 		self.GPS_coords = new_coords
 
-	def visualize_with_single_GPS_point(self,point):
+	def visualize_with_single_GPS_point(self,point,point_img):
 		if self.rgb_img is None:
 			return
 
 		output = self.rgb_img.copy()
+		cv2.circle(output,point_img,20,(0,255,0),thickness=-1)
+
 		ratio = self.rgb_img.shape[0]/self.rgb_img.shape[1]
 		output = cv2.resize(output, (500, int(500*ratio))) 
 
@@ -1641,9 +1643,9 @@ def get_groups_and_patches_with_lids(patches_folder,coordinate_address,lids):
 		p = Patch(p_name,None,None,coord,(-1,-1))
 		p.load_img(patches_folder)
 
-		p.visualize_with_single_GPS_point(lids[l_marker])
+		p.visualize_with_single_GPS_point(lids[l_marker],(x,y))
 		p.correct_GPS_based_on_point((x,y),lids[l_marker])
-		p.visualize_with_single_GPS_point(lids[l_marker])
+		p.visualize_with_single_GPS_point(lids[l_marker],(x,y))
 
 		p.GPS_Corrected = True
 
