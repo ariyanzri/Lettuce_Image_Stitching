@@ -10,6 +10,7 @@ import pickle
 import os
 import threading
 from heapq import heappush, heappop, heapify
+from datetime import datetime
 
 def convert_to_gray(img):
 	
@@ -395,15 +396,32 @@ class Patch:
 		diff_GPS_after_correction = (old_GPS_point[0]-point_in_GPS[0],old_GPS_point[1]-point_in_GPS[1])
 
 
-		new_UR = (self.GPS_coords.UR_coord[0]-diff_GPS_after_correction[0],self.GPS_coords.UR_coord[1]-diff_GPS_after_correction[1])
-		new_UL = (self.GPS_coords.UL_coord[0]-diff_GPS_after_correction[0],self.GPS_coords.UL_coord[1]-diff_GPS_after_correction[1])
-		new_LL = (self.GPS_coords.LL_coord[0]-diff_GPS_after_correction[0],self.GPS_coords.LL_coord[1]-diff_GPS_after_correction[1])
-		new_LR = (self.GPS_coords.LR_coord[0]-diff_GPS_after_correction[0],self.GPS_coords.LR_coord[1]-diff_GPS_after_correction[1])
-		new_center = (self.GPS_coords.Center[0]-diff_GPS_after_correction[0],self.GPS_coords.Center[1]-diff_GPS_after_correction[1])
+		new_UR = (round(self.GPS_coords.UR_coord[0]-diff_GPS_after_correction[0],7),round(self.GPS_coords.UR_coord[1]-diff_GPS_after_correction[1],7))
+		new_UL = (round(self.GPS_coords.UL_coord[0]-diff_GPS_after_correction[0],7),round(self.GPS_coords.UL_coord[1]-diff_GPS_after_correction[1],7))
+		new_LL = (round(self.GPS_coords.LL_coord[0]-diff_GPS_after_correction[0],7),round(self.GPS_coords.LL_coord[1]-diff_GPS_after_correction[1],7))
+		new_LR = (round(self.GPS_coords.LR_coord[0]-diff_GPS_after_correction[0],7),round(self.GPS_coords.LR_coord[1]-diff_GPS_after_correction[1],7))
+		new_center = (round(self.GPS_coords.Center[0]-diff_GPS_after_correction[0],7),round(self.GPS_coords.Center[1]-diff_GPS_after_correction[1],7))
 
 		new_coords = Patch_GPS_coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
 
 		self.GPS_coords = new_coords
+
+	def visualize_with_single_GPS_point(self,point):
+		if self.rgb_img is None:
+			return
+
+		output = self.rgb_img.copy()
+		ratio = self.rgb_img.shape[0]/self.rgb_img.shape[1]
+		output = cv2.resize(output, (500, int(500*ratio))) 
+
+		ratio_x = (point[0] - self.GPS_coords.UL_coord[0])/(self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])
+		ratio_y = (self.GPS_coords.UL_coord[1] - point[1])/(self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])
+
+		cv2.circle(output,(ratio_x*500,ratio_y*500),20,(0,0,255),thickness=-1)
+
+		cv2.imshow('GPS',output)
+		cv2.waitKey(0)
+
 
 
 	def has_overlap(self,p):
@@ -1624,13 +1642,13 @@ def get_groups_and_patches_with_lids(patches_folder,coordinate_address,lids):
 		p = Patch(p_name,None,None,coord,(-1,-1))
 		p.load_img(patches_folder)
 
-		print(p.GPS_coords)
+		p.visualize_with_single_GPS_point(lids[l_marker])
 		p.correct_GPS_based_on_point((x,y),lids[l_marker])
-		print(p.GPS_coords)
+		p.visualize_with_single_GPS_point(lids[l_marker])
 
 		p.GPS_Corrected = True
 
-		list_all_groups[l] = [p]
+		list_all_groups[l_marker] = [p]
 
 	
 	# add other patches load
