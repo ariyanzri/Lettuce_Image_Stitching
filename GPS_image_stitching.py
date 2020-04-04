@@ -1581,7 +1581,7 @@ def get_lids(address):
 
 def get_name_of_patches_with_lids(address,lids):
 	
-	patches_names_with_lid = ()
+	patches_names_with_lid = []
 
 	with open(address) as f:
 		lines = f.read()
