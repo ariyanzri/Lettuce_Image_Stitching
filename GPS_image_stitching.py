@@ -395,22 +395,23 @@ class Patch:
 		diff_GPS_after_correction = (old_GPS_point[0]-point_in_GPS[0],old_GPS_point[1]-point_in_GPS[1])
 
 
-		new_UR = (round(self.GPS_coords.UR_coord[0]-diff_GPS_after_correction[0],7),round(self.GPS_coords.UR_coord[1]-diff_GPS_after_correction[1],7))
-		new_UL = (round(self.GPS_coords.UL_coord[0]-diff_GPS_after_correction[0],7),round(self.GPS_coords.UL_coord[1]-diff_GPS_after_correction[1],7))
-		new_LL = (round(self.GPS_coords.LL_coord[0]-diff_GPS_after_correction[0],7),round(self.GPS_coords.LL_coord[1]-diff_GPS_after_correction[1],7))
-		new_LR = (round(self.GPS_coords.LR_coord[0]-diff_GPS_after_correction[0],7),round(self.GPS_coords.LR_coord[1]-diff_GPS_after_correction[1],7))
-		new_center = (round(self.GPS_coords.Center[0]-diff_GPS_after_correction[0],7),round(self.GPS_coords.Center[1]-diff_GPS_after_correction[1],7))
+		new_UR = (round(self.GPS_coords.UR_coord[0]+diff_GPS_after_correction[0],7),round(self.GPS_coords.UR_coord[1]-diff_GPS_after_correction[1],7))
+		new_UL = (round(self.GPS_coords.UL_coord[0]+diff_GPS_after_correction[0],7),round(self.GPS_coords.UL_coord[1]-diff_GPS_after_correction[1],7))
+		new_LL = (round(self.GPS_coords.LL_coord[0]+diff_GPS_after_correction[0],7),round(self.GPS_coords.LL_coord[1]-diff_GPS_after_correction[1],7))
+		new_LR = (round(self.GPS_coords.LR_coord[0]+diff_GPS_after_correction[0],7),round(self.GPS_coords.LR_coord[1]-diff_GPS_after_correction[1],7))
+		new_center = (round(self.GPS_coords.Center[0]+diff_GPS_after_correction[0],7),round(self.GPS_coords.Center[1]-diff_GPS_after_correction[1],7))
 
 		new_coords = Patch_GPS_coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
 
 		self.GPS_coords = new_coords
 
-	def visualize_with_single_GPS_point(self,point,point_img):
+	def visualize_with_single_GPS_point(self,point,point_img,r):
 		if self.rgb_img is None:
 			return
 
 		output = self.rgb_img.copy()
 		cv2.circle(output,point_img,20,(0,255,0),thickness=-1)
+		cv2.circle(output,point_img,r,(255,0,0),thickness=15)
 
 		ratio = self.rgb_img.shape[0]/self.rgb_img.shape[1]
 		output = cv2.resize(output, (500, int(500*ratio))) 
