@@ -1453,13 +1453,17 @@ def plot_groups(address,lids):
 	data = np.load(address)
 	plt.axis('equal')
 
+	lids_data = []
+
 	for d in data:
 		if d[5]==1:
-			plt.scatter(d[0],d[1],color=(d[2],d[3],d[4]),marker='+')
+			lids_data.append(d)
 		else:
 			plt.scatter(d[0],d[1],color=(d[2],d[3],d[4]))
 			
-
+	for d in lids_data:
+		plt.scatter(d[0],d[1],color=(0,0,0),marker='x',s=30)
+		
 	plt.show()
 
 def save_group_data(groups,lids,n,address):
@@ -1485,6 +1489,8 @@ def save_group_data(groups,lids,n,address):
 
 			if p.GPS_coords.is_coord_inside(lids[g]):
 				data[i,5] = 1
+				print(p.name)
+				
 			else:
 				data[i,5] = 0
 			i+=1
@@ -1537,7 +1543,9 @@ def main():
 	patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
 	lids = get_lids('/data/plant/full_scans/2020-01-08-rgb/lids.txt')
 	save_group_data(group_images_by_nearest_lid(lids,patches),lids,len(patches),'/data/plant/full_scans/2020-01-08-rgb/plt.npy')
-	# plot_groups('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/plt.npy',lids)
+	
+	# lids = get_lids('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/lids.txt')
+	# plot_groups('/home/ariyan/Desktop/plt.npy',lids)
 
 
 def report_time(start,end):
