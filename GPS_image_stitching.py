@@ -393,12 +393,6 @@ class Patch:
 
 		old_GPS_point = (self.GPS_coords.UL_coord[0]+diff_x_GPS,self.GPS_coords.UL_coord[1]-diff_y_GPS)
 
-		print(ratio_x)
-		print(ratio_y)
-
-		print(diff_x_GPS)
-		print(diff_y_GPS)
-
 		self.visualize_with_single_GPS_point(old_GPS_point,point_in_img,400)
 
 		diff_GPS_after_correction = (old_GPS_point[0]-point_in_GPS[0],old_GPS_point[1]-point_in_GPS[1])
@@ -428,7 +422,8 @@ class Patch:
 		ratio_x = (point[0] - self.GPS_coords.UL_coord[0])/(self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])
 		ratio_y = (self.GPS_coords.UL_coord[1] - point[1])/(self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])
 
-		cv2.circle(output,(int(ratio_x*500),int(ratio_y*500)),20,(0,0,255),thickness=-1)
+		shp = np.shape(output)
+		cv2.circle(output,(int(ratio_x*shp[1]),int(ratio_y*shp[0])),20,(0,0,255),thickness=-1)
 
 		cv2.imshow('GPS',output)
 		cv2.waitKey(0)
