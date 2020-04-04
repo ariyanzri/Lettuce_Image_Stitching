@@ -416,7 +416,7 @@ class Patch:
 		ratio_x = (point[0] - self.GPS_coords.UL_coord[0])/(self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])
 		ratio_y = (self.GPS_coords.UL_coord[1] - point[1])/(self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])
 
-		cv2.circle(output,(ratio_x*500,ratio_y*500),20,(0,0,255),thickness=-1)
+		cv2.circle(output,(int(ratio_x*500),int(ratio_y*500)),20,(0,0,255),thickness=-1)
 
 		cv2.imshow('GPS',output)
 		cv2.waitKey(0)
