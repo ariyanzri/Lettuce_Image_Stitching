@@ -391,7 +391,7 @@ class Patch:
 		diff_x_GPS = (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])*ratio_x
 		diff_y_GPS = (self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])*ratio_y
 
-		old_GPS_point = (self.GPS_coords.UR_coord[0]-diff_x_GPS,self.GPS_coords.UR_coord[1]+diff_y_GPS)
+		old_GPS_point = (self.GPS_coords.UL_coord[0]-diff_x_GPS,self.GPS_coords.UL_coord[1]+diff_y_GPS)
 		diff_GPS_after_correction = (old_GPS_point[0]-point_in_GPS[0],old_GPS_point[1]-point_in_GPS[1])
 
 
