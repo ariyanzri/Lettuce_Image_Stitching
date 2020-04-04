@@ -393,16 +393,14 @@ class Patch:
 
 		old_GPS_point = (self.GPS_coords.UL_coord[0]+diff_x_GPS,self.GPS_coords.UL_coord[1]-diff_y_GPS)
 
-		self.visualize_with_single_GPS_point(old_GPS_point,point_in_img,400)
-
 		diff_GPS_after_correction = (old_GPS_point[0]-point_in_GPS[0],old_GPS_point[1]-point_in_GPS[1])
 
 
-		new_UR = (round(self.GPS_coords.UR_coord[0]+diff_GPS_after_correction[0],7),round(self.GPS_coords.UR_coord[1]+diff_GPS_after_correction[1],7))
-		new_UL = (round(self.GPS_coords.UL_coord[0]+diff_GPS_after_correction[0],7),round(self.GPS_coords.UL_coord[1]+diff_GPS_after_correction[1],7))
-		new_LL = (round(self.GPS_coords.LL_coord[0]+diff_GPS_after_correction[0],7),round(self.GPS_coords.LL_coord[1]+diff_GPS_after_correction[1],7))
-		new_LR = (round(self.GPS_coords.LR_coord[0]+diff_GPS_after_correction[0],7),round(self.GPS_coords.LR_coord[1]+diff_GPS_after_correction[1],7))
-		new_center = (round(self.GPS_coords.Center[0]+diff_GPS_after_correction[0],7),round(self.GPS_coords.Center[1]+diff_GPS_after_correction[1],7))
+		new_UR = (round(self.GPS_coords.UR_coord[0]-diff_GPS_after_correction[0],7),round(self.GPS_coords.UR_coord[1]-diff_GPS_after_correction[1],7))
+		new_UL = (round(self.GPS_coords.UL_coord[0]-diff_GPS_after_correction[0],7),round(self.GPS_coords.UL_coord[1]-diff_GPS_after_correction[1],7))
+		new_LL = (round(self.GPS_coords.LL_coord[0]-diff_GPS_after_correction[0],7),round(self.GPS_coords.LL_coord[1]-diff_GPS_after_correction[1],7))
+		new_LR = (round(self.GPS_coords.LR_coord[0]-diff_GPS_after_correction[0],7),round(self.GPS_coords.LR_coord[1]-diff_GPS_after_correction[1],7))
+		new_center = (round(self.GPS_coords.Center[0]-diff_GPS_after_correction[0],7),round(self.GPS_coords.Center[1]-diff_GPS_after_correction[1],7))
 
 		new_coords = Patch_GPS_coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
 
