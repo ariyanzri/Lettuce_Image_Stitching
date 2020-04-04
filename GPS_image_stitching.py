@@ -391,7 +391,7 @@ class Patch:
 		diff_x_GPS = (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])*ratio_x
 		diff_y_GPS = (self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])*ratio_y
 
-		old_GPS_point = (self.GPS_coords.UL_coord[0]+diff_x_GPS,self.GPS_coords.UL_coord[1]-diff_y_GPS)
+		old_GPS_point = (self.GPS_coords.UL_coord[0]+diff_x_GPS,self.GPS_coords.UL_coord[1]+diff_y_GPS)
 
 		self.visualize_with_single_GPS_point(old_GPS_point,point_in_img,400)
 
