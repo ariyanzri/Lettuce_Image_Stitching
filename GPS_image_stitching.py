@@ -364,6 +364,18 @@ class Patch:
 	def __eq__(self,other):
 		return (self.name == other.name)
 
+	def load_img(self,patch_folder):
+		img,img_g = load_preprocess_image('{0}/{1}'.format(patch_folder,self.name))
+		self.rgb_img = img
+		self.img = img_g
+		self.size = np.shape(img)
+
+
+	def del_img(self):
+		self.rgb_img = None
+		self.img = None
+		gc.collect()
+
 	def claculate_area_score(self):
 		score = 0
 		for n in self.overlaps:
@@ -371,6 +383,28 @@ class Patch:
 			score+=abs(overlap_rect[2]-overlap_rect[0])*abs(overlap_rect[3]-overlap_rect[1])
 
 		self.area_score = -1*score
+
+	def correct_GPS_based_on_point(self,point_in_img,point_in_GPS):
+		ratio_x = point_in_img[0]/self.size[1]
+		ratio_y = point_in_img[1]/self.size[0]
+
+		diff_x_GPS = (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])*ratio_x
+		diff_y_GPS = (self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])*ratio_y
+
+		old_GPS_point = (self.GPS_coords.UR_coord[0]+diff_x_GPS,self.GPS_coords.UR_coord[1]-diff_y_GPS)
+		diff_GPS_after_correction = (old_GPS_point[0]-point_in_GPS[0],old_GPS_point[1]-point_in_GPS[1])
+
+
+		new_UR = (self.GPS_coords.UR_coord[0]-diff_GPS_after_correction[0],self.GPS_coords.UR_coord[1]-diff_GPS_after_correction[1])
+		new_UL = (self.GPS_coords.UL_coord[0]-diff_GPS_after_correction[0],self.GPS_coords.UL_coord[1]-diff_GPS_after_correction[1])
+		new_LL = (self.GPS_coords.LL_coord[0]-diff_GPS_after_correction[0],self.GPS_coords.LL_coord[1]-diff_GPS_after_correction[1])
+		new_LR = (self.GPS_coords.LR_coord[0]-diff_GPS_after_correction[0],self.GPS_coords.LR_coord[1]-diff_GPS_after_correction[1])
+		new_center = (self.GPS_coords.Center[0]-diff_GPS_after_correction[0],self.GPS_coords.Center[1]-diff_GPS_after_correction[1])
+
+		new_coords = Patch_GPS_coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+
+		self.GPS_coords = new_coords
+
 
 	def has_overlap(self,p):
 		if self.GPS_coords.is_coord_inside(p.GPS_coords.UL_coord) or self.GPS_coords.is_coord_inside(p.GPS_coords.UR_coord) or\
@@ -1405,7 +1439,213 @@ def save_coordinates(final_patches,filename):
 	with open(filename,'w') as f:
 		f.write(final_results)
 
+
+
+def fit_circle(xs,ys):
+
+	us = xs - np.mean(xs)
+	vs = ys - np.mean(ys)
+
+	A1 = np.sum(us**2)
+	B1 = np.sum(us*vs)
+	C1 = 0.5*(np.sum(us**3)+np.sum(us*(vs**2)))
+	A2 = B1
+	B2 = np.sum(vs**2)
+	C2 = 0.5*(np.sum(vs**3)+np.sum(vs*(us**2)))
+
+	v = (A1*C2 - A2*C1)/(A1*B2 - A2*B1)
+	u = (C1-B1*v)/A1
+
+	r = int(math.sqrt(u**2+v**2+(A1+B2)/np.shape(xs)[0]))
+
+	x = int(u+np.mean(xs))
+	y = int(v+np.mean(ys))
+
+	return x,y,r
+
+def circle_error(x,y,r,xs,ys):
+	err = 0
+
+	for i in range(0,np.shape(xs)[0]):
+		d = math.sqrt((x-xs[i])**2+(y-ys[i])**2)
+		if d>2*r:
+			err+=0
+		elif d<r/2:
+			err+=0
+		else:
+			err += abs(d - r)
+
+	return err
+
+def ransac(xs,ys,iterations,number_of_points):
+	best_x = -1
+	best_y = -1
+	best_r = -1
+	min_error = None
+
+	for i in range(0,iterations):
+		
+		indexes = random.sample(range(0,np.shape(xs)[0]),number_of_points)
+	
+		xs_r = xs[indexes]
+		ys_r = ys[indexes]
+
+		x,y,r = fit_circle(xs_r,ys_r)
+		err = circle_error(x,y,r,xs,ys)
+
+		if min_error == None or min_error>err:
+			min_error = err
+			best_x = x
+			best_y = y
+			best_r = r
+
+	return best_x,best_y,best_r
+
+def get_unique_lists(xs,ys):
+	tmp, ind1 = np.unique(xs,return_index=True)
+	tmp, ind2 = np.unique(ys,return_index=True)
+
+	ind = np.intersect1d(ind1,ind2)
+
+	return xs[ind],ys[ind]
+
+def get_lid_in_patch(address,img_name,ransac_iter=100,ransac_min_num_fit=10):
+	
+	img = cv2.imread('{0}/{1}'.format(address,img_name))
+	
+	img[:,:,1:3] = 0
+
+	img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+	
+	img = adjust_gamma(img,2.5)
+	
+	max_intensity = np.amax(img)
+	
+	t = max_intensity-2
+	
+	(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
+	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (200, 200))
+	img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
+
+	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (50, 50))
+	img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+
+	shp = np.shape(img)
+
+	img, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+	
+	new_contours = []
+
+	for c in contours:
+		for p in c:
+			new_contours.append([p[0][0],p[0][1]])
+	
+	new_contours = np.array(new_contours)
+
+	if np.shape(new_contours)[0]<ransac_min_num_fit:
+		return -1,-1,-1
+
+	xs = np.array(new_contours[:,0])
+	ys = np.array(new_contours[:,1])
+
+	xs,ys = get_unique_lists(xs,ys)
+
+	x,y,r = ransac(xs,ys,100,10)
+	
+	if x >= 0 and x < shp[1] and y >= 0 and y < shp[0] and r >= 400 and r <= 500:
+		return x,y,r
+	else:
+		return -1,-1,-1
+
+
+
+def get_lids(address):
+	lids = {}
+
+	with open(address) as f:
+		lines = f.read()
+
+		for l in lines.split('\n'):
+			if l == '':
+				break
+
+			features = l.split(',')
+
+			marker = features[0]
+			lat = features[1]
+			lon = features[2]
+
+			lids[marker] = (float(lon),float(lat))
+
+	return lids
+
+def get_name_of_patches_with_lids(address,lids):
+	
+	patches_names_with_lid = ()
+
+	with open(address) as f:
+		lines = f.read()
+		lines = lines.replace('"','')
+
+		for l in lines.split('\n'):
+			if l == '':
+				break
+			if l == 'Filename,Upper left,Lower left,Upper right,Lower right,Center' or l == 'name,upperleft,lowerleft,uperright,lowerright,center':
+				continue
+
+			features = l.split(',')
+
+			filename = features[0]
+			upper_left = (float(features[1]),float(features[2]))
+			lower_left = (float(features[3]),float(features[4]))
+			upper_right = (float(features[5]),float(features[6]))
+			lower_right = (float(features[7]),float(features[8]))
+			center = (float(features[9]),float(features[10]))
+
+			coord = Patch_GPS_coordinate(upper_left,upper_right,lower_left,lower_right,center)
+			
+			for l in lids:
+				if coord.is_coord_inside(lids[l]):
+					patches_names_with_lid.append((l,filename,coord))
+
+	return patches_names_with_lid
+
+def get_groups_and_patches_with_lids(patches_folder,coordinate_address,lids):
+
+	possible_patches_with_lids = get_name_of_patches_with_lids(coordinate_address,lids)
+	list_all_groups = {}
+
+	for l_marker,p_name,coord in possible_patches_with_lids:
+		x,y,r = get_lid_in_patch(patches_folder,p_name)
+
+		if x==-1 and y==-1 and r==-1:
+			continue
+
+		p = Patch(p_name,None,None,coord,(-1,-1))
+		p.load_img(patches_folder)
+
+		print(p.GPS_coords)
+		p.correct_GPS_based_on_point((x,y),lids[l_marker])
+		print(p.GPS_coords)
+
+		p.GPS_Corrected = True
+
+		list_all_groups[l] = [p]
+
+	
+	# add other patches load
+
+	print('Detected {0} groups as follow:'.format(len(list_all_groups.values())))
+
+	for g in list_all_groups:
+		print('Group {0} with {1} images.'.format(g,len(list_all_groups[g])))
+
+	return list_all_groups
+
+
+
 def GPS_based_distance(coord1,coord2):
+
 	return math.sqrt((coord2[0]-coord1[0])**2+(coord2[1]-coord1[1])**2)
 
 def get_nearest_lid_coord(lids,coord):
@@ -1495,54 +1735,8 @@ def save_group_data(groups,lids,n,address):
 	
 	np.save(address,data)
 
-def get_lids(address):
-	lids = {}
 
-	with open(address) as f:
-		lines = f.read()
 
-		for l in lines.split('\n'):
-			if l == '':
-				break
-
-			features = l.split(',')
-
-			marker = features[0]
-			lat = features[1]
-			lon = features[2]
-
-			lids[marker] = (float(lon),float(lat))
-
-	return lids
-
-def get_name_of_patches_with_lids(address,lids):
-	
-	with open(address) as f:
-		lines = f.read()
-		lines = lines.replace('"','')
-
-		for l in lines.split('\n'):
-			if l == '':
-				break
-			if l == 'Filename,Upper left,Lower left,Upper right,Lower right,Center' or l == 'name,upperleft,lowerleft,uperright,lowerright,center':
-				continue
-
-			features = l.split(',')
-
-			filename = features[0]
-			upper_left = (float(features[1]),float(features[2]))
-			lower_left = (float(features[3]),float(features[4]))
-			upper_right = (float(features[5]),float(features[6]))
-			lower_right = (float(features[7]),float(features[8]))
-			center = (float(features[9]),float(features[10]))
-
-			coord = Patch_GPS_coordinate(upper_left,upper_right,lower_left,lower_right,center)
-			
-			for l in lids:
-				if coord.is_coord_inside(lids[l]):
-					print('marker: {0} patch: {1}'.format(l,filename))
-
-	
 
 def main():
 
@@ -1570,7 +1764,8 @@ def main():
 	# patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
 	lids = get_lids('/data/plant/full_scans/2020-01-08-rgb/lids.txt')
 	# save_group_data(group_images_by_nearest_lid(lids,patches),lids,len(patches),'/data/plant/full_scans/2020-01-08-rgb/plt.npy')
-	get_name_of_patches_with_lids('/data/plant/full_scans/metadata/2020-01-08_coordinates.csv',lids)
+	# get_name_of_patches_with_lids('/data/plant/full_scans/metadata/2020-01-08_coordinates.csv',lids)
+	get_groups_and_patches_with_lids('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv',lids)
 
 	# lids = get_lids('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/lids.txt')
 	# plot_groups('/home/ariyan/Desktop/plt.npy',lids)
