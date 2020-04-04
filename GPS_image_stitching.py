@@ -1058,7 +1058,6 @@ def visualize_single_run(H,p,p2,x1,y1,x2,y2,x11,y11,x22,y22,SIFT_address):
 
 	stitch(img1,img2,black1,black2,H,(x11,y11,x22,y22),True)
 
-
 def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 
 	patches_tmp = patches.copy()
@@ -1139,7 +1138,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 			result_string+=' <ERR: Low inliers> --> ({0},{1}%)'.format(len(matches),percentage_inliers)
 			print(result_string)
 			number_of_iterations_without_change+=1
-			p.area_score*=0.9
+			p.area_score*=0.5
 			# visualize_single_run(H,p,p2,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],SIFT_address)
 			continue
 
@@ -1151,7 +1150,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 				result_string+=' <ERR: High GPS error> --> ({0},{1}%,<{2},{3}>)'.format(len(matches),percentage_inliers,gps_err[0],gps_err[1])
 				print(result_string)
 				number_of_iterations_without_change+=1
-				p.area_score*=0.9
+				p.area_score*=0.5
 				# visualize_single_run(H,p,p2,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],SIFT_address)
 				continue
 			else:
@@ -1324,7 +1323,6 @@ def correct_GPS_coords_new_code_parallel(patches,show,show2,SIFT_address):
 
 	return patches_tmp
 
-
 def stitch_based_on_corrected_GPS(patches,show):
 	patches_tmp = patches.copy()
 
@@ -1490,7 +1488,7 @@ def save_group_data(groups,lids,n,address):
 			if p.GPS_coords.is_coord_inside(lids[g]):
 				data[i,5] = 1
 				print(p.name)
-				
+
 			else:
 				data[i,5] = 0
 			i+=1
@@ -1517,6 +1515,35 @@ def get_lids(address):
 
 	return lids
 
+def get_name_of_patches_with_lids(address,lids):
+	
+	with open(address) as f:
+		lines = f.read()
+		lines = lines.replace('"','')
+
+		for l in lines.split('\n'):
+			if l == '':
+				break
+			if l == 'Filename,Upper left,Lower left,Upper right,Lower right,Center' or l == 'name,upperleft,lowerleft,uperright,lowerright,center':
+				continue
+
+			features = l.split(',')
+
+			filename = features[0]
+			upper_left = (float(features[1]),float(features[2]))
+			lower_left = (float(features[3]),float(features[4]))
+			upper_right = (float(features[5]),float(features[6]))
+			lower_right = (float(features[7]),float(features[8]))
+			center = (float(features[9]),float(features[10]))
+
+			coord = Patch_GPS_coordinate(upper_left,upper_right,lower_left,lower_right,center)
+			
+			for l in lids:
+				if coord.is_coord_inside(lids[l]):
+					print('marker: {0} patch: {1}'.format(l,filename))
+
+	
+
 def main():
 
 	# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT',False)
@@ -1540,12 +1567,14 @@ def main():
 	# final_patches = correct_GPS_coords_new_code(patches,False,False,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
 	# save_coordinates(final_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
 
-	patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
+	# patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
 	lids = get_lids('/data/plant/full_scans/2020-01-08-rgb/lids.txt')
-	save_group_data(group_images_by_nearest_lid(lids,patches),lids,len(patches),'/data/plant/full_scans/2020-01-08-rgb/plt.npy')
-	
+	# save_group_data(group_images_by_nearest_lid(lids,patches),lids,len(patches),'/data/plant/full_scans/2020-01-08-rgb/plt.npy')
+	get_name_of_patches_with_lids('/data/plant/full_scans/metadata/2020-01-08_coordinates.csv',lids)
+
 	# lids = get_lids('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/lids.txt')
 	# plot_groups('/home/ariyan/Desktop/plt.npy',lids)
+
 
 
 def report_time(start,end):
