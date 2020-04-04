@@ -385,8 +385,8 @@ class Patch:
 		self.area_score = -1*score
 
 	def correct_GPS_based_on_point(self,point_in_img,point_in_GPS):
-		ratio_x = point_in_img[0]/self.size[1]
-		ratio_y = point_in_img[1]/self.size[0]
+		ratio_x = point_in_img[0]/self.size[0]
+		ratio_y = point_in_img[1]/self.size[1]
 
 		diff_x_GPS = (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])*ratio_x
 		diff_y_GPS = (self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])*ratio_y
