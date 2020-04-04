@@ -1644,9 +1644,9 @@ def get_groups_and_patches_with_lids(patches_folder,coordinate_address,lids):
 		p = Patch(p_name,None,None,coord,(-1,-1))
 		p.load_img(patches_folder)
 
-		p.visualize_with_single_GPS_point(lids[l_marker],(x,y))
+		p.visualize_with_single_GPS_point(lids[l_marker],(x,y),r)
 		p.correct_GPS_based_on_point((x,y),lids[l_marker])
-		p.visualize_with_single_GPS_point(lids[l_marker],(x,y))
+		p.visualize_with_single_GPS_point(lids[l_marker],(x,y),r)
 
 		p.GPS_Corrected = True
 
