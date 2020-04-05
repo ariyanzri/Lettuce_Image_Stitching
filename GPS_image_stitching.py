@@ -38,7 +38,9 @@ def choose_SIFT_key_points(patch,x1,y1,x2,y2,SIFT_address):
 	kp = []
 	desc = []
 
-	(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_address,patch.name.replace('.tif','')), "rb"))
+	# (kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_address,patch.name.replace('.tif','')), "rb"))
+	kp_tmp = patch.SIFT_kp_locations
+	desc_tmp = patch.SIFT_kp_desc
 
 	for i,k in enumerate(kp_tmp):
 		if k[0]>= x1 and k[0]<=x2 and k[1]>=y1 and k[1]<=y2:
@@ -354,6 +356,9 @@ class Patch:
 		self.GPS_Corrected = False
 		self.area_score = 0
 		self.overlaps = None
+		self.SIFT_kp_locations = None
+		self.SIFT_kp_desc = None
+
 
 	def __le__(self,other):
 		return (self.area_score<=other.area_score)
@@ -374,6 +379,19 @@ class Patch:
 	def del_img(self):
 		self.rgb_img = None
 		self.img = None
+		gc.collect()
+
+	def load_SIFT(self,SIFT_address):
+		# print('load sift for {0}'.format(self.name))
+		(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_address,self.name.replace('.tif','')), "rb"))
+		self.SIFT_kp_locations = kp_tmp
+		self.SIFT_kp_desc = desc_tmp
+
+
+	def del_SIFT(self):
+		# print('delete sift for {0}'.format(self.name))
+		self.SIFT_kp_locations = None
+		self.SIFT_kp_desc = None
 		gc.collect()
 
 	def claculate_area_score(self):
@@ -578,6 +596,7 @@ def parallel_patch_creator_helper(args):
 	return parallel_patch_creator(*args)
 
 def read_all_data_on_server(patches_address,metadatafile_address,SIFT_address,calc_SIFT):
+	global no_of_cores_to_use
 
 	# patches = []
 
@@ -644,7 +663,7 @@ def read_all_data_on_server(patches_address,metadatafile_address,SIFT_address,ca
 			args_list.append((patches_address,filename,coord,SIFT_address,calc_SIFT))
 
 		
-		processes = multiprocessing.Pool(28)
+		processes = multiprocessing.Pool(no_of_cores_to_use)
 		
 		# iterable = processes.imap(parallel_patch_creator_helper,args_list)
 		# results = []
@@ -1114,27 +1133,21 @@ def visualize_single_run(H,p,p2,x1,y1,x2,y2,x11,y11,x22,y22,SIFT_address):
 
 	stitch(img1,img2,black1,black2,H,(x11,y11,x22,y22),True)
 
-def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
+def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None'):
 
 	patches_tmp = patches.copy()
 	not_corrected_patches = []
-
-	best_f = 0
-	best_p = patches_tmp[0]
 
 	for p in patches_tmp:
 		overlaps = [p_n for p_n in patches_tmp if p_n.name != p.name and (p.has_overlap(p_n) or p_n.has_overlap(p))]
 		p.overlaps = overlaps
 		p.claculate_area_score()
 
-		f = len(overlaps)
-
-		if f>best_f:
-			best_f = f
-			best_p = p
-
-	best_p.GPS_Corrected = True
-	not_corrected_patches = not_corrected_patches+[t for t in best_p.overlaps]
+		if p.GPS_Corrected:
+			p.load_SIFT(SIFT_address)
+			not_corrected_patches = not_corrected_patches+overlaps
+			for p_tmp in overlaps:
+				p_tmp.load_SIFT(SIFT_address)
 
 	heapify(not_corrected_patches)
 
@@ -1142,13 +1155,17 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 
 	while True:
 
-		result_string = ''
+		result_string = 'GROPU ID: {0} - '.format(group_id)
 		# random.shuffle(not_corrected_patches)
 
 		sys.stdout.flush()
 
 		# not_corrected_patches = [p for p in patches_tmp if p.GPS_Corrected == False]
 		if len(not_corrected_patches) == 0:
+			break
+
+		if number_of_iterations_without_change > 3*len(not_corrected_patches):
+			print('--- No more correction possible.')
 			break
 
 		p = heappop(not_corrected_patches)
@@ -1225,11 +1242,17 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 		p.GPS_Corrected = True
 		
 		# not_corrected_patches = list(set(not_corrected_patches + [p_n for p_n in p.overlaps if not p_n.GPS_Corrected]))
+
 		for p_n in p.overlaps:
 			p_n.claculate_area_score()
 
-			if (not p_n.GPS_Corrected) and (p_n not in [t for t in not_corrected_patches]):
+			if (not p_n.GPS_Corrected) and (p_n not in not_corrected_patches):
+				p_n.load_SIFT(SIFT_address)
 				heappush(not_corrected_patches,p_n)
+				continue
+
+			if p_n.GPS_Corrected and len([p_c for p_c in p_n.overlaps if not p_c.GPS_Corrected]) == 0:
+				p_n.del_SIFT()
 
 		print(result_string)
 
@@ -1243,6 +1266,10 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address):
 			result, MSE = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,G,ov_1_on_2,show2)
 
 	return patches_tmp
+
+def correct_GPS_coords_new_code_helper(args):
+
+	return correct_GPS_coords_new_code(*args)
 
 def correct_GPS_parallel_inner_function(p,SIFT_address,show2,relaxed_mode):
 
@@ -1462,6 +1489,26 @@ def save_coordinates(final_patches,filename):
 		f.write(final_results)
 
 
+def correct_GPS_new_code_groups(groups,show,show2,SIFT_address):
+	global no_of_cores_to_use
+
+	list_args = []
+
+	for g in groups:
+		list_args.append((groups[g],show,show2,SIFT_address,g))
+
+	processes = multiprocessing.Pool(no_of_cores_to_use)
+
+	list_final_patches = processes.map(correct_GPS_coords_new_code_helper,list_args)
+	processes.close()
+
+	patches = []
+
+	for p_list in list_final_patches:
+		patches += p_list
+
+	return patches
+
 
 def fit_circle(xs,ys):
 
@@ -1657,6 +1704,7 @@ def create_lid_patch_helper(args):
 	return create_lid_patch(*args)
 
 def get_groups_and_patches_with_lids(patches_folder,coordinate_address,lids):
+	global no_of_cores_to_use
 
 	possible_patches_with_lids = get_name_of_patches_with_lids(coordinate_address,lids)
 	list_all_groups = {}
@@ -1668,7 +1716,7 @@ def get_groups_and_patches_with_lids(patches_folder,coordinate_address,lids):
 	for l_marker,p_name,coord in possible_patches_with_lids:
 		args_list.append((patches_folder,p_name,coord,lids,l_marker))
 
-	processes = multiprocessing.Pool(28)
+	processes = multiprocessing.Pool(no_of_cores_to_use)
 
 	lid_patches_with_l = processes.map(create_lid_patch_helper,args_list)
 	processes.close()
@@ -1789,7 +1837,7 @@ def save_group_data(groups,lids,n,address):
 
 			if p.GPS_coords.is_coord_inside(lids[g]):
 				data[i,5] = 1
-				print(p.name)
+				# print(p.name)
 
 			else:
 				data[i,5] = 0
@@ -1803,6 +1851,7 @@ def save_group_data(groups,lids,n,address):
 def main():
 
 	# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT',False)
+	# patches[0].GPS_Corrected = True
 	# final_patches = correct_GPS_coords_new_code(patches,False,False,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')
 	# save_coordinates(final_patches,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
 	
@@ -1825,10 +1874,13 @@ def main():
 
 	# patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
 	lids = get_lids('/data/plant/full_scans/2020-01-08-rgb/lids.txt')
+	groups = get_groups_and_patches_with_lids('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv',lids)
+	corrected_patches = correct_GPS_new_code_groups(groups,False,False,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
+	save_coordinates(corrected_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
+	
 	# save_group_data(group_images_by_nearest_lid(lids,patches),lids,len(patches),'/data/plant/full_scans/2020-01-08-rgb/plt.npy')
 	# get_name_of_patches_with_lids('/data/plant/full_scans/metadata/2020-01-08_coordinates.csv',lids)
-	get_groups_and_patches_with_lids('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv',lids)
-
+	
 	# plot_groups('/home/ariyan/Desktop/plt.npy')
 
 
@@ -1836,6 +1888,8 @@ def main():
 def report_time(start,end):
 	print('-----------------------------------------------------------')
 	print('Start date time: {0}\nEnd date time: {1}\nTotal running time: {2}.'.format(start,end,end-start))
+
+no_of_cores_to_use = 28
 
 start_time = datetime.datetime.now()
 main()
