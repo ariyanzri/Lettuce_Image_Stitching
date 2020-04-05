@@ -1635,7 +1635,7 @@ def get_name_of_patches_with_lids(address,lids):
 
 	return patches_names_with_lid
 
-def create_lid_patch(patches_folder,p_name,coord,GPS_Coord,l):
+def create_lid_patch(patches_folder,p_name,coord,lids,l_marker):
 	x,y,r = get_lid_in_patch(patches_folder,p_name)
 
 	if x==-1 and y==-1 and r==-1:
@@ -1645,12 +1645,12 @@ def create_lid_patch(patches_folder,p_name,coord,GPS_Coord,l):
 	p.load_img(patches_folder)
 
 	p.visualize_with_single_GPS_point(lids[l_marker],(x,y),r)
-	p.correct_GPS_based_on_point((x,y),GPS_Coord)
+	p.correct_GPS_based_on_point((x,y),lids[l_marker])
 	p.visualize_with_single_GPS_point(lids[l_marker],(x,y),r)
 
 	p.GPS_Corrected = True
 
-	return p,l
+	return p,l_marker
 
 def create_lid_patch_helper(args):
 
@@ -1666,7 +1666,7 @@ def get_groups_and_patches_with_lids(patches_folder,coordinate_address,lids):
 	args_list = []
 
 	for l_marker,p_name,coord in possible_patches_with_lids:
-		args_list.append((patches_folder,p_name,coord,lids[l_marker],l_marker))
+		args_list.append((patches_folder,p_name,coord,lids,l_marker))
 
 	processes = multiprocessing.Pool(28)
 
