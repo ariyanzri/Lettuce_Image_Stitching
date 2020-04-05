@@ -1823,12 +1823,12 @@ def main():
 	# save_coordinates(final_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
 
 	# patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
-	# lids = get_lids('/data/plant/full_scans/2020-01-08-rgb/lids.txt')
+	lids = get_lids('/data/plant/full_scans/2020-01-08-rgb/lids.txt')
 	# save_group_data(group_images_by_nearest_lid(lids,patches),lids,len(patches),'/data/plant/full_scans/2020-01-08-rgb/plt.npy')
 	# get_name_of_patches_with_lids('/data/plant/full_scans/metadata/2020-01-08_coordinates.csv',lids)
-	# get_groups_and_patches_with_lids('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv',lids)
+	get_groups_and_patches_with_lids('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv',lids)
 
-	plot_groups('/home/ariyan/Desktop/plt.npy')
+	# plot_groups('/home/ariyan/Desktop/plt.npy')
 
 
 
