@@ -1677,8 +1677,11 @@ def get_groups_and_patches_with_lids(patches_folder,coordinate_address,lids):
 		if l == None:
 			continue
 
-		list_all_groups[l] = [p]
+		if len(list_all_groups[l]) > 0:
+			assigned_patches_names.remove(list_all_groups[l][0].name)
+			
 		assigned_patches_names.append(p.name)
+		list_all_groups[l] = [p]
 
 	new_lids = {}
 
