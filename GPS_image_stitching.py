@@ -1639,7 +1639,7 @@ def create_lid_patch(patches_folder,p_name,coord,GPS_Coord,l):
 	x,y,r = get_lid_in_patch(patches_folder,p_name)
 
 	if x==-1 and y==-1 and r==-1:
-		return None
+		return None,None
 
 	p = Patch(p_name,None,None,coord,(-1,-1))
 	p.load_img(patches_folder)
@@ -1674,6 +1674,9 @@ def get_groups_and_patches_with_lids(patches_folder,coordinate_address,lids):
 	processes.close()
 
 	for p,l in lid_patches_with_l:
+		if p == None or l == None:
+			continue
+			
 		list_all_groups[l] = [p]
 		assigned_patches_names.append(p.name)
 
