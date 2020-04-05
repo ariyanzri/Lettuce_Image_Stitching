@@ -554,9 +554,9 @@ def read_all_data():
 	return patches
 
 def parallel_patch_creator(address,filename,coord,SIFT_address,calc_SIFT):
-	rgb,img = load_preprocess_image('{0}/{1}'.format(address,filename))
 	
 	if calc_SIFT:
+		rgb,img = load_preprocess_image('{0}/{1}'.format(address,filename))
 		kp,desc = detect_SIFT_key_points(img,0,0,img.shape[1],img.shape[0],filename,False)
 		# *** kp_tmp = [(p.pt, p.size, p.angle, p.response, p.octave, p.class_id) for p in kp]
 		kp_tmp = [(p.pt[0], p.pt[1]) for p in kp]
@@ -566,7 +566,7 @@ def parallel_patch_creator(address,filename,coord,SIFT_address,calc_SIFT):
 	# print('Patch created and SIFT generated for {0}'.format(filename))
 	sys.stdout.flush()
 	
-	size = np.shape(img)
+	size = (3296, 2472)
 
 	p = Patch(filename,None,None,coord,size)
 	
@@ -1639,6 +1639,7 @@ def get_groups_and_patches_with_lids(patches_folder,coordinate_address,lids):
 
 	possible_patches_with_lids = get_name_of_patches_with_lids(coordinate_address,lids)
 	list_all_groups = {}
+	assigned_patches_names = []
 
 	for l_marker,p_name,coord in possible_patches_with_lids:
 		x,y,r = get_lid_in_patch(patches_folder,p_name)
@@ -1649,16 +1650,26 @@ def get_groups_and_patches_with_lids(patches_folder,coordinate_address,lids):
 		p = Patch(p_name,None,None,coord,(-1,-1))
 		p.load_img(patches_folder)
 
-		p.visualize_with_single_GPS_point(lids[l_marker],(x,y),r)
+		# p.visualize_with_single_GPS_point(lids[l_marker],(x,y),r)
 		p.correct_GPS_based_on_point((x,y),lids[l_marker])
-		p.visualize_with_single_GPS_point(lids[l_marker],(x,y),r)
+		# p.visualize_with_single_GPS_point(lids[l_marker],(x,y),r)
 
 		p.GPS_Corrected = True
 
 		list_all_groups[l_marker] = [p]
+		assigned_patches_names.append(p.name)
+
+	new_lids = {}
+
+	for l in list_all_groups:
+		new_lids[l] = lids[l]
 
 	
-	# add other patches load
+	patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
+
+	for p in patches:
+		if p.name not in assigned_patches_names:
+			list_all_groups[get_nearest_lid_patch(new_lids,p)].append(p)
 
 	print('Detected {0} groups as follow:'.format(len(list_all_groups.values())))
 
