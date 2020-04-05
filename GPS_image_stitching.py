@@ -1697,6 +1697,8 @@ def get_groups_and_patches_with_lids(patches_folder,coordinate_address,lids):
 	for g in list_all_groups:
 		print('Group {0} with {1} images.'.format(g,len(list_all_groups[g])))
 
+	print(len(patches))
+	
 	save_group_data(list_all_groups,new_lids,len(patches),'/data/plant/full_scans/2020-01-08-rgb/plt.npy')
 
 	return list_all_groups
@@ -1744,7 +1746,7 @@ def group_images_by_nearest_lid(lids,patches):
 
 	return list_all_groups
 
-def plot_groups(address,lids):
+def plot_groups(address):
 	import matplotlib.pyplot as plt
 
 	data = np.load(address)
@@ -1821,13 +1823,12 @@ def main():
 	# save_coordinates(final_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
 
 	# patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
-	lids = get_lids('/data/plant/full_scans/2020-01-08-rgb/lids.txt')
+	# lids = get_lids('/data/plant/full_scans/2020-01-08-rgb/lids.txt')
 	# save_group_data(group_images_by_nearest_lid(lids,patches),lids,len(patches),'/data/plant/full_scans/2020-01-08-rgb/plt.npy')
 	# get_name_of_patches_with_lids('/data/plant/full_scans/metadata/2020-01-08_coordinates.csv',lids)
-	get_groups_and_patches_with_lids('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv',lids)
+	# get_groups_and_patches_with_lids('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv',lids)
 
-	# lids = get_lids('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/lids.txt')
-	# plot_groups('/home/ariyan/Desktop/plt.npy',lids)
+	plot_groups('/home/ariyan/Desktop/plt.npy')
 
 
 
