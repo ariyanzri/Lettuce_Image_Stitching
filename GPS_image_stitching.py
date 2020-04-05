@@ -562,6 +562,7 @@ def parallel_patch_creator(address,filename,coord,SIFT_address,calc_SIFT):
 		kp_tmp = [(p.pt[0], p.pt[1]) for p in kp]
 		pickle.dump((kp_tmp,desc), open('{0}/{1}_SIFT.data'.format(SIFT_address,filename.replace('.tif','')), "wb"))
 		del kp,kp_tmp,desc
+		del rgb,img
 		
 	# print('Patch created and SIFT generated for {0}'.format(filename))
 	sys.stdout.flush()
@@ -570,7 +571,6 @@ def parallel_patch_creator(address,filename,coord,SIFT_address,calc_SIFT):
 
 	p = Patch(filename,None,None,coord,size)
 	
-	del rgb,img
 	return p
 
 def parallel_patch_creator_helper(args):
