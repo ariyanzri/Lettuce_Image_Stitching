@@ -1644,9 +1644,9 @@ def create_lid_patch(patches_folder,p_name,coord,GPS_Coord,l):
 	p = Patch(p_name,None,None,coord,(-1,-1))
 	p.load_img(patches_folder)
 
-	# p.visualize_with_single_GPS_point(lids[l_marker],(x,y),r)
+	p.visualize_with_single_GPS_point(lids[l_marker],(x,y),r)
 	p.correct_GPS_based_on_point((x,y),GPS_Coord)
-	# p.visualize_with_single_GPS_point(lids[l_marker],(x,y),r)
+	p.visualize_with_single_GPS_point(lids[l_marker],(x,y),r)
 
 	p.GPS_Corrected = True
 
@@ -1697,8 +1697,6 @@ def get_groups_and_patches_with_lids(patches_folder,coordinate_address,lids):
 	for g in list_all_groups:
 		print('Group {0} with {1} images.'.format(g,len(list_all_groups[g])))
 
-	print(len(patches))
-	
 	save_group_data(list_all_groups,new_lids,len(patches),'/data/plant/full_scans/2020-01-08-rgb/plt.npy')
 
 	return list_all_groups
