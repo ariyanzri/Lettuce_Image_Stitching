@@ -1206,7 +1206,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 
 		percentage_inliers = round(percentage_inliers*100,2)
 
-		if (number_of_iterations_without_change<=len(not_corrected_patches)) and (percentage_inliers<=10 or len(matches) < 40):
+		if (number_of_iterations_without_change<=len(not_corrected_patches)+1) and (percentage_inliers<=10 or len(matches) < 40):
 			heappush(not_corrected_patches,p)
 			result_string+=' <ERR: Low inliers> --> ({0},{1}%)'.format(len(matches),percentage_inliers)
 			print(result_string)
@@ -1218,7 +1218,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 		gps_err = Get_GPS_Error(H,ov_1_on_2,ov_2_on_1)
 		
 		if gps_err[0] > (ov_1_on_2[2]-ov_1_on_2[0])/2 and gps_err[1] > (ov_1_on_2[3]-ov_1_on_2[1])/2:
-			if (number_of_iterations_without_change<=len(not_corrected_patches)):
+			if (number_of_iterations_without_change<=len(not_corrected_patches)+1):
 				heappush(not_corrected_patches,p)
 				result_string+=' <ERR: High GPS error> --> ({0},{1}%,<{2},{3}>)'.format(len(matches),percentage_inliers,gps_err[0],gps_err[1])
 				print(result_string)
@@ -1233,7 +1233,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 			G = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
 			result, MSE = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,G,ov_1_on_2,show2)
 
-		if number_of_iterations_without_change>len(not_corrected_patches):
+		if number_of_iterations_without_change>len(not_corrected_patches)+1:
 			result_string+=' <OK: Relax mode> --> ({0},{1}%)'.format(len(matches),percentage_inliers)
 		else:
 			result_string+=' <OK: Perfect mode> --> ({0},{1}%)'.format(len(matches),percentage_inliers)
@@ -1889,7 +1889,7 @@ def report_time(start,end):
 	print('-----------------------------------------------------------')
 	print('Start date time: {0}\nEnd date time: {1}\nTotal running time: {2}.'.format(start,end,end-start))
 
-no_of_cores_to_use = 28
+no_of_cores_to_use = 20
 
 start_time = datetime.datetime.now()
 main()
