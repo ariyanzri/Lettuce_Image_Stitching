@@ -1644,9 +1644,9 @@ def create_lid_patch(patches_folder,p_name,coord,lids,l_marker):
 	p = Patch(p_name,None,None,coord,(-1,-1))
 	p.load_img(patches_folder)
 
-	p.visualize_with_single_GPS_point(lids[l_marker],(x,y),r)
+	# p.visualize_with_single_GPS_point(lids[l_marker],(x,y),r)
 	p.correct_GPS_based_on_point((x,y),lids[l_marker])
-	p.visualize_with_single_GPS_point(lids[l_marker],(x,y),r)
+	# p.visualize_with_single_GPS_point(lids[l_marker],(x,y),r)
 
 	p.GPS_Corrected = True
 
