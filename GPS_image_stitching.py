@@ -1674,9 +1674,9 @@ def get_groups_and_patches_with_lids(patches_folder,coordinate_address,lids):
 	processes.close()
 
 	for p,l in lid_patches_with_l:
-		if p == None or l == None:
+		if l == None:
 			continue
-			
+
 		list_all_groups[l] = [p]
 		assigned_patches_names.append(p.name)
 
