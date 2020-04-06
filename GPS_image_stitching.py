@@ -1135,6 +1135,8 @@ def visualize_single_run(H,p,p2,x1,y1,x2,y2,x11,y11,x22,y22,SIFT_address):
 
 def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None'):
 
+	OK_GPS_ERR_AVG = (0,0)
+
 	patches_tmp = patches.copy()
 	not_corrected_patches = []
 
@@ -1166,7 +1168,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 
 		p = heappop(not_corrected_patches)
 
-		if p.area_score == 0:
+		if number_of_iterations_without_change > 3*len(not_corrected_patches):
 			break
 
 		result_string+='Patch {0}'.format(p.name)
@@ -1206,11 +1208,11 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 
 		percentage_inliers = round(percentage_inliers*100,2)
 
-		if (number_of_iterations_without_change<=len(not_corrected_patches)+1) and (percentage_inliers<=10 or len(matches) < 40):
+		if number_of_iterations_without_change <= len(not_corrected_patches)+1 and (percentage_inliers<=10 or len(matches) < 40):
 			result_string+=' <ERR: Low inliers> --> ({0},{1}%)'.format(len(matches),percentage_inliers)
 			print(result_string)
 			number_of_iterations_without_change+=1
-			p.area_score*=0
+			p.area_score=0
 			heappush(not_corrected_patches,p)
 			# visualize_single_run(H,p,p2,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],SIFT_address)
 			continue
@@ -1218,23 +1220,20 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 		gps_err = Get_GPS_Error(H,ov_1_on_2,ov_2_on_1)
 		
 		if gps_err[0] > (ov_1_on_2[2]-ov_1_on_2[0])/2 and gps_err[1] > (ov_1_on_2[3]-ov_1_on_2[1])/2:
-			if (number_of_iterations_without_change<=len(not_corrected_patches)+1):
-				result_string+=' <ERR: High GPS error> --> ({0},{1}%,<{2},{3}>)'.format(len(matches),percentage_inliers,gps_err[0],gps_err[1])
-				print(result_string)
-				number_of_iterations_without_change+=1
-				p.area_score*=0
-				heappush(not_corrected_patches,p)
-				# visualize_single_run(H,p,p2,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],SIFT_address)
-				continue
-			else:
-				H = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
-
+			result_string+=' <ERR: High GPS error> --> ({0},{1}%,<{2},{3}>)'.format(len(matches),percentage_inliers,gps_err[0],gps_err[1])
+			print(result_string)
+			number_of_iterations_without_change+=1
+			p.area_score=0
+			heappush(not_corrected_patches,p)
+			# visualize_single_run(H,p,p2,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],SIFT_address)
+			continue
+			
 		if show2:
 			G = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
 			result, MSE = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,G,ov_1_on_2,show2)
 
-		if number_of_iterations_without_change>len(not_corrected_patches)+1:
-			result_string+=' <OK: Relax mode> --> ({0},{1}%)'.format(len(matches),percentage_inliers)
+		if number_of_iterations_without_change > len(not_corrected_patches)+1:
+			result_string+=' <OK: Relaxed mode> --> ({0},{1}%)'.format(len(matches),percentage_inliers)
 		else:
 			result_string+=' <OK: Perfect mode> --> ({0},{1}%)'.format(len(matches),percentage_inliers)
 
@@ -1261,7 +1260,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 
 		if heapify_flag:
 			heapify(not_corrected_patches)
-			
+
 		print(result_string)
 
 		number_of_iterations_without_change = 0
@@ -1329,27 +1328,37 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 		
 		if gps_err[0] > (ov_1_on_2[2]-ov_1_on_2[0])/2 and gps_err[1] > (ov_1_on_2[3]-ov_1_on_2[1])/2:
 			H = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
+			result_string+=' <OK: GPS ONLY FULL Relax mode> --> ({0},{1}%,<{2},{3}>)'.format(len(matches),percentage_inliers,gps_err[0],gps_err[1])
+		else:
+			result_string+=' <OK: FULL Relax mode> --> ({0},{1}%)'.format(len(matches),percentage_inliers,gps_err[0],gps_err[1])
 
 		if show2:
 			G = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
 			result, MSE = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,G,ov_1_on_2,show2)
-
-		result_string+=' <OK: FULL Relax mode> --> ({0},{1}%,<{2},{3}>)'.format(len(matches),percentage_inliers,gps_err[0],gps_err[1])
 
 		p.GPS_coords = get_new_GPS_Coords(p,p2,H)
 		p.GPS_Corrected = True
 		
 		# not_corrected_patches = list(set(not_corrected_patches + [p_n for p_n in p.overlaps if not p_n.GPS_Corrected]))
 
+		heapify_flag = False
+
 		for p_n in p.overlaps:
-			
-			if (not p_n.GPS_Corrected) and (p_n not in not_corrected_patches):
-				p_n.load_SIFT(SIFT_address)
-				heappush(not_corrected_patches,p_n)
-				continue
+
+			if (not p_n.GPS_Corrected):
+				if (p_n not in not_corrected_patches):
+					p_n.load_SIFT(SIFT_address)
+					p_n.claculate_area_score()
+					heappush(not_corrected_patches,p_n)
+				else:
+					p_n.claculate_area_score()
+					heapify_flag = True
 
 			if p_n.GPS_Corrected and len([p_c for p_c in p_n.overlaps if not p_c.GPS_Corrected]) == 0:
 				p_n.del_SIFT()
+
+		if heapify_flag:
+			heapify(not_corrected_patches)
 
 		print(result_string)
 
