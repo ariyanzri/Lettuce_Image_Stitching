@@ -1240,8 +1240,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 		else:
 			result_string+=' <OK: Perfect mode> --> ({0},{1}%)'.format(len(matches),percentage_inliers)
 			OK_GPS_N+=1
-			OK_GPS_ERR_AVG[0]=OK_GPS_ERR_AVG[0]+gps_err[0]
-			OK_GPS_ERR_AVG[1]=OK_GPS_ERR_AVG[1]+gps_err[1]
+			OK_GPS_ERR_AVG=(OK_GPS_ERR_AVG[0]+gps_err[0],OK_GPS_ERR_AVG[1]+gps_err[1])
 
 		p.GPS_coords = get_new_GPS_Coords(p,p2,H)
 		p.GPS_Corrected = True
@@ -1380,7 +1379,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 			result, MSE = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,G,ov_1_on_2,show2)
 
 	print('GPS ERROR: ({0},{1})'.format(OK_GPS_ERR_AVG[0]/OK_GPS_N,OK_GPS_ERR_AVG[1]/OK_GPS_N))
-	
+
 	return patches_tmp
 
 def correct_GPS_coords_new_code_helper(args):
