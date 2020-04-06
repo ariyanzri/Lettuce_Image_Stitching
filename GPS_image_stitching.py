@@ -1243,18 +1243,25 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 		
 		# not_corrected_patches = list(set(not_corrected_patches + [p_n for p_n in p.overlaps if not p_n.GPS_Corrected]))
 
-		for p_n in p.overlaps:
-			
-			if (not p_n.GPS_Corrected) and (p_n not in not_corrected_patches):
-				p_n.load_SIFT(SIFT_address)
-				p_n.claculate_area_score()
-				heappush(not_corrected_patches,p_n)
+		heapify_flag = False
 
-				continue
+		for p_n in p.overlaps:
+
+			if (not p_n.GPS_Corrected):
+				if (p_n not in not_corrected_patches):
+					p_n.load_SIFT(SIFT_address)
+					p_n.claculate_area_score()
+					heappush(not_corrected_patches,p_n)
+				else:
+					p_n.claculate_area_score()
+					heapify_flag = True
 
 			if p_n.GPS_Corrected and len([p_c for p_c in p_n.overlaps if not p_c.GPS_Corrected]) == 0:
 				p_n.del_SIFT()
 
+		if heapify_flag:
+			heapify(not_corrected_patches)
+			
 		print(result_string)
 
 		number_of_iterations_without_change = 0
