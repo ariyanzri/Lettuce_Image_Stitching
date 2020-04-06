@@ -1207,11 +1207,11 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 		percentage_inliers = round(percentage_inliers*100,2)
 
 		if (number_of_iterations_without_change<=len(not_corrected_patches)+1) and (percentage_inliers<=10 or len(matches) < 40):
-			heappush(not_corrected_patches,p)
 			result_string+=' <ERR: Low inliers> --> ({0},{1}%)'.format(len(matches),percentage_inliers)
 			print(result_string)
 			number_of_iterations_without_change+=1
 			p.area_score*=0
+			heappush(not_corrected_patches,p)
 			# visualize_single_run(H,p,p2,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],SIFT_address)
 			continue
 
@@ -1219,11 +1219,11 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 		
 		if gps_err[0] > (ov_1_on_2[2]-ov_1_on_2[0])/2 and gps_err[1] > (ov_1_on_2[3]-ov_1_on_2[1])/2:
 			if (number_of_iterations_without_change<=len(not_corrected_patches)+1):
-				heappush(not_corrected_patches,p)
 				result_string+=' <ERR: High GPS error> --> ({0},{1}%,<{2},{3}>)'.format(len(matches),percentage_inliers,gps_err[0],gps_err[1])
 				print(result_string)
 				number_of_iterations_without_change+=1
 				p.area_score*=0
+				heappush(not_corrected_patches,p)
 				# visualize_single_run(H,p,p2,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],SIFT_address)
 				continue
 			else:
