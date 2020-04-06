@@ -1612,7 +1612,7 @@ def correct_GPS_new_code_groups(groups,show,show2,SIFT_address):
 	for g in groups:
 		list_args.append((groups[g],show,show2,SIFT_address,g))
 
-	processes = multiprocessing.Pool(no_of_cores_to_use)
+	processes = multiprocessing.Pool(min(len(groups),no_of_cores_to_use))
 
 	list_final_patches = processes.map(correct_GPS_coords_new_code_helper,list_args)
 	processes.close()
