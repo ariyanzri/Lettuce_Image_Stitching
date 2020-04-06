@@ -1164,11 +1164,10 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 		if len(not_corrected_patches) == 0:
 			break
 
-		if number_of_iterations_without_change > 3*len(not_corrected_patches):
-			print('--- No more correction possible.')
-			break
-
 		p = heappop(not_corrected_patches)
+
+		if p.area_score == 0:
+			break
 
 		result_string+='Patch {0}'.format(p.name)
 
@@ -1179,6 +1178,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 			print(result_string)
 			heappush(not_corrected_patches,p)
 			number_of_iterations_without_change+=1
+
 			continue
 
 		p2,f_grbg = get_best_overlap(p,overlaps)
@@ -1244,8 +1244,98 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 		# not_corrected_patches = list(set(not_corrected_patches + [p_n for p_n in p.overlaps if not p_n.GPS_Corrected]))
 
 		for p_n in p.overlaps:
-			p_n.claculate_area_score()
+			
+			if (not p_n.GPS_Corrected) and (p_n not in not_corrected_patches):
+				p_n.load_SIFT(SIFT_address)
+				p_n.claculate_area_score()
+				heappush(not_corrected_patches,p_n)
 
+				continue
+
+			if p_n.GPS_Corrected and len([p_c for p_c in p_n.overlaps if not p_c.GPS_Corrected]) == 0:
+				p_n.del_SIFT()
+
+		print(result_string)
+
+		number_of_iterations_without_change = 0
+
+		if show2:
+			ov_2_on_1 = p.get_overlap_rectangle(p2)
+			ov_1_on_2 = p2.get_overlap_rectangle(p)
+
+			G = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
+			result, MSE = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,G,ov_1_on_2,show2)
+
+
+	print('******* GROUP ID: {0} - Entering FULL Relax Mode ********'.format(group_id))
+
+	while True:
+
+		result_string = 'GROPU ID: {0} - '.format(group_id)
+		# random.shuffle(not_corrected_patches)
+
+		sys.stdout.flush()
+
+		# not_corrected_patches = [p for p in patches_tmp if p.GPS_Corrected == False]
+		if len(not_corrected_patches) == 0 or number_of_iterations_without_change > len(not_corrected_patches)+1:
+			break
+
+		p = heappop(not_corrected_patches)
+
+		result_string+='Patch {0}'.format(p.name)
+
+		overlaps = [p_n for p_n in p.overlaps if p_n.GPS_Corrected]
+
+		if len(overlaps) == 0:
+			result_string+=' <ERR: No overlaps>'
+			print(result_string)
+			heappush(not_corrected_patches,p)
+			number_of_iterations_without_change+=1
+			continue
+
+		p2,f_grbg = get_best_overlap(p,overlaps)
+		
+		ov_2_on_1 = p.get_overlap_rectangle(p2)
+		ov_1_on_2 = p2.get_overlap_rectangle(p)
+		
+		if (ov_2_on_1[0] == 0 and ov_2_on_1[1] == 0 and ov_2_on_1[2] == 0 and ov_2_on_1[3] == 0)\
+		or (ov_1_on_2[0] == 0 and ov_1_on_2[1] == 0 and ov_1_on_2[2] == 0 and ov_1_on_2[3] == 0):
+			result_string+=' <ERR: Empty overlap>'
+			print(result_string)
+			heappush(not_corrected_patches,p)
+			number_of_iterations_without_change+=1
+			continue
+
+		# kp1,desc1 = detect_SIFT_key_points(p.img,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],1,show)
+		# kp2,desc2 = detect_SIFT_key_points(p2.img,ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],2,show)
+
+		kp1,desc1 = choose_SIFT_key_points(p,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],SIFT_address)
+		kp2,desc2 = choose_SIFT_key_points(p2,ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],SIFT_address)
+
+		matches = get_good_matches(desc2,desc1)
+
+		H,percentage_inliers = find_homography(matches,kp2,kp1,ov_2_on_1,ov_1_on_2,False)
+
+		percentage_inliers = round(percentage_inliers*100,2)
+
+		gps_err = Get_GPS_Error(H,ov_1_on_2,ov_2_on_1)
+		
+		if gps_err[0] > (ov_1_on_2[2]-ov_1_on_2[0])/2 and gps_err[1] > (ov_1_on_2[3]-ov_1_on_2[1])/2:
+			H = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
+
+		if show2:
+			G = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
+			result, MSE = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,G,ov_1_on_2,show2)
+
+		result_string+=' <OK: FULL Relax mode> --> ({0},{1}%,<{2},{3}>)'.format(len(matches),percentage_inliers,gps_err[0],gps_err[1])
+
+		p.GPS_coords = get_new_GPS_Coords(p,p2,H)
+		p.GPS_Corrected = True
+		
+		# not_corrected_patches = list(set(not_corrected_patches + [p_n for p_n in p.overlaps if not p_n.GPS_Corrected]))
+
+		for p_n in p.overlaps:
+			
 			if (not p_n.GPS_Corrected) and (p_n not in not_corrected_patches):
 				p_n.load_SIFT(SIFT_address)
 				heappush(not_corrected_patches,p_n)
@@ -1264,6 +1354,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 
 			G = find_homography_gps_only(ov_2_on_1,ov_1_on_2,p,p2)
 			result, MSE = stitch(p.rgb_img,p2.rgb_img,p.img,p2.img,G,ov_1_on_2,show2)
+
 
 	return patches_tmp
 
