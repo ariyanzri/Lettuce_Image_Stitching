@@ -1211,7 +1211,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 			result_string+=' <ERR: Low inliers> --> ({0},{1}%)'.format(len(matches),percentage_inliers)
 			print(result_string)
 			number_of_iterations_without_change+=1
-			p.area_score*=0.5
+			p.area_score*=0
 			# visualize_single_run(H,p,p2,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],SIFT_address)
 			continue
 
@@ -1223,7 +1223,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 				result_string+=' <ERR: High GPS error> --> ({0},{1}%,<{2},{3}>)'.format(len(matches),percentage_inliers,gps_err[0],gps_err[1])
 				print(result_string)
 				number_of_iterations_without_change+=1
-				p.area_score*=0.5
+				p.area_score*=0
 				# visualize_single_run(H,p,p2,ov_2_on_1[0],ov_2_on_1[1],ov_2_on_1[2],ov_2_on_1[3],ov_1_on_2[0],ov_1_on_2[1],ov_1_on_2[2],ov_1_on_2[3],SIFT_address)
 				continue
 			else:
