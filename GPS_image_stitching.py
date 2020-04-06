@@ -1178,6 +1178,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 		if len(overlaps) == 0:
 			result_string+=' <ERR: No overlaps>'
 			print(result_string)
+			p.area_score=0
 			heappush(not_corrected_patches,p)
 			number_of_iterations_without_change+=1
 
@@ -1192,6 +1193,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 		or (ov_1_on_2[0] == 0 and ov_1_on_2[1] == 0 and ov_1_on_2[2] == 0 and ov_1_on_2[3] == 0):
 			result_string+=' <ERR: Empty overlap>'
 			print(result_string)
+			p.area_score=0
 			heappush(not_corrected_patches,p)
 			number_of_iterations_without_change+=1
 			continue
@@ -1295,6 +1297,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 		if len(overlaps) == 0:
 			result_string+=' <ERR: No overlaps>'
 			print(result_string)
+			p.area_score=0
 			heappush(not_corrected_patches,p)
 			number_of_iterations_without_change+=1
 			continue
@@ -1308,6 +1311,7 @@ def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None')
 		or (ov_1_on_2[0] == 0 and ov_1_on_2[1] == 0 and ov_1_on_2[2] == 0 and ov_1_on_2[3] == 0):
 			result_string+=' <ERR: Empty overlap>'
 			print(result_string)
+			p.area_score=0
 			heappush(not_corrected_patches,p)
 			number_of_iterations_without_change+=1
 			continue
