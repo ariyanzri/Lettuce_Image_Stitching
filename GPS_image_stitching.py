@@ -2337,7 +2337,7 @@ def main():
 	# patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
 	lids = get_lids('/data/plant/full_scans/2020-01-08-rgb/lids.txt')
 	groups = get_groups_and_patches_with_lids('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv',lids)
-	corrected_patches = correct_GPS_two_queues_groups(groups['131'],'/data/plant/full_scans/2020-01-08-rgb/SIFT')
+	corrected_patches = correct_GPS_two_queues_groups({'131':groups['131']},'/data/plant/full_scans/2020-01-08-rgb/SIFT')
 	# corrected_patches = correct_GPS_new_code_groups(groups,False,False,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
 	save_coordinates(corrected_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
 	
