@@ -1453,8 +1453,6 @@ def correct_GPS_two_queues(patches,SIFT_address,group_id='None'):
 			break
 
 
-	return patches
-
 def correct_GPS_two_queues_helper(args):
 
 	return correct_GPS_two_queues(*args)
@@ -1941,13 +1939,13 @@ def correct_GPS_two_queues_groups(groups,SIFT_address):
 
 	processes = multiprocessing.Pool(min(len(groups),no_of_cores_to_use))
 
-	list_final_patches = processes.map(correct_GPS_two_queues_helper,list_args)
+	processes.map(correct_GPS_two_queues_helper,list_args)
 	processes.close()
 
 	patches = []
 
-	for p_list in list_final_patches:
-		patches += p_list
+	for g in groups:
+		patches += groups[g]
 
 	return patches
 
