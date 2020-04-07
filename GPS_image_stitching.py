@@ -1344,8 +1344,9 @@ def precalculate_pairwise_transformation_info_and_add_neighbors(patches,SIFT_add
 				p.neighbors.append((n,overlap_on_n,overlap_on_p,H,num_matches,percentage_inliers,gps_err))
 
 		print('Calculated Transformation and error values for {0} neighbors of {1}'.format(len(p.neighbors),p.name))
-
-	if main_patch == None:
+		sys.stdout.flush()
+		
+	if main_patch is None:
 		main_patch = patches[0]
 		main_patch.GPS_Corrected = True
 
