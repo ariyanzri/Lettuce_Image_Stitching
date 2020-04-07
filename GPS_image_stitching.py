@@ -2149,7 +2149,7 @@ def create_lid_patch(patches_folder,p_name,coord,lids,l_marker):
 	if x==-1 and y==-1 and r==-1:
 		return None,None
 
-	p = Patch(p_name,None,None,coord,(-1,-1))
+	p = Patch_2(p_name,None,None,coord,(-1,-1))
 	p.load_img(patches_folder)
 
 	# p.visualize_with_single_GPS_point(lids[l_marker],(x,y),r)
