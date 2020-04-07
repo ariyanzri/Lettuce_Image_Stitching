@@ -1326,7 +1326,7 @@ def get_pairwise_transformation_info(p1,p2,SIFT_address):
 
 	return overlap1,overlap2,H,num_matches,percentage_inliers,gps_err
 
-def precalculate_pairwise_transformation_info_and_add_neighbors(patches,SIFT_address):
+def precalculate_pairwise_transformation_info_and_add_neighbors(patches,SIFT_address,group_id):
 	
 	main_patch = None
 
@@ -1343,9 +1343,9 @@ def precalculate_pairwise_transformation_info_and_add_neighbors(patches,SIFT_add
 
 				p.neighbors.append((n,overlap_on_n,overlap_on_p,H,num_matches,percentage_inliers,gps_err))
 
-		print('Calculated Transformation and error values for {0} neighbors of {1}'.format(len(p.neighbors),p.name))
+		print('GROPU ID: {0} - Calculated Transformation and error values for {1} neighbors of {2}'.format(group_id,len(p.neighbors),p.name))
 		sys.stdout.flush()
-		
+
 	if main_patch is None:
 		main_patch = patches[0]
 		main_patch.GPS_Corrected = True
@@ -1413,7 +1413,7 @@ def get_list_of_corrected_neighbors_queue_2(patch,group_id):
 
 def correct_GPS_two_queues(patches,SIFT_address,group_id='None'):
 
-	starting_patch = precalculate_pairwise_transformation_info_and_add_neighbors(patches,SIFT_address)
+	starting_patch = precalculate_pairwise_transformation_info_and_add_neighbors(patches,SIFT_address,group_id)
 
 	queue_1 = [starting_patch]
 	queue_2 = []
@@ -2338,7 +2338,7 @@ def main():
 	# patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
 	lids = get_lids('/data/plant/full_scans/2020-01-08-rgb/lids.txt')
 	groups = get_groups_and_patches_with_lids('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv',lids)
-	corrected_patches = correct_GPS_two_queues_groups({'131':groups['131']},'/data/plant/full_scans/2020-01-08-rgb/SIFT')
+	corrected_patches = correct_GPS_two_queues_groups(groups,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
 	# corrected_patches = correct_GPS_new_code_groups(groups,False,False,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
 	save_coordinates(corrected_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
 	
