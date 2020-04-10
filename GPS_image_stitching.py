@@ -1365,8 +1365,9 @@ def get_list_of_corrected_neighbors_queue_1(patch,group_id):
 
 					result_string = 'GROPU ID: {0} - '.format(group_id)
 					result_string +='Patch {0}'.format(n.name)
-				
+					
 					n.GPS_coords = get_new_GPS_Coords(n,patch,H)
+					
 					n.GPS_Corrected = True
 
 					result_string+=' <Q1: Corrected> --> ({0},{1}%,<{2},{3}>)'.format(num_matches,percentage_inliers,gps_err[0],gps_err[1])
@@ -1392,7 +1393,9 @@ def get_list_of_corrected_neighbors_queue_2(patch,group_id):
 			result_string +='Patch {0}'.format(n.name)
 
 			if (gps_err[0] <= (overlap_on_p[2]-overlap_on_p[0])/2 and gps_err[1] <= (overlap_on_p[3]-overlap_on_p[1])/2):
+				
 				n.GPS_coords = get_new_GPS_Coords(n,patch,H)
+				
 				n.GPS_Corrected = True
 				
 				result_string+=' <Q2: Low Inliers Relaxed> --> ({0},{1}%,<{2},{3}>)'.format(num_matches,percentage_inliers,gps_err[0],gps_err[1])
@@ -1410,6 +1413,46 @@ def get_list_of_corrected_neighbors_queue_2(patch,group_id):
 	sys.stdout.flush()
 
 	return corrected_neighbors
+
+def get_corrected_string(patches):
+
+	final_results = ''
+
+	for p in patches:
+		p.GPS_coords.UL_coord = (round(p.GPS_coords.UL_coord[0],7),round(p.GPS_coords.UL_coord[1],7))
+		p.GPS_coords.LL_coord = (round(p.GPS_coords.LL_coord[0],7),round(p.GPS_coords.LL_coord[1],7))
+		p.GPS_coords.UR_coord = (round(p.GPS_coords.UR_coord[0],7),round(p.GPS_coords.UR_coord[1],7))
+		p.GPS_coords.LR_coord = (round(p.GPS_coords.LR_coord[0],7),round(p.GPS_coords.LR_coord[1],7))
+		p.GPS_coords.Center = (round(p.GPS_coords.Center[0],7),round(p.GPS_coords.Center[1],7))
+
+		final_results += '{:s},"{:.7f},{:.7f}","{:.7f},{:.7f}","{:.7f},{:.7f}","{:.7f},{:.7f}","{:.7f},{:.7f}"\n'\
+		.format(p.name,p.GPS_coords.UL_coord[0],p.GPS_coords.UL_coord[1],p.GPS_coords.LL_coord[0],p.GPS_coords.LL_coord[1],p.GPS_coords.UR_coord[0],p.GPS_coords.UR_coord[1]\
+			,p.GPS_coords.LR_coord[0],p.GPS_coords.LR_coord[1],p.GPS_coords.Center[0],p.GPS_coords.Center[1])
+
+	final_results = final_results.replace('(','"').replace(')','"')
+
+	return final_results
+
+def pop_best_from_queue_2(queue_2):
+	patch = queue_2[0]
+	if len([n[0] for n in patch.neighbors if not n[0].GPS_Corrected]) == 0:
+		best_score = 0
+	else:
+		best_score = min([percentage_inliers for n,overlap_on_n,overlap_on_p,H,num_matches,percentage_inliers,gps_err in patch.neighbors if not n.GPS_Corrected])
+
+	for p in queue_2:
+		if len([n[0] for n in p.neighbors if not n[0].GPS_Corrected]) == 0:
+			continue
+
+		score = min([percentage_inliers for n,overlap_on_n,overlap_on_p,H,num_matches,percentage_inliers,gps_err in p.neighbors if not n.GPS_Corrected])
+		if score > best_score:
+			patch = p
+			best_score = score
+
+	queue_2.remove(patch)
+	return patch
+
+
 
 def correct_GPS_two_queues(patches,SIFT_address,group_id='None'):
 
@@ -1429,6 +1472,7 @@ def correct_GPS_two_queues(patches,SIFT_address,group_id='None'):
 		if current_queue == 1:
 			patch = queue_1.pop()
 		else:
+			# patch = pop_best_from_queue_2(queue_2)
 			patch = queue_2.pop()
 
 		if current_queue == 1:
@@ -1452,6 +1496,9 @@ def correct_GPS_two_queues(patches,SIFT_address,group_id='None'):
 		if len(queue_2) == 0 and len(queue_1) == 0:
 			break
 
+
+	string_corrected = get_corrected_string(patches)
+	return string_corrected
 
 def correct_GPS_two_queues_helper(args):
 
@@ -1928,6 +1975,15 @@ def save_coordinates(final_patches,filename):
 	with open(filename,'w') as f:
 		f.write(final_results)
 
+def save_coordinates_from_string(results,filename):
+	
+	final_results = 'Filename,Upper left,Lower left,Upper right,Lower right,Center\n'
+
+	for r in results:
+		final_results+=r
+
+	with open(filename,'w') as f:
+		f.write(final_results)
 
 def correct_GPS_two_queues_groups(groups,SIFT_address):
 	global no_of_cores_to_use
@@ -1939,15 +1995,10 @@ def correct_GPS_two_queues_groups(groups,SIFT_address):
 
 	processes = multiprocessing.Pool(min(len(groups),no_of_cores_to_use))
 
-	processes.map(correct_GPS_two_queues_helper,list_args)
+	results = processes.map(correct_GPS_two_queues_helper,list_args)
 	processes.close()
 
-	patches = []
-
-	for g in groups:
-		patches += groups[g]
-
-	return patches
+	return results
 
 def correct_GPS_new_code_groups(groups,show,show2,SIFT_address):
 	global no_of_cores_to_use
@@ -2058,6 +2109,8 @@ def get_lid_in_patch(address,img_name,ransac_iter=100,ransac_min_num_fit=10):
 
 	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (50, 50))
 	img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+	
+
 
 	shp = np.shape(img)
 
@@ -2163,7 +2216,7 @@ def create_lid_patch_helper(args):
 
 	return create_lid_patch(*args)
 
-def get_groups_and_patches_with_lids(patches_folder,coordinate_address,lids):
+def get_groups_and_patches_with_lids(patches_folder,coordinate_address,SIFT_address,lids):
 	global no_of_cores_to_use
 
 	possible_patches_with_lids = get_name_of_patches_with_lids(coordinate_address,lids)
@@ -2197,7 +2250,7 @@ def get_groups_and_patches_with_lids(patches_folder,coordinate_address,lids):
 		new_lids[l] = lids[l]
 
 	
-	patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
+	patches = read_all_data_on_server(patches_folder,coordinate_address,SIFT_address,False)
 
 	for p in patches:
 		if p.name not in assigned_patches_names:
@@ -2309,12 +2362,17 @@ def save_group_data(groups,lids,n,address):
 
 
 def main():
-
 	# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT',False)
+	# patches[0].GPS_Corrected = True
+	# lids = get_lids('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/lids.txt')
+	# groups = get_groups_and_patches_with_lids('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT',lids)
+	# results = correct_GPS_two_queues_groups({'131':patches},'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')
+	# save_coordinates_from_string(results,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
+
 	# patches[0].GPS_Corrected = True
 	# final_patches = correct_GPS_coords_new_code(patches,False,False,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')
 	# final_patches = correct_GPS_two_queues(patches,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')
-	# save_coordinates(final_patches,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
+	# save_coordinates(corrected_patches,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
 
 	# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT',False)
 	# lids = get_lids('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/lids.txt')
@@ -2335,10 +2393,10 @@ def main():
 
 	# patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
 	lids = get_lids('/data/plant/full_scans/2020-01-08-rgb/lids.txt')
-	groups = get_groups_and_patches_with_lids('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv',lids)
-	corrected_patches = correct_GPS_two_queues_groups(groups,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
+	groups = get_groups_and_patches_with_lids('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',lids)
+	results = correct_GPS_two_queues_groups(groups,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
 	# corrected_patches = correct_GPS_new_code_groups(groups,False,False,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
-	save_coordinates(corrected_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
+	save_coordinates_from_string(results,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
 	
 	# save_group_data(group_images_by_nearest_lid(lids,patches),lids,len(patches),'/data/plant/full_scans/2020-01-08-rgb/plt.npy')
 	# get_name_of_patches_with_lids('/data/plant/full_scans/metadata/2020-01-08_coordinates.csv',lids)
