@@ -9,6 +9,7 @@ import gc
 import pickle
 import os
 import threading
+import socket
 from heapq import heappush, heappop, heapify
 
 def convert_to_gray(img):
@@ -2636,46 +2637,83 @@ def save_group_data(groups,lids,n,address):
 
 
 def main():
-	# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT',False)
+	global server
+
+	if server == 'coge':
+		patch_folder = '/storage/ariyanzarei/2020-01-08-rgb/bin2tif_out'
+		SIFT_folder = '/storage/ariyanzarei/2020-01-08-rgb/SIFT'
+		lid_file = '/storage/ariyanzarei/2020-01-08-rgb/lid.txt'
+		coordinates_file = '/storage/ariyanzarei/2020-01-08-rgb/2020-01-08_coordinates.csv'
+		CORRECTED_coordinates_file = '/storage/ariyanzarei/2020-01-08-rgb/2020-01-08_coordinates_CORRECTED.csv'
+		plot_npy_file = '/storage/ariyanzarei/2020-01-08-rgb/plt.npy'
+
+	elif server == 'laplace.cs.arizona.edu':
+		patch_folder = '/data/plant/full_scans/2020-01-08-rgb/bin2tif_out'
+		SIFT_folder = '/data/plant/full_scans/2020-01-08-rgb/SIFT'
+		lid_file = '/data/plant/full_scans/2020-01-08-rgb/lids.txt'
+		coordinates_file = '/data/plant/full_scans/metadata/2020-01-08_coordinates.csv'
+		CORRECTED_coordinates_file = '/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv'
+		plot_npy_file = '/data/plant/full_scans/2020-01-08-rgb/plt.npy'
+
+	elif server == 'ariyan':
+		patch_folder = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures'
+		SIFT_folder = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT'
+		lid_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/lids.txt'
+		coordinates_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt'
+		CORRECTED_coordinates_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt'
+		plot_npy_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/plt.npy'
+
+
+	if server == 'coge':
+		patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,True)
+		print('Generated sift files')
+
+	elif server == 'laplace.cs.arizona.edu':
+		
+
+	elif server == 'ariyan':
+		
+
+	# patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
 	# patches[0].GPS_Corrected = True
-	# lids = get_lids('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/lids.txt')
-	# groups = get_groups_and_patches_with_lids('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT',lids)
-	# results = correct_GPS_two_queues_groups({'131':patches},'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures')
-	# results = correct_GPS_new_code_no_heap_precalculate_groups({'131':patches},'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures')
-	# save_coordinates_from_string(results,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
+	# lids = get_lids(lid_file)
+	# groups = get_groups_and_patches_with_lids(patch_folder,coordinates_file,SIFT_folder,lids)
+	# results = correct_GPS_two_queues_groups({'131':patches},SIFT_folder,patch_folder)
+	# results = correct_GPS_new_code_no_heap_precalculate_groups({'131':patches},SIFT_folder,patch_folder)
+	# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 
 	# patches[0].GPS_Corrected = True
-	# final_patches = correct_GPS_coords_new_code(patches,False,False,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')
-	# final_patches = correct_GPS_two_queues(patches,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')
-	# save_coordinates(corrected_patches,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
+	# final_patches = correct_GPS_coords_new_code(patches,False,False,SIFT_folder)
+	# final_patches = correct_GPS_two_queues(patches,SIFT_folder)
+	# save_coordinates(corrected_patches,CORRECTED_coordinates_file)
 
-	# patches = read_all_data_on_server('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT',False)
-	# lids = get_lids('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/lids.txt')
-	# save_group_data(group_images_by_nearest_lid(lids,patches),lids,len(patches),'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/plt.npy')
-	# plot_groups('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/plt.npy',lids)
+	# patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
+	# lids = get_lids(lid_file)
+	# save_group_data(group_images_by_nearest_lid(lids,patches),lids,len(patches),plot_npy_file)
+	# plot_groups(plot_npy_file,lids)
 
 	# patches = read_all_data()
 	# final_patches = stitch_based_on_corrected_GPS(patches,True)
 	# show_and_save_final_patches(final_patches)
 
 	# final_patches = stitch_complete(patches,True,True)
-	# final_patches = correct_GPS_coords(patches,False,False,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')
-	# final_patches = correct_GPS_coords_new_code_parallel(patches,False,False,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')	
+	# final_patches = correct_GPS_coords(patches,False,False,SIFT_folder)
+	# final_patches = correct_GPS_coords_new_code_parallel(patches,False,False,SIFT_folder)	
 
-	# patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
-	# final_patches = correct_GPS_coords_new_code(patches,False,False,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
-	# save_coordinates(final_patches,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
+	# patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
+	# final_patches = correct_GPS_coords_new_code(patches,False,False,SIFT_folder)
+	# save_coordinates(final_patches,CORRECTED_coordinates_file)
 
-	# patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
-	lids = get_lids('/data/plant/full_scans/2020-01-08-rgb/lids.txt')
-	groups = get_groups_and_patches_with_lids('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',lids)
-	results = correct_GPS_new_code_no_heap_precalculate_groups(groups,'/data/plant/full_scans/2020-01-08-rgb/SIFT','/data/plant/full_scans/2020-01-08-rgb/bin2tif_out')
-	# results = correct_GPS_two_queues_groups(groups,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
-	# corrected_patches = correct_GPS_new_code_groups(groups,False,False,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
-	save_coordinates_from_string(results,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
+	# patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
+	# lids = get_lids(lid_file)
+	# groups = get_groups_and_patches_with_lids(patch_folder,coordinates_file,SIFT_folder,lids)
+	# results = correct_GPS_new_code_no_heap_precalculate_groups(groups,SIFT_folder,patch_folder)
+	# results = correct_GPS_two_queues_groups(groups,SIFT_folder)
+	# corrected_patches = correct_GPS_new_code_groups(groups,False,False,SIFT_folder)
+	# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 	
-	# save_group_data(group_images_by_nearest_lid(lids,patches),lids,len(patches),'/data/plant/full_scans/2020-01-08-rgb/plt.npy')
-	# get_name_of_patches_with_lids('/data/plant/full_scans/metadata/2020-01-08_coordinates.csv',lids)
+	# save_group_data(group_images_by_nearest_lid(lids,patches),lids,len(patches),plot_npy_file)
+	# get_name_of_patches_with_lids(coordinates_file,lids)
 	
 	# plot_groups('/home/ariyan/Desktop/plt.npy')
 
@@ -2685,7 +2723,10 @@ def report_time(start,end):
 	print('-----------------------------------------------------------')
 	print('Start date time: {0}\nEnd date time: {1}\nTotal running time: {2}.'.format(start,end,end-start))
 
-no_of_cores_to_use = 20
+server_core = {'coge':48,'laplace.cs.arizona.edu':20,'ariyan':4}
+# server = 'coge' #'laplace' 'local'
+server = socket.gethostname()
+no_of_cores_to_use = server_core[server]
 
 start_time = datetime.datetime.now()
 main()
