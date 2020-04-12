@@ -26,8 +26,28 @@ def adjust_gamma(image, gamma=1.0):
 	
 	return cv2.LUT(image, table)
 
+def normalize_img(img):
+
+	# img_r = img[:,:,2]
+	# img_g = img[:,:,1]
+	# img_b = img[:,:,0]
+
+	# img_r = (255*np.array((img_r-np.min(img_r))/(np.max(img_r)-np.min(img_r)))).astype('uint8')
+	# img_g = (255*np.array((img_g-np.min(img_g))/(np.max(img_g)-np.min(img_g)))).astype('uint8')
+	# img_b = (255*np.array((img_b-np.min(img_b))/(np.max(img_b)-np.min(img_b)))).astype('uint8')
+
+	# img[:,:,2] = img_r
+	# img[:,:,1] = img_g
+	# img[:,:,0] = img_b
+
+	img = (255*np.array((img-np.min(img))/(np.max(img)-np.min(img)))).astype('uint8')
+
+	return img 
+
 def load_preprocess_image(address):
 	img = cv2.imread(address)
+	# img = normalize_img(img)
+	
 	# img = adjust_gamma(img,1.2)
 	img = img.astype('uint8')
 	img_g = convert_to_gray(img)
@@ -98,7 +118,7 @@ def get_good_matches(desc1,desc2):
 
 	good = []
 	for m in matches:
-		if m[0].distance < 0.8*m[1].distance:
+		if m[0].distance < 0.8*m[1].distance or True:
 			good.append(m)
 	matches = np.asarray(good)
 
@@ -557,9 +577,25 @@ class Patch_2:
 			self.size = size
 		self.GPS_Corrected = False
 		self.neighbors = []
+		self.average_score = 0
 	
 	def __eq__(self,other):
 		return (self.name == other.name)
+
+	def __le__(self,other):
+		return (self.average_score<=other.average_score)
+
+	def __lt__(self,other):
+		return (self.average_score<other.average_score)
+
+	def calculate_average_score(self):
+		score = 0
+
+		for n in self.neighbors:
+			if n[0].GPS_Corrected:
+				score += (n[5]*n[4])/((n[1][2]-n[1][0])*(n[1][3]-n[1][1]))
+
+		self.average_score = -1*score
 
 	def load_img(self,patch_folder):
 		img,img_g = load_preprocess_image('{0}/{1}'.format(patch_folder,self.name))
@@ -616,8 +652,6 @@ class Patch_2:
 		cv2.imshow('GPS',output)
 		cv2.waitKey(0)
 
-
-
 	def has_overlap(self,p):
 		if self.GPS_coords.is_coord_inside(p.GPS_coords.UL_coord) or self.GPS_coords.is_coord_inside(p.GPS_coords.UR_coord) or\
 			self.GPS_coords.is_coord_inside(p.GPS_coords.LL_coord) or self.GPS_coords.is_coord_inside(p.GPS_coords.LR_coord):
@@ -625,7 +659,7 @@ class Patch_2:
 		else:
 			return False
 
-	def get_overlap_rectangle(self,patch,increase_size=True):
+	def get_overlap_rectangle(self,patch,increase_size=False):
 		p1_x = 0
 		p1_y = 0
 		p2_x = self.size[1]
@@ -737,6 +771,8 @@ def read_all_data():
 			center = (float(features[9]),float(features[10]))
 
 			coord = Patch_GPS_coordinate(upper_left,upper_right,lower_left,lower_right,center)
+
+			# rgb = cv2.putText(rgb, features[0].split('-')[0], (200,200), cv2.FONT_HERSHEY_SIMPLEX, 6, (0,0,255), 10, cv2.LINE_AA) 
 
 			patch = Patch(l,rgb,img,coord)
 			patches.append(patch)
@@ -939,6 +975,29 @@ def choose_patch_with_largest_overlap(patches):
 			max_p = p
 
 	return max_p
+
+def get_best_overlap_based_perc_inliers(patch):
+
+	corr_neighbors = [n[0] for n in patch.neighbors if n[0].GPS_Corrected]
+
+	best_neighbor = None
+	best_neighbor_param = [None,None,None,None,None,None,None]
+	best_neighbor_score = -1
+
+	for p in corr_neighbors:
+		patch_from_other_way = [n for n in p.neighbors if n[0]==patch]
+		if len(patch_from_other_way) == 0:
+			continue
+
+		patch_from_other_way = patch_from_other_way[0]
+		score = (patch_from_other_way[5]*patch_from_other_way[4])/((patch_from_other_way[1][2]-patch_from_other_way[1][0])*(patch_from_other_way[1][3]-patch_from_other_way[1][1]))
+
+		if score>best_neighbor_score:
+			best_neighbor_score = score
+			best_neighbor = p
+			best_neighbor_param = patch_from_other_way
+
+	return best_neighbor,best_neighbor_param[2],best_neighbor_param[1],best_neighbor_param[3],best_neighbor_param[4],best_neighbor_param[5],best_neighbor_param[6]
 
 def get_best_overlap(p,overlaps,increase_size=True):
 	max_f = -1
@@ -1305,12 +1364,139 @@ def visualize_single_run(H,p,p2,x1,y1,x2,y2,x11,y11,x22,y22,SIFT_address):
 
 	stitch(img1,img2,black1,black2,H,(x11,y11,x22,y22),True)
 
+def evaluate_beneficiary_overlap(p1,p2,H,patch_folder,ov1,ov2):
 
-def get_pairwise_transformation_info(p1,p2,SIFT_address):
+	p1_ul = [0,0,1]
+	p1_ur = [p1.size[1],0,1]
+	p1_ll = [0,p1.size[0],1]
+	p1_lr = [p1.size[1],p1.size[0],1]
+
+	p1_ul_new = H.dot(p1_ul).astype(int)
+	p1_ur_new = H.dot(p1_ur).astype(int)
+	p1_ll_new = H.dot(p1_ll).astype(int)
+	p1_lr_new = H.dot(p1_lr).astype(int)
+	
+	p1_x1 = 0
+	p1_y1 = 0
+	p1_x2 = p1.size[1]
+	p1_y2 = p1.size[0]
+
+	p2_x1 = 0
+	p2_y1 = 0
+	p2_x2 = p2.size[1]
+	p2_y2 = p2.size[0]
+
+	flag = False
+
+	if p1_ul_new[0]>=0 and p1_ul_new[0]<p2.size[1] and p1_ul_new[1]>=1 and p1_ul_new[1]<p2.size[0]:
+		p2_x1 = p1_ul_new[0]
+		p2_y1 = p1_ul_new[1]
+
+		p1_x2 = p2.size[1] - p1_ul_new[0]
+		p1_y2 = p2.size[0] - p1_ul_new[1]
+
+		flag = True
+
+	if p1_ur_new[0]>=0 and p1_ur_new[0]<p2.size[1] and p1_ur_new[1]>=1 and p1_ur_new[1]<p2.size[0]:
+		p2_x2 = p1_ur_new[0]
+		p2_y1 = p1_ur_new[1]
+
+		p1_x1 = p2.size[1] - p1_ur_new[0]
+		p1_y2 = p2.size[0] - p1_ur_new[1]
+
+		flag = True
+
+	if p1_ll_new[0]>=0 and p1_ll_new[0]<p2.size[1] and p1_ll_new[1]>=1 and p1_ll_new[1]<p2.size[0]:
+		p2_x1 = p1_ll_new[0]
+		p2_y2 = p1_ll_new[1]
+
+		p1_x2 = p2.size[1] - p1_ll_new[0]
+		p1_y1 = p2.size[0] - p1_ll_new[1]
+
+		flag = True
+
+	if p1_lr_new[0]>=0 and p1_lr_new[0]<p2.size[1] and p1_lr_new[1]>=1 and p1_lr_new[1]<p2.size[0]:
+		p2_x2 = p1_lr_new[0]
+		p2_y2 = p1_lr_new[1]
+
+		p1_x1 = p2.size[1] - p1_lr_new[0]
+		p1_y1 = p2.size[0] - p1_lr_new[1]
+
+		flag = True
+
+	if not flag:
+		p1_x1 = 0
+		p1_y1 = 0
+		p1_x2 = 0
+		p1_y2 = 0
+
+		p2_x1 = 0
+		p2_y1 = 0
+		p2_x2 = 0
+		p2_y2 = 0
+		return -1
+
+	# overlap_1_img = p1.rgb_img[p1_y1:p1_y2,p1_x1:p1_x2,:]
+	# overlap_2_img = p2.rgb_img[p2_y1:p2_y2,p2_x1:p2_x2,:]
+
+	# hsv1 = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2HSV)
+	# hsv2 = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2HSV)
+
+	# hsv1[:,:,1] = 255
+	# hsv2[:,:,1] = 255
+	# hsv1[:,:,2] = 255
+	# hsv2[:,:,2] = 255
+
+	# hsv1 = cv2.blur(hsv1,(21,21))
+	# hsv2 = cv2.blur(hsv2,(21,21))
+
+	# overlap_1_img = cv2.cvtColor(hsv1, cv2.COLOR_HSV2BGR)
+	# overlap_2_img = cv2.cvtColor(hsv2, cv2.COLOR_HSV2BGR)
+	# overlap_1_img = cv2.cvtColor(hsv1, cv2.COLOR_BGR2GRAY)
+	# overlap_2_img = cv2.cvtColor(hsv2, cv2.COLOR_BGR2GRAY)
+
+	# overlap_1_img = normalize_img(overlap_1_img)
+	# overlap_2_img = normalize_img(overlap_2_img)
+
+	# tmp_size = np.shape(overlap_1_img)
+	# error =math.sqrt(np.sum((overlap_1_img-overlap_2_img)**2)/(tmp_size[0]*tmp_size[1]*tmp_size[2]))
+	# print(error)
+
+	# cv2.namedWindow('1',cv2.WINDOW_NORMAL)
+	# cv2.namedWindow('2',cv2.WINDOW_NORMAL)
+	# cv2.namedWindow('p1',cv2.WINDOW_NORMAL)
+	# cv2.namedWindow('p2',cv2.WINDOW_NORMAL)
+	# cv2.resizeWindow('1', 500,500)
+	# cv2.resizeWindow('2', 500,500)
+	# cv2.resizeWindow('p1', 500,500)
+	# cv2.resizeWindow('p2', 500,500)
+	# img1 = p1.rgb_img
+	# img2 = p2.rgb_img
+
+	# cv2.rectangle(img1,(p1_x1,p1_y1),(p1_x2,p1_y2),(0,0,255),20)
+	# cv2.rectangle(img2,(p2_x1,p2_y1),(p2_x2,p2_y2),(0,0,255),20)
+
+	# cv2.rectangle(img1,(ov1[0],ov1[1]),(ov1[2],ov1[3]),(0,255,0),20)
+	# cv2.rectangle(img2,(ov2[0],ov2[1]),(ov2[2],ov2[3]),(0,255,0),20)
+
+	# cv2.imshow('p1',img1)
+	# cv2.imshow('p2',img2)
+	# cv2.imshow('1',overlap_1_img)
+	# cv2.imshow('2',overlap_2_img)
+	# cv2.waitKey(0)
+
+	return 0
+
+
+def get_pairwise_transformation_info(p1,p2,SIFT_address,patch_folder):
 
 	overlap1 = p1.get_overlap_rectangle(p2)
 	overlap2 = p2.get_overlap_rectangle(p1)
-				
+	
+	if overlap1[2]-overlap1[0]<p1.size[1]/5 and overlap1[3]-overlap1[1]<p1.size[0]/5:
+		# very small overlap
+		return None,None,None,None,None,None
+
 	kp1,desc1 = choose_SIFT_key_points(p1,overlap1[0],overlap1[1],overlap1[2],overlap1[3],SIFT_address)
 	kp2,desc2 = choose_SIFT_key_points(p2,overlap2[0],overlap2[1],overlap2[2],overlap2[3],SIFT_address)
 
@@ -1324,9 +1510,15 @@ def get_pairwise_transformation_info(p1,p2,SIFT_address):
 
 	gps_err = Get_GPS_Error(H,overlap2,overlap1)
 
+	overlap_status = evaluate_beneficiary_overlap(p1,p2,H,patch_folder,overlap1,overlap2)
+
+	if overlap_status == -1:
+		# outside of the boundry transformation
+		return None,None,None,None,None,None
+
 	return overlap1,overlap2,H,num_matches,percentage_inliers,gps_err
 
-def precalculate_pairwise_transformation_info_and_add_neighbors(patches,SIFT_address,group_id):
+def precalculate_pairwise_transformation_info_and_add_neighbors(patches,SIFT_address,group_id,patch_folder):
 	
 	main_patch = None
 
@@ -1339,7 +1531,12 @@ def precalculate_pairwise_transformation_info_and_add_neighbors(patches,SIFT_add
 
 			if n != p and (p.has_overlap(n) or n.has_overlap(p)):
 
-				overlap_on_n,overlap_on_p,H,num_matches,percentage_inliers,gps_err = get_pairwise_transformation_info(n,p,SIFT_address)
+				overlap_on_n,overlap_on_p,H,num_matches,percentage_inliers,gps_err = get_pairwise_transformation_info(n,p,SIFT_address,patch_folder)
+				
+				# do not add if not a good overlap
+				if overlap_on_n == None:
+					continue
+				
 
 				p.neighbors.append((n,overlap_on_n,overlap_on_p,H,num_matches,percentage_inliers,gps_err))
 
@@ -1358,7 +1555,7 @@ def get_list_of_corrected_neighbors_queue_1(patch,group_id):
 
 	for n,overlap_on_n,overlap_on_p,H,num_matches,percentage_inliers,gps_err in patch.neighbors:
 		
-		if not n.GPS_Corrected:
+		if (not n.GPS_Corrected):
 
 			if (percentage_inliers>10 and num_matches >= 40):
 				if (gps_err[0] <= (overlap_on_p[2]-overlap_on_p[0])/2 and gps_err[1] <= (overlap_on_p[3]-overlap_on_p[1])/2):
@@ -1370,7 +1567,8 @@ def get_list_of_corrected_neighbors_queue_1(patch,group_id):
 					
 					n.GPS_Corrected = True
 
-					result_string+=' <Q1: Corrected> --> ({0},{1}%,<{2},{3}>)'.format(num_matches,percentage_inliers,gps_err[0],gps_err[1])
+					result_string+=' <Q1: Corrected> --> ({0},{1}%,<{2},{3}>,{4})'.format(num_matches,percentage_inliers,gps_err[0],gps_err[1],\
+					calculate_overlap_area_number(overlap_on_p))
 					print(result_string)
 
 					corrected_neighbors.append(n)
@@ -1395,16 +1593,18 @@ def get_list_of_corrected_neighbors_queue_2(patch,group_id):
 			if (gps_err[0] <= (overlap_on_p[2]-overlap_on_p[0])/2 and gps_err[1] <= (overlap_on_p[3]-overlap_on_p[1])/2):
 				
 				n.GPS_coords = get_new_GPS_Coords(n,patch,H)
-				
+
 				n.GPS_Corrected = True
 				
-				result_string+=' <Q2: Low Inliers Relaxed> --> ({0},{1}%,<{2},{3}>)'.format(num_matches,percentage_inliers,gps_err[0],gps_err[1])
+				result_string+=' <Q2: Low Inliers Relaxed> --> ({0},{1}%,<{2},{3}>,{4})'.format(num_matches,percentage_inliers,gps_err[0],gps_err[1],\
+					calculate_overlap_area_number(overlap_on_p))
 
 				corrected_neighbors.append(n)
 			else:
 				n.GPS_Corrected = True
 
-				result_string+=' <Q2: GPS Relaxed> --> ({0},{1}%,<{2},{3}>)'.format(num_matches,percentage_inliers,gps_err[0],gps_err[1])
+				result_string+=' <Q2: GPS Relaxed> --> ({0},{1}%,<{2},{3}>,{4},{5})'.format(num_matches,percentage_inliers,gps_err[0],gps_err[1],\
+					calculate_overlap_area_number(overlap_on_p))
 
 				corrected_neighbors.append(n)
 
@@ -1433,30 +1633,20 @@ def get_corrected_string(patches):
 
 	return final_results
 
-def pop_best_from_queue_2(queue_2):
-	patch = queue_2[0]
-	if len([n[0] for n in patch.neighbors if not n[0].GPS_Corrected]) == 0:
-		best_score = 0
-	else:
-		best_score = min([percentage_inliers for n,overlap_on_n,overlap_on_p,H,num_matches,percentage_inliers,gps_err in patch.neighbors if not n.GPS_Corrected])
+def pop_best_from_queue(queue):
+	patch = queue[0]
 
-	for p in queue_2:
-		if len([n[0] for n in p.neighbors if not n[0].GPS_Corrected]) == 0:
-			continue
-
-		score = min([percentage_inliers for n,overlap_on_n,overlap_on_p,H,num_matches,percentage_inliers,gps_err in p.neighbors if not n.GPS_Corrected])
-		if score > best_score:
-			patch = p
-			best_score = score
-
-	queue_2.remove(patch)
+	queue.remove(patch)
 	return patch
 
+def calculate_overlap_area_number(overlap):
+
+	return abs(overlap[0]-overlap[2])*abs(overlap[1]-overlap[3])
 
 
-def correct_GPS_two_queues(patches,SIFT_address,group_id='None'):
+def correct_GPS_two_queues(patches,SIFT_address,patch_folder,group_id='None'):
 
-	starting_patch = precalculate_pairwise_transformation_info_and_add_neighbors(patches,SIFT_address,group_id)
+	starting_patch = precalculate_pairwise_transformation_info_and_add_neighbors(patches,SIFT_address,group_id,patch_folder)
 
 	queue_1 = [starting_patch]
 	queue_2 = []
@@ -1471,8 +1661,9 @@ def correct_GPS_two_queues(patches,SIFT_address,group_id='None'):
 		
 		if current_queue == 1:
 			patch = queue_1.pop()
+			# patch = pop_best_from_queue(queue_1)
 		else:
-			# patch = pop_best_from_queue_2(queue_2)
+			# patch = pop_best_from_queue(queue_2)
 			patch = queue_2.pop()
 
 		if current_queue == 1:
@@ -1504,6 +1695,70 @@ def correct_GPS_two_queues_helper(args):
 
 	return correct_GPS_two_queues(*args)
 
+
+def correct_GPS_coords_new_code_no_heap_precalculate(patches,SIFT_address,patch_folder,group_id='None'):
+
+
+	patches_tmp = patches.copy()
+	starting_patch = precalculate_pairwise_transformation_info_and_add_neighbors(patches_tmp,SIFT_address,group_id,patch_folder)
+
+	not_corrected_patches = [n[0] for n in starting_patch.neighbors]
+	for p in not_corrected_patches:
+		p.calculate_average_score()
+
+	heapify(not_corrected_patches)
+
+
+	while True:
+
+		result_string = 'GROPU ID: {0} - '.format(group_id)
+
+		sys.stdout.flush()
+
+		if len(not_corrected_patches) == 0:
+			break
+
+		p = heappop(not_corrected_patches)
+
+		result_string+='Patch {0}'.format(p.name)
+
+		p2,overlap_on_p2,overlap_on_p,H,num_matches,percentage_inliers,gps_err = get_best_overlap_based_perc_inliers(p)		
+
+		if p2 is None:
+			result_string+=' <ERR: NO Connected Neighbor>'
+			print(result_string)
+
+			continue
+
+		result_string+=' <OK: Perfect mode> --> ({0},{1}%,<{2},{3}>,{4},{5})'.format(num_matches,percentage_inliers,gps_err[0],gps_err[1],\
+					calculate_overlap_area_number(overlap_on_p),p.average_score)
+
+		
+		p.GPS_coords = get_new_GPS_Coords(p,p2,H)
+		p.GPS_Corrected = True
+
+		need_heapify = False
+
+		for p_n in p.neighbors:
+
+			if (not p_n[0].GPS_Corrected):
+				p_n[0].calculate_average_score()
+
+				if (p_n[0] not in not_corrected_patches):
+					heappush(not_corrected_patches,p_n[0])
+				else:
+					need_heapify = True
+
+		heapify(not_corrected_patches)
+
+		print(result_string)
+
+	string_corrected = get_corrected_string(patches_tmp)
+	return string_corrected
+
+def correct_GPS_coords_new_code_no_heap_precalculate_helper(args):
+
+	return correct_GPS_coords_new_code_no_heap_precalculate(*args)
 
 def correct_GPS_coords_new_code(patches,show,show2,SIFT_address,group_id='None'):
 
@@ -1985,13 +2240,13 @@ def save_coordinates_from_string(results,filename):
 	with open(filename,'w') as f:
 		f.write(final_results)
 
-def correct_GPS_two_queues_groups(groups,SIFT_address):
+def correct_GPS_two_queues_groups(groups,SIFT_address,patch_folder):
 	global no_of_cores_to_use
 
 	list_args = []
 
 	for g in groups:
-		list_args.append((groups[g],SIFT_address,g))
+		list_args.append((groups[g],SIFT_address,patch_folder,g))
 
 	processes = multiprocessing.Pool(min(len(groups),no_of_cores_to_use))
 
@@ -2019,6 +2274,21 @@ def correct_GPS_new_code_groups(groups,show,show2,SIFT_address):
 		patches += p_list
 
 	return patches
+
+def correct_GPS_new_code_no_heap_precalculate_groups(groups,SIFT_address,patch_folder):
+	global no_of_cores_to_use
+
+	list_args = []
+
+	for g in groups:
+		list_args.append((groups[g],SIFT_address,patch_folder,g))
+
+	processes = multiprocessing.Pool(min(len(groups),no_of_cores_to_use))
+
+	results = processes.map(correct_GPS_coords_new_code_no_heap_precalculate_helper,list_args)
+	processes.close()
+
+	return results
 
 
 def fit_circle(xs,ys):
@@ -2366,7 +2636,8 @@ def main():
 	# patches[0].GPS_Corrected = True
 	# lids = get_lids('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/lids.txt')
 	# groups = get_groups_and_patches_with_lids('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT',lids)
-	# results = correct_GPS_two_queues_groups({'131':patches},'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT')
+	# results = correct_GPS_two_queues_groups({'131':patches},'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures')
+	# results = correct_GPS_new_code_no_heap_precalculate_groups({'131':patches},'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT','/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures')
 	# save_coordinates_from_string(results,'/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt')
 
 	# patches[0].GPS_Corrected = True
@@ -2394,7 +2665,8 @@ def main():
 	# patches = read_all_data_on_server('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',False)
 	lids = get_lids('/data/plant/full_scans/2020-01-08-rgb/lids.txt')
 	groups = get_groups_and_patches_with_lids('/data/plant/full_scans/2020-01-08-rgb/bin2tif_out','/data/plant/full_scans/metadata/2020-01-08_coordinates.csv','/data/plant/full_scans/2020-01-08-rgb/SIFT',lids)
-	results = correct_GPS_two_queues_groups(groups,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
+	results = correct_GPS_new_code_no_heap_precalculate_groups(groups,'/data/plant/full_scans/2020-01-08-rgb/SIFT','/data/plant/full_scans/2020-01-08-rgb/bin2tif_out')
+	# results = correct_GPS_two_queues_groups(groups,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
 	# corrected_patches = correct_GPS_new_code_groups(groups,False,False,'/data/plant/full_scans/2020-01-08-rgb/SIFT')
 	save_coordinates_from_string(results,'/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv')
 	
