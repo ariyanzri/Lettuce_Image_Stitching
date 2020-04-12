@@ -2665,13 +2665,15 @@ def main():
 
 
 	if server == 'coge':
+		print('RUNNING ON -- {0} --'.format(server))
 		patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,True)
 		print('Generated sift files')
 
 	elif server == 'laplace.cs.arizona.edu':
-		
+		print('RUNNING ON -- {0} --'.format(server))
 
 	elif server == 'ariyan':
+		print('RUNNING ON -- {0} --'.format(server))
 		
 
 	# patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
@@ -2716,7 +2718,7 @@ def main():
 	# get_name_of_patches_with_lids(coordinates_file,lids)
 	
 	# plot_groups('/home/ariyan/Desktop/plt.npy')
-
+ 
 
 def report_time(start,end):
 	print('-----------------------------------------------------------')
