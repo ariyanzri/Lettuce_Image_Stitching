@@ -2718,7 +2718,6 @@ def main():
 	# plot_groups('/home/ariyan/Desktop/plt.npy')
 
 
-
 def report_time(start,end):
 	print('-----------------------------------------------------------')
 	print('Start date time: {0}\nEnd date time: {1}\nTotal running time: {2}.'.format(start,end,end-start))
