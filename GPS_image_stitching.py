@@ -159,7 +159,7 @@ def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2,add_gps):
 		src = np.append(src,np.array([[ov_1_on_2[0],ov_1_on_2[1]]]).reshape(-1,1,2),axis=0)
 		src = np.append(src,np.array([[ov_1_on_2[2],ov_1_on_2[3]]]).reshape(-1,1,2),axis=0)
 		
-	if len(matches)>0:
+	if len(matches)>1:
 		# src = np.float32([ kp1[m.queryIdx].pt for m in matches[:,0] ]).reshape(-1,1,2)
 		# dst = np.float32([ kp2[m.trainIdx].pt for m in matches[:,0] ]).reshape(-1,1,2)
 		src = np.float32([ kp1[m.queryIdx] for m in matches[:,0] ]).reshape(-1,1,2)
@@ -1505,6 +1505,10 @@ def get_pairwise_transformation_info(p1,p2,SIFT_address,patch_folder):
 	num_matches = len(matches)
 
 	H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
+
+	if H is None:
+		# low number of matches, bad transformation
+		return None,None,None,None,None,None
 
 	percentage_inliers = round(percentage_inliers*100,2)
 
