@@ -119,7 +119,7 @@ def get_good_matches(desc1,desc2):
 
 	good = []
 	for m in matches:
-		if m[0].distance < 0.8*m[1].distance or True:
+		if m[0].distance < 0.8*m[1].distance:
 			good.append(m)
 	matches = np.asarray(good)
 
@@ -660,7 +660,7 @@ class Patch_2:
 		else:
 			return False
 
-	def get_overlap_rectangle(self,patch,increase_size=False):
+	def get_overlap_rectangle(self,patch,increase_size=True):
 		p1_x = 0
 		p1_y = 0
 		p2_x = self.size[1]
@@ -2666,8 +2666,10 @@ def main():
 
 	if server == 'coge':
 		print('RUNNING ON -- {0} --'.format(server))
-		patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,True)
-		print('Generated sift files')
+		lids = get_lids(lid_file)
+		groups = get_groups_and_patches_with_lids(patch_folder,coordinates_file,SIFT_folder,lids)
+		results = correct_GPS_new_code_no_heap_precalculate_groups(groups,SIFT_folder,patch_folder)
+		save_coordinates_from_string(results,CORRECTED_coordinates_file)
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
