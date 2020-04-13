@@ -2536,7 +2536,7 @@ def get_groups_and_patches_with_lids(patches_folder,coordinate_address,SIFT_addr
 	for g in list_all_groups:
 		print('Group {0} with {1} images.'.format(g,len(list_all_groups[g])))
 
-	save_group_data(list_all_groups,new_lids,len(patches),'/data/plant/full_scans/2020-01-08-rgb/plt.npy')
+	# save_group_data(list_all_groups,new_lids,len(patches),'/data/plant/full_scans/2020-01-08-rgb/plt.npy')
 
 	return list_all_groups
 
