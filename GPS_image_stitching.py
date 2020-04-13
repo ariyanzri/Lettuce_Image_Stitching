@@ -2642,7 +2642,7 @@ def main():
 	if server == 'coge':
 		patch_folder = '/storage/ariyanzarei/2020-01-08-rgb/bin2tif_out'
 		SIFT_folder = '/storage/ariyanzarei/2020-01-08-rgb/SIFT'
-		lid_file = '/storage/ariyanzarei/2020-01-08-rgb/lid.txt'
+		lid_file = '/storage/ariyanzarei/2020-01-08-rgb/lids.txt'
 		coordinates_file = '/storage/ariyanzarei/2020-01-08-rgb/2020-01-08_coordinates.csv'
 		CORRECTED_coordinates_file = '/storage/ariyanzarei/2020-01-08-rgb/2020-01-08_coordinates_CORRECTED.csv'
 		plot_npy_file = '/storage/ariyanzarei/2020-01-08-rgb/plt.npy'
