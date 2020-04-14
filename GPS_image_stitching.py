@@ -1683,7 +1683,7 @@ class Graph():
 					self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]] = n[7]
 					self.edges[self.vertex_name_to_index_dict[n[0].name]][self.vertex_name_to_index_dict[p.name]] = n[7] 
 				else:
-					if n[7] < self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]]:
+					if n[7] > self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]]:
 						self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]] = n[7]
 						self.edges[self.vertex_name_to_index_dict[n[0].name]][self.vertex_name_to_index_dict[p.name]] = n[7] 
 
@@ -2829,15 +2829,15 @@ def main():
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
-		patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
-		patches[0].GPS_Corrected = True
+		# patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
+		# patches[0].GPS_Corrected = True
 		
-		results = correct_GPS_MST_groups({'131':patches},SIFT_folder,patch_folder)
-		# results = correct_GPS_new_code_no_heap_precalculate_groups({'131':patches},SIFT_folder,patch_folder)
-		save_coordinates_from_string(results,CORRECTED_coordinates_file)
+		# results = correct_GPS_MST_groups({'131':patches},SIFT_folder,patch_folder)
+		# # results = correct_GPS_new_code_no_heap_precalculate_groups({'131':patches},SIFT_folder,patch_folder)
+		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 
-		# patches = read_all_data()
-		# final_patches = stitch_based_on_corrected_GPS(patches,True)
+		patches = read_all_data()
+		final_patches = stitch_based_on_corrected_GPS(patches,True)
 		# show_and_save_final_patches(final_patches)
 		
 
