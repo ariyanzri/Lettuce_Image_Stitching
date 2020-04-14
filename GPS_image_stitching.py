@@ -1437,31 +1437,32 @@ def evaluate_beneficiary_overlap(p1,p2,H,patch_folder,ov1,ov2):
 		p2_y2 = 0
 		return -1
 
-	# overlap_1_img = p1.rgb_img[p1_y1:p1_y2,p1_x1:p1_x2,:]
-	# overlap_2_img = p2.rgb_img[p2_y1:p2_y2,p2_x1:p2_x2,:]
+	p1.load_img(patch_folder)
+	p2.load_img(patch_folder)
+	overlap_1_img = p1.rgb_img[p1_y1:p1_y2,p1_x1:p1_x2,:]
+	overlap_2_img = p2.rgb_img[p2_y1:p2_y2,p2_x1:p2_x2,:]
 
-	# hsv1 = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2HSV)
-	# hsv2 = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2HSV)
+	overlap_1_img = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2GRAY)
+	overlap_2_img = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2GRAY)
 
-	# hsv1[:,:,1] = 255
-	# hsv2[:,:,1] = 255
-	# hsv1[:,:,2] = 255
-	# hsv2[:,:,2] = 255
+	overlap_1_img = cv2.blur(overlap_1_img,(5,5))
+	overlap_2_img = cv2.blur(overlap_2_img,(5,5))
 
-	# hsv1 = cv2.blur(hsv1,(21,21))
-	# hsv2 = cv2.blur(hsv2,(21,21))
+	ret1,overlap_1_img = cv2.threshold(overlap_1_img,0,255,cv2.THRESH_OTSU)
+	ret1,overlap_2_img = cv2.threshold(overlap_2_img,0,255,cv2.THRESH_OTSU)
 
-	# overlap_1_img = cv2.cvtColor(hsv1, cv2.COLOR_HSV2BGR)
-	# overlap_2_img = cv2.cvtColor(hsv2, cv2.COLOR_HSV2BGR)
-	# overlap_1_img = cv2.cvtColor(hsv1, cv2.COLOR_BGR2GRAY)
-	# overlap_2_img = cv2.cvtColor(hsv2, cv2.COLOR_BGR2GRAY)
+	tmp_size = np.shape(overlap_1_img)
+	
+	overlap_1_img[overlap_1_img==255] = 1
+	overlap_2_img[overlap_2_img==255] = 1
 
-	# overlap_1_img = normalize_img(overlap_1_img)
-	# overlap_2_img = normalize_img(overlap_2_img)
+	xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
 
-	# tmp_size = np.shape(overlap_1_img)
-	# error =math.sqrt(np.sum((overlap_1_img-overlap_2_img)**2)/(tmp_size[0]*tmp_size[1]*tmp_size[2]))
-	# print(error)
+	dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
+	# print(dissimilarity)
+
+	# overlap_1_img[overlap_1_img==1] = 255
+	# overlap_2_img[overlap_2_img==1] = 255
 
 	# cv2.namedWindow('1',cv2.WINDOW_NORMAL)
 	# cv2.namedWindow('2',cv2.WINDOW_NORMAL)
@@ -1486,8 +1487,14 @@ def evaluate_beneficiary_overlap(p1,p2,H,patch_folder,ov1,ov2):
 	# cv2.imshow('2',overlap_2_img)
 	# cv2.waitKey(0)
 
-	return 0
+	return dissimilarity
 
+def get_is_above(p1,p2):
+
+	if p1.GPS_coords.Center[1] > p2.GPS_coords.Center[1]:
+		return True
+	else:
+		return False
 
 def get_pairwise_transformation_info(p1,p2,SIFT_address,patch_folder):
 
@@ -1496,7 +1503,7 @@ def get_pairwise_transformation_info(p1,p2,SIFT_address,patch_folder):
 	
 	if overlap1[2]-overlap1[0]<p1.size[1]/5 and overlap1[3]-overlap1[1]<p1.size[0]/5:
 		# very small overlap
-		return None,None,None,None,None,None
+		return None,None,None,None,None,None,None
 
 	kp1,desc1 = choose_SIFT_key_points(p1,overlap1[0],overlap1[1],overlap1[2],overlap1[3],SIFT_address)
 	kp2,desc2 = choose_SIFT_key_points(p2,overlap2[0],overlap2[1],overlap2[2],overlap2[3],SIFT_address)
@@ -1509,7 +1516,7 @@ def get_pairwise_transformation_info(p1,p2,SIFT_address,patch_folder):
 
 	if H is None:
 		# low number of matches, bad transformation
-		return None,None,None,None,None,None
+		return None,None,None,None,None,None,None
 
 	percentage_inliers = round(percentage_inliers*100,2)
 
@@ -1517,11 +1524,18 @@ def get_pairwise_transformation_info(p1,p2,SIFT_address,patch_folder):
 
 	overlap_status = evaluate_beneficiary_overlap(p1,p2,H,patch_folder,overlap1,overlap2)
 
+	# is_above = get_is_above(p1,p2) or get_is_above(p2,p1)
+
+	# if is_above and 1-overlap_status < 0.60:
+	# 	# bad vertical overlap
+	# 	# print('bad vertical overlap.')
+	# 	return None,None,None,None,None,None,None
+
 	if overlap_status == -1:
 		# outside of the boundry transformation
-		return None,None,None,None,None,None
+		return None,None,None,None,None,None,None
 
-	return overlap1,overlap2,H,num_matches,percentage_inliers,gps_err
+	return overlap1,overlap2,H,num_matches,percentage_inliers,gps_err,overlap_status
 
 def precalculate_pairwise_transformation_info_and_add_neighbors(patches,SIFT_address,group_id,patch_folder):
 	
@@ -1536,14 +1550,14 @@ def precalculate_pairwise_transformation_info_and_add_neighbors(patches,SIFT_add
 
 			if n != p and (p.has_overlap(n) or n.has_overlap(p)):
 
-				overlap_on_n,overlap_on_p,H,num_matches,percentage_inliers,gps_err = get_pairwise_transformation_info(n,p,SIFT_address,patch_folder)
+				overlap_on_n,overlap_on_p,H,num_matches,percentage_inliers,gps_err,dissimilarity = get_pairwise_transformation_info(n,p,SIFT_address,patch_folder)
 				
 				# do not add if not a good overlap
 				if overlap_on_n == None:
 					continue
 				
 
-				p.neighbors.append((n,overlap_on_n,overlap_on_p,H,num_matches,percentage_inliers,gps_err))
+				p.neighbors.append((n,overlap_on_n,overlap_on_p,H,num_matches,percentage_inliers,gps_err,dissimilarity))
 
 		print('GROPU ID: {0} - Calculated Transformation and error values for {1} neighbors of {2}'.format(group_id,len(p.neighbors),p.name))
 		sys.stdout.flush()
@@ -1558,7 +1572,7 @@ def get_list_of_corrected_neighbors_queue_1(patch,group_id):
 	
 	corrected_neighbors = []
 
-	for n,overlap_on_n,overlap_on_p,H,num_matches,percentage_inliers,gps_err in patch.neighbors:
+	for n,overlap_on_n,overlap_on_p,H,num_matches,percentage_inliers,gps_err,dissimilarity in patch.neighbors:
 		
 		if (not n.GPS_Corrected):
 
@@ -1590,7 +1604,7 @@ def get_list_of_corrected_neighbors_queue_2(patch,group_id):
 	
 	corrected_neighbors = []
 
-	for n,overlap_on_n,overlap_on_p,H,num_matches,percentage_inliers,gps_err in patch.neighbors:
+	for n,overlap_on_n,overlap_on_p,H,num_matches,percentage_inliers,gps_err,dissimilarity in patch.neighbors:
 		if not n.GPS_Corrected:
 			result_string = 'GROPU ID: {0} - '.format(group_id)
 			result_string +='Patch {0}'.format(n.name)
@@ -1647,6 +1661,119 @@ def pop_best_from_queue(queue):
 def calculate_overlap_area_number(overlap):
 
 	return abs(overlap[0]-overlap[2])*abs(overlap[1]-overlap[3])
+
+
+class Graph():
+
+	def __init__(self,no_vertex,vertex_names):
+		self.vertecis_number = no_vertex
+		self.vertex_index_to_name_dict = {}
+		self.vertex_name_to_index_dict = {}
+		for i,v in enumerate(vertex_names):
+			self.vertex_index_to_name_dict[i] = v
+			self.vertex_name_to_index_dict[v] = i
+
+		self.edges = [[-1 for column in range(no_vertex)] for row in range(no_vertex)]
+
+	def initialize_edge_weights(self,patches):
+		
+		for p in patches:
+			for n in p.neighbors:
+				if self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]] == -1:
+					self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]] = n[7]
+					self.edges[self.vertex_name_to_index_dict[n[0].name]][self.vertex_name_to_index_dict[p.name]] = n[7] 
+				else:
+					if n[7] < self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]]:
+						self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]] = n[7]
+						self.edges[self.vertex_name_to_index_dict[n[0].name]][self.vertex_name_to_index_dict[p.name]] = n[7] 
+
+	def print_graph(self):
+		print(self.vertex_name_to_index_dict)
+		print(self.edges)
+
+
+	def find_min_key(self,keys,mstSet):
+		min_value = 1
+
+		for v in range(self.vertecis_number): 
+			if keys[v] < min_value and mstSet[v] == False: 
+				min_value = keys[v] 
+				min_index = v 
+
+		return min_index 
+
+
+	def generate_MST_prim(self,starting_vertex):
+		keys = [1]*self.vertecis_number
+		parents = [None]*self.vertecis_number
+		mstSet = [False]*self.vertecis_number
+
+		keys[self.vertex_name_to_index_dict[starting_vertex]] = 0
+		parents[self.vertex_name_to_index_dict[starting_vertex]] = -1
+
+		for count in range(self.vertecis_number):
+			u = self.find_min_key(keys,mstSet)
+			mstSet[u] = True
+
+			for v in range(self.vertecis_number):
+				if self.edges[u][v] != -1 and mstSet[v] == False and keys[v] > self.edges[u][v]:
+					keys[v] = self.edges[u][v]
+					parents[v] = u
+
+		print(parents)
+		return parents
+
+	def get_patches_dict(self,patches):
+		dict_patches={}
+
+		for p in patches:
+			dict_patches[p.name] = p
+
+		return dict_patches
+
+	def revise_GPS_from_generated_MST(self,patches,parents):
+		dict_patches = self.get_patches_dict(patches)
+
+		queue_traverse = []
+		
+		for v,p in enumerate(parents):
+			if p == -1:
+				queue_traverse = [v]
+				break
+
+		while len(queue_traverse) > 0:
+			u = queue_traverse.pop()
+
+			for v,p in enumerate(parents):
+				if p == u:
+					queue_traverse = [v] + queue_traverse
+
+					patch = dict_patches[self.vertex_index_to_name_dict[v]]
+					parent_patch = dict_patches[self.vertex_index_to_name_dict[p]]
+					H = [n[3] for n in parent_patch.neighbors if n[0] == patch]
+					H = H[0]
+
+					patch.GPS_coords = get_new_GPS_Coords(patch,parent_patch,H)
+					patch.GPS_Corrected = True
+
+		string_corrected = get_corrected_string(patches)
+		return string_corrected
+
+				
+
+
+def correct_GPS_MST(patches,SIFT_address,patch_folder,group_id='None'):
+	patches_tmp = patches.copy()
+	starting_patch = precalculate_pairwise_transformation_info_and_add_neighbors(patches_tmp,SIFT_address,group_id,patch_folder)
+
+	G = Graph(len(patches_tmp),[p.name for p in patches_tmp])
+	G.initialize_edge_weights(patches_tmp)
+	parents = G.generate_MST_prim(starting_patch.name)
+	return G.revise_GPS_from_generated_MST(patches_tmp,parents)
+
+def correct_GPS_MST_helper(args):
+
+	return correct_GPS_MST(*args)
 
 
 def correct_GPS_two_queues(patches,SIFT_address,patch_folder,group_id='None'):
@@ -1706,6 +1833,12 @@ def correct_GPS_coords_new_code_no_heap_precalculate(patches,SIFT_address,patch_
 
 	patches_tmp = patches.copy()
 	starting_patch = precalculate_pairwise_transformation_info_and_add_neighbors(patches_tmp,SIFT_address,group_id,patch_folder)
+
+	# for n in patches_tmp[0].neighbors:
+	# 	print(n[7])
+	# 	me_from_other = [p for p in n[0].neighbors if p[0] == patches_tmp[0]]
+	# 	me_from_other = me_from_other[0]
+	# 	print(me_from_other[7])
 
 	not_corrected_patches = [n[0] for n in starting_patch.neighbors]
 	for p in not_corrected_patches:
@@ -2295,6 +2428,21 @@ def correct_GPS_new_code_no_heap_precalculate_groups(groups,SIFT_address,patch_f
 
 	return results
 
+def correct_GPS_MST_groups(groups,SIFT_address,patch_folder):
+	global no_of_cores_to_use
+
+	list_args = []
+
+	for g in groups:
+		list_args.append((groups[g],SIFT_address,patch_folder,g))
+
+	processes = multiprocessing.Pool(min(len(groups),no_of_cores_to_use))
+
+	results = processes.map(correct_GPS_MST_helper,list_args)
+	processes.close()
+
+	return results
+
 
 def fit_circle(xs,ys):
 
@@ -2674,8 +2822,23 @@ def main():
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
 
+		lids = get_lids(lid_file)
+		groups = get_groups_and_patches_with_lids(patch_folder,coordinates_file,SIFT_folder,lids)
+		results = correct_GPS_MST_groups(groups,SIFT_folder,patch_folder)
+		save_coordinates_from_string(results,CORRECTED_coordinates_file)
+
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
+		patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
+		patches[0].GPS_Corrected = True
+		
+		results = correct_GPS_MST_groups({'131':patches},SIFT_folder,patch_folder)
+		# results = correct_GPS_new_code_no_heap_precalculate_groups({'131':patches},SIFT_folder,patch_folder)
+		save_coordinates_from_string(results,CORRECTED_coordinates_file)
+
+		# patches = read_all_data()
+		# final_patches = stitch_based_on_corrected_GPS(patches,True)
+		# show_and_save_final_patches(final_patches)
 		
 
 	# patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
