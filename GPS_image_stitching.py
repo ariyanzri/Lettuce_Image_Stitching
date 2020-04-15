@@ -1459,6 +1459,9 @@ def evaluate_beneficiary_overlap(p1,p2,H,patch_folder,ov1,ov2):
 	xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
 
 	dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
+	p1.del_img()
+	p2.del_img()
+	
 	# print(dissimilarity)
 
 	# overlap_1_img[overlap_1_img==1] = 255
@@ -1758,8 +1761,6 @@ class Graph():
 
 		string_corrected = get_corrected_string(patches)
 		return string_corrected
-
-				
 
 
 def correct_GPS_MST(patches,SIFT_address,patch_folder,group_id='None'):
