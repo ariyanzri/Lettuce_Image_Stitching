@@ -2890,7 +2890,8 @@ def detect_rows(address):
 	for g in patches_groups_by_rows:
 		for p in patches_groups_by_rows[g]:
 			# print(p.GPS_coords.UL_coord)
-			plt.scatter(p.GPS_coords.UL_coord[0],p.GPS_coords.UL_coord[1],color=color)
+			plt.scatter(p.GPS_coords.UL_coord[0],p.GPS_coords.UL_coord[1],color='red')
+			plt.scatter(p.GPS_coords.LL_coord[0],p.GPS_coords.LL_coord[1],color='blue')
 		break
 
 	plt.savefig('rows.png')
