@@ -2892,6 +2892,7 @@ def detect_rows(address):
 			# print(p.GPS_coords.UL_coord)
 			plt.scatter(p.GPS_coords.UL_coord[0],p.GPS_coords.UL_coord[1],color='red')
 			plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color='green')
+			print(p.GPS_coords.Center)
 			plt.scatter(p.GPS_coords.LL_coord[0],p.GPS_coords.LL_coord[1],color='blue')
 		break
 
