@@ -2858,10 +2858,16 @@ def detect_rows(address):
 		patches_groups_by_rows[(round(c[0],7),round(c[1],7))] = []
 
 	for p in patches:
+		min_distance = height_in_GPS*2
+		min_row = None
+
 		for c in center_second_dim_rows:
-			if abs(p.GPS_coords.Center[1]-c[1]) <= height_in_GPS:
-				patches_groups_by_rows[(round(c[0],7),round(c[1],7))].append(p)
-				break
+			distance = abs(p.GPS_coords.Center[1]-c[1])
+			if distance<min_distance:
+				min_distance = distance
+				min_row = c
+
+		patches_groups_by_rows[(round(min_row[0],7),round(min_row[1],7))].append(p)
 
 
 		
