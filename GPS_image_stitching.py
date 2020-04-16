@@ -2812,6 +2812,7 @@ def save_group_data(groups,lids,n,address):
 
 def detect_rows(address):
 	center_second_dim_rows = []
+	height_in_GPS = None
 
 	with open(address) as f:
 		lines = f.read()
@@ -2825,13 +2826,26 @@ def detect_rows(address):
 
 			features = l.split(',')
 
-			center = '{0},{1}'.format(float(features[9]),float(features[10]))
-			center_second_dim_rows.append(center)
+			if height_in_GPS is None:
+				upper_left = (float(features[1]),float(features[2]))
+				lower_left = (float(features[3]),float(features[4]))
 
+				height_in_GPS = abs(upperleft[1]-lower_left[1])
+				
 
-	center_second_dim_rows = list(set(center_second_dim_rows))
+			center = (float(features[9]),float(features[10]))
+			is_new = True
+
+			for c in center_second_dim_rows:
+				if abs(center[1]-c[1]) < height_in_GPS:
+					is_new = False
+
+			if is_new:
+				center_second_dim_rows.append(center)
+
 
 	print(center_second_dim_rows)
+	print(len(center_second_dim_rows))
 			
 
 
