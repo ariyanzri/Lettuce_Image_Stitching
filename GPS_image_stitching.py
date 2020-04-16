@@ -2875,7 +2875,7 @@ def detect_rows(address):
 	for g in patches_groups_by_rows:
 		print('{0}: {1}'.format(g,len(patches_groups_by_rows[g])))
 		total+=len(patches_groups_by_rows[g])
-		
+
 		if color == 'red':
 			color = 'green'
 		else:
@@ -2885,7 +2885,7 @@ def detect_rows(address):
 			plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color=color)
 			
 	plt.savefig('rows.png')
-
+	print(total)
 def main():
 	global server
 
