@@ -2866,7 +2866,7 @@ def detect_rows(address):
 		
 	import matplotlib.pyplot as plt
 	import matplotlib
-	matplotlib.use('GTK') 
+	matplotlib.use('GTK3Agg') 
 
 	plt.axis('equal')
 
