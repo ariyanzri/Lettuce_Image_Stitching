@@ -2865,8 +2865,7 @@ def detect_rows(address):
 
 		
 	import matplotlib.pyplot as plt
-	import matplotlib
-	matplotlib.use('Qt4Agg') 
+	
 
 	plt.axis('equal')
 
@@ -2882,7 +2881,7 @@ def detect_rows(address):
 		for p in patches_groups_by_rows[g]:
 			plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color=color)
 			
-	plt.show()
+	plt.savefig('rows.png')
 
 def main():
 	global server
