@@ -2864,7 +2864,8 @@ def detect_rows(address):
 
 
 					
-
+	import matplotlib.pyplot as plt
+	
 	for g in patches_groups_by_rows:
 		print('{0} : {1}'.format(g,len(patches_groups_by_rows[g])))
 			
