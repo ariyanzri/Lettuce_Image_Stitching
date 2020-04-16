@@ -2865,11 +2865,19 @@ def detect_rows(address):
 
 					
 	import matplotlib.pyplot as plt
-	
-	for g in patches_groups_by_rows:
-		print('{0} : {1}'.format(g,len(patches_groups_by_rows[g])))
-			
+	plt.axis('equal')
 
+	color = 'red'
+	for g in patches_groups_by_rows:
+		if color == 'red':
+			color = 'green'
+		else:
+			color = 'red'
+
+		for p in patches_groups_by_rows[g]:
+			plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color=color)
+			
+	plt.show()
 
 def main():
 	global server
