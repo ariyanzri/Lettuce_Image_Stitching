@@ -2865,6 +2865,9 @@ def detect_rows(address):
 
 		
 	import matplotlib.pyplot as plt
+	import matplotlib
+	matplotlib.use('GTK') 
+
 	plt.axis('equal')
 
 	color = 'red'
