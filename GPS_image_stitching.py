@@ -2813,6 +2813,8 @@ def save_group_data(groups,lids,n,address):
 def detect_rows(address):
 	center_second_dim_rows = []
 	height_in_GPS = None
+	patches = []
+	size = (3296, 2472)
 
 	with open(address) as f:
 		lines = f.read()
@@ -2826,14 +2828,20 @@ def detect_rows(address):
 
 			features = l.split(',')
 
-			if height_in_GPS is None:
-				upper_left = (float(features[1]),float(features[2]))
-				lower_left = (float(features[3]),float(features[4]))
+			filename = features[0]
+			upper_left = (float(features[1]),float(features[2]))
+			lower_left = (float(features[3]),float(features[4]))
+			upper_right = (float(features[5]),float(features[6]))
+			lower_right = (float(features[7]),float(features[8]))
+			center = (float(features[9]),float(features[10]))
 
+			coord = Patch_GPS_coordinate(upper_left,upper_right,lower_left,lower_right,center)
+			patches.append(Patch_2(filename,None,None,coord,size))
+
+
+			if height_in_GPS is None:
 				height_in_GPS = abs(upper_left[1]-lower_left[1])
 				
-
-			center = (float(features[9]),float(features[10]))
 			is_new = True
 
 			for c in center_second_dim_rows:
@@ -2843,9 +2851,20 @@ def detect_rows(address):
 			if is_new:
 				center_second_dim_rows.append(center)
 
+	patches_groups_by_rows = {}
+	iterator = 0
 
-	print(center_second_dim_rows)
-	print(len(center_second_dim_rows))
+	for c in center_second_dim_rows:
+		patches_groups_by_rows[(round(c,7),round(c,7))] = []
+
+	for p in patches:
+		for c in center_second_dim_rows:
+				if abs(p.GPS_coords.center[1]-c[1]) < height_in_GPS:
+					patches_groups_by_rows[(round(c,7),round(c,7))].append(p)
+					
+
+	for g in patches_groups_by_rows:
+		print('{0} : {1}'.format(g,len(patches_groups_by_rows[g])))
 			
 
 
