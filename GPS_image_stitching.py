@@ -2845,7 +2845,7 @@ def detect_rows(address):
 			is_new = True
 
 			for c in center_second_dim_rows:
-				if abs(center[1]-c[1]) < height_in_GPS/2:
+				if abs(center[1]-c[1]) < height_in_GPS:
 					is_new = False
 
 			if is_new:
@@ -2870,7 +2870,7 @@ def detect_rows(address):
 	color = 'red'
 	for g in patches_groups_by_rows:
 		print('{0}: {1}'.format(g,len(patches_groups_by_rows[g])))
-		
+
 		if color == 'red':
 			color = 'green'
 		else:
