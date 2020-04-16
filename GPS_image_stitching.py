@@ -1389,7 +1389,7 @@ def evaluate_beneficiary_overlap(p1,p2,H,patch_folder,ov1,ov2):
 
 	flag = False
 
-	if p1_ul_new[0]>=0 and p1_ul_new[0]<p2.size[1] and p1_ul_new[1]>=1 and p1_ul_new[1]<p2.size[0]:
+	if p1_ul_new[0]>=0 and p1_ul_new[0]<p2.size[1] and p1_ul_new[1]>=0 and p1_ul_new[1]<p2.size[0]:
 		p2_x1 = p1_ul_new[0]
 		p2_y1 = p1_ul_new[1]
 
@@ -1398,7 +1398,7 @@ def evaluate_beneficiary_overlap(p1,p2,H,patch_folder,ov1,ov2):
 
 		flag = True
 
-	if p1_ur_new[0]>=0 and p1_ur_new[0]<p2.size[1] and p1_ur_new[1]>=1 and p1_ur_new[1]<p2.size[0]:
+	if p1_ur_new[0]>=0 and p1_ur_new[0]<p2.size[1] and p1_ur_new[1]>=0 and p1_ur_new[1]<p2.size[0]:
 		p2_x2 = p1_ur_new[0]
 		p2_y1 = p1_ur_new[1]
 
@@ -1407,7 +1407,7 @@ def evaluate_beneficiary_overlap(p1,p2,H,patch_folder,ov1,ov2):
 
 		flag = True
 
-	if p1_ll_new[0]>=0 and p1_ll_new[0]<p2.size[1] and p1_ll_new[1]>=1 and p1_ll_new[1]<p2.size[0]:
+	if p1_ll_new[0]>=0 and p1_ll_new[0]<p2.size[1] and p1_ll_new[1]>=0 and p1_ll_new[1]<p2.size[0]:
 		p2_x1 = p1_ll_new[0]
 		p2_y2 = p1_ll_new[1]
 
@@ -1416,7 +1416,7 @@ def evaluate_beneficiary_overlap(p1,p2,H,patch_folder,ov1,ov2):
 
 		flag = True
 
-	if p1_lr_new[0]>=0 and p1_lr_new[0]<p2.size[1] and p1_lr_new[1]>=1 and p1_lr_new[1]<p2.size[0]:
+	if p1_lr_new[0]>=0 and p1_lr_new[0]<p2.size[1] and p1_lr_new[1]>=0 and p1_lr_new[1]<p2.size[0]:
 		p2_x2 = p1_lr_new[0]
 		p2_y2 = p1_lr_new[1]
 
@@ -1435,6 +1435,8 @@ def evaluate_beneficiary_overlap(p1,p2,H,patch_folder,ov1,ov2):
 		p2_y1 = 0
 		p2_x2 = 0
 		p2_y2 = 0
+
+		print('out of bound overlap {0} to {1}.'.format(p1.name,p2.name))
 		return -1
 
 	p1.load_img(patch_folder)
@@ -1506,6 +1508,7 @@ def get_pairwise_transformation_info(p1,p2,SIFT_address,patch_folder):
 	
 	if overlap1[2]-overlap1[0]<p1.size[1]/5 and overlap1[3]-overlap1[1]<p1.size[0]/5:
 		# very small overlap
+		# print('very small overlap')
 		return None,None,None,None,None,None,None
 
 	kp1,desc1 = choose_SIFT_key_points(p1,overlap1[0],overlap1[1],overlap1[2],overlap1[3],SIFT_address)
@@ -1519,6 +1522,7 @@ def get_pairwise_transformation_info(p1,p2,SIFT_address,patch_folder):
 
 	if H is None:
 		# low number of matches, bad transformation
+		# print('low number matches')
 		return None,None,None,None,None,None,None
 
 	percentage_inliers = round(percentage_inliers*100,2)
@@ -1541,7 +1545,7 @@ def get_pairwise_transformation_info(p1,p2,SIFT_address,patch_folder):
 	return overlap1,overlap2,H,num_matches,percentage_inliers,gps_err,overlap_status
 
 def precalculate_pairwise_transformation_info_and_add_neighbors(patches,SIFT_address,group_id,patch_folder):
-	
+	remove_neighbors = []
 	main_patch = None
 
 	for p in patches:
@@ -1557,6 +1561,7 @@ def precalculate_pairwise_transformation_info_and_add_neighbors(patches,SIFT_add
 				
 				# do not add if not a good overlap
 				if overlap_on_n == None:
+					remove_neighbors.append((n,p))
 					continue
 				
 
@@ -1564,6 +1569,17 @@ def precalculate_pairwise_transformation_info_and_add_neighbors(patches,SIFT_add
 
 		print('GROPU ID: {0} - Calculated Transformation and error values for {1} neighbors of {2}'.format(group_id,len(p.neighbors),p.name))
 		sys.stdout.flush()
+
+	for a,b in remove_neighbors:
+		new_neighbors = []
+
+		for n in a.neighbors:
+			if b != n[0]:
+				new_neighbors.append(n)
+			else:
+				print('{0} removed from {1} neighbors.'.format(b.name,a.name))
+		a.neighbors = new_neighbors
+
 
 	if main_patch is None:
 		main_patch = patches[0]
@@ -1682,13 +1698,15 @@ class Graph():
 		
 		for p in patches:
 			for n in p.neighbors:
+				print(p in [ne[0] for ne in n[0].neighbors])
+
 				if self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]] == -1:
-					self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]] = n[7]
-					self.edges[self.vertex_name_to_index_dict[n[0].name]][self.vertex_name_to_index_dict[p.name]] = n[7] 
+					self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]] = round(n[7],2)
+					self.edges[self.vertex_name_to_index_dict[n[0].name]][self.vertex_name_to_index_dict[p.name]] =  round(n[7],2)
 				else:
 					if n[7] > self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]]:
-						self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]] = n[7]
-						self.edges[self.vertex_name_to_index_dict[n[0].name]][self.vertex_name_to_index_dict[p.name]] = n[7] 
+						self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]] = round(n[7],2)
+						self.edges[self.vertex_name_to_index_dict[n[0].name]][self.vertex_name_to_index_dict[p.name]] = round(n[7],2)
 
 	def print_graph(self):
 		print(self.vertex_name_to_index_dict)
@@ -1723,7 +1741,7 @@ class Graph():
 					keys[v] = self.edges[u][v]
 					parents[v] = u
 
-		print(parents)
+		
 		return parents
 
 	def get_patches_dict(self,patches):
@@ -1769,6 +1787,7 @@ def correct_GPS_MST(patches,SIFT_address,patch_folder,group_id='None'):
 
 	G = Graph(len(patches_tmp),[p.name for p in patches_tmp])
 	G.initialize_edge_weights(patches_tmp)
+
 	parents = G.generate_MST_prim(starting_patch.name)
 	return G.revise_GPS_from_generated_MST(patches_tmp,parents)
 
@@ -2830,12 +2849,12 @@ def main():
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
-		# patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
-		# patches[0].GPS_Corrected = True
+		patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
+		patches[0].GPS_Corrected = True
 		
-		# results = correct_GPS_MST_groups({'131':patches},SIFT_folder,patch_folder)
+		results = correct_GPS_MST_groups({'131':patches},SIFT_folder,patch_folder)
 		# # results = correct_GPS_new_code_no_heap_precalculate_groups({'131':patches},SIFT_folder,patch_folder)
-		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
+		save_coordinates_from_string(results,CORRECTED_coordinates_file)
 
 		patches = read_all_data()
 		final_patches = stitch_based_on_corrected_GPS(patches,True)
