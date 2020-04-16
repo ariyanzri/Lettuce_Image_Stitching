@@ -1705,7 +1705,7 @@ class Graph():
 		
 		for p in patches:
 			for n in p.neighbors:
-				print(p in [ne[0] for ne in n[0].neighbors])
+				# print(p in [ne[0] for ne in n[0].neighbors])
 
 				if self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]] == -1:
 					self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]] = round(n[7],2)
@@ -2848,7 +2848,7 @@ def main():
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
-		os.system("taskset -p -c 6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39 %d" % os.getpid())
+		os.system("taskset -p -c 6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,44,45,46 %d" % os.getpid())
 		lids = get_lids(lid_file)
 		groups = get_groups_and_patches_with_lids(patch_folder,coordinates_file,SIFT_folder,lids)
 		results = correct_GPS_MST_groups(groups,SIFT_folder,patch_folder)
