@@ -2870,9 +2870,12 @@ def detect_rows(address):
 	plt.axis('equal')
 
 	color = 'red'
+	total=0
+
 	for g in patches_groups_by_rows:
 		print('{0}: {1}'.format(g,len(patches_groups_by_rows[g])))
-
+		total+=len(patches_groups_by_rows[g])
+		
 		if color == 'red':
 			color = 'green'
 		else:
