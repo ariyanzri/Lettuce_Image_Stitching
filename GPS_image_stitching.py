@@ -2830,7 +2830,7 @@ def detect_rows(address):
 				upper_left = (float(features[1]),float(features[2]))
 				lower_left = (float(features[3]),float(features[4]))
 
-				height_in_GPS = abs(upperleft[1]-lower_left[1])
+				height_in_GPS = abs(upper_left[1]-lower_left[1])
 				
 
 			center = (float(features[9]),float(features[10]))
