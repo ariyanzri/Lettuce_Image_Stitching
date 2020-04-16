@@ -1444,6 +1444,13 @@ def evaluate_beneficiary_overlap(p1,p2,H,patch_folder,ov1,ov2):
 	overlap_1_img = p1.rgb_img[p1_y1:p1_y2,p1_x1:p1_x2,:]
 	overlap_2_img = p2.rgb_img[p2_y1:p2_y2,p2_x1:p2_x2,:]
 
+	shape_1 = np.shape(overlap_1_img)
+	shape_2 = np.shape(overlap_2_img)
+
+	if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
+		print('very small overlap after transformation {0} to {1}.'.format(p1.name,p2.name))
+		return -1
+
 	overlap_1_img = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2GRAY)
 	overlap_2_img = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2GRAY)
 
