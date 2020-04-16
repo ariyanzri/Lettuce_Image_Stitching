@@ -2810,6 +2810,30 @@ def save_group_data(groups,lids,n,address):
 
 
 
+def detect_rows(address):
+	center_second_dim_rows = []
+
+	with open(address) as f:
+		lines = f.read()
+		lines = lines.replace('"','')
+
+		for l in lines.split('\n'):
+			if l == '':
+				break
+			if l == 'Filename,Upper left,Lower left,Upper right,Lower right,Center' or l == 'name,upperleft,lowerleft,uperright,lowerright,center':
+				continue
+
+			features = l.split(',')
+
+			center = '{0},{1}'.format(float(features[9]),float(features[10]))
+			center_second_dim_rows.append(center)
+
+
+	center_second_dim_rows = list(set(center_second_dim_rows))
+
+	print(center_second_dim_rows)
+			
+
 
 def main():
 	global server
@@ -2841,10 +2865,12 @@ def main():
 
 	if server == 'coge':
 		print('RUNNING ON -- {0} --'.format(server))
-		lids = get_lids(lid_file)
-		groups = get_groups_and_patches_with_lids(patch_folder,coordinates_file,SIFT_folder,lids)
-		results = correct_GPS_new_code_no_heap_precalculate_groups(groups,SIFT_folder,patch_folder)
-		save_coordinates_from_string(results,CORRECTED_coordinates_file)
+		# lids = get_lids(lid_file)
+		# groups = get_groups_and_patches_with_lids(patch_folder,coordinates_file,SIFT_folder,lids)
+		# results = correct_GPS_new_code_no_heap_precalculate_groups(groups,SIFT_folder,patch_folder)
+		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
+
+		detect_rows(coordinates_file)
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
