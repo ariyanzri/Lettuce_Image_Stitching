@@ -2870,7 +2870,14 @@ def detect_rows(address):
 		patches_groups_by_rows[(round(min_row[0],7),round(min_row[1],7))].append(p)
 
 
-		
+	patches_groups_by_rows_new = {}
+
+	for g in patches_groups_by_rows:
+		newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
+		patches_groups_by_rows_new[g] = newlist
+
+
+
 	# import matplotlib.pyplot as plt
 	
 	# plt.axis('equal')
@@ -2893,18 +2900,63 @@ def detect_rows(address):
 	# plt.savefig('rows.png')
 	# print(total)
 
-	for g in patches_groups_by_rows:
-		newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
-		for p in newlist:
+	# for g in patches_groups_by_rows:
+	# 	newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
+	# 	for p in newlist:
 			# print(p.GPS_coords.UL_coord)
 			# plt.scatter(p.GPS_coords.UL_coord[0],p.GPS_coords.UL_coord[1],color='red')
 			# plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color='green')
-			print(p.GPS_coords.Center)
+			# print(p.GPS_coords.Center)
 			# plt.scatter(p.GPS_coords.LL_coord[0],p.GPS_coords.LL_coord[1],color='blue')
-		break
+		# break
 
 	# plt.savefig('rows.png')
-	return patches_groups_by_rows
+	return patches_groups_by_rows_new
+
+def generate_superpatches(groups_by_rows):
+
+	import matplotlib.pyplot as plt
+	plt.axis('equal')
+
+	for g in groups_by_rows:
+		patches = groups_by_rows[g]
+
+		up = patches[0].GPS_coords.UL_coord[1]
+		down = (0,0)
+		left = (0,0)
+		right = (0,0)
+		center = (0,0)
+
+		for p in patches:
+			if p.GPS_coords.UL_coord[1]>up:
+				up=p.GPS_coords.UL_coord[1]
+
+			if p.GPS_coords.LL_coord[1]<down:
+				down=p.GPS_coords.LL_coord[1]
+
+			if p.GPS_coords.UL_coord[0]<left:
+				left=p.GPS_coords.UL_coord[0]
+
+			if p.GPS_coords.UR_coord[0]>right:
+				right=p.GPS_coords.UR_coord[0]
+
+			plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color='green')
+
+		UL_coord = (left,up)
+		UR_coord = (right,up)
+		LL_coord = (left,down)
+		LR_coord = (right,down)
+		Center = ((left+right)/2,(down+up)/2)
+
+		plt.scatter(UL_coord[0],UL_coord[1],color='blue',marker='x')
+		plt.scatter(UR_coord[0],UR_coord[1],color='blue',marker='x')
+		plt.scatter(LL_coord[0],LL_coord[1],color='blue',marker='x')
+		plt.scatter(LR_coord[0],LR_coord[1],color='blue',marker='x')
+		plt.scatter(Center[0],Center[1],color='blue',marker='x')
+
+		plt.savefig('rows.png')
+		break
+
 
 
 def main():
@@ -2942,7 +2994,8 @@ def main():
 		# results = correct_GPS_new_code_no_heap_precalculate_groups(groups,SIFT_folder,patch_folder)
 		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 
-		detect_rows(coordinates_file)
+		row_groups = detect_rows(coordinates_file)
+		generate_superpatches(row_groups)
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
