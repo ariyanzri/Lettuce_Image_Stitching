@@ -2922,10 +2922,9 @@ def generate_superpatches(groups_by_rows):
 		patches = groups_by_rows[g]
 
 		up = patches[0].GPS_coords.UL_coord[1]
-		down = (0,0)
-		left = (0,0)
-		right = (0,0)
-		center = (0,0)
+		down = patches[0].GPS_coords.LL_coord[1]
+		left = patches[0].GPS_coords.UL_coord[0]
+		right = patches[0].GPS_coords.UR_coord[0]
 
 		for p in patches:
 			if p.GPS_coords.UL_coord[1]>up:
