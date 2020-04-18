@@ -2809,6 +2809,31 @@ def save_group_data(groups,lids,n,address):
 	np.save(address,data)
 
 
+def recalculate_keypoints_locations(p,SIFT_folder,x_difference,y_difference):
+	upper_kp = []
+	upper_desc = []
+	lower_kp = []
+	lower_desc = []
+
+	(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_folder,p.name.replace('.tif','')), "rb"))
+
+			for i,k in enumerate(kp_tmp):
+
+				if k[1]<p.size[0]/2:
+					# calculate new locations
+					upper_kp.append((k[0]+x_difference,k[1]+y_difference))
+					upper_desc.append(list(np.array(desc_tmp[i,:])))
+				else:
+					# calculate new locations
+					lower_kp.append((k[0]+x_difference,k[1]+y_difference))
+					lower_desc.append(list(np.array(desc_tmp[i,:])))
+
+	return upper_kp,upper_desc,lower_kp,lower_desc
+
+def recalculate_keypoints_locations_helper(args):
+
+	return recalculate_keypoints_locations(*args)
+
 class SuperPatch():
 
 	def __init__(self,row_n,list_patches,gps_coords,SIFT_folder):
@@ -2831,27 +2856,30 @@ class SuperPatch():
 		return x_difference_from_UL/self.x_ratio_GPS_over_pixel,y_difference_from_UL/self.y_ratio_GPS_over_pixel
 
 	def calculate_super_sift_points(self,SIFT_folder):
+		global no_of_cores_to_use
 
 		upper_kp = []
 		upper_desc = []
 		lower_kp = []
 		lower_desc = []
 
+		args = []
+
 		for p in self.patches:
-			(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_folder,p.name.replace('.tif','')), "rb"))
-
 			x_difference,y_difference = self.calculate_difference_from_UL(p)
+			args.append((p,SIFT_folder,x_difference,y_difference))
+			
+		processes = multiprocessing.Pool(no_of_cores_to_use)
 
-			for i,k in enumerate(kp_tmp):
+		results = processes.map(recalculate_keypoints_locations_helper,args)
 
-				if k[1]<p.size[0]/2:
-					# calculate new locations
-					upper_kp.append((k[0]+x_difference,k[1]+y_difference))
-					upper_desc.append(list(np.array(desc_tmp[i,:])))
-				else:
-					# calculate new locations
-					lower_kp.append((k[0]+x_difference,k[1]+y_difference))
-					lower_desc.append(list(np.array(desc_tmp[i,:])))
+		processes.close()
+
+		for ukp,uds,lkp,lds in results:
+			upper_kp+=ukp
+			upper_desc+=uds
+			lower_kp+=lkp
+			lower_desc+=lds 
 
 		return upper_kp,upper_desc,lower_kp,lower_desc
 
@@ -3008,7 +3036,7 @@ def generate_superpatches(groups_by_rows,SIFT_folder):
 
 		sp = SuperPatch(g,patches,coord,SIFT_folder)
 		sp.draw_kp()
-		
+
 		break
 		# plt.scatter(UL_coord[0],UL_coord[1],color='blue',marker='x')
 		# plt.scatter(UR_coord[0],UR_coord[1],color='blue',marker='x')
