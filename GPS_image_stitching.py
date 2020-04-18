@@ -2888,11 +2888,19 @@ class SuperPatch():
 		import matplotlib.pyplot as plt
 		plt.axis('equal')
 
-		for k in self.upper_kp:
-			plt.scatter(k[0],k[1],color='green')
+		upper_kp1 = [k[0] for k in upper_kp]
+		upper_kp2 = [k[1] for k in upper_kp]
+		plt.scatter(upper_kp1,upper_kp2,color='green')
 
-		for k in self.lower_kp:
-			plt.scatter(k[0],k[1],color='red')
+		lower_kp1 = [k[0] for k in lower_kp]
+		lower_kp2 = [k[1] for k in lower_kp]
+		plt.scatter(lower_kp1,lower_kp2,color='red')
+
+		# for k in self.upper_kp:
+		# 	plt.scatter(k[0],k[1],color='green')
+
+		# for k in self.lower_kp:
+		# 	plt.scatter(k[0],k[1],color='red')
 
 		plt.savefig('rows.png')
 
