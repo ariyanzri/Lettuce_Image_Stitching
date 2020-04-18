@@ -2838,7 +2838,7 @@ class SuperPatch():
 		lower_desc = []
 
 		for p in self.patches:
-			(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_address,patch.name.replace('.tif','')), "rb"))
+			(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_folder,p.name.replace('.tif','')), "rb"))
 
 			x_difference,y_difference = self.calculate_difference_from_UL(p)
 
