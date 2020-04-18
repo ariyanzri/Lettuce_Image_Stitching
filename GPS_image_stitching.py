@@ -2843,7 +2843,6 @@ class SuperPatch():
 			x_difference,y_difference = self.calculate_difference_from_UL(p)
 
 			for i,k in enumerate(kp_tmp):
-				print(k)
 
 				if k[1]<p.size[0]/2:
 					# calculate new locations
@@ -2855,6 +2854,18 @@ class SuperPatch():
 					lower_desc.append(list(np.array(desc_tmp[i,:])))
 
 		return upper_kp,upper_desc,lower_kp,lower_desc
+
+	def draw_kp(self):
+		import matplotlib.pyplot as plt
+		plt.axis('equal')
+
+		for k in self.upper_kp:
+			plt.scatter(k[0],k[1],color='green')
+
+		for k in self.lower_kp:
+			plt.scatter(k[0],k[1],color='red')
+
+		plt.savefig('rows.png')
 
 def detect_rows(address):
 	center_second_dim_rows = []
@@ -2996,6 +3007,8 @@ def generate_superpatches(groups_by_rows,SIFT_folder):
 		coord = Patch_GPS_coordinate(UL_coord,UR_coord,LL_coord,LR_coord,Center)
 
 		sp = SuperPatch(g,patches,coord,SIFT_folder)
+		sp.draw_kp()
+		
 		break
 		# plt.scatter(UL_coord[0],UL_coord[1],color='blue',marker='x')
 		# plt.scatter(UR_coord[0],UR_coord[1],color='blue',marker='x')
