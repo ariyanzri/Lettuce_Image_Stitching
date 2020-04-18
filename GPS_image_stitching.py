@@ -2809,6 +2809,52 @@ def save_group_data(groups,lids,n,address):
 	np.save(address,data)
 
 
+class SuperPatch():
+
+	def __init__(self,row_n,list_patches,gps_coords,SIFT_folder):
+		self.row_number = row_n
+		self.patches = list_patches
+		self.GPS_coords = gps_coords
+		self.x_ratio_GPS_over_pixel = (list_patches[0].GPS_coords.UR_coord[0] - list_patches[0].GPS_coords.UL_coord[0])/list_patches[0].size[1]
+		self.y_ratio_GPS_over_pixel = (list_patches[0].GPS_coords.UL_coord[1] - list_patches[0].GPS_coords.LL_coord[1])/list_patches[0].size[0]
+
+		self.size = ((self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])/self.y_ratio_GPS_over_pixel,\
+			(self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])/self.x_ratio_GPS_over_pixel)
+
+		self.upper_kp, self.upper_desc, self.lower_kp, self.lower_desc = self.calculate_super_sift_points(SIFT_folder)
+
+	def calculate_difference_from_UL(self,p):
+
+		x_difference_from_UL = p.GPS_coords.UL_coord[0] - self.GPS_coords.UL_coord[0]
+		y_difference_from_UL = self.GPS_coords.UL_coord[1] - p.GPS_coords.UL_coord[1]
+
+		return x_difference_from_UL/self.x_ratio_GPS_over_pixel,y_difference_from_UL/self.y_ratio_GPS_over_pixel
+
+	def calculate_super_sift_points(self,SIFT_folder):
+
+		upper_kp = []
+		upper_desc = []
+		lower_kp = []
+		lower_desc = []
+
+		for p in self.patches:
+			(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_address,patch.name.replace('.tif','')), "rb"))
+
+			x_difference,y_difference = self.calculate_difference_from_UL(p)
+
+			for i,k in enumerate(kp_tmp):
+				print(k)
+
+				if k[1]<p.size[0]/2:
+					# calculate new locations
+					upper_kp.append((k[0]+x_difference,k[1]+y_difference))
+					upper_desc.append(list(np.array(desc_tmp[i,:])))
+				else:
+					# calculate new locations
+					lower_kp.append((k[0]+x_difference,k[1]+y_difference))
+					lower_desc.append(list(np.array(desc_tmp[i,:])))
+
+		return upper_kp,upper_desc,lower_kp,lower_desc
 
 def detect_rows(address):
 	center_second_dim_rows = []
@@ -2913,10 +2959,10 @@ def detect_rows(address):
 	# plt.savefig('rows.png')
 	return patches_groups_by_rows_new
 
-def generate_superpatches(groups_by_rows):
+def generate_superpatches(groups_by_rows,SIFT_folder):
 
-	import matplotlib.pyplot as plt
-	plt.axis('equal')
+	# import matplotlib.pyplot as plt
+	# plt.axis('equal')
 
 	for g in groups_by_rows:
 		patches = groups_by_rows[g]
@@ -2939,7 +2985,7 @@ def generate_superpatches(groups_by_rows):
 			if p.GPS_coords.UR_coord[0]>right:
 				right=p.GPS_coords.UR_coord[0]
 
-			plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color='green')
+			# plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color='green')
 
 		UL_coord = (left,up)
 		UR_coord = (right,up)
@@ -2947,14 +2993,19 @@ def generate_superpatches(groups_by_rows):
 		LR_coord = (right,down)
 		Center = ((left+right)/2,(down+up)/2)
 
-		plt.scatter(UL_coord[0],UL_coord[1],color='blue',marker='x')
-		plt.scatter(UR_coord[0],UR_coord[1],color='blue',marker='x')
-		plt.scatter(LL_coord[0],LL_coord[1],color='blue',marker='x')
-		plt.scatter(LR_coord[0],LR_coord[1],color='blue',marker='x')
-		plt.scatter(Center[0],Center[1],color='blue',marker='x')
+		coord = Patch_GPS_coordinate(UL_coord,UR_coord,LL_coord,LR_coord,Center)
 
-		plt.savefig('rows.png')
+		sp = SuperPatch(g,patches,coord,SIFT_folder)
 		break
+		# plt.scatter(UL_coord[0],UL_coord[1],color='blue',marker='x')
+		# plt.scatter(UR_coord[0],UR_coord[1],color='blue',marker='x')
+		# plt.scatter(LL_coord[0],LL_coord[1],color='blue',marker='x')
+		# plt.scatter(LR_coord[0],LR_coord[1],color='blue',marker='x')
+		# plt.scatter(Center[0],Center[1],color='blue',marker='x')
+
+		# plt.savefig('rows.png')
+		
+		
 
 
 
@@ -2994,7 +3045,7 @@ def main():
 		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 
 		row_groups = detect_rows(coordinates_file)
-		generate_superpatches(row_groups)
+		generate_superpatches(row_groups,SIFT_folder)
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
