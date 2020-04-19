@@ -2863,9 +2863,9 @@ class SuperPatch():
 		global no_of_cores_to_use
 
 		upper_kp = []
-		upper_desc = []
+		upper_desc = None
 		lower_kp = []
-		lower_desc = []
+		lower_desc = None
 
 		args = []
 
@@ -2881,9 +2881,16 @@ class SuperPatch():
 
 		for ukp,uds,lkp,lds in results:
 			upper_kp+=ukp
-			upper_desc+=uds
+			if upper_desc is None:
+				upper_desc = uds.copy()
+			else:
+				upper_desc = np.append(upper_desc,uds,axis=0)
+			
 			lower_kp+=lkp
-			lower_desc+=lds 
+			if lower_desc is None:
+				lower_desc = lds.copy()
+			else:
+				lower_desc = np.append(lower_desc,lds,axis=0)
 
 		return upper_kp,upper_desc,lower_kp,lower_desc
 
