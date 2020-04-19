@@ -2819,11 +2819,11 @@ def recalculate_keypoints_locations(p,SIFT_folder,x_difference,y_difference):
 
 	for i,k in enumerate(kp_tmp):
 
-		if k[1]<p.size[0]/4:
+		if k[1]<p.size[0]/6:
 			# calculate new locations
 			upper_kp.append((k[0]+x_difference,k[1]+y_difference))
 			upper_desc.append(list(np.array(desc_tmp[i,:])))
-		elif k[1]>=p.size[0]*3/4:
+		elif k[1]>=p.size[0]*5/6:
 			# calculate new locations
 			lower_kp.append((k[0]+x_difference,k[1]+y_difference))
 			lower_desc.append(list(np.array(desc_tmp[i,:])))
