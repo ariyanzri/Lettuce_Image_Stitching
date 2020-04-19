@@ -2892,8 +2892,6 @@ class SuperPatch():
 			else:
 				lower_desc = np.append(lower_desc,lds,axis=0)
 
-		indexes = random.sample()
-
 		return upper_kp,upper_desc,lower_kp,lower_desc
 
 	def draw_kp(self):
