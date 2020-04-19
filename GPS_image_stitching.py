@@ -2828,6 +2828,9 @@ def recalculate_keypoints_locations(p,SIFT_folder,x_difference,y_difference):
 			lower_kp.append((k[0]+x_difference,k[1]+y_difference))
 			lower_desc.append(list(np.array(desc_tmp[i,:])))
 
+	upper_desc = np.array(upper_desc)
+	lower_desc = np.array(lower_desc)
+
 	print('patch {0} done...'.format(p.name))
 	return upper_kp,upper_desc,lower_kp,lower_desc
 
