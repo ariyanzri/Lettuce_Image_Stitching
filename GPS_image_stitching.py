@@ -2953,8 +2953,9 @@ def detect_rows(address):
 
 	for c in center_second_dim_rows:
 		patches_groups_by_rows[(round(c[0],7),round(c[1],7))] = []
+		print(c)
 
-	print(center_second_dim_rows)
+
 
 	for p in patches:
 		min_distance = height_in_GPS*2
