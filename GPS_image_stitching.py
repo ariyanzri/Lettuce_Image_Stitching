@@ -2894,7 +2894,7 @@ class SuperPatch():
 
 		lower_kp1 = [k[0] for k in self.lower_kp]
 		lower_kp2 = [k[1] for k in self.lower_kp]
-		
+
 		plt.scatter(lower_kp1,lower_kp2,color='red')
 
 		# for k in self.upper_kp:
@@ -2949,8 +2949,12 @@ def detect_rows(address):
 	patches_groups_by_rows = {}
 	iterator = 0
 
+	center_second_dim_rows = sorted(center_second_dim_rows, key=lambda x: x[1])
+
 	for c in center_second_dim_rows:
 		patches_groups_by_rows[(round(c[0],7),round(c[1],7))] = []
+
+	print(center_second_dim_rows)
 
 	for p in patches:
 		min_distance = height_in_GPS*2
@@ -3010,6 +3014,8 @@ def detect_rows(address):
 
 def generate_superpatches(groups_by_rows,SIFT_folder):
 
+	super_patches = []
+
 	# import matplotlib.pyplot as plt
 	# plt.axis('equal')
 
@@ -3045,9 +3051,9 @@ def generate_superpatches(groups_by_rows,SIFT_folder):
 		coord = Patch_GPS_coordinate(UL_coord,UR_coord,LL_coord,LR_coord,Center)
 
 		sp = SuperPatch(g,patches,coord,SIFT_folder)
-		sp.draw_kp()
+		
+		super_patches.append(sp)
 
-		break
 		# plt.scatter(UL_coord[0],UL_coord[1],color='blue',marker='x')
 		# plt.scatter(UR_coord[0],UR_coord[1],color='blue',marker='x')
 		# plt.scatter(LL_coord[0],LL_coord[1],color='blue',marker='x')
@@ -3056,9 +3062,8 @@ def generate_superpatches(groups_by_rows,SIFT_folder):
 
 		# plt.savefig('rows.png')
 		
+	return super_patches
 		
-
-
 
 def main():
 	global server
