@@ -2879,7 +2879,13 @@ class SuperPatch():
 
 		processes.close()
 
+		i = -1
+
 		for ukp,uds,lkp,lds in results:
+			i+=1
+			if i%3 != 0:
+				continue
+
 			upper_kp+=ukp
 			if upper_desc is None:
 				upper_desc = uds.copy()
