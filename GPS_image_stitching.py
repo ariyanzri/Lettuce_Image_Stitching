@@ -3154,13 +3154,15 @@ def correct_all_sub_patches(H,super_patch,previous_super_patch):
 	super_patch.GPS_coords = super_new_coords
 
 
-def generate_superpatches(groups_by_rows,SIFT_folder):
+def generate_superpatches_and_correct_GPS(groups_by_rows,SIFT_folder):
 
-	super_patches = []
+	results_final = 'Filename,Upper left,Lower left,Upper right,Lower right,Center\n'
+
+	patches_count_done = 0
 	previous_super_patch = None
 
-	import matplotlib.pyplot as plt
-	plt.axis('equal')
+	# import matplotlib.pyplot as plt
+	# plt.axis('equal')
 
 	for g in groups_by_rows:
 		patches = groups_by_rows[g]
@@ -3208,30 +3210,36 @@ def generate_superpatches(groups_by_rows,SIFT_folder):
 
 			H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
 
-			plt.scatter(sp.GPS_coords.UL_coord[0],sp.GPS_coords.UL_coord[1],color='blue',marker='x')
-			plt.scatter(sp.GPS_coords.UR_coord[0],sp.GPS_coords.UR_coord[1],color='blue',marker='x')
-			plt.scatter(sp.GPS_coords.LL_coord[0],sp.GPS_coords.LL_coord[1],color='blue',marker='x')
-			plt.scatter(sp.GPS_coords.LR_coord[0],sp.GPS_coords.LR_coord[1],color='blue',marker='x')
-			plt.scatter(sp.GPS_coords.Center[0],sp.GPS_coords.Center[1],color='blue',marker='x')
+			# plt.scatter(sp.GPS_coords.UL_coord[0],sp.GPS_coords.UL_coord[1],color='blue',marker='x')
+			# plt.scatter(sp.GPS_coords.UR_coord[0],sp.GPS_coords.UR_coord[1],color='blue',marker='x')
+			# plt.scatter(sp.GPS_coords.LL_coord[0],sp.GPS_coords.LL_coord[1],color='blue',marker='x')
+			# plt.scatter(sp.GPS_coords.LR_coord[0],sp.GPS_coords.LR_coord[1],color='blue',marker='x')
+			# plt.scatter(sp.GPS_coords.Center[0],sp.GPS_coords.Center[1],color='blue',marker='x')
 
 			correct_all_sub_patches(H,sp,previous_super_patch)
 
-			plt.scatter(sp.GPS_coords.UL_coord[0],sp.GPS_coords.UL_coord[1],color='green',marker='x')
-			plt.scatter(sp.GPS_coords.UR_coord[0],sp.GPS_coords.UR_coord[1],color='green',marker='x')
-			plt.scatter(sp.GPS_coords.LL_coord[0],sp.GPS_coords.LL_coord[1],color='green',marker='x')
-			plt.scatter(sp.GPS_coords.LR_coord[0],sp.GPS_coords.LR_coord[1],color='green',marker='x')
-			plt.scatter(sp.GPS_coords.Center[0],sp.GPS_coords.Center[1],color='green',marker='x')
+			print('GPS for Super Patch # {0} corrected.'.format(patches_count_done))
+			sys.stdout.flush()
 
-			plt.savefig('rows.png')
+			# plt.scatter(sp.GPS_coords.UL_coord[0],sp.GPS_coords.UL_coord[1],color='green',marker='x')
+			# plt.scatter(sp.GPS_coords.UR_coord[0],sp.GPS_coords.UR_coord[1],color='green',marker='x')
+			# plt.scatter(sp.GPS_coords.LL_coord[0],sp.GPS_coords.LL_coord[1],color='green',marker='x')
+			# plt.scatter(sp.GPS_coords.LR_coord[0],sp.GPS_coords.LR_coord[1],color='green',marker='x')
+			# plt.scatter(sp.GPS_coords.Center[0],sp.GPS_coords.Center[1],color='green',marker='x')
 
-			break
+			# plt.savefig('rows.png')
 
-		super_patches.append(sp)
+
+		patches_count_done+=1
+		results_final+=get_corrected_string(sp.patches)
 
 		previous_super_patch = sp
 		
-	return super_patches
+	return results_final
 		
+def save_corrected_from_super_patches_string(res_string,corrected_filename):
+	with open(corrected_filename,'w') as f:
+		f.write(res_string)
 
 def main():
 	global server
@@ -3269,7 +3277,8 @@ def main():
 		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 
 		row_groups = detect_rows(coordinates_file)
-		generate_superpatches(row_groups,SIFT_folder)
+		results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
+		save_corrected_from_super_patches_string(results,CORRECTED_coordinates_file)
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
