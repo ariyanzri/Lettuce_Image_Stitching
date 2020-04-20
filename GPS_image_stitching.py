@@ -2869,6 +2869,8 @@ class SuperPatch():
 		print(np.shape(self.lower_desc))
 		print(np.shape(self.lower_kp))
 
+		self.draw_kp()
+
 	def calculate_difference_from_UL(self,p):
 
 		x_difference_from_UL = p.GPS_coords.UL_coord[0] - self.GPS_coords.UL_coord[0]
