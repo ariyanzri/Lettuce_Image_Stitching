@@ -2883,7 +2883,7 @@ class SuperPatch():
 
 		for ukp,uds,lkp,lds in results:
 			i+=1
-			if i%3 != 0:
+			if i%4 != 0:
 				continue
 
 			upper_kp+=ukp
