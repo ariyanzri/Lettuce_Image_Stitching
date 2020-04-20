@@ -3184,7 +3184,8 @@ def generate_superpatches(groups_by_rows,SIFT_folder):
 		coord = Patch_GPS_coordinate(UL_coord,UR_coord,LL_coord,LR_coord,Center)
 
 		sp = SuperPatch(g,patches,coord,SIFT_folder)
-		
+		sp.draw_kp()
+		break
 		if previous_super_patch is not None:
 			overlap1 = sp.get_overlap_rectangle(previous_super_patch)
 			overlap2 = previous_super_patch.get_overlap_rectangle(sp)
