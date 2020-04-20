@@ -2869,7 +2869,7 @@ class SuperPatch():
 		print(np.shape(self.lower_desc))
 		print(np.shape(self.lower_kp))
 
-		self.draw_kp()
+
 
 	def calculate_difference_from_UL(self,p):
 
@@ -2920,12 +2920,12 @@ class SuperPatch():
 
 		upper_kp1 = [k[0] for k in self.upper_kp]
 		upper_kp2 = [k[1] for k in self.upper_kp]
-		plt.scatter(upper_kp1,upper_kp2,color='green')
+		plt.scatter(upper_kp1,upper_kp2,color='green',marker='.')
 
 		lower_kp1 = [k[0] for k in self.lower_kp]
 		lower_kp2 = [k[1] for k in self.lower_kp]
 
-		plt.scatter(lower_kp1,lower_kp2,color='red')
+		plt.scatter(lower_kp1,lower_kp2,color='red',marker='.')
 
 		# for k in self.upper_kp:
 		# 	plt.scatter(k[0],k[1],color='green')
@@ -3198,7 +3198,8 @@ def generate_superpatches(groups_by_rows,SIFT_folder):
 		coord = Patch_GPS_coordinate(UL_coord,UR_coord,LL_coord,LR_coord,Center)
 
 		sp = SuperPatch(g,patches,coord,SIFT_folder)
-		# sp.draw_kp()
+		sp.draw_kp()
+
 		break
 
 		if previous_super_patch is not None:
