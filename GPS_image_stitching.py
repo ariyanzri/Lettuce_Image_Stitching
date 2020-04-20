@@ -3150,7 +3150,7 @@ def correct_all_sub_patches(H,super_patch,previous_super_patch):
 	super_new_LR = (super_patch.GPS_coords.LR_coord[0]-diff_UL[0],super_patch.GPS_coords.LR_coord[1]-diff_UL[1])
 	super_new_center = (super_patch.GPS_coords.Center[0]-diff_UL[0],super_patch.GPS_coords.Center[1]-diff_UL[1])
 
-	super_new_coords = Patch_GPS_coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+	super_new_coords = Patch_GPS_coordinate(super_new_UL,super_new_UR,super_new_LL,super_new_LR,super_new_center)
 	super_patch.GPS_coords = super_new_coords
 
 
