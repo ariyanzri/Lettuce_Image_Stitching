@@ -2860,10 +2860,10 @@ class SuperPatch():
 		upper_sample_indexes = random.sample(upper_indexes,262143)
 		lower_sample_indexes = random.sample(lower_indexes,262143)
 
-		self.upper_kp = self.upper_kp[upper_sample_indexes]
+		self.upper_kp = [self.upper_kp[i] for i in upper_sample_indexes]
 		self.upper_desc = self.upper_desc[upper_sample_indexes,:]
 
-		self.lower_kp = self.lower_kp[lower_sample_indexes]
+		self.lower_kp = [self.lower_kp[i] for i in lower_sample_indexes]
 		self.lower_desc = self.lower_desc[lower_sample_indexes,:]
 
 		print(np.shape(lower_desc))
