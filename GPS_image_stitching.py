@@ -2854,10 +2854,13 @@ class SuperPatch():
 		self.remove_randomly()
 
 	def remove_randomly(self):
-		upper_indexes = range(0,np.shape(self.upper_desc)[1])
-		lower_indexes = range(0,np.shape(self.lower_desc)[1])
+		upper_indexes = range(0,np.shape(self.upper_desc)[0])
+		lower_indexes = range(0,np.shape(self.lower_desc)[0])
+
 		print(lower_indexes)
 		print(upper_indexes)
+
+		print(random.sample(lower_indexes,2))
 
 	def calculate_difference_from_UL(self,p):
 
@@ -3188,7 +3191,7 @@ def generate_superpatches(groups_by_rows,SIFT_folder):
 		sp = SuperPatch(g,patches,coord,SIFT_folder)
 		# sp.draw_kp()
 		break
-		
+
 		if previous_super_patch is not None:
 			overlap1 = sp.get_overlap_rectangle(previous_super_patch)
 			overlap2 = previous_super_patch.get_overlap_rectangle(sp)
