@@ -2851,6 +2851,13 @@ class SuperPatch():
 			(self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])/self.x_ratio_GPS_over_pixel)
 
 		self.upper_kp, self.upper_desc, self.lower_kp, self.lower_desc = self.calculate_super_sift_points(SIFT_folder)
+		self.remove_randomly()
+
+	def remove_randomly(self):
+		upper_indexes = range(0,np.shape(self.upper_desc)[1])
+		lower_indexes = range(0,np.shape(self.lower_desc)[1])
+		print(lower_indexes)
+		print(upper_indexes)
 
 	def calculate_difference_from_UL(self,p):
 
@@ -2879,12 +2886,7 @@ class SuperPatch():
 
 		processes.close()
 
-		i = -1
-
 		for ukp,uds,lkp,lds in results:
-			i+=1
-			if i%4 != 0:
-				continue
 
 			upper_kp+=ukp
 			if upper_desc is None:
@@ -3184,8 +3186,9 @@ def generate_superpatches(groups_by_rows,SIFT_folder):
 		coord = Patch_GPS_coordinate(UL_coord,UR_coord,LL_coord,LR_coord,Center)
 
 		sp = SuperPatch(g,patches,coord,SIFT_folder)
-		sp.draw_kp()
+		# sp.draw_kp()
 		break
+		
 		if previous_super_patch is not None:
 			overlap1 = sp.get_overlap_rectangle(previous_super_patch)
 			overlap2 = previous_super_patch.get_overlap_rectangle(sp)
