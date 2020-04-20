@@ -3151,7 +3151,7 @@ def correct_all_sub_patches(H,super_patch,previous_super_patch):
 	super_new_center = (super_patch.GPS_coords.Center[0]-diff_UL[0],super_patch.GPS_coords.Center[1]-diff_UL[1])
 
 	super_new_coords = Patch_GPS_coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
-	p.GPS_coords = super_new_coords
+	super_patch.GPS_coords = super_new_coords
 
 
 def generate_superpatches(groups_by_rows,SIFT_folder):
