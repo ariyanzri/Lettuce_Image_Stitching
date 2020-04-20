@@ -2866,8 +2866,8 @@ class SuperPatch():
 		self.lower_kp = [self.lower_kp[i] for i in lower_sample_indexes]
 		self.lower_desc = self.lower_desc[lower_sample_indexes,:]
 
-		print(np.shape(lower_desc))
-		print(np.shape(lower_kp))
+		print(np.shape(self.lower_desc))
+		print(np.shape(self.lower_kp))
 
 	def calculate_difference_from_UL(self,p):
 
