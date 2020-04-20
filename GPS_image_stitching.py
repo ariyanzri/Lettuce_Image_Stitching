@@ -2857,14 +2857,15 @@ class SuperPatch():
 		upper_indexes = range(0,np.shape(self.upper_desc)[0])
 		lower_indexes = range(0,np.shape(self.lower_desc)[0])
 
-		upper_sample_indexes = random.sample(upper_indexes,262143)
-		lower_sample_indexes = random.sample(lower_indexes,262143)
+		if len(self.upper_kp)>262143:
+			upper_sample_indexes = random.sample(upper_indexes,262143)
+			self.upper_kp = [self.upper_kp[i] for i in upper_sample_indexes]
+			self.upper_desc = self.upper_desc[upper_sample_indexes,:]
 
-		self.upper_kp = [self.upper_kp[i] for i in upper_sample_indexes]
-		self.upper_desc = self.upper_desc[upper_sample_indexes,:]
-
-		self.lower_kp = [self.lower_kp[i] for i in lower_sample_indexes]
-		self.lower_desc = self.lower_desc[lower_sample_indexes,:]
+		if len(self.lower_kp)>262143:
+			lower_sample_indexes = random.sample(lower_indexes,262143)
+			self.lower_kp = [self.lower_kp[i] for i in lower_sample_indexes]
+			self.lower_desc = self.lower_desc[lower_sample_indexes,:]
 
 
 	def calculate_difference_from_UL(self,p):
