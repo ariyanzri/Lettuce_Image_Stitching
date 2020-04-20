@@ -3159,8 +3159,8 @@ def generate_superpatches(groups_by_rows,SIFT_folder):
 	super_patches = []
 	previous_super_patch = None
 
-	# import matplotlib.pyplot as plt
-	# plt.axis('equal')
+	import matplotlib.pyplot as plt
+	plt.axis('equal')
 
 	for g in groups_by_rows:
 		patches = groups_by_rows[g]
