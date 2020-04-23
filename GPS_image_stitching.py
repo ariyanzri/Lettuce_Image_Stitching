@@ -1467,7 +1467,9 @@ def evaluate_beneficiary_overlap(p1,p2,H,patch_folder,ov1,ov2):
 
 	xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
 
-	dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
+	# dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
+	dissimilarity = np.sum(xnor_images)
+
 	p1.del_img()
 	p2.del_img()
 	
@@ -1732,7 +1734,7 @@ class Graph():
 
 
 	def generate_MST_prim(self,starting_vertex):
-		keys = [1]*self.vertecis_number
+		keys = [sys.maxsize]*self.vertecis_number
 		parents = [None]*self.vertecis_number
 		mstSet = [False]*self.vertecis_number
 
@@ -3272,14 +3274,14 @@ def main():
 
 	if server == 'coge':
 		print('RUNNING ON -- {0} --'.format(server))
-		# lids = get_lids(lid_file)
-		# groups = get_groups_and_patches_with_lids(patch_folder,coordinates_file,SIFT_folder,lids)
-		# results = correct_GPS_new_code_no_heap_precalculate_groups(groups,SIFT_folder,patch_folder)
-		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
-
-		row_groups = detect_rows(coordinates_file)
-		results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
-		save_corrected_from_super_patches_string(results,CORRECTED_coordinates_file)
+		lids = get_lids(lid_file)
+		groups = get_groups_and_patches_with_lids(patch_folder,coordinates_file,SIFT_folder,lids)
+		results = correct_GPS_MST_groups(groups,SIFT_folder,patch_folder)
+		save_coordinates_from_string(results,CORRECTED_coordinates_file)
+		
+		# row_groups = detect_rows(coordinates_file)
+		# results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
+		# save_corrected_from_super_patches_string(results,CORRECTED_coordinates_file)
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
