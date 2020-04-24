@@ -3337,7 +3337,7 @@ def main():
 		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 		
 		row_groups = detect_rows(coordinates_file)
-		results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
+		# results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
 		# save_corrected_from_super_patches_string(results,CORRECTED_coordinates_file)
 		# stitch_rows(row_groups,row_save_path,patch_folder)
 
