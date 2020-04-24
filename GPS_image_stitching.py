@@ -2868,7 +2868,7 @@ class SuperPatch():
 			st_y = int(y_diff/self.y_ratio_GPS_over_pixel)
 			print(st_x,st_y)
 			print(p.size)
-			result[st_y:st_y+p.size[0],st_x:st_x+p.size[1],:] = p.rgb_img
+			result[st_y:st_y+p.size[0],st_x:st_x+p.size[1],:] = p.rgb_img.copy()
 			p.del_img()
 
 
