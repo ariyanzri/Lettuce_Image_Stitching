@@ -2852,7 +2852,7 @@ class SuperPatch():
 		self.y_ratio_GPS_over_pixel = (list_patches[0].GPS_coords.UL_coord[1] - list_patches[0].GPS_coords.LL_coord[1])/list_patches[0].size[0]
 
 		self.size = (int((self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])/self.y_ratio_GPS_over_pixel),\
-			(int(self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])/self.x_ratio_GPS_over_pixel))
+			int((self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])/self.x_ratio_GPS_over_pixel))
 
 		self.upper_kp, self.upper_desc, self.lower_kp, self.lower_desc = self.calculate_super_sift_points(SIFT_folder)
 		self.remove_randomly()
