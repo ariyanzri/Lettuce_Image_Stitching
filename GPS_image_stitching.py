@@ -3151,10 +3151,13 @@ def stitch_rows(rows,path_to_save,image_path):
 		
 	for r in rows:
 		patches = rows[r]
+		for p in patches:
+			p.load_img(image_path)
+			
 		stitched = stitch_based_on_corrected_GPS(patches,False)
 		print(stitched)
 		print(len(stitched))
-		cv2.imwrite('{0}/row_{1}.jpg'.format(args[2],args[4]),stitched)
+		cv2.imwrite('{0}/row_{1}.jpg'.format(path_to_save,0),stitched)
 		break
 
 def correct_all_sub_patches(H,super_patch,previous_super_patch):
