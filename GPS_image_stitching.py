@@ -3066,7 +3066,7 @@ def detect_rows(address):
 				height_in_GPS = abs(upper_left[1]-lower_left[1])
 				
 			
-	sorted_patches = sorted(patches, key=lambda x: x.GPS_coords.Center[1])
+	sorted_patches = sorted(patches, key=lambda x: x.GPS_coords.UL_coord[0])
 
 	for p in sorted_patches:
 
