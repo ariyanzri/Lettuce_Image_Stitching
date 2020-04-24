@@ -3124,10 +3124,8 @@ def stitch_based_on_corrected_GPS_helper(args):
 		p.load_img(args[3])
 
 	stitched = stitch_based_on_corrected_GPS(args[0],args[1])
-	print(stitched)
-	print(len(stitched))
+
 	if len(stitched)==1:
-		stitched = stitched[0]
 		cv2.imwrite('{0}/row_{1}.jpg'.format(args[2],args[4]),stitched)
 		print('Saved for row {0}.'.format(args[4]))
 	else:
