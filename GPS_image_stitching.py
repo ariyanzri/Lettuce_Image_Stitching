@@ -3119,8 +3119,21 @@ def detect_rows(address):
 	# plt.savefig('rows.png')
 	return patches_groups_by_rows_new
 
+def stitch_based_on_corrected_GPS_helper(args):
+	stitched = stitch_based_on_corrected_GPS(*args)
+
+	if len(stitched)==1:
+		stitched = stitched[0]
+		cv2.imwrite('{0}/row_{1}.jpg'.format(path_to_save,iterator),stitched)
+		print('Saved for row {0}.'.format(iterator))
+	else:
+		print('Error for row {0}. Number of stitched images: {1}.'.format(iterator,len(stitched)))
+
+	
+
 def stitch_rows(rows,path_to_save,image_path):
 	iterator = 0
+	args_list = []
 
 	for r in rows:
 		iterator +=1
@@ -3130,17 +3143,12 @@ def stitch_rows(rows,path_to_save,image_path):
 		for p in patches:
 			p.load_img(image_path)
 
-		stitched = stitch_based_on_corrected_GPS(patches,False)
+		args_list.append((patches[0:39],False))
 
-		for p in patches:
-			p.del_img()
 
-		if len(stitched)==1:
-			stitched = stitched[0]
-			cv2.imwrite('{0}/row_{1}.jpg'.format(path_to_save,iterator),stitched)
-			print('Saved for row {0}.'.format(iterator))
-		else:
-			print('Error for row {0}. Number of stitched images: {1}.'.format(iterator,len(stitched)))
+	processes = multiprocessing.Pool(no_of_cores_to_use)
+	processes.map(stitch_based_on_corrected_GPS_helper,args_list)
+		
 
 def correct_all_sub_patches(H,super_patch,previous_super_patch):
 	c1 = [0,0,1]
