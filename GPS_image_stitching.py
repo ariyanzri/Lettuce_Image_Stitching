@@ -3153,8 +3153,8 @@ def stitch_rows(rows,path_to_save,image_path):
 		patches = rows[r]
 		for p in patches:
 			p.load_img(image_path)
-			
-		stitched = stitch_based_on_corrected_GPS(patches,False)
+
+		stitched = stitch_based_on_corrected_GPS(patches[0:30],False)
 		print(stitched)
 		print(len(stitched))
 		cv2.imwrite('{0}/row_{1}.jpg'.format(path_to_save,0),stitched)
