@@ -3068,7 +3068,7 @@ def detect_rows(address):
 			is_new = True
 
 			for c in center_second_dim_rows:
-				if abs(center[1]-c[1]) < height_in_GPS/20:
+				if abs(center[1]-c[1]) < height_in_GPS/30:
 					is_new = False
 
 			if is_new:
