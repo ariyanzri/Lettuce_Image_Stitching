@@ -3120,14 +3120,17 @@ def detect_rows(address):
 	return patches_groups_by_rows_new
 
 def stitch_based_on_corrected_GPS_helper(args):
-	stitched = stitch_based_on_corrected_GPS(*args)
+	for p in args[0]:
+		p.load_img(args[3])
+
+	stitched = stitch_based_on_corrected_GPS(args[0],args[1])
 
 	if len(stitched)==1:
 		stitched = stitched[0]
-		cv2.imwrite('{0}/row_{1}.jpg'.format(path_to_save,iterator),stitched)
-		print('Saved for row {0}.'.format(iterator))
+		cv2.imwrite('{0}/row_{1}.jpg'.format(args[2],args[4]),stitched)
+		print('Saved for row {0}.'.format(args[4]))
 	else:
-		print('Error for row {0}. Number of stitched images: {1}.'.format(iterator,len(stitched)))
+		print('Error for row {0}. Number of stitched images: {1}.'.format(args[4],len(stitched)))
 
 	
 
@@ -3140,10 +3143,7 @@ def stitch_rows(rows,path_to_save,image_path):
 
 		patches = rows[r]
 		
-		for p in patches:
-			p.load_img(image_path)
-
-		args_list.append((patches[0:39],False))
+		args_list.append((patches[0:39],False,path_to_save,image_path,iterator))
 
 
 	processes = multiprocessing.Pool(no_of_cores_to_use)
