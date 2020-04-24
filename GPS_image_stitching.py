@@ -3126,7 +3126,7 @@ def stitch_based_on_corrected_GPS_helper(args):
 	stitched = stitch_based_on_corrected_GPS(args[0],args[1])
 
 	if len(stitched)==1:
-		cv2.imwrite('{0}/row_{1}.jpg'.format(args[2],args[4]),stitched)
+		cv2.imwrite('{0}/row_{1}.jpg'.format(args[2],args[4]),stitched[0].rgb_img)
 		print('Saved for row {0}.'.format(args[4]))
 	else:
 		print('Error for row {0}. Number of stitched images: {1}.'.format(args[4],len(stitched)))
@@ -3134,31 +3134,20 @@ def stitch_based_on_corrected_GPS_helper(args):
 	
 
 def stitch_rows(rows,path_to_save,image_path):
-	# iterator = 0
-	# args_list = []
+	iterator = 0
+	args_list = []
 
-	# for r in rows:
-	# 	iterator +=1
-
-	# 	patches = rows[r]
-		
-	# 	args_list.append((patches[0:30],False,path_to_save,image_path,iterator))
-	# 	break
-
-
-	# processes = multiprocessing.Pool(no_of_cores_to_use)
-	# processes.map(stitch_based_on_corrected_GPS_helper,args_list)
-		
 	for r in rows:
-		patches = rows[r]
-		for p in patches:
-			p.load_img(image_path)
+		iterator +=1
 
-		stitched = stitch_based_on_corrected_GPS(patches[0:30],False)
-		print(stitched)
-		print(len(stitched))
-		cv2.imwrite('{0}/row_{1}.jpg'.format(path_to_save,0),stitched)
+		patches = rows[r]
+		
+		args_list.append((patches[0:30],False,path_to_save,image_path,iterator))
 		break
+
+
+	processes = multiprocessing.Pool(no_of_cores_to_use)
+	processes.map(stitch_based_on_corrected_GPS_helper,args_list)
 
 def correct_all_sub_patches(H,super_patch,previous_super_patch):
 	c1 = [0,0,1]
