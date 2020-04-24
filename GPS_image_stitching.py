@@ -3068,7 +3068,7 @@ def detect_rows(address):
 			is_new = True
 
 			for c in center_second_dim_rows:
-				if abs(center[1]-c[1]) < height_in_GPS/2:
+				if abs(center[1]-c[1]) < height_in_GPS/20:
 					is_new = False
 
 			if is_new:
@@ -3101,7 +3101,8 @@ def detect_rows(address):
 		newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
 		patches_groups_by_rows_new[g] = newlist
 
-	# print(len(patches_groups_by_rows))
+	print(len(patches_groups_by_rows))
+	print(len(patches_groups_by_rows[g]))
 
 	# import matplotlib.pyplot as plt
 	
