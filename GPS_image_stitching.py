@@ -2869,7 +2869,7 @@ class SuperPatch():
 			print(st_x,st_y)
 			print(p.size)
 			# result[st_y:st_y+p.size[0],st_x:st_x+p.size[1],:] = p.rgb_img
-			cv2.rectangle(img_res,(st_x+1,st_y+1),(st_x+p.size[1]-1,st_y+p.size[0]-1),(0,0,255),20)
+			cv2.rectangle(result,(st_x+1,st_y+1),(st_x+p.size[1]-1,st_y+p.size[0]-1),(0,0,255),20)
 			p.del_img()
 
 
