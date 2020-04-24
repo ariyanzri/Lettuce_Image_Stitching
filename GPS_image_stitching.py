@@ -3272,6 +3272,7 @@ def main():
 		coordinates_file = '/storage/ariyanzarei/2020-01-08-rgb/2020-01-08_coordinates.csv'
 		CORRECTED_coordinates_file = '/storage/ariyanzarei/2020-01-08-rgb/2020-01-08_coordinates_CORRECTED.csv'
 		plot_npy_file = '/storage/ariyanzarei/2020-01-08-rgb/plt.npy'
+		row_save_path = '/storage/ariyanzarei/2020-01-08-rgb/rows'
 
 	elif server == 'laplace.cs.arizona.edu':
 		patch_folder = '/data/plant/full_scans/2020-01-08-rgb/bin2tif_out'
@@ -3292,14 +3293,16 @@ def main():
 
 	if server == 'coge':
 		print('RUNNING ON -- {0} --'.format(server))
-		lids = get_lids(lid_file)
-		groups = get_groups_and_patches_with_lids(patch_folder,coordinates_file,SIFT_folder,lids)
-		results = correct_GPS_MST_groups(groups,SIFT_folder,patch_folder)
-		save_coordinates_from_string(results,CORRECTED_coordinates_file)
+		# lids = get_lids(lid_file)
+		# groups = get_groups_and_patches_with_lids(patch_folder,coordinates_file,SIFT_folder,lids)
+		# results = correct_GPS_MST_groups(groups,SIFT_folder,patch_folder)
+		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 		
-		# row_groups = detect_rows(coordinates_file)
+		row_groups = detect_rows(coordinates_file)
 		# results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
 		# save_corrected_from_super_patches_string(results,CORRECTED_coordinates_file)
+		stitch_rows(row_groups,row_save_path)
+
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
