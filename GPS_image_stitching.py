@@ -2864,8 +2864,8 @@ class SuperPatch():
 			p.load_img(patch_folder)
 			x_diff = p.GPS_coords.UL_coord[0] - self.GPS_coords.UL_coord[0]
 			y_diff = p.GPS_coords.UL_coord[1] - self.GPS_coords.UL_coord[1]
-			st_x = x_diff/self.x_ratio_GPS_over_pixel
-			st_y = y_diff/self.y_ratio_GPS_over_pixel
+			st_x = int(x_diff/self.x_ratio_GPS_over_pixel)
+			st_y = int(y_diff/self.y_ratio_GPS_over_pixel)
 			result[st_y:st_y+p.size[1],st_x:st_x+p.size[0],:] = p.rgb_img
 			p.del_img()
 
