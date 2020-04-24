@@ -3105,28 +3105,28 @@ def detect_rows(address):
 	print(len(patches_groups_by_rows))
 	print(len(patches_groups_by_rows[g]))
 
-	# import matplotlib.pyplot as plt
+	import matplotlib.pyplot as plt
 	
-	# plt.axis('equal')
+	plt.axis('equal')
 
-	# color = 'red'
-	# total=0
+	color = 'red'
+	total=0
 
-	# for g in patches_groups_by_rows:
-	# 	print('{0}: {1}'.format(g,len(patches_groups_by_rows[g])))
-	# 	total+=len(patches_groups_by_rows[g])
+	for g in patches_groups_by_rows:
+		# print('{0}: {1}'.format(g,len(patches_groups_by_rows[g])))
+		total+=len(patches_groups_by_rows[g])
 
-	# 	if color == 'red':
-	# 		color = 'green'
-	# 	else:
-	# 		color = 'red'
+		if color == 'red':
+			color = 'green'
+		else:
+			color = 'red'
 
-	# 	for p in patches_groups_by_rows[g]:
-	# 		plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color=color)
-	# 	print(len(patches_groups_by_rows[g]))
-	# 	break
+		for p in patches_groups_by_rows[g]:
+			plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color=color,marker='.')
+		
+		
 			
-	# plt.savefig('rows.png')
+	plt.savefig('rows.png')
 	# print(total)
 
 	# for g in patches_groups_by_rows:
