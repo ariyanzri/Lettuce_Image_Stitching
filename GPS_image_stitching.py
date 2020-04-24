@@ -3143,7 +3143,8 @@ def stitch_rows(rows,path_to_save,image_path):
 
 		patches = rows[r]
 		
-		args_list.append((patches[0:39],False,path_to_save,image_path,iterator))
+		args_list.append((patches[0:30],False,path_to_save,image_path,iterator))
+		break
 
 
 	processes = multiprocessing.Pool(no_of_cores_to_use)
