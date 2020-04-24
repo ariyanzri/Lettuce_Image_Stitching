@@ -2867,9 +2867,9 @@ class SuperPatch():
 			st_x = int(x_diff/self.x_ratio_GPS_over_pixel)
 			st_y = int(y_diff/self.y_ratio_GPS_over_pixel)
 			print(st_x,st_y)
-			# print(p.size)
-			result[st_y:st_y+p.size[0],st_x:st_x+p.size[1],:] = p.rgb_img
-			# cv2.rectangle(result,(st_x+1,st_y+1),(st_x+p.size[1]-1,st_y+p.size[0]-1),(0,0,255),20)
+			print(p.size)
+			# result[st_y:st_y+p.size[0],st_x:st_x+p.size[1],:] = p.rgb_img
+			cv2.rectangle(result,(st_x+1,st_y+1),(st_x+p.size[1]-1,st_y+p.size[0]-1),(0,0,255),20)
 			p.del_img()
 
 
@@ -3064,11 +3064,12 @@ def detect_rows(address):
 
 			if height_in_GPS is None:
 				height_in_GPS = abs(upper_left[1]-lower_left[1])
+				print(height_in_GPS)
 				
 			is_new = True
 
 			for c in center_second_dim_rows:
-				if abs(center[1]-c[1]) == 0:
+				if abs(center[1]-c[1]) < height_in_GPS/40:
 					is_new = False
 
 			if is_new:
@@ -3101,31 +3102,31 @@ def detect_rows(address):
 		newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
 		patches_groups_by_rows_new[g] = newlist
 
-	# print(len(patches_groups_by_rows))
-	# print(len(patches_groups_by_rows[g]))
+	print(len(patches_groups_by_rows))
+	print(len(patches_groups_by_rows[g]))
 
-	import matplotlib.pyplot as plt
+	# import matplotlib.pyplot as plt
 	
-	plt.axis('equal')
+	# plt.axis('equal')
 
-	color = 'red'
-	total=0
+	# color = 'red'
+	# total=0
 
-	for g in patches_groups_by_rows:
-		print('{0}: {1}'.format(g,len(patches_groups_by_rows[g])))
-		total+=len(patches_groups_by_rows[g])
+	# for g in patches_groups_by_rows:
+	# 	print('{0}: {1}'.format(g,len(patches_groups_by_rows[g])))
+	# 	total+=len(patches_groups_by_rows[g])
 
-		if color == 'red':
-			color = 'green'
-		else:
-			color = 'red'
+	# 	if color == 'red':
+	# 		color = 'green'
+	# 	else:
+	# 		color = 'red'
 
-		for p in patches_groups_by_rows[g]:
-			plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color=color)
-		print(len(patches_groups_by_rows[g]))
-		break
+	# 	for p in patches_groups_by_rows[g]:
+	# 		plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color=color)
+	# 	print(len(patches_groups_by_rows[g]))
+	# 	break
 			
-	plt.savefig('rows.png')
+	# plt.savefig('rows.png')
 	# print(total)
 
 	# for g in patches_groups_by_rows:
@@ -3337,7 +3338,7 @@ def main():
 		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 		
 		row_groups = detect_rows(coordinates_file)
-		results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
+		# results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
 		# save_corrected_from_super_patches_string(results,CORRECTED_coordinates_file)
 		# stitch_rows(row_groups,row_save_path,patch_folder)
 
