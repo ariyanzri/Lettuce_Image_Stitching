@@ -3119,14 +3119,21 @@ def detect_rows(address):
 	# plt.savefig('rows.png')
 	return patches_groups_by_rows_new
 
-def stitch_rows(rows,path_to_save):
+def stitch_rows(rows,path_to_save,image_path):
 	iterator = 0
 
 	for r in rows:
 		iterator +=1
 
 		patches = rows[r]
+		
+		for p in patches:
+			p.load_img(image_path)
+
 		stitched = stitch_based_on_corrected_GPS(patches,False)
+
+		for p in patches:
+			p.del_img()
 
 		if len(stitched)==1:
 			stitched = stitched[0]
