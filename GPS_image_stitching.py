@@ -3049,7 +3049,7 @@ def detect_rows(address):
 			is_new = True
 
 			for c in center_second_dim_rows:
-				if abs(center[1]-c[1]) < height_in_GPS/2:
+				if abs(center[1]-c[1]) < height_in_GPS/5:
 					is_new = False
 
 			if is_new:
@@ -3082,42 +3082,44 @@ def detect_rows(address):
 		newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
 		patches_groups_by_rows_new[g] = newlist
 
+	print(len(patches_groups_by_rows))
 
-
-	# import matplotlib.pyplot as plt
+	import matplotlib.pyplot as plt
 	
-	# plt.axis('equal')
+	plt.axis('equal')
 
-	# color = 'red'
-	# total=0
+	color = 'red'
+	total=0
 
-	# for g in patches_groups_by_rows:
-	# 	print('{0}: {1}'.format(g,len(patches_groups_by_rows[g])))
-	# 	total+=len(patches_groups_by_rows[g])
+	for g in patches_groups_by_rows:
+		print('{0}: {1}'.format(g,len(patches_groups_by_rows[g])))
+		total+=len(patches_groups_by_rows[g])
 
-	# 	if color == 'red':
-	# 		color = 'green'
-	# 	else:
-	# 		color = 'red'
+		if color == 'red':
+			color = 'green'
+		else:
+			color = 'red'
 
-	# 	for p in patches_groups_by_rows[g]:
-	# 		plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color=color)
+		for p in patches_groups_by_rows[g]:
+			plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color=color)
+		print(len(patches_groups_by_rows[g]))
+		break
 			
-	# plt.savefig('rows.png')
+	plt.savefig('rows.png')
 	# print(total)
 
 	# for g in patches_groups_by_rows:
 	# 	newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
 	# 	for p in newlist:
-			# print(p.GPS_coords.UL_coord)
-			# plt.scatter(p.GPS_coords.UL_coord[0],p.GPS_coords.UL_coord[1],color='red')
-			# plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color='green')
-			# print(p.GPS_coords.Center)
-			# plt.scatter(p.GPS_coords.LL_coord[0],p.GPS_coords.LL_coord[1],color='blue')
-		# break
+	# 		print(p.GPS_coords.UL_coord)
+	# 		plt.scatter(p.GPS_coords.UL_coord[0],p.GPS_coords.UL_coord[1],color='red')
+	# 		plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color='green')
+	# 		print(p.GPS_coords.Center)
+	# 		plt.scatter(p.GPS_coords.LL_coord[0],p.GPS_coords.LL_coord[1],color='blue')
+	# 	break
 
 	# plt.savefig('rows.png')
-	return patches_groups_by_rows_new
+	# return patches_groups_by_rows_new
 
 def stitch_based_on_corrected_GPS_helper(args):
 	for p in args[0]:
