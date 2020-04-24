@@ -3064,16 +3064,20 @@ def detect_rows(address):
 
 			if height_in_GPS is None:
 				height_in_GPS = abs(upper_left[1]-lower_left[1])
-				print(height_in_GPS)
 				
-			is_new = True
+			
+	sorted_patches = sorted(patches, key=lambda x: x.GPS_coords.Center[1])
 
-			for c in center_second_dim_rows:
-				if abs(center[1]-c[1]) < height_in_GPS/50:
-					is_new = False
+	for p in sorted_patches:
 
-			if is_new:
-				center_second_dim_rows.append(center)
+		is_new = True
+
+		for c in center_second_dim_rows:
+			if abs(p.GPS_coords.Center[1]-c[1]) < height_in_GPS/20:
+				is_new = False
+
+		if is_new:
+			center_second_dim_rows.append(p.GPS_coords.Center)
 
 	patches_groups_by_rows = {}
 	iterator = 0
