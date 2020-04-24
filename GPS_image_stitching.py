@@ -2857,6 +2857,22 @@ class SuperPatch():
 		self.upper_kp, self.upper_desc, self.lower_kp, self.lower_desc = self.calculate_super_sift_points(SIFT_folder)
 		self.remove_randomly()
 
+	def draw_super_patch(self,patch_folder):
+		result = np.zeros((self.size[1],self.size[0],3), np.uint8)
+
+		for p in self.patches:
+			p.load_img(patch_folder)
+			x_diff = p.GPS_coords.UL_coord[0] - self.GPS_coords.UL_coord[0]
+			y_diff = p.GPS_coords.UL_coord[1] - self.GPS_coords.UL_coord[1]
+			st_x = x_diff/self.x_ratio_GPS_over_pixel
+			st_y = y_diff/self.y_ratio_GPS_over_pixel
+			result[st_y:st_y+p.size[1],st_x:st_x+p.size[0],:] = p.rgb_img
+			p.del_img()
+
+
+		cv2.imwrite('rows.jpg',result)
+
+
 	def remove_randomly(self):
 		upper_indexes = range(0,np.shape(self.upper_desc)[0])
 		lower_indexes = range(0,np.shape(self.lower_desc)[0])
@@ -3049,7 +3065,7 @@ def detect_rows(address):
 			is_new = True
 
 			for c in center_second_dim_rows:
-				if abs(center[1]-c[1]) < height_in_GPS/20:
+				if abs(center[1]-c[1]) < height_in_GPS/2:
 					is_new = False
 
 			if is_new:
@@ -3082,30 +3098,30 @@ def detect_rows(address):
 		newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
 		patches_groups_by_rows_new[g] = newlist
 
-	print(len(patches_groups_by_rows))
+	# print(len(patches_groups_by_rows))
 
-	import matplotlib.pyplot as plt
+	# import matplotlib.pyplot as plt
 	
-	plt.axis('equal')
+	# plt.axis('equal')
 
-	color = 'red'
-	total=0
+	# color = 'red'
+	# total=0
 
-	for g in patches_groups_by_rows:
-		print('{0}: {1}'.format(g,len(patches_groups_by_rows[g])))
-		total+=len(patches_groups_by_rows[g])
+	# for g in patches_groups_by_rows:
+	# 	print('{0}: {1}'.format(g,len(patches_groups_by_rows[g])))
+	# 	total+=len(patches_groups_by_rows[g])
 
-		if color == 'red':
-			color = 'green'
-		else:
-			color = 'red'
+	# 	if color == 'red':
+	# 		color = 'green'
+	# 	else:
+	# 		color = 'red'
 
-		for p in patches_groups_by_rows[g]:
-			plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color=color)
-		print(len(patches_groups_by_rows[g]))
-		break
+	# 	for p in patches_groups_by_rows[g]:
+	# 		plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color=color)
+	# 	print(len(patches_groups_by_rows[g]))
+	# 	break
 			
-	plt.savefig('rows.png')
+	# plt.savefig('rows.png')
 	# print(total)
 
 	# for g in patches_groups_by_rows:
@@ -3119,7 +3135,7 @@ def detect_rows(address):
 	# 	break
 
 	# plt.savefig('rows.png')
-	# return patches_groups_by_rows_new
+	return patches_groups_by_rows_new
 
 def stitch_based_on_corrected_GPS_helper(args):
 	for p in args[0]:
@@ -3233,7 +3249,9 @@ def generate_superpatches_and_correct_GPS(groups_by_rows,SIFT_folder):
 		coord = Patch_GPS_coordinate(UL_coord,UR_coord,LL_coord,LR_coord,Center)
 
 		sp = SuperPatch(g,patches,coord,SIFT_folder)
-		
+		sp.draw_super_patch('/storage/ariyanzarei/2020-01-08-rgb/bin2tif_out')
+		break
+
 		if previous_super_patch is not None:
 			overlap1 = sp.get_overlap_rectangle(previous_super_patch)
 			overlap2 = previous_super_patch.get_overlap_rectangle(sp)
@@ -3315,9 +3333,9 @@ def main():
 		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 		
 		row_groups = detect_rows(coordinates_file)
-		# results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
+		results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
 		# save_corrected_from_super_patches_string(results,CORRECTED_coordinates_file)
-		stitch_rows(row_groups,row_save_path,patch_folder)
+		# stitch_rows(row_groups,row_save_path,patch_folder)
 
 
 	elif server == 'laplace.cs.arizona.edu':
