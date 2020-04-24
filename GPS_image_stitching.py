@@ -1470,37 +1470,39 @@ def evaluate_beneficiary_overlap(p1,p2,H,patch_folder,ov1,ov2):
 	# dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
 	dissimilarity = np.sum(xnor_images)
 
-	p1.del_img()
-	p2.del_img()
+	
 	
 	# print(dissimilarity)
 
-	# overlap_1_img[overlap_1_img==1] = 255
-	# overlap_2_img[overlap_2_img==1] = 255
+	overlap_1_img[overlap_1_img==1] = 255
+	overlap_2_img[overlap_2_img==1] = 255
 
-	# cv2.namedWindow('1',cv2.WINDOW_NORMAL)
-	# cv2.namedWindow('2',cv2.WINDOW_NORMAL)
-	# cv2.namedWindow('p1',cv2.WINDOW_NORMAL)
-	# cv2.namedWindow('p2',cv2.WINDOW_NORMAL)
-	# cv2.resizeWindow('1', 500,500)
-	# cv2.resizeWindow('2', 500,500)
-	# cv2.resizeWindow('p1', 500,500)
-	# cv2.resizeWindow('p2', 500,500)
-	# img1 = p1.rgb_img
-	# img2 = p2.rgb_img
+	cv2.namedWindow('1',cv2.WINDOW_NORMAL)
+	cv2.namedWindow('2',cv2.WINDOW_NORMAL)
+	cv2.namedWindow('p1',cv2.WINDOW_NORMAL)
+	cv2.namedWindow('p2',cv2.WINDOW_NORMAL)
+	cv2.resizeWindow('1', 500,500)
+	cv2.resizeWindow('2', 500,500)
+	cv2.resizeWindow('p1', 500,500)
+	cv2.resizeWindow('p2', 500,500)
+	img1 = p1.rgb_img
+	img2 = p2.rgb_img
 
-	# cv2.rectangle(img1,(p1_x1,p1_y1),(p1_x2,p1_y2),(0,0,255),20)
-	# cv2.rectangle(img2,(p2_x1,p2_y1),(p2_x2,p2_y2),(0,0,255),20)
+	cv2.rectangle(img1,(p1_x1,p1_y1),(p1_x2,p1_y2),(0,0,255),20)
+	cv2.rectangle(img2,(p2_x1,p2_y1),(p2_x2,p2_y2),(0,0,255),20)
 
-	# cv2.rectangle(img1,(ov1[0],ov1[1]),(ov1[2],ov1[3]),(0,255,0),20)
-	# cv2.rectangle(img2,(ov2[0],ov2[1]),(ov2[2],ov2[3]),(0,255,0),20)
+	cv2.rectangle(img1,(ov1[0],ov1[1]),(ov1[2],ov1[3]),(0,255,0),20)
+	cv2.rectangle(img2,(ov2[0],ov2[1]),(ov2[2],ov2[3]),(0,255,0),20)
 
-	# cv2.imshow('p1',img1)
-	# cv2.imshow('p2',img2)
-	# cv2.imshow('1',overlap_1_img)
-	# cv2.imshow('2',overlap_2_img)
-	# cv2.waitKey(0)
+	cv2.imshow('p1',img1)
+	cv2.imshow('p2',img2)
+	cv2.imshow('1',overlap_1_img)
+	cv2.imshow('2',overlap_2_img)
+	cv2.waitKey(0)
 
+	p1.del_img()
+	p2.del_img()
+	
 	return dissimilarity
 
 def get_is_above(p1,p2):
@@ -1723,7 +1725,7 @@ class Graph():
 
 
 	def find_min_key(self,keys,mstSet):
-		min_value = 1
+		min_value = sys.maxsize
 
 		for v in range(self.vertecis_number): 
 			if keys[v] < min_value and mstSet[v] == False: 
@@ -3116,6 +3118,22 @@ def detect_rows(address):
 
 	# plt.savefig('rows.png')
 	return patches_groups_by_rows_new
+
+def stitch_rows(rows,path_to_save):
+	iterator = 0
+
+	for r in rows:
+		iterator +=1
+
+		patches = rows[r]
+		stitched = stitch_based_on_corrected_GPS(patches,False)
+
+		if len(stitched)==1:
+			stitched = stitched[0]
+			cv2.imwrite('{0}/row_{1}.jpg'.format(path_to_save,iterator),stitched)
+			print('Saved for row {0}.'.format(iterator))
+		else:
+			print('Error for row {0}. Number of stitched images: {1}.'.format(iterator,len(stitched)))
 
 def correct_all_sub_patches(H,super_patch,previous_super_patch):
 	c1 = [0,0,1]
