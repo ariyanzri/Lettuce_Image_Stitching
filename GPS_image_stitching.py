@@ -3075,7 +3075,7 @@ def detect_rows(address):
 		group_first = None
 
 		for c in center_second_dim_rows:
-			if abs(p.GPS_coords.Center[1]-c[1]) < height_in_GPS/2:
+			if abs(p.GPS_coords.Center[1]-c[1]) <= height_in_GPS/2:
 				is_new = False
 				group_first = c
 				break
