@@ -3082,11 +3082,9 @@ def detect_rows(address):
 
 		if is_new:
 			center_second_dim_rows.append(p.GPS_coords.Center)
-			patches_groups_by_rows[group_first] = [p]
+			patches_groups_by_rows[p.GPS_coords.Center] = [p]
 		else:
 			patches_groups_by_rows[group_first].append(p)
-
-		print(patches_groups_by_rows)
 
 	
 	# iterator = 0
