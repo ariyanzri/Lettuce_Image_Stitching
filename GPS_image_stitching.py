@@ -3069,7 +3069,7 @@ def detect_rows(address):
 	sorted_patches = sorted(patches, key=lambda x: x.GPS_coords.UL_coord[0])
 
 	for p in sorted_patches:
-		print(p.GPS_coords.UL_coord)
+		# print(p.GPS_coords.UL_coord)
 		is_new = True
 
 		for c in center_second_dim_rows:
@@ -3106,7 +3106,7 @@ def detect_rows(address):
 	for g in patches_groups_by_rows:
 		newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
 		patches_groups_by_rows_new[g] = newlist
-		print(len(newlist))
+		# print(len(newlist))
 
 	import matplotlib.pyplot as plt
 	
