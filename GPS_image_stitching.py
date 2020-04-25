@@ -3288,7 +3288,8 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 
 	processes = multiprocessing.Pool(no_of_cores_to_use)
 	results = processes.map(create_supper_patch_parallel_helper,args)
-
+	processes.close()
+	
 	super_patches = results
 
 	print(super_patches)
