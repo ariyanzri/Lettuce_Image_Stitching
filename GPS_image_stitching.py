@@ -3241,6 +3241,58 @@ def correct_all_sub_patches(H,super_patch,previous_super_patch):
 	super_new_coords = Patch_GPS_coordinate(super_new_UL,super_new_UR,super_new_LL,super_new_LR,super_new_center)
 	super_patch.GPS_coords = super_new_coords
 
+def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder):
+
+	up = patches[0].GPS_coords.UL_coord[1]
+	down = patches[0].GPS_coords.LL_coord[1]
+	left = patches[0].GPS_coords.UL_coord[0]
+	right = patches[0].GPS_coords.UR_coord[0]
+
+	for p in patches:
+		if p.GPS_coords.UL_coord[1]>up:
+			up=p.GPS_coords.UL_coord[1]
+
+		if p.GPS_coords.LL_coord[1]<down:
+			down=p.GPS_coords.LL_coord[1]
+
+		if p.GPS_coords.UL_coord[0]<left:
+			left=p.GPS_coords.UL_coord[0]
+
+		if p.GPS_coords.UR_coord[0]>right:
+			right=p.GPS_coords.UR_coord[0]
+
+		# plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color='green')
+
+	UL_coord = (left,up)
+	UR_coord = (right,up)
+	LL_coord = (left,down)
+	LR_coord = (right,down)
+	Center = ((left+right)/2,(down+up)/2)
+
+	coord = Patch_GPS_coordinate(UL_coord,UR_coord,LL_coord,LR_coord,Center)
+
+	sp = SuperPatch(g,patches,coord,SIFT_folder)
+	sp.draw_super_patch(patch_folder)
+
+	return sp
+
+def create_supper_patch_parallel_helper(args):
+	return create_supper_patch_parallel(*args)
+
+def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
+	super_patches = []
+	args = []
+
+	for g in groups_by_rows:
+		args.append((groups_by_rows[g],g,SIFT_folder,patch_folder))
+
+	processes = multiprocessing.Pool(no_of_cores_to_use)
+	results = processes.map(create_supper_patch_parallel_helper,args)
+
+	super_patches = results
+
+	print(super_patches)
+	return super_patches
 
 def generate_superpatches_and_correct_GPS(groups_by_rows,SIFT_folder):
 
@@ -3251,6 +3303,7 @@ def generate_superpatches_and_correct_GPS(groups_by_rows,SIFT_folder):
 
 	# import matplotlib.pyplot as plt
 	# plt.axis('equal')
+
 
 	for g in groups_by_rows:
 
@@ -3369,7 +3422,8 @@ def main():
 		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 		
 		row_groups = detect_rows(coordinates_file)
-		results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
+		generate_superpatches(row_groups,SIFT_folder,patch_folder)
+		# results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
 		# save_rows(row_groups,plot_npy_file)
 		# draw_rows(plot_npy_file)
 		# save_corrected_from_super_patches_string(results,CORRECTED_coordinates_file)
