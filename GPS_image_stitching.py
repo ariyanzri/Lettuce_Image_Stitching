@@ -3086,6 +3086,8 @@ def detect_rows(address):
 		else:
 			patches_groups_by_rows[group_first].append(p)
 
+		print(patches_groups_by_rows)
+
 	
 	# iterator = 0
 
