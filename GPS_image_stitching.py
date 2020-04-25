@@ -2838,10 +2838,6 @@ def recalculate_keypoints_locations(p,SIFT_folder,x_difference,y_difference):
 	# print('patch {0} done...'.format(p.name))
 	return upper_kp,upper_desc,lower_kp,lower_desc
 
-def recalculate_keypoints_locations_helper(args):
-
-	return recalculate_keypoints_locations(*args)
-
 class SuperPatch():
 
 	def __init__(self,row_n,list_patches,gps_coords,SIFT_folder):
@@ -2910,15 +2906,7 @@ class SuperPatch():
 
 		for p in self.patches:
 			x_difference,y_difference = self.calculate_difference_from_UL(p)
-			args.append((p,SIFT_folder,x_difference,y_difference))
-			
-		processes = multiprocessing.Pool(no_of_cores_to_use)
-
-		results = processes.map(recalculate_keypoints_locations_helper,args)
-
-		processes.close()
-
-		for ukp,uds,lkp,lds in results:
+			ukp,uds,lkp,lds = recalculate_keypoints_locations(p,SIFT_folder,x_difference,y_difference)
 
 			upper_kp+=ukp
 			if upper_desc is None:
@@ -2931,6 +2919,8 @@ class SuperPatch():
 				lower_desc = lds.copy()
 			else:
 				lower_desc = np.append(lower_desc,lds,axis=0)
+				
+			
 
 		return upper_kp,upper_desc,lower_kp,lower_desc
 
@@ -3276,11 +3266,21 @@ def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder):
 
 	return sp
 
+def create_supper_patch_parallel_helper(args):
+	return create_supper_patch_parallel(*args)
+
 def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	super_patches = []
-	
+	args = []
+
 	for g in groups_by_rows:
-		super_patches.append(create_supper_patch_parallel(groups_by_rows[g],g,SIFT_folder,patch_folder))
+		args.append((groups_by_rows[g],g,SIFT_folder,patch_folder))
+
+	processes = multiprocessing.Pool(no_of_cores_to_use)
+	results = processes.map(create_supper_patch_parallel_helper,args)
+	processes.close()
+
+	super_patches = results
 
 	print(super_patches)
 	return super_patches
