@@ -2873,7 +2873,7 @@ class SuperPatch():
 			p.del_img()
 
 		result = cv2.resize(result,(result.shape[0]/10,result.shape[1]/10))
-		cv2.imwrite('rows.bmp',result)
+		cv2.imwrite('rows_{0}.bmp'.format(self.row_number),result)
 
 
 	def remove_randomly(self):
@@ -3254,7 +3254,7 @@ def generate_superpatches_and_correct_GPS(groups_by_rows,SIFT_folder):
 
 		sp = SuperPatch(g,patches,coord,SIFT_folder)
 		sp.draw_super_patch('/storage/ariyanzarei/2020-01-08-rgb/bin2tif_out')
-		break
+		
 
 		if previous_super_patch is not None:
 			overlap1 = sp.get_overlap_rectangle(previous_super_patch)
