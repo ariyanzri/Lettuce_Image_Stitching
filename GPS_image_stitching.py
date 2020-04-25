@@ -2919,7 +2919,7 @@ class SuperPatch():
 				lower_desc = lds.copy()
 			else:
 				lower_desc = np.append(lower_desc,lds,axis=0)
-				
+
 			
 
 		return upper_kp,upper_desc,lower_kp,lower_desc
@@ -3493,7 +3493,7 @@ def report_time(start,end):
 	print('-----------------------------------------------------------')
 	print('Start date time: {0}\nEnd date time: {1}\nTotal running time: {2}.'.format(start,end,end-start))
 
-server_core = {'coge':48,'laplace.cs.arizona.edu':20,'ariyan':4}
+server_core = {'coge':64,'laplace.cs.arizona.edu':20,'ariyan':4}
 # server = 'coge' #'laplace' 'local'
 server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
