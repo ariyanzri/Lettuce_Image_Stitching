@@ -3145,7 +3145,7 @@ def save_rows(groups,path_to_save):
 	result = []
 	color = 0
 
-	for g in plot_groups:
+	for g in groups:
 		
 		if color == 0:
 			color = 1
