@@ -3276,21 +3276,11 @@ def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder):
 
 	return sp
 
-def create_supper_patch_parallel_helper(args):
-	return create_supper_patch_parallel(*args)
-
 def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	super_patches = []
-	args = []
-
-	for g in groups_by_rows:
-		args.append((groups_by_rows[g],g,SIFT_folder,patch_folder))
-
-	processes = multiprocessing.Pool(no_of_cores_to_use)
-	results = processes.map(create_supper_patch_parallel_helper,args)
-	processes.close()
 	
-	super_patches = results
+	for g in groups_by_rows:
+		super_patches.append(create_supper_patch_parallel(groups_by_rows[g],g,SIFT_folder,patch_folder))
 
 	print(super_patches)
 	return super_patches
