@@ -3145,14 +3145,14 @@ def save_rows(groups,path_to_save):
 	result = []
 	color = 0
 
-	for g in patches_groups_by_rows:
+	for g in plot_groups:
 		
 		if color == 0:
 			color = 1
 		else:
 			color = 0
 
-		for p in patches_groups_by_rows[g]:
+		for p in groups[g]:
 			result.append([p.GPS_coords.Center[0],p.GPS_coords.Center[1],color])
 		
 	np.save(path_to_save,np.array(result))
