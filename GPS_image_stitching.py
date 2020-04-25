@@ -3101,13 +3101,15 @@ def detect_rows(address):
 
 
 	patches_groups_by_rows_new = {}
+	print(len(patches_groups_by_rows))
 
 	for g in patches_groups_by_rows:
 		newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
 		patches_groups_by_rows_new[g] = newlist
+		print(len(newlist))
 
-	print(len(patches_groups_by_rows))
-	print(len(patches_groups_by_rows[g]))
+	
+	
 
 	import matplotlib.pyplot as plt
 	
