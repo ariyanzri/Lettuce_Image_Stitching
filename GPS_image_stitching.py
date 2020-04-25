@@ -3065,55 +3065,44 @@ def detect_rows(address):
 			if height_in_GPS is None:
 				height_in_GPS = abs(upper_left[1]-lower_left[1])
 				
-			
-	sorted_patches = sorted(patches, key=lambda x: x.GPS_coords.UL_coord[0])
-	patches_groups_by_rows = {}
+			is_new = True
 
-	for p in sorted_patches:
-		# print(p.GPS_coords.UL_coord)
-		is_new = True
-		group_first = None
+			for c in center_second_dim_rows:
+				if abs(center[1]-c[1]) < height_in_GPS/50:
+					is_new = False
+
+			if is_new:
+				center_second_dim_rows.append(center)
+
+	patches_groups_by_rows = {}
+	iterator = 0
+
+	center_second_dim_rows = sorted(center_second_dim_rows, key=lambda x: x[1])
+
+	for c in center_second_dim_rows:
+		patches_groups_by_rows[(round(c[0],7),round(c[1],7))] = []
+
+	for p in patches:
+		min_distance = height_in_GPS*2
+		min_row = None
 
 		for c in center_second_dim_rows:
-			if abs(p.GPS_coords.Center[1]-c[1]) <= height_in_GPS/2:
-				is_new = False
-				group_first = c
-				break
+			distance = abs(p.GPS_coords.Center[1]-c[1])
+			if distance<min_distance:
+				min_distance = distance
+				min_row = c
 
-		if is_new:
-			center_second_dim_rows.append(p.GPS_coords.Center)
-			patches_groups_by_rows[p.GPS_coords.Center] = [p]
-		else:
-			patches_groups_by_rows[group_first].append(p)
-
-	
-	# iterator = 0
-
-	# center_second_dim_rows = sorted(center_second_dim_rows, key=lambda x: x[1])
-
-	# for c in center_second_dim_rows:
-	# 	patches_groups_by_rows[(round(c[0],7),round(c[1],7))] = []
-
-	# for p in patches:
-	# 	min_distance = height_in_GPS*2
-	# 	min_row = None
-
-	# 	for c in center_second_dim_rows:
-	# 		distance = abs(p.GPS_coords.Center[1]-c[1])
-	# 		if distance<min_distance:
-	# 			min_distance = distance
-	# 			min_row = c
-
-	# 	patches_groups_by_rows[(round(min_row[0],7),round(min_row[1],7))].append(p)
+		patches_groups_by_rows[(round(min_row[0],7),round(min_row[1],7))].append(p)
 
 
 	patches_groups_by_rows_new = {}
-	print(len(patches_groups_by_rows))
 
 	for g in patches_groups_by_rows:
 		newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
 		patches_groups_by_rows_new[g] = newlist
-		# print(len(newlist))
+
+	print(len(patches_groups_by_rows))
+	print(len(patches_groups_by_rows[g]))
 
 	import matplotlib.pyplot as plt
 	
