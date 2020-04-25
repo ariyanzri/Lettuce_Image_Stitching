@@ -3262,7 +3262,7 @@ def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder):
 	coord = Patch_GPS_coordinate(UL_coord,UR_coord,LL_coord,LR_coord,Center)
 
 	sp = SuperPatch(g,patches,coord,SIFT_folder)
-	sp.draw_super_patch(patch_folder)
+	# sp.draw_super_patch(patch_folder)
 
 	return sp
 
