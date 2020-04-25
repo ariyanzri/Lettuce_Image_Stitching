@@ -3070,7 +3070,7 @@ def detect_rows(address):
 	patches_groups_by_rows = {}
 
 	for p in sorted_patches:
-		# print(p.GPS_coords.UL_coord)
+		print(p.GPS_coords.UL_coord)
 		is_new = True
 		group_first = None
 
