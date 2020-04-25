@@ -2858,7 +2858,7 @@ class SuperPatch():
 		self.remove_randomly()
 
 	def draw_super_patch(self,patch_folder):
-		result = np.zeros((self.size[0],self.size[1],3), np.uint8)
+		result = np.zeros((self.size[0]+40,self.size[1]+40,3), np.uint8)
 
 		for p in self.patches:
 			p.load_img(patch_folder)
