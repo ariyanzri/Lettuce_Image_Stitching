@@ -3070,12 +3070,12 @@ def detect_rows(address):
 	patches_groups_by_rows = {}
 
 	for p in sorted_patches:
-		print(p.GPS_coords.UL_coord)
+		# print(p.GPS_coords.UL_coord)
 		is_new = True
 		group_first = None
 
 		for c in center_second_dim_rows:
-			if abs(p.GPS_coords.Center[1]-c[1]) < height_in_GPS/10:
+			if abs(p.GPS_coords.Center[1]-c[1]) < height_in_GPS/2:
 				is_new = False
 				group_first = c
 				break
