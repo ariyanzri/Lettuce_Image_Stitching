@@ -3162,6 +3162,16 @@ def draw_rows(path):
 
 	plt.axis('equal')
 
+	data = np.load(path)
+
+	c = []
+	for d in data:
+		c.append('red' if d[2] == 1 else 'green')
+
+	plt.scatter(data[:,0],data[:,1],color=c)
+
+	plt.show()
+
 def stitch_based_on_corrected_GPS_helper(args):
 	for p in args[0]:
 		p.load_img(args[3])
@@ -3243,6 +3253,7 @@ def generate_superpatches_and_correct_GPS(groups_by_rows,SIFT_folder):
 	# plt.axis('equal')
 
 	for g in groups_by_rows:
+
 		patches = groups_by_rows[g]
 
 		up = patches[0].GPS_coords.UL_coord[1]
@@ -3347,7 +3358,7 @@ def main():
 		lid_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/lids.txt'
 		coordinates_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt'
 		CORRECTED_coordinates_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt'
-		plot_npy_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/plt.npy'
+		plot_npy_file = '/home/ariyan/Desktop/plt.npy'
 
 
 	if server == 'coge':
@@ -3358,9 +3369,9 @@ def main():
 		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 		
 		row_groups = detect_rows(coordinates_file)
-		# results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
-		save_rows(row_groups,plot_npy_file)
-		draw_rows(plot_npy_file)
+		results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
+		# save_rows(row_groups,plot_npy_file)
+		# draw_rows(plot_npy_file)
 		# save_corrected_from_super_patches_string(results,CORRECTED_coordinates_file)
 		# stitch_rows(row_groups,row_save_path,patch_folder)
 
@@ -3375,16 +3386,18 @@ def main():
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
-		patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
-		patches[0].GPS_Corrected = True
+		# patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
+		# patches[0].GPS_Corrected = True
 		
-		results = correct_GPS_MST_groups({'131':patches},SIFT_folder,patch_folder)
+		# results = correct_GPS_MST_groups({'131':patches},SIFT_folder,patch_folder)
 		# # results = correct_GPS_new_code_no_heap_precalculate_groups({'131':patches},SIFT_folder,patch_folder)
-		save_coordinates_from_string(results,CORRECTED_coordinates_file)
+		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 
-		patches = read_all_data()
-		final_patches = stitch_based_on_corrected_GPS(patches,True)
+		# patches = read_all_data()
+		# final_patches = stitch_based_on_corrected_GPS(patches,True)
 		# show_and_save_final_patches(final_patches)
+
+		draw_rows(plot_npy_file)
 		
 
 	# patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
