@@ -3141,6 +3141,27 @@ def detect_rows(address):
 	# plt.savefig('rows.png')
 	return patches_groups_by_rows_new
 
+def save_rows(groups,path_to_save):
+	result = []
+	color = 0
+
+	for g in patches_groups_by_rows:
+		
+		if color == 0:
+			color = 1
+		else:
+			color = 0
+
+		for p in patches_groups_by_rows[g]:
+			result.append([p.GPS_coords.Center[0],p.GPS_coords.Center[1],color])
+		
+	np.save(path_to_save,np.array(result))
+
+def draw_rows(path):
+	import matplotlib.pyplot as plt
+
+	plt.axis('equal')
+
 def stitch_based_on_corrected_GPS_helper(args):
 	for p in args[0]:
 		p.load_img(args[3])
@@ -3337,7 +3358,9 @@ def main():
 		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 		
 		row_groups = detect_rows(coordinates_file)
-		results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
+		# results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
+		save_rows(row_groups,plot_npy_file)
+		draw_rows(plot_npy_file)
 		# save_corrected_from_super_patches_string(results,CORRECTED_coordinates_file)
 		# stitch_rows(row_groups,row_save_path,patch_folder)
 
