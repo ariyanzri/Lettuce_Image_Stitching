@@ -2862,7 +2862,7 @@ def get_good_matches_for_horizontal(desc1,desc2,kp1,kp2,diff_th):
 		point_1 = kp1[m[0].queryIdx]
 		point_2 = kp2[m[0].trainIdx]
 
-		if abs(point_1[1]-point_2[1]) <= diff_th:
+		if abs(point_1[0]-point_2[0]) <= diff_th:
 			good.append(m)
 
 	matches = np.asarray(good)
