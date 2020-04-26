@@ -3083,7 +3083,7 @@ def detect_rows(address):
 	iterator = 0
 
 	center_second_dim_rows = sorted(center_second_dim_rows, key=lambda x: x[1])
-	print(center_second_dim_rows)
+
 	for c in center_second_dim_rows:
 		patches_groups_by_rows[(round(c[0],7),round(c[1],7))] = []
 
@@ -3190,7 +3190,7 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 
 	super_patches = results
 
-	print(super_patches)
+	
 	return super_patches
 
 
