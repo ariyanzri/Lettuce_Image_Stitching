@@ -2897,7 +2897,7 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address):
 		return
 
 	# H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
-	draw_matches(p1,p2,kp1,kp2,matches)
+	draw_matches(p2,p1,kp2,kp1,matches)
 
 
 class SuperPatch():
