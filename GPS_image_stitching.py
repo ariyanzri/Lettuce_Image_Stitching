@@ -2885,7 +2885,7 @@ def draw_matches(p1,p2,kp1,kp2,matches):
 
 	cv2.imwrite('matches.bmp',result)
 
-def correct_horizontal_neighbors(p1,p2,SIFT_address):
+def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder):
 	overlap1 = p1.get_overlap_rectangle(p2)
 	overlap2 = p2.get_overlap_rectangle(p1)
 	
@@ -2898,6 +2898,8 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address):
 		return
 
 	# H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
+	p1.load_img(patch_folder)
+	p2.load_img(patch_folder)
 	draw_matches(p2,p1,kp2,kp1,matches)
 
 
@@ -2934,7 +2936,7 @@ class SuperPatch():
 		result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
 		cv2.imwrite('rows_{0}.bmp'.format(self.row_number[1]),result)
 
-	def correct_supper_patch_internally(self,SIFT_address):
+	def correct_supper_patch_internally(self,SIFT_address,patch_folder):
 		prev_patch = None
 
 		for p in self.patches:
@@ -2943,7 +2945,7 @@ class SuperPatch():
 				prev_patch = p
 				continue
 
-			correct_horizontal_neighbors(p,prev_patch,SIFT_address)
+			correct_horizontal_neighbors(p,prev_patch,SIFT_address,patch_folder)
 			break
 
 
@@ -3224,7 +3226,7 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	super_patches = results
 
 	# super_patches[34].draw_super_patch(patch_folder)
-	super_patches[34].correct_supper_patch_internally(SIFT_folder)
+	super_patches[34].correct_supper_patch_internally(SIFT_folder,patch_folder)
 
 	return super_patches
 
