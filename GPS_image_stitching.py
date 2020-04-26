@@ -2813,6 +2813,19 @@ def save_group_data(groups,lids,n,address):
 	np.save(address,data)
 
 
+
+def stitch_based_on_corrected_GPS_helper(args):
+	for p in args[0]:
+		p.load_img(args[3])
+
+	stitched = stitch_based_on_corrected_GPS(args[0],args[1])
+
+	if len(stitched)==1:
+		cv2.imwrite('{0}/row_{1}.jpg'.format(args[2],args[4]),stitched[0].rgb_img)
+		print('Saved for row {0}.'.format(args[4]))
+	else:
+		print('Error for row {0}. Number of stitched images: {1}.'.format(args[4],len(stitched)))
+
 def recalculate_keypoints_locations(p,SIFT_folder,x_difference,y_difference):
 	upper_kp = []
 	upper_desc = []
@@ -2838,6 +2851,8 @@ def recalculate_keypoints_locations(p,SIFT_folder,x_difference,y_difference):
 	# print('patch {0} done...'.format(p.name))
 	return upper_kp,upper_desc,lower_kp,lower_desc
 
+
+
 class SuperPatch():
 
 	def __init__(self,row_n,list_patches,gps_coords,SIFT_folder):
@@ -2850,8 +2865,8 @@ class SuperPatch():
 		self.size = (int((self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])/self.y_ratio_GPS_over_pixel),\
 			int((self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])/self.x_ratio_GPS_over_pixel))
 
-		self.upper_kp, self.upper_desc, self.lower_kp, self.lower_desc = self.calculate_super_sift_points(SIFT_folder)
-		self.remove_randomly()
+		# self.upper_kp, self.upper_desc, self.lower_kp, self.lower_desc = self.calculate_super_sift_points(SIFT_folder)
+		# self.remove_randomly()
 
 	def draw_super_patch(self,patch_folder):
 		result = np.zeros((self.size[0]+40,self.size[1]+40,3), np.uint8)
@@ -3162,19 +3177,23 @@ def draw_rows(path):
 
 	plt.show()
 
-def stitch_based_on_corrected_GPS_helper(args):
-	for p in args[0]:
-		p.load_img(args[3])
+def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
+	super_patches = []
+	args = []
 
-	stitched = stitch_based_on_corrected_GPS(args[0],args[1])
+	for g in groups_by_rows:
+		args.append((groups_by_rows[g],g,SIFT_folder,patch_folder))
 
-	if len(stitched)==1:
-		cv2.imwrite('{0}/row_{1}.jpg'.format(args[2],args[4]),stitched[0].rgb_img)
-		print('Saved for row {0}.'.format(args[4]))
-	else:
-		print('Error for row {0}. Number of stitched images: {1}.'.format(args[4],len(stitched)))
+	processes = multiprocessing.Pool(no_of_cores_to_use)
+	results = processes.map(create_supper_patch_parallel_helper,args)
+	processes.close()
 
-	
+	super_patches = results
+
+	print(super_patches)
+	return super_patches
+
+
 
 def stitch_rows(rows,path_to_save,image_path):
 	iterator = 0
@@ -3269,22 +3288,6 @@ def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder):
 def create_supper_patch_parallel_helper(args):
 	return create_supper_patch_parallel(*args)
 
-def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
-	super_patches = []
-	args = []
-
-	for g in groups_by_rows:
-		args.append((groups_by_rows[g],g,SIFT_folder,patch_folder))
-
-	processes = multiprocessing.Pool(no_of_cores_to_use)
-	results = processes.map(create_supper_patch_parallel_helper,args)
-	processes.close()
-
-	super_patches = results
-
-	print(super_patches)
-	return super_patches
-
 def generate_superpatches_and_correct_GPS(groups_by_rows,SIFT_folder):
 
 	results_final = 'Filename,Upper left,Lower left,Upper right,Lower right,Center\n'
@@ -3375,6 +3378,7 @@ def generate_superpatches_and_correct_GPS(groups_by_rows,SIFT_folder):
 def save_corrected_from_super_patches_string(res_string,corrected_filename):
 	with open(corrected_filename,'w') as f:
 		f.write(res_string)
+
 
 def main():
 	global server
