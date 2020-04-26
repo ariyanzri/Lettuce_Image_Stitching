@@ -2877,7 +2877,8 @@ def draw_matches(p1,p2,kp1,kp2,matches):
 	for m in matches:
 		point_1 = kp1[m[0].queryIdx]
 		point_2 = kp2[m[0].trainIdx]
-		point_2 = (point_2[0],point_2[1]+p1.size[0])
+		point_1 = (int(point_1[0]),int(point_1[1]))
+		point_2 = (int(point_2[0]),int(point_2[1]+p1.size[0]))
 		cv2.line(result,point_1,point_2,(0,0,255),2)
 
 	cv2.imwrite('matches.bmp',result)
