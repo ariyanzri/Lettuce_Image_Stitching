@@ -2871,9 +2871,9 @@ def get_good_matches_for_horizontal(desc1,desc2,kp1,kp2,diff_th):
 
 def draw_matches(p1,p2,kp1,kp2,matches):
 	print(p1.size)
-	result = np.zeros((p1.size[1],p1.size[0]*2,3))
-	result[:,0:p1.size[0],:] = p1.rgb_img
-	result[:,p1.size[0]:p1.size[0]*2,:] = p2.rgb_img
+	result = np.zeros((p1.size[0],p1.size[1]*2,3))
+	result[:,0:p1.size[1],:] = p1.rgb_img
+	result[:,p1.size[1]:p1.size[1]*2,:] = p2.rgb_img
 
 	# for m in matches[:,0]:
 	# 	print(m)
