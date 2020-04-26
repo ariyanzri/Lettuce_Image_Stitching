@@ -3419,7 +3419,7 @@ def main():
 		row_groups = detect_rows(coordinates_file)
 		generate_superpatches(row_groups,SIFT_folder,patch_folder)
 		# results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
-		# save_rows(row_groups,plot_npy_file)
+		save_rows(row_groups,plot_npy_file)
 		# draw_rows(plot_npy_file)
 		# save_corrected_from_super_patches_string(results,CORRECTED_coordinates_file)
 		# stitch_rows(row_groups,row_save_path,patch_folder)
