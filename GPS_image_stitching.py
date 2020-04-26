@@ -2888,7 +2888,7 @@ class SuperPatch():
 
 
 	def correct_supper_patch_internally(self):
-
+		pass
 
 	def remove_randomly(self):
 		upper_indexes = range(0,np.shape(self.upper_desc)[0])
