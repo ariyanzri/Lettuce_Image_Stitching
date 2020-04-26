@@ -2900,10 +2900,9 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder):
 	if len(matches)<3:
 		return
 
-	# H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
-	p1.load_img(patch_folder)
-	p2.load_img(patch_folder)
-	draw_matches(p2,p1,kp2,kp1,matches)
+	H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
+	
+	p1.GPS_coords = get_new_GPS_Coords(p1,p2,H)
 
 
 class SuperPatch():
@@ -2921,7 +2920,7 @@ class SuperPatch():
 		# self.upper_kp, self.upper_desc, self.lower_kp, self.lower_desc = self.calculate_super_sift_points(SIFT_folder)
 		# self.remove_randomly()
 
-	def draw_super_patch(self,patch_folder):
+	def draw_super_patch(self,patch_folder,name_of):
 		result = np.zeros((self.size[0]+40,self.size[1]+40,3), np.uint8)
 
 		for p in self.patches:
@@ -2937,19 +2936,23 @@ class SuperPatch():
 			p.del_img()
 
 		result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
-		cv2.imwrite('rows_{0}.bmp'.format(self.row_number[1]),result)
+		cv2.imwrite('rows_{0}.bmp'.format(name_of),result)
 
 	def correct_supper_patch_internally(self,SIFT_address,patch_folder):
 		prev_patch = None
 
-		for p in self.patches:
+		for i,p in enumerate(self.patches):
 			
 			if prev_patch is None:
 				prev_patch = p
 				continue
 
 			correct_horizontal_neighbors(p,prev_patch,SIFT_address,patch_folder)
-			break
+
+			prev_patch = p
+
+			print('.')
+			sys.stdout.flush()
 
 
 	def remove_randomly(self):
@@ -3228,8 +3231,9 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 
 	super_patches = results
 
-	# super_patches[34].draw_super_patch(patch_folder)
+	super_patches[34].draw_super_patch(patch_folder,'old')
 	super_patches[34].correct_supper_patch_internally(SIFT_folder,patch_folder)
+	super_patches[34].draw_super_patch(patch_folder,'new')
 
 	return super_patches
 
