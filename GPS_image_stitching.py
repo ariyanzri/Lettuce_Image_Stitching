@@ -2869,7 +2869,7 @@ def get_good_matches_for_horizontal(desc1,desc2,kp1,kp2,diff_th):
 
 	return matches
 
-def draw_matches(p1,p2,matches):
+def draw_matches(p1,p2,kp1,kp2,matches):
 	result = np.zeros((p1.size[1],p1.size[0]*2,3))
 	result[:,0:p1.size[0],:] = p1.rgb_img
 	result[:,p1.size[0]:p1.size[0]*2,:] = p2.rgb_img
@@ -2895,7 +2895,7 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address):
 		return
 
 	# H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
-	draw_matches(p1,p2,matches)
+	draw_matches(p1,p2,kp1,kp2,matches)
 
 
 class SuperPatch():
