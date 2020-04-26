@@ -2875,6 +2875,7 @@ def draw_matches(p1,p2,kp1,kp2,matches):
 	result[:,p1.size[0]:p1.size[0]*2,:] = p2.rgb_img
 
 	for m in matches:
+		print(m)
 		point_1 = kp1[m[0].queryIdx]
 		point_2 = kp2[m[0].trainIdx]
 		point_1 = (int(point_1[0]),int(point_1[1]))
