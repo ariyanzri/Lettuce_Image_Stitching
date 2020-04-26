@@ -2887,6 +2887,9 @@ class SuperPatch():
 		cv2.imwrite('rows_{0}.bmp'.format(self.row_number[1]),result)
 
 
+	def correct_supper_patch_internally(self):
+
+
 	def remove_randomly(self):
 		upper_indexes = range(0,np.shape(self.upper_desc)[0])
 		lower_indexes = range(0,np.shape(self.lower_desc)[0])
@@ -3104,6 +3107,7 @@ def detect_rows(address):
 
 	for g in patches_groups_by_rows:
 		newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
+		print([p.GPS_coords.Center[0] for p in newlist])
 		patches_groups_by_rows_new[g] = newlist
 
 	# print(len(patches_groups_by_rows))
@@ -3190,7 +3194,7 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 
 	super_patches = results
 
-	super_patches[34].draw_super_patch(patch_folder)
+	# super_patches[34].draw_super_patch(patch_folder)
 
 	return super_patches
 
