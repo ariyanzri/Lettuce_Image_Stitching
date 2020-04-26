@@ -2853,6 +2853,51 @@ def recalculate_keypoints_locations(p,SIFT_folder,x_difference,y_difference):
 
 
 
+def get_good_matches_for_horizontal(desc1,desc2,kp1,kp2,diff_th):
+	bf = cv2.BFMatcher()
+	matches = bf.knnMatch(desc1,desc2, k=2)
+
+	good = []
+	for m in matches:
+		point_1 = kp1[m[0].queryIdx]
+		point_2 = kp2[m[0].trainIdx]
+
+		if abs(point_1[1]-point_2[1]) <= diff_th:
+			good.append(m)
+
+	matches = np.asarray(good)
+
+	return matches
+
+def draw_matches(p1,p2,matches):
+	result = np.zeros((p1.size[1],p1.size[0]*2,3))
+	result[:,0:p1.size[0],:] = p1.rgb_img
+	result[:,p1.size[0]:p1.size[0]*2,:] = p2.rgb_img
+
+	for m in matches:
+		point_1 = kp1[m[0].queryIdx].copy()
+		point_2 = kp2[m[0].trainIdx].copy()
+		point_2[1]+=p1.size[0]
+		cv2.line(result,point_1,point_2,(0,0,255),2)
+
+	cv2.imwrite('matches.bmp',result)
+
+def correct_horizontal_neighbors(p1,p2,SIFT_address):
+	overlap1 = p1.get_overlap_rectangle(p2)
+	overlap2 = p2.get_overlap_rectangle(p1)
+	
+	kp1,desc1 = choose_SIFT_key_points(p1,overlap1[0],overlap1[1],overlap1[2],overlap1[3],SIFT_address)
+	kp2,desc2 = choose_SIFT_key_points(p2,overlap2[0],overlap2[1],overlap2[2],overlap2[3],SIFT_address)
+
+	matches = get_good_matches_for_horizontal(desc2,desc1)
+
+	if len(matches)<3:
+		return
+
+	# H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
+	draw_matches(p1,p2,matches)
+
+
 class SuperPatch():
 
 	def __init__(self,row_n,list_patches,gps_coords,SIFT_folder):
@@ -2886,9 +2931,18 @@ class SuperPatch():
 		result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
 		cv2.imwrite('rows_{0}.bmp'.format(self.row_number[1]),result)
 
+	def correct_supper_patch_internally(self,SIFT_address):
+		prev_patch = None
 
-	def correct_supper_patch_internally(self):
-		pass
+		for p in self.patches:
+			
+			if prev_patch is None:
+				prev_patch = p
+				continue
+
+			correct_horizontal_neighbors(p,prev_patch,SIFT_address)
+			break
+
 
 	def remove_randomly(self):
 		upper_indexes = range(0,np.shape(self.upper_desc)[0])
@@ -2971,50 +3025,22 @@ class SuperPatch():
 
 		detect_overlap = False
 
-		# if self.GPS_coords.is_coord_inside(patch.GPS_coords.UL_coord):
-		# 	detect_overlap = True
-		# 	p1_x = int(((patch.GPS_coords.UL_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
-		# 	p1_y = int(((patch.GPS_coords.UL_coord[1]-self.GPS_coords.UL_coord[1]) / (self.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]))*self.size[0])
-		
-		# if self.GPS_coords.is_coord_inside(patch.GPS_coords.LR_coord):
-		# 	detect_overlap = True
-		# 	p2_x = int(((patch.GPS_coords.LR_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
-		# 	p2_y = int(((patch.GPS_coords.LR_coord[1]-self.GPS_coords.UL_coord[1]) / (self.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]))*self.size[0])
-
-		# if self.GPS_coords.is_coord_inside(patch.GPS_coords.UR_coord):
-		# 	detect_overlap = True
-		# 	p2_x = int(((patch.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
-		# 	p1_y = int(((patch.GPS_coords.UR_coord[1]-self.GPS_coords.UL_coord[1]) / (self.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]))*self.size[0])
-
-		# if self.GPS_coords.is_coord_inside(patch.GPS_coords.LL_coord):
-		# 	detect_overlap = True
-		# 	p1_x = int(((patch.GPS_coords.LL_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
-		# 	p2_y = int(((patch.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]) / (self.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]))*self.size[0])
-
 		if patch.GPS_coords.UL_coord[1]>=self.GPS_coords.LL_coord[1] and patch.GPS_coords.UL_coord[1]<=self.GPS_coords.UL_coord[1]:
 			detect_overlap = True
-			# print(patch.name+' upper border is inside')
-			# p1_x = int(((patch.GPS_coords.UL_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
 			p1_y = int(((patch.GPS_coords.UL_coord[1]-self.GPS_coords.UL_coord[1]) / (self.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]))*self.size[0])
 		
 		if patch.GPS_coords.LL_coord[1]>=self.GPS_coords.LL_coord[1] and patch.GPS_coords.LL_coord[1]<=self.GPS_coords.UL_coord[1]:
 			detect_overlap = True
-			# print(patch.name+' lower border is inside')
-			# p2_x = int(((patch.GPS_coords.LR_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
 			p2_y = int(((patch.GPS_coords.LR_coord[1]-self.GPS_coords.UL_coord[1]) / (self.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]))*self.size[0])
 
 		if patch.GPS_coords.UR_coord[0]<=self.GPS_coords.UR_coord[0] and patch.GPS_coords.UR_coord[0]>=self.GPS_coords.UL_coord[0]:
 			detect_overlap = True
-			# print(patch.name+' right border is inside')
 			p2_x = int(((patch.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
-			# p1_y = int(((patch.GPS_coords.UR_coord[1]-self.GPS_coords.UL_coord[1]) / (self.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]))*self.size[0])
-
+			
 		if patch.GPS_coords.UL_coord[0]<=self.GPS_coords.UR_coord[0] and patch.GPS_coords.UL_coord[0]>=self.GPS_coords.UL_coord[0]:
 			detect_overlap = True
-			# print(patch.name+' left border is inside')
 			p1_x = int(((patch.GPS_coords.LL_coord[0]-self.GPS_coords.UL_coord[0]) / (self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0]))*self.size[1])
-			# p2_y = int(((patch.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]) / (self.GPS_coords.LL_coord[1]-self.GPS_coords.UL_coord[1]))*self.size[0])
-
+			
 		if patch.GPS_coords.is_coord_inside(self.GPS_coords.UL_coord) and patch.GPS_coords.is_coord_inside(self.GPS_coords.UR_coord) and \
 		patch.GPS_coords.is_coord_inside(self.GPS_coords.LL_coord) and patch.GPS_coords.is_coord_inside(self.GPS_coords.LR_coord):
 			p1_x = 0
@@ -3107,7 +3133,7 @@ def detect_rows(address):
 
 	for g in patches_groups_by_rows:
 		newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
-		print([p.GPS_coords.Center[0] for p in newlist])
+		
 		patches_groups_by_rows_new[g] = newlist
 
 	# print(len(patches_groups_by_rows))
@@ -3195,7 +3221,8 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	super_patches = results
 
 	# super_patches[34].draw_super_patch(patch_folder)
-
+	super_patches[34].correct_supper_patch_internally(SIFT_folder)
+	
 	return super_patches
 
 def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder):
