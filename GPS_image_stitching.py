@@ -3190,7 +3190,7 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 
 	super_patches = results
 
-	super_patches[8].draw_super_patch(patch_folder)
+	super_patches[34].draw_super_patch(patch_folder)
 
 	return super_patches
 
