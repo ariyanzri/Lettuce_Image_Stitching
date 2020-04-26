@@ -2938,6 +2938,38 @@ class SuperPatch():
 		result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
 		cv2.imwrite('rows_{0}.bmp'.format(name_of),result)
 
+
+	def recalculate_size_and_coords(self):
+		up = self.patches[0].GPS_coords.UL_coord[1]
+		down = self.patches[0].GPS_coords.LL_coord[1]
+		left = self.patches[0].GPS_coords.UL_coord[0]
+		right = self.patches[0].GPS_coords.UR_coord[0]
+
+		for p in self.patches:
+			if p.GPS_coords.UL_coord[1]>up:
+				up=p.GPS_coords.UL_coord[1]
+
+			if p.GPS_coords.LL_coord[1]<down:
+				down=p.GPS_coords.LL_coord[1]
+
+			if p.GPS_coords.UL_coord[0]<left:
+				left=p.GPS_coords.UL_coord[0]
+
+			if p.GPS_coords.UR_coord[0]>right:
+				right=p.GPS_coords.UR_coord[0]
+
+		UL_coord = (left,up)
+		UR_coord = (right,up)
+		LL_coord = (left,down)
+		LR_coord = (right,down)
+		Center = ((left+right)/2,(down+up)/2)
+
+		coord = Patch_GPS_coordinate(UL_coord,UR_coord,LL_coord,LR_coord,Center)
+		self.GPS_coords = coord
+		self.size = (int((self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])/self.y_ratio_GPS_over_pixel),\
+			int((self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])/self.x_ratio_GPS_over_pixel))
+
+
 	def correct_supper_patch_internally(self,SIFT_address,patch_folder):
 		prev_patch = None
 
@@ -2954,6 +2986,7 @@ class SuperPatch():
 			print('.')
 			sys.stdout.flush()
 
+		self.recalculate_size_and_coords()
 
 	def remove_randomly(self):
 		upper_indexes = range(0,np.shape(self.upper_desc)[0])
