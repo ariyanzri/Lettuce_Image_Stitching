@@ -2870,17 +2870,18 @@ def get_good_matches_for_horizontal(desc1,desc2,kp1,kp2,diff_th):
 	return matches
 
 def draw_matches(p1,p2,kp1,kp2,matches):
+	print(p1.size)
 	result = np.zeros((p1.size[1],p1.size[0]*2,3))
 	result[:,0:p1.size[0],:] = p1.rgb_img
 	result[:,p1.size[0]:p1.size[0]*2,:] = p2.rgb_img
 
-	for m in matches[:,0]:
-		print(m)
-		point_1 = kp1[m.queryIdx]
-		point_2 = kp2[m.trainIdx]
-		point_1 = (int(point_1[0]),int(point_1[1]))
-		point_2 = (int(point_2[0]),int(point_2[1]+p1.size[0]))
-		cv2.line(result,point_1,point_2,(0,0,255),2)
+	# for m in matches[:,0]:
+	# 	print(m)
+	# 	point_1 = kp1[m.queryIdx]
+	# 	point_2 = kp2[m.trainIdx]
+	# 	point_1 = (int(point_1[0]),int(point_1[1]))
+	# 	point_2 = (int(point_2[0]),int(point_2[1]+p1.size[0]))
+	# 	cv2.line(result,point_1,point_2,(0,0,255),2)
 
 	cv2.imwrite('matches.bmp',result)
 
