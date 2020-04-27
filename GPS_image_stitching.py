@@ -3082,7 +3082,7 @@ class SuperPatch():
 					prev_kp.append(kp2)
 					prev_desc.append(desc2)
 					
-					matches.append(get_top_n_good_matches(desc2,desc1,kp2,kp1,1000,19*(inner_p.size[0])/20))
+					matches.append(get_top_n_good_matches(desc2,desc1,kp2,kp1,5000,19*(inner_p.size[0])/20))
 
 		H = calculate_homography_for_super_patches(prev_kp,prev_desc,kp,desc,matches)
 		
