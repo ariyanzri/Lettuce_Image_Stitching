@@ -2964,7 +2964,7 @@ class SuperPatch():
 	def draw_super_patch(self,patch_folder,name_of):
 		result = np.zeros((self.size[0]+40,self.size[1]+40,3), np.uint8)
 
-		for p in self.patches[:-2]:
+		for p in self.patches:
 			p.load_img(patch_folder)
 			x_diff = p.GPS_coords.UL_coord[0] - self.GPS_coords.UL_coord[0]
 			y_diff = self.GPS_coords.UL_coord[1] - p.GPS_coords.UL_coord[1]
