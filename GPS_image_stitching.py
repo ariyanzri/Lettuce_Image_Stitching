@@ -3388,6 +3388,9 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	# super_patches[1].correct_supper_patch_internally(SIFT_folder,patch_folder)
 	# super_patches[2].correct_supper_patch_internally(SIFT_folder,patch_folder)
 
+	sp = create_supper_patch_parallel(super_patches[1].patches+super_patches[2].patches,1,SIFT_folder,patch_folder)
+	sp.draw_super_patch(patch_folder,'combine')
+
 	super_patches[2].correct_whole_based_on_super_patch(super_patches[1],SIFT_folder,patch_folder)
 	# super_patches[8].draw_super_patch(patch_folder,'new')
 
@@ -3397,8 +3400,8 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	return super_patches
 
 def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder):
-	if len(patches) != 8:
-		patches = patches[0:4]
+	if len(patches) != 2:
+		patches = patches[0:1]
 
 	up = patches[0].GPS_coords.UL_coord[1]
 	down = patches[0].GPS_coords.LL_coord[1]
