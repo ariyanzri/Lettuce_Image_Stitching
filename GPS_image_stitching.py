@@ -3491,7 +3491,10 @@ def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder,not_revise_i
 	sp = SuperPatch(g,patches,coord,SIFT_folder)
 	
 	if not not_revise_internally:
+		sp.draw_super_patch(patch_folder,'before_{0}'.format(g))
 		sp.correct_supper_patch_internally(SIFT_folder,patch_folder)
+		sp.draw_super_patch(patch_folder,'after_{0}'.format(g))
+
 		sp.upper_kp, sp.upper_desc, sp.lower_kp, sp.lower_desc = sp.calculate_super_sift_points(SIFT_folder)
 		sp.remove_randomly()
 
@@ -3691,7 +3694,7 @@ def main():
 		
 		row_groups = detect_rows(coordinates_file)
 		super_patches = generate_superpatches(row_groups[3:5],SIFT_folder,patch_folder)
-		correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder)
+		# correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder)
 		# results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
 		# save_rows(row_groups,plot_npy_file)
 		# draw_rows(plot_npy_file)
