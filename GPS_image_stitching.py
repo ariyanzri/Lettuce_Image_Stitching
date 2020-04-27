@@ -2958,7 +2958,7 @@ class SuperPatch():
 		self.GPS_coords = gps_coords
 		self.x_ratio_GPS_over_pixel = (list_patches[0].GPS_coords.UR_coord[0] - list_patches[0].GPS_coords.UL_coord[0])/list_patches[0].size[1]
 		self.y_ratio_GPS_over_pixel = (list_patches[0].GPS_coords.UL_coord[1] - list_patches[0].GPS_coords.LL_coord[1])/list_patches[0].size[0]
-
+		
 		self.size = (int((self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])/self.y_ratio_GPS_over_pixel),\
 			int((self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])/self.x_ratio_GPS_over_pixel))
 
@@ -2967,7 +2967,7 @@ class SuperPatch():
 
 	def draw_super_patch(self,patch_folder,name_of):
 		
-		result = np.zeros((self.size[0]+1,self.size[1]+1,3), np.uint8)
+		result = np.zeros((self.size[0],self.size[1],3), np.uint8)
 
 		for p in self.patches:
 			p.load_img(patch_folder)
@@ -2975,7 +2975,7 @@ class SuperPatch():
 			y_diff = self.GPS_coords.UL_coord[1] - p.GPS_coords.UL_coord[1]
 			st_x = int(x_diff/self.x_ratio_GPS_over_pixel)
 			st_y = int(y_diff/self.y_ratio_GPS_over_pixel)
-			# print(st_x,st_y)
+			print(st_x,st_y)
 			# print('.')
 			try:
 				result[st_y:st_y+p.size[0],st_x:st_x+p.size[1],:] = p.rgb_img
