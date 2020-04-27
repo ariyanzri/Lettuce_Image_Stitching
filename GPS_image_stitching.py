@@ -3037,7 +3037,7 @@ class SuperPatch():
 		self.recalculate_size_and_coords()
 	
 	def correct_all_patches_and_self_by_H(self,H,prev_super_patch):
-		print(H)
+
 		c1 = [0,0,1]
 		
 		c1 = H.dot(c1).astype(int)
@@ -3096,7 +3096,7 @@ class SuperPatch():
 					
 					matches.append(get_top_n_good_matches(desc1,desc2,kp1,kp2,100,19*(inner_p.size[0])/20))
 
-		H = calculate_homography_for_super_patches(kp,desc,prev_kp,prev_desc,matches)
+		H = calculate_homography_for_super_patches(prev_kp,prev_desc,kp,desc,matches)
 		
 		self.correct_all_patches_and_self_by_H(H,prev_super_patch)
 
