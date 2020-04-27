@@ -3687,7 +3687,7 @@ def main():
 		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 		
 		row_groups = detect_rows(coordinates_file)
-		super_patches = generate_superpatches(row_groups[3:5],SIFT_folder,patch_folder)
+		super_patches = generate_superpatches(row_groups[4:5],SIFT_folder,patch_folder)
 		# correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder)
 		# results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
 		# save_rows(row_groups,plot_npy_file)
