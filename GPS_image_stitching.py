@@ -2862,7 +2862,7 @@ def get_good_matches_for_horizontal(desc1,desc2,kp1,kp2,diff_th):
 		point_1 = kp1[m[0].queryIdx]
 		point_2 = kp2[m[0].trainIdx]
 
-		if abs(point_1[1]-point_2[1]) <= diff_th:
+		if abs(point_1[1]-point_2[1]) <= diff_th and m[0].distance < 0.8*m[1].distance:
 			good.append(m)
 
 	matches = np.asarray(good)
@@ -2902,7 +2902,11 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder):
 
 	H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
 	
-	p1.GPS_coords = get_new_GPS_Coords(p1,p2,H)
+	coord = get_new_GPS_Coords(p1,p2,H)
+	if p1.GPS_coords.Center[1]-coord.Center[1]>abs(p1.GPS_coords.UL_coord[1]-p1.GPS_coords.LL_coord[1])/20:
+		return 
+		
+	p1.GPS_coords = coord
 
 
 class SuperPatch():
