@@ -2943,7 +2943,7 @@ def calculate_homography_for_super_patches(kp,desc,prev_kp,prev_desc,matches):
 	src = np.float32(src_list).reshape(-1,1,2)
 	dst = np.float32(dst_list).reshape(-1,1,2)
 	
-	H, masked = cv2.estimateAffinePartial2D(dst, src, maxIters = 9000, confidence = 0.999, refineIters = 15)
+	H, masked = cv2.estimateAffinePartial2D(src, dst, maxIters = 9000, confidence = 0.999, refineIters = 15)
 	
 	H = np.append(H,np.array([[0,0,1]]),axis=0)
 	H[0:2,0:2] = np.array([[1,0],[0,1]])
@@ -3077,9 +3077,6 @@ class SuperPatch():
 					prev_desc.append(desc2)
 					
 					matches.append(get_top_n_good_matches(desc1,desc2,kp1,kp2,100,19*(inner_p.size[0])/20))
-					draw_matches(inner_p,prev_inner_p,kp1,kp2,matches[-1])
-					break
-			break
 
 
 		H = calculate_homography_for_super_patches(kp,desc,prev_kp,prev_desc,matches)
