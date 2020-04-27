@@ -2963,8 +2963,8 @@ class SuperPatch():
 		self.size = (int((self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])/self.y_ratio_GPS_over_pixel),\
 			int((self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])/self.x_ratio_GPS_over_pixel))
 
-		self.upper_kp, self.upper_desc, self.lower_kp, self.lower_desc = self.calculate_super_sift_points(SIFT_folder)
-		self.remove_randomly()
+		# self.upper_kp, self.upper_desc, self.lower_kp, self.lower_desc = self.calculate_super_sift_points(SIFT_folder)
+		# self.remove_randomly()
 
 	def draw_super_patch(self,patch_folder,name_of):
 		
@@ -3394,6 +3394,11 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	# super_patches[8].draw_super_patch(patch_folder,'old')
 	super_patches[3].correct_supper_patch_internally(SIFT_folder,patch_folder)
 	super_patches[4].correct_supper_patch_internally(SIFT_folder,patch_folder)
+	
+	super_patches[3].upper_kp, super_patches[3].upper_desc, super_patches[3].lower_kp, super_patches[3].lower_desc = super_patches[3].calculate_super_sift_points(SIFT_folder)
+	super_patches[3].remove_randomly()
+	super_patches[4].upper_kp, super_patches[4].upper_desc, super_patches[4].lower_kp, super_patches[4].lower_desc = super_patches[4].calculate_super_sift_points(SIFT_folder)
+	super_patches[4].remove_randomly()
 
 	sp = create_supper_patch_parallel(super_patches[3].patches+super_patches[4].patches,1,SIFT_folder,patch_folder)
 	sp.draw_super_patch(patch_folder,'combine')
