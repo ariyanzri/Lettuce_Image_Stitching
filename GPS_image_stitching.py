@@ -2901,13 +2901,48 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder):
 		return
 
 	H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
-	
+	# print(round(percentage_inliers,2))
+
 	coord = get_new_GPS_Coords(p1,p2,H)
 	if p1.GPS_coords.Center[1]-coord.Center[1]>abs(p1.GPS_coords.UL_coord[1]-p1.GPS_coords.LL_coord[1])/20:
 		return 
 
 	p1.GPS_coords = coord
 
+def get_top_n_good_matches(desc1,desc2,kp1,kp2,n):
+	bf = cv2.BFMatcher()
+	matches = bf.knnMatch(desc1,desc2, k=2)
+
+	sorted_matches = sorted(matches, key=lambda x: m[0].distance)
+
+	good = []
+
+	if len(sorted_matches)>n:
+		good += sorted_matches[0:n]
+	else:
+		good += sorted_matches
+
+	matches = np.asarray(good)
+
+	return matches
+
+def calculate_homography_for_super_patches(kp,desc,prev_kp,prev_desc,matches):
+
+	src_list = []
+	dst_list = []
+
+	for i,mtch in enumerate(matches):
+		src_list += [kp[i][m.queryIdx] for m in mtch[:,0]]
+		dst_list += [prev_kp[i][m.trainIdx] for m in mtch[:,0]]
+
+	src = np.float32(src_list).reshape(-1,1,2)
+	dst = np.float32(dst_list).reshape(-1,1,2)
+	
+	H, masked = cv2.estimateAffinePartial2D(dst, src, maxIters = 9000, confidence = 0.999, refineIters = 15)
+	
+	H = np.append(H,np.array([[0,0,1]]),axis=0)
+	H[0:2,0:2] = np.array([[1,0],[0,1]])
+	return H
 
 class SuperPatch():
 
@@ -2987,10 +3022,70 @@ class SuperPatch():
 
 			prev_patch = p
 
-			print('.')
-			sys.stdout.flush()
+		self.recalculate_size_and_coords()
+	
+	def correct_all_patches_and_self_by_H(self,H):
+
+		for p in self.patches:
+			c1 = [0,0,1]
+		
+			c1 = H.dot(c1).astype(int)
+			
+			diff_x = -c1[0]
+			diff_y = -c1[1]
+
+			gps_scale_x = (p.GPS_coords.UR_coord[0] - p.GPS_coords.UL_coord[0])/(p.size[1])
+			gps_scale_y = (p.GPS_coords.LL_coord[1] - p.GPS_coords.UL_coord[1])/(p.size[0])
+
+			diff_x = diff_x*gps_scale_x
+			diff_y = diff_y*gps_scale_y
+
+			new_UL = (p.GPS_coords.UL_coord[0]+diff_x, p.GPS_coords.UL_coord[1]+diff_y)
+			new_UR = (p.GPS_coords.UR_coord[0]+diff_x,p.GPS_coords.UR_coord[1]+diff_y)
+			new_LL = (p.GPS_coords.LL_coord[0]+diff_x,p.GPS_coords.LL_coord[1]+diff_y)
+			new_LR = (p.GPS_coords.LR_coord[0]+diff_x,p.GPS_coords.LR_coord[1]+diff_y)
+			new_center = (p.GPS_coords.Center[0]+diff_x,p.GPS_coords.Center[1]+diff_y)
+
+			new_coords = Patch_GPS_coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+
+			p.GPS_coords = new_coords
 
 		self.recalculate_size_and_coords()
+
+		
+
+	def correct_whole_based_on_super_patch(self,prev_super_patch,SIFT_folder,patch_folder):
+
+		matches = []
+		kp = []
+		desc = []
+		prev_kp = []
+		prev_desc = []
+
+		for inner_p in self.patches:
+
+			for prev_inner_p in prev_super_patch.patches:
+				if inner_p.has_overlap(prev_inner_p) or prev_inner_p.has_overlap(inner_p):
+					overlap1 = inner_p.get_overlap_rectangle(prev_inner_p)
+					overlap2 = prev_inner_p.get_overlap_rectangle(inner_p)
+					
+					kp1,desc1 = choose_SIFT_key_points(inner_p,overlap1[0],overlap1[1],overlap1[2],overlap1[3],SIFT_address)
+					kp2,desc2 = choose_SIFT_key_points(prev_inner_p,overlap2[0],overlap2[1],overlap2[2],overlap2[3],SIFT_address)
+
+					kp.append(kp1)
+					desc.append(desc1)
+					prev_kp.append(kp2)
+					prev_desc.append(desc2)
+					
+					matches.append(get_top_n_good_matches(desc1,desc2,kp1,kp2,1000))
+
+		H = calculate_homography_for_super_patches(kp,desc,prev_kp,prev_desc,matches)
+		
+		self.correct_all_patches_and_self_by_H(H)
+
+
+
+
 
 	def remove_randomly(self):
 		upper_indexes = range(0,np.shape(self.upper_desc)[0])
@@ -3255,6 +3350,20 @@ def draw_rows(path):
 
 	plt.show()
 
+def correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder):
+
+	prev_super_patch = None
+
+	for sp in super_patches:
+
+		if prev_super_patch is None:
+			prev_super_patch = sp
+			continue
+
+		sp.correct_whole_based_on_super_patch(prev_super_patch,SIFT_folder,patch_folder)
+
+
+
 def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	super_patches = []
 	args = []
@@ -3268,9 +3377,12 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 
 	super_patches = results
 
-	super_patches[8].draw_super_patch(patch_folder,'old')
-	super_patches[8].correct_supper_patch_internally(SIFT_folder,patch_folder)
-	super_patches[8].draw_super_patch(patch_folder,'new')
+	# super_patches[8].draw_super_patch(patch_folder,'old')
+	# super_patches[8].correct_supper_patch_internally(SIFT_folder,patch_folder)
+	# super_patches[8].draw_super_patch(patch_folder,'new')
+
+	sp = create_supper_patch_parallel(super_patches[1].patches+super_patches[2].patches,1,SIFT_folder,patch_folder)
+	sp.draw_super_patch(patch_folder,'combine')
 
 	return super_patches
 
@@ -3305,7 +3417,11 @@ def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder):
 	coord = Patch_GPS_coordinate(UL_coord,UR_coord,LL_coord,LR_coord,Center)
 
 	sp = SuperPatch(g,patches,coord,SIFT_folder)
-	# sp.draw_super_patch(patch_folder)
+	
+	sp.correct_supper_patch_internally(SIFT_folder,patch_folder)
+	
+	print('Super patch for row {0} has been successfully created and revised internally. '.format(g))
+	sys.stdout.flush()
 
 	return sp
 
