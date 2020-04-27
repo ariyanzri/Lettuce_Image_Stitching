@@ -3274,7 +3274,7 @@ def detect_rows(address):
 	for g in patches_groups_by_rows:
 		newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
 		
-		patches_groups_by_rows_new[g] = newlist[0:1]+newlist[2:3]
+		patches_groups_by_rows_new[g] = newlist[0:3]
 
 	# print(len(patches_groups_by_rows))
 	# print(len(patches_groups_by_rows[g]))
@@ -3375,8 +3375,8 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	super_patches = results
 
 	# super_patches[8].draw_super_patch(patch_folder,'old')
-	# super_patches[1].correct_supper_patch_internally(SIFT_folder,patch_folder)
-	# super_patches[2].correct_supper_patch_internally(SIFT_folder,patch_folder)
+	super_patches[1].correct_supper_patch_internally(SIFT_folder,patch_folder)
+	super_patches[2].correct_supper_patch_internally(SIFT_folder,patch_folder)
 
 	sp = create_supper_patch_parallel(super_patches[1].patches+super_patches[2].patches,1,SIFT_folder,patch_folder)
 	sp.draw_super_patch(patch_folder,'combine')
