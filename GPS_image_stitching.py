@@ -2972,8 +2972,11 @@ class SuperPatch():
 			st_x = int(x_diff/self.x_ratio_GPS_over_pixel)
 			st_y = int(y_diff/self.y_ratio_GPS_over_pixel)
 			# print(st_x,st_y)
-			print('.')
-			result[st_y:st_y+p.size[0],st_x:st_x+p.size[1],:] = p.rgb_img
+			# print('.')
+			try:
+				result[st_y:st_y+p.size[0],st_x:st_x+p.size[1],:] = p.rgb_img
+			except Exception as e:
+				print('error')
 			# cv2.rectangle(result,(st_x+1,st_y+1),(st_x+p.size[1]-1,st_y+p.size[0]-1),(0,0,255),20)
 			p.del_img()
 
