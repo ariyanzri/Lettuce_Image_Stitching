@@ -3319,7 +3319,7 @@ def detect_rows(address):
 	for g in patches_groups_by_rows:
 		newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
 		
-		patches_groups_by_rows_new.append(newlist[4:9])
+		patches_groups_by_rows_new.append(newlist[0:10])
 
 	# print(len(patches_groups_by_rows))
 	# print(len(patches_groups_by_rows[g]))
