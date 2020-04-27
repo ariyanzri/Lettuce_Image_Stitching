@@ -3070,6 +3070,7 @@ class SuperPatch():
 					overlap2 = prev_inner_p.get_overlap_rectangle(inner_p)
 					
 					if overlap1[2]-overlap1[0]<inner_p.size[1]/5 and overlap1[3]-overlap1[1]<inner_p.size[0]/5:
+						print('..')
 						continue
 
 					kp1,desc1 = choose_SIFT_key_points(inner_p,overlap1[0],overlap1[1],overlap1[2],overlap1[3],SIFT_folder)
