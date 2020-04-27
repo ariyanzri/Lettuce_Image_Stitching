@@ -3077,7 +3077,7 @@ class SuperPatch():
 					prev_desc.append(desc2)
 					
 					matches.append(get_top_n_good_matches(desc2,desc1,kp2,kp1,100,19*(inner_p.size[0])/20))
-					draw_matches(inner_p,prev_inner_p,kp1,kp2,matches[-1])
+					draw_matches(prev_inner_p,inner_p,kp2,kp1,matches[-1])
 					break
 			break
 
