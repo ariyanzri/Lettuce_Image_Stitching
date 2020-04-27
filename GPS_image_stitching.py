@@ -3036,15 +3036,15 @@ class SuperPatch():
 	def correct_all_patches_and_self_by_H(self,H,prev_super_patch):
 
 		new_coords = get_new_GPS_Coords(self,prev_super_patch,H)
-		diff_x = self.GPS_coords.UL_coord[0]-new_coords.UL_coord[0]
-		diff_y = self.GPS_coords.UL_coord[1]-new_coords.UL_coord[1]
+		diff_x = self.GPS_coords.UL_coord[0]+new_coords.UL_coord[0]
+		diff_y = self.GPS_coords.UL_coord[1]+new_coords.UL_coord[1]
 
 		for p in self.patches:
-			new_UL = (p.GPS_coords.UL_coord[0]+diff_x,p.GPS_coords.UL_coord[1]+diff_y)
-			new_UR = (p.GPS_coords.UR_coord[0]+diff_x,p.GPS_coords.UR_coord[1]+diff_y)
-			new_LL = (p.GPS_coords.LL_coord[0]+diff_x,p.GPS_coords.LL_coord[1]+diff_y)
-			new_LR = (p.GPS_coords.LR_coord[0]+diff_x,p.GPS_coords.LR_coord[1]+diff_y)
-			new_center = (p.GPS_coords.Center[0]+diff_x,p.GPS_coords.Center[1]+diff_y)
+			new_UL = (p.GPS_coords.UL_coord[0]-diff_x,p.GPS_coords.UL_coord[1]-diff_y)
+			new_UR = (p.GPS_coords.UR_coord[0]-diff_x,p.GPS_coords.UR_coord[1]-diff_y)
+			new_LL = (p.GPS_coords.LL_coord[0]-diff_x,p.GPS_coords.LL_coord[1]-diff_y)
+			new_LR = (p.GPS_coords.LR_coord[0]-diff_x,p.GPS_coords.LR_coord[1]-diff_y)
+			new_center = (p.GPS_coords.Center[0]-diff_x,p.GPS_coords.Center[1]-diff_y)
 
 			new_p_coord = Patch_GPS_coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
 			p.GPS_coords = new_p_coord
