@@ -2913,7 +2913,7 @@ def get_top_n_good_matches(desc1,desc2,kp1,kp2,n):
 	bf = cv2.BFMatcher()
 	matches = bf.knnMatch(desc1,desc2, k=2)
 
-	sorted_matches = sorted(matches, key=lambda x: m[0].distance)
+	sorted_matches = sorted(matches, key=lambda x: x[0].distance)
 
 	good = []
 
