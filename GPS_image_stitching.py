@@ -1032,8 +1032,8 @@ def get_new_GPS_Coords(p1,p2,H):
 	
 	# print(c1)
 
-	diff_x = c1[0]
-	diff_y = c1[1]
+	diff_x = -c1[0]
+	diff_y = -c1[1]
 
 	gps_scale_x = (p2.GPS_coords.UR_coord[0] - p2.GPS_coords.UL_coord[0])/(p2.size[1])
 	gps_scale_y = (p2.GPS_coords.LL_coord[1] - p2.GPS_coords.UL_coord[1])/(p2.size[0])
@@ -3077,6 +3077,10 @@ class SuperPatch():
 					prev_desc.append(desc2)
 					
 					matches.append(get_top_n_good_matches(desc1,desc2,kp1,kp2,100,19*(inner_p.size[0])/20))
+					draw_matches(inner_p,prev_inner_p,kp1,kp2,matches[-1])
+					break
+			break
+
 
 		H = calculate_homography_for_super_patches(kp,desc,prev_kp,prev_desc,matches)
 		
