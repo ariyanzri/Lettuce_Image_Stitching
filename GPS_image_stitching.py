@@ -3123,11 +3123,11 @@ class SuperPatch():
 
 		matches = get_top_n_good_matches(desc2,desc1,kp2,kp1,150000,self.patches[0].size)
 
-		self.draw_super_patch_and_lines(matches,kp1,kp2,patch_folder,'lines')
+		# self.draw_super_patch_and_lines(matches,kp1,kp2,patch_folder,'lines')
 
-		# H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
+		H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
 
-		# self.correct_all_patches_and_self_by_H(H,prev_super_patch)
+		self.correct_all_patches_and_self_by_H(H,prev_super_patch)
 
 	def remove_randomly(self):
 		upper_indexes = range(0,np.shape(self.upper_desc)[0])
