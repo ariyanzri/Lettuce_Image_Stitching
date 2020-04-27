@@ -3394,7 +3394,7 @@ def draw_rows(path):
 
 def correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder):
 
-	spr = create_supper_patch_parallel(super_patches[0].patches+super_patches[1].patches,-1,SIFT_folder,patch_folder,False)
+	spr = create_supper_patch_parallel(super_patches[0].patches+super_patches[1].patches,-1,SIFT_folder,patch_folder,True)
 	spr.draw_super_patch(patch_folder,'combine')
 
 	prev_super_patch = None
@@ -3408,7 +3408,7 @@ def correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder):
 		sp.correct_whole_based_on_super_patch(prev_super_patch,SIFT_folder,patch_folder)
 
 
-	spr = create_supper_patch_parallel(super_patches[0].patches+super_patches[1].patches,-1,SIFT_folder,patch_folder,False)
+	spr = create_supper_patch_parallel(super_patches[0].patches+super_patches[1].patches,-1,SIFT_folder,patch_folder,True)
 	spr.draw_super_patch(patch_folder,'combine_new')
 
 def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
