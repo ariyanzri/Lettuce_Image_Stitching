@@ -2913,9 +2913,12 @@ def get_top_n_good_matches(desc1,desc2,kp1,kp2,n):
 	bf = cv2.BFMatcher()
 	matches = bf.knnMatch(desc1,desc2, k=2)
 
+	good = []
+	for m in matches:
+		if m[0].distance < 0.8*m[1].distance:
+			good.append(m)
 
-
-	sorted_matches = sorted(matches, key=lambda x: x[0].distance)
+	sorted_matches = sorted(good, key=lambda x: x[0].distance)
 
 	good = []
 
