@@ -2947,6 +2947,8 @@ def calculate_homography_for_super_patches(kp,desc,prev_kp,prev_desc,matches):
 	
 	H = np.append(H,np.array([[0,0,1]]),axis=0)
 	H[0:2,0:2] = np.array([[1,0],[0,1]])
+	print(H)
+	
 	return H
 
 class SuperPatch():
@@ -3035,7 +3037,7 @@ class SuperPatch():
 	
 	def correct_all_patches_and_self_by_H(self,H,prev_super_patch):
 
-		new_coords = get_new_GPS_Coords(prev_super_patch,self,H)
+		new_coords = get_new_GPS_Coords(self,prev_super_patch,H)
 		diff_x = self.GPS_coords.UL_coord[0]-new_coords.UL_coord[0]
 		diff_y = self.GPS_coords.UL_coord[0]-new_coords.UL_coord[1]
 		
@@ -3081,9 +3083,6 @@ class SuperPatch():
 		H = calculate_homography_for_super_patches(prev_kp,prev_desc,kp,desc,matches)
 		
 		self.correct_all_patches_and_self_by_H(H,prev_super_patch)
-
-
-
 
 
 	def remove_randomly(self):
