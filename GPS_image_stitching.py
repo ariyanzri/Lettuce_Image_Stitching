@@ -3038,7 +3038,7 @@ class SuperPatch():
 
 		new_coords = get_new_GPS_Coords(self,prev_super_patch,H)
 		diff_x = (self.GPS_coords.UL_coord[0]-new_coords.UL_coord[0])
-		diff_y = -(self.GPS_coords.UL_coord[1]-new_coords.UL_coord[1])
+		diff_y = (self.GPS_coords.UL_coord[1]-new_coords.UL_coord[1])
 		
 		for p in self.patches:
 			new_UL = (p.GPS_coords.UL_coord[0]-diff_x,p.GPS_coords.UL_coord[1]-diff_y)
