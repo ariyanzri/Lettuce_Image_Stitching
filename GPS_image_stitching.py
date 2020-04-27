@@ -2851,7 +2851,7 @@ def recalculate_keypoints_locations(p,SIFT_folder,x_difference,y_difference):
 
 
 
-def get_good_matches_for_horizontal(desc1,desc2,kp1,kp2,diff_th):
+def get_good_matches_for_horizontal(desc1,desc2,kp1,kp2,patch_size):
 	bf = cv2.BFMatcher()
 	matches = bf.knnMatch(desc1,desc2, k=2)
 
@@ -2860,7 +2860,9 @@ def get_good_matches_for_horizontal(desc1,desc2,kp1,kp2,diff_th):
 		point_1 = kp1[m[0].queryIdx]
 		point_2 = kp2[m[0].trainIdx]
 
-		if abs(point_1[1]-point_2[1]) <= diff_th and m[0].distance < 0.8*m[1].distance:
+		if 0 <= abs(point_1[1]-point_2[1]) <= patch_size[0]/20 and\
+		0 <= abs(point_1[0]-point_2[0]) <= patch_size[1] and\
+		m[0].distance < 0.8*m[1].distance:
 			good.append(m)
 
 	matches = np.asarray(good)
@@ -2893,7 +2895,7 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder):
 	kp1,desc1 = choose_SIFT_key_points(p1,overlap1[0],overlap1[1],overlap1[2],overlap1[3],SIFT_address)
 	kp2,desc2 = choose_SIFT_key_points(p2,overlap2[0],overlap2[1],overlap2[2],overlap2[3],SIFT_address)
 
-	matches = get_good_matches_for_horizontal(desc2,desc1,kp2,kp1,p1.size[0]/20)
+	matches = get_good_matches_for_horizontal(desc2,desc1,kp2,kp1,p1.size)
 
 	if len(matches)<3:
 		return
@@ -3397,19 +3399,19 @@ def correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder):
 	spr = create_supper_patch_parallel(super_patches[0].patches+super_patches[1].patches,-1,SIFT_folder,patch_folder,True)
 	spr.draw_super_patch(patch_folder,'combine')
 
-	prev_super_patch = None
+	# prev_super_patch = None
 
-	for sp in super_patches:
+	# for sp in super_patches:
 
-		if prev_super_patch is None:
-			prev_super_patch = sp
-			continue
+	# 	if prev_super_patch is None:
+	# 		prev_super_patch = sp
+	# 		continue
 
-		sp.correct_whole_based_on_super_patch(prev_super_patch,SIFT_folder,patch_folder)
+	# 	sp.correct_whole_based_on_super_patch(prev_super_patch,SIFT_folder,patch_folder)
 
 
-	spr = create_supper_patch_parallel(super_patches[0].patches+super_patches[1].patches,-1,SIFT_folder,patch_folder,True)
-	spr.draw_super_patch(patch_folder,'combine_new')
+	# spr = create_supper_patch_parallel(super_patches[0].patches+super_patches[1].patches,-1,SIFT_folder,patch_folder,True)
+	# spr.draw_super_patch(patch_folder,'combine_new')
 
 def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	super_patches = []
