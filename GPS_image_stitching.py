@@ -72,15 +72,16 @@ def choose_SIFT_key_points(patch,x1,y1,x2,y2,SIFT_address,show=False):
 	desc = np.array(desc)
 
 	if show:
-		patch.load_img('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures')
+		patch.load_img('/storage/ariyanzarei/2020-01-08-rgb/bin2tif_out')
 
 		img_res = patch.img.copy()
 		# img_res = cv2.drawKeypoints(img_res,kp,img_res)
 		ratio = img_res.shape[0]/img_res.shape[1]
 		cv2.rectangle(img_res,(x1,y1),(x2,y2),(0,0,255),20)
 		img_res = cv2.resize(img_res, (500, int(500*ratio))) 
-		cv2.imshow('fig {0}'.format(patch.name),img_res)
-		cv2.waitKey(0)
+		# cv2.imshow('fig {0}'.format(patch.name),img_res)
+		# cv2.waitKey(0)
+		cv2.imwrite('tmp',img_res)
 
 		patch.del_img()
 	
@@ -3068,13 +3069,13 @@ class SuperPatch():
 				if inner_p.has_overlap(prev_inner_p) or prev_inner_p.has_overlap(inner_p):
 					overlap1 = inner_p.get_overlap_rectangle(prev_inner_p)
 					overlap2 = prev_inner_p.get_overlap_rectangle(inner_p)
-					print(overlap1)
+					
 					if overlap1[2]-overlap1[0]<inner_p.size[1]/5 and overlap1[3]-overlap1[1]<inner_p.size[0]/5:
 
 						continue
 
-					kp1,desc1 = choose_SIFT_key_points(inner_p,overlap1[0],overlap1[1],overlap1[2],overlap1[3],SIFT_folder)
-					kp2,desc2 = choose_SIFT_key_points(prev_inner_p,overlap2[0],overlap2[1],overlap2[2],overlap2[3],SIFT_folder)
+					kp1,desc1 = choose_SIFT_key_points(inner_p,overlap1[0],overlap1[1],overlap1[2],overlap1[3],SIFT_folder,True)
+					kp2,desc2 = choose_SIFT_key_points(prev_inner_p,overlap2[0],overlap2[1],overlap2[2],overlap2[3],SIFT_folder,True)
 
 					kp.append(kp1)
 					desc.append(desc1)
