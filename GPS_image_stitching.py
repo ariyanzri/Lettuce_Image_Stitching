@@ -2963,7 +2963,7 @@ class SuperPatch():
 
 	def draw_super_patch(self,patch_folder,name_of):
 		
-		result = np.zeros((self.size[0]+1500,self.size[1]+1500,3), np.uint8)
+		result = np.zeros((self.size[0],self.size[1],3), np.uint8)
 
 		for p in self.patches:
 			p.load_img(patch_folder)
