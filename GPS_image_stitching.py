@@ -2909,13 +2909,16 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder):
 
 	p1.GPS_coords = coord
 
-def get_top_n_good_matches(desc1,desc2,kp1,kp2,n):
+def get_top_n_good_matches(desc1,desc2,kp1,kp2,n,diff_th):
 	bf = cv2.BFMatcher()
 	matches = bf.knnMatch(desc1,desc2, k=2)
 
 	good = []
 	for m in matches:
-		if m[0].distance < 0.8*m[1].distance:
+		point_1 = kp1[m[0].queryIdx]
+		point_2 = kp2[m[0].trainIdx]
+
+		if abs(point_1[1]-point_2[1]) <= diff_th and m[0].distance < 0.8*m[1].distance:
 			good.append(m)
 
 	sorted_matches = sorted(good, key=lambda x: x[0].distance)
@@ -3091,7 +3094,7 @@ class SuperPatch():
 					prev_kp.append(kp2)
 					prev_desc.append(desc2)
 					
-					matches.append(get_top_n_good_matches(desc1,desc2,kp1,kp2,1000))
+					matches.append(get_top_n_good_matches(desc1,desc2,kp1,kp2,100,19*(inner_p.size[0])/20))
 
 		H = calculate_homography_for_super_patches(kp,desc,prev_kp,prev_desc,matches)
 		
