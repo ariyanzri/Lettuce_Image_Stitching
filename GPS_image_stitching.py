@@ -2959,22 +2959,22 @@ class SuperPatch():
 		self.x_ratio_GPS_over_pixel = (list_patches[0].GPS_coords.UR_coord[0] - list_patches[0].GPS_coords.UL_coord[0])/list_patches[0].size[1]
 		self.y_ratio_GPS_over_pixel = (list_patches[0].GPS_coords.UL_coord[1] - list_patches[0].GPS_coords.LL_coord[1])/list_patches[0].size[0]
 
-		self.size = (int(math.ceil((self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])/self.y_ratio_GPS_over_pixel)),\
-			int(math.ceil((self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])/self.x_ratio_GPS_over_pixel)))
+		self.size = (int((self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])/self.y_ratio_GPS_over_pixel),\
+			int((self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])/self.x_ratio_GPS_over_pixel))
 
 		# self.upper_kp, self.upper_desc, self.lower_kp, self.lower_desc = self.calculate_super_sift_points(SIFT_folder)
 		# self.remove_randomly()
 
 	def draw_super_patch(self,patch_folder,name_of):
 		
-		result = np.zeros((self.size[0],self.size[1],3), np.uint8)
+		result = np.zeros((self.size[0]+40,self.size[1]+40,3), np.uint8)
 
 		for p in self.patches:
 			p.load_img(patch_folder)
 			x_diff = p.GPS_coords.UL_coord[0] - self.GPS_coords.UL_coord[0]
 			y_diff = self.GPS_coords.UL_coord[1] - p.GPS_coords.UL_coord[1]
-			st_x = int(math.ceil(x_diff/self.x_ratio_GPS_over_pixel))
-			st_y = int(math.ceil(y_diff/self.y_ratio_GPS_over_pixel))
+			st_x = int(x_diff/self.x_ratio_GPS_over_pixel)
+			st_y = int(y_diff/self.y_ratio_GPS_over_pixel)
 			print(st_x,st_y)
 			# print('.')
 			try:
@@ -3015,8 +3015,8 @@ class SuperPatch():
 
 		coord = Patch_GPS_coordinate(UL_coord,UR_coord,LL_coord,LR_coord,Center)
 		self.GPS_coords = coord
-		self.size = (int(math.ceil((self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])/self.y_ratio_GPS_over_pixel)),\
-			int(math.ceil((self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])/self.x_ratio_GPS_over_pixel)))
+		self.size = (int((self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])/self.y_ratio_GPS_over_pixel),\
+			int((self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])/self.x_ratio_GPS_over_pixel))
 
 
 	def correct_supper_patch_internally(self,SIFT_address,patch_folder):
