@@ -3064,13 +3064,13 @@ class SuperPatch():
 		prev_desc = []
 
 		for inner_p in self.patches:
-			print('-{0}'.format(inner_p.size))
+			# print('-{0}'.format(inner_p.size))
 			for prev_inner_p in prev_super_patch.patches:
 				if inner_p.has_overlap(prev_inner_p) or prev_inner_p.has_overlap(inner_p):
 					overlap1 = inner_p.get_overlap_rectangle(prev_inner_p)
 					overlap2 = prev_inner_p.get_overlap_rectangle(inner_p)
-					print(overlap1[2]-overlap1[0])
-					if overlap1[2]-overlap1[0]<inner_p.size[1]/3:
+					# print(overlap1[2]-overlap1[0])
+					if overlap1[2]-overlap1[0]<inner_p.size[1]/2:
 						print('did')
 						continue
 
