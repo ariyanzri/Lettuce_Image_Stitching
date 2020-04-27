@@ -81,7 +81,7 @@ def choose_SIFT_key_points(patch,x1,y1,x2,y2,SIFT_address,show=False):
 		img_res = cv2.resize(img_res, (500, int(500*ratio))) 
 		# cv2.imshow('fig {0}'.format(patch.name),img_res)
 		# cv2.waitKey(0)
-		cv2.imwrite('tmp',img_res)
+		cv2.imwrite('tmp.bmp',img_res)
 
 		patch.del_img()
 	
