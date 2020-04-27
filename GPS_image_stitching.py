@@ -3042,11 +3042,11 @@ class SuperPatch():
 		diff_y = self.GPS_coords.UL_coord[0]-new_coords.UL_coord[1]
 		
 		for p in self.patches:
-			new_UL = (p.GPS_coords.UL_coord[0]+diff_x,p.GPS_coords.UL_coord[1]-diff_y)
-			new_UR = (p.GPS_coords.UR_coord[0]+diff_x,p.GPS_coords.UR_coord[1]-diff_y)
-			new_LL = (p.GPS_coords.LL_coord[0]+diff_x,p.GPS_coords.LL_coord[1]-diff_y)
-			new_LR = (p.GPS_coords.LR_coord[0]+diff_x,p.GPS_coords.LR_coord[1]-diff_y)
-			new_center = (p.GPS_coords.Center[0]+diff_x,p.GPS_coords.Center[1]-diff_y)
+			new_UL = (p.GPS_coords.UL_coord[0]-diff_x,p.GPS_coords.UL_coord[1]-diff_y)
+			new_UR = (p.GPS_coords.UR_coord[0]-diff_x,p.GPS_coords.UR_coord[1]-diff_y)
+			new_LL = (p.GPS_coords.LL_coord[0]-diff_x,p.GPS_coords.LL_coord[1]-diff_y)
+			new_LR = (p.GPS_coords.LR_coord[0]-diff_x,p.GPS_coords.LR_coord[1]-diff_y)
+			new_center = (p.GPS_coords.Center[0]-diff_x,p.GPS_coords.Center[1]-diff_y)
 
 			new_p_coord = Patch_GPS_coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
 			p.GPS_coords = new_p_coord
@@ -3078,9 +3078,9 @@ class SuperPatch():
 					prev_kp.append(kp2)
 					prev_desc.append(desc2)
 					
-					matches.append(get_top_n_good_matches(desc2,desc1,kp2,kp1,100,19*(inner_p.size[0])/20))
+					matches.append(get_top_n_good_matches(desc1,desc2,kp1,kp2,100,19*(inner_p.size[0])/20))
 
-		H = calculate_homography_for_super_patches(prev_kp,prev_desc,kp,desc,matches)
+		H = calculate_homography_for_super_patches(kp,desc,prev_kp,prev_desc,matches)
 		
 		self.correct_all_patches_and_self_by_H(H,prev_super_patch)
 
