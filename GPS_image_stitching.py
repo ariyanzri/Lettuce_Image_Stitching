@@ -2898,6 +2898,7 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder):
 	matches = get_good_matches_for_horizontal(desc2,desc1,kp2,kp1,p1.size)
 
 	if len(matches)<3:
+		print('not corrected')
 		return
 
 	H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
@@ -2905,8 +2906,10 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder):
 
 	coord = get_new_GPS_Coords(p1,p2,H)
 	if p1.GPS_coords.Center[1]-coord.Center[1]>abs(p1.GPS_coords.UL_coord[1]-p1.GPS_coords.LL_coord[1])/20:
+		print('not corrected')
 		return 
 
+	print('corrected')
 	p1.GPS_coords = coord
 
 def get_top_n_good_matches(desc1,desc2,kp1,kp2,n,size_patch):
@@ -3399,19 +3402,19 @@ def correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder):
 	spr = create_supper_patch_parallel(super_patches[0].patches+super_patches[1].patches,-1,SIFT_folder,patch_folder,True)
 	spr.draw_super_patch(patch_folder,'combine')
 
-	# prev_super_patch = None
+	prev_super_patch = None
 
-	# for sp in super_patches:
+	for sp in super_patches:
 
-	# 	if prev_super_patch is None:
-	# 		prev_super_patch = sp
-	# 		continue
+		if prev_super_patch is None:
+			prev_super_patch = sp
+			continue
 
-	# 	sp.correct_whole_based_on_super_patch(prev_super_patch,SIFT_folder,patch_folder)
+		sp.correct_whole_based_on_super_patch(prev_super_patch,SIFT_folder,patch_folder)
 
 
-	# spr = create_supper_patch_parallel(super_patches[0].patches+super_patches[1].patches,-1,SIFT_folder,patch_folder,True)
-	# spr.draw_super_patch(patch_folder,'combine_new')
+	spr = create_supper_patch_parallel(super_patches[0].patches+super_patches[1].patches,-1,SIFT_folder,patch_folder,True)
+	spr.draw_super_patch(patch_folder,'combine_new')
 
 def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	super_patches = []
