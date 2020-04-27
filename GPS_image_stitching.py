@@ -3291,7 +3291,7 @@ def detect_rows(address):
 	for g in patches_groups_by_rows:
 		newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
 		
-		patches_groups_by_rows_new.append(newlist)
+		patches_groups_by_rows_new.append(newlist[4:9])
 
 	# print(len(patches_groups_by_rows))
 	# print(len(patches_groups_by_rows[g]))
@@ -3647,7 +3647,7 @@ def main():
 		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 		
 		row_groups = detect_rows(coordinates_file)
-		super_patches = generate_superpatches(row_groups[0:2],SIFT_folder,patch_folder)
+		super_patches = generate_superpatches(row_groups[3:5],SIFT_folder,patch_folder)
 		correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder)
 		# results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
 		# save_rows(row_groups,plot_npy_file)
