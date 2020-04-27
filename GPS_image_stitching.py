@@ -3069,8 +3069,8 @@ class SuperPatch():
 					overlap1 = inner_p.get_overlap_rectangle(prev_inner_p)
 					overlap2 = prev_inner_p.get_overlap_rectangle(inner_p)
 					
-					kp1,desc1 = choose_SIFT_key_points(inner_p,overlap1[0],overlap1[1],overlap1[2],overlap1[3],SIFT_address)
-					kp2,desc2 = choose_SIFT_key_points(prev_inner_p,overlap2[0],overlap2[1],overlap2[2],overlap2[3],SIFT_address)
+					kp1,desc1 = choose_SIFT_key_points(inner_p,overlap1[0],overlap1[1],overlap1[2],overlap1[3],SIFT_folder)
+					kp2,desc2 = choose_SIFT_key_points(prev_inner_p,overlap2[0],overlap2[1],overlap2[2],overlap2[3],SIFT_folder)
 
 					kp.append(kp1)
 					desc.append(desc1)
