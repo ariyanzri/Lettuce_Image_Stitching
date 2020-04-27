@@ -3392,17 +3392,18 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	super_patches = results
 
 	# super_patches[8].draw_super_patch(patch_folder,'old')
-	super_patches[1].correct_supper_patch_internally(SIFT_folder,patch_folder)
+	# super_patches[1].correct_supper_patch_internally(SIFT_folder,patch_folder)
 	super_patches[2].correct_supper_patch_internally(SIFT_folder,patch_folder)
+	super_patches[2].draw_super_patch(patch_folder,'newp')
 
-	sp = create_supper_patch_parallel(super_patches[1].patches+super_patches[2].patches,1,SIFT_folder,patch_folder)
-	sp.draw_super_patch(patch_folder,'combine')
+	# sp = create_supper_patch_parallel(super_patches[1].patches+super_patches[2].patches,1,SIFT_folder,patch_folder)
+	# sp.draw_super_patch(patch_folder,'combine')
 
-	super_patches[2].correct_whole_based_on_super_patch(super_patches[1],SIFT_folder,patch_folder)
-	# super_patches[8].draw_super_patch(patch_folder,'new')
+	# super_patches[2].correct_whole_based_on_super_patch(super_patches[1],SIFT_folder,patch_folder)
+	# # super_patches[8].draw_super_patch(patch_folder,'new')
 
-	sp = create_supper_patch_parallel(super_patches[1].patches+super_patches[2].patches,1,SIFT_folder,patch_folder)
-	sp.draw_super_patch(patch_folder,'combine_n')
+	# sp = create_supper_patch_parallel(super_patches[1].patches+super_patches[2].patches,1,SIFT_folder,patch_folder)
+	# sp.draw_super_patch(patch_folder,'combine_n')
 
 	return super_patches
 
