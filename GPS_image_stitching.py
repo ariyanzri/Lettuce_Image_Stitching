@@ -3121,7 +3121,7 @@ class SuperPatch():
 		kp2 = prev_super_patch.upper_kp
 		desc2 = prev_super_patch.upper_desc
 
-		matches = get_top_n_good_matches(desc2,desc1,kp2,kp1,150000,self.patches[0].size[0])
+		matches = get_top_n_good_matches(desc2,desc1,kp2,kp1,150000,self.patches[0].size)
 
 		self.draw_super_patch_and_lines(matches,kp1,kp2,patch_folder,'lines')
 
@@ -3394,7 +3394,7 @@ def draw_rows(path):
 
 def correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder):
 
-	spr = create_supper_patch_parallel(super_patches[0].patches+super_patches[1].patches,-1,SIFT_folder,patch_folder)
+	spr = create_supper_patch_parallel(super_patches[0].patches+super_patches[1].patches,-1,SIFT_folder,patch_folder,False)
 	spr.draw_super_patch(patch_folder,'combine')
 
 	prev_super_patch = None
@@ -3408,7 +3408,7 @@ def correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder):
 		sp.correct_whole_based_on_super_patch(prev_super_patch,SIFT_folder,patch_folder)
 
 
-	spr = create_supper_patch_parallel(super_patches[0].patches+super_patches[1].patches,-1,SIFT_folder,patch_folder)
+	spr = create_supper_patch_parallel(super_patches[0].patches+super_patches[1].patches,-1,SIFT_folder,patch_folder,False)
 	spr.draw_super_patch(patch_folder,'combine_new')
 
 def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
@@ -3444,7 +3444,7 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 
 	return super_patches
 
-def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder):
+def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder,not_revise_internally=False):
 
 	up = patches[0].GPS_coords.UL_coord[1]
 	down = patches[0].GPS_coords.LL_coord[1]
@@ -3476,7 +3476,7 @@ def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder):
 
 	sp = SuperPatch(g,patches,coord,SIFT_folder)
 	
-	if g != -1:
+	if not not_revise_internally:
 		sp.correct_supper_patch_internally(SIFT_folder,patch_folder)
 		sp.upper_kp, sp.upper_desc, sp.lower_kp, sp.lower_desc = sp.calculate_super_sift_points(SIFT_folder)
 		sp.remove_randomly()
