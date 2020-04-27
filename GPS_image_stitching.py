@@ -2916,7 +2916,7 @@ def get_top_n_good_matches(desc1,desc2,kp1,kp2,n,diff_th):
 		point_1 = kp1[m[0].queryIdx]
 		point_2 = kp2[m[0].trainIdx]
 
-		if abs(point_1[1]-point_2[1]) <= diff_th and m[0].distance < 0.8*m[1].distance:
+		if abs(point_1[0]-point_2[0]) <= diff_th and m[0].distance < 0.8*m[1].distance:
 			good.append(m)
 
 	sorted_matches = sorted(good, key=lambda x: x[0].distance)
