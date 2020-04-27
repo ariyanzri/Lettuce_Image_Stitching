@@ -2884,6 +2884,8 @@ def draw_matches(p1,p2,kp1,kp2,matches,j):
 		point_1 = (int(point_1[0]),int(point_1[1]))
 		point_2 = (int(point_2[0])+p1.size[1],int(point_2[1]))
 		cv2.line(result,point_1,point_2,(0,0,255),2)
+		cv2.circle(result,point_1,10,(0,255,0),thickness=-1)
+		cv2.circle(result,point_1,10,(255,0,0),thickness=-1)
 		i+=1
 
 	result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
@@ -2898,9 +2900,9 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder,i):
 
 	matches = get_good_matches_for_horizontal(desc2,desc1,kp2,kp1,p1.size)
 	
-	# p1.load_img(patch_folder)
-	# p2.load_img(patch_folder)
-	# draw_matches(p2,p1,kp2,kp1,matches,i)
+	p1.load_img(patch_folder)
+	p2.load_img(patch_folder)
+	draw_matches(p2,p1,kp2,kp1,matches,i)
 
 	if len(matches)<3:
 		return None
@@ -3491,9 +3493,9 @@ def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder,not_revise_i
 	sp = SuperPatch(g,patches,coord,SIFT_folder)
 	
 	if not not_revise_internally:
-		sp.draw_super_patch(patch_folder,'before_{0}'.format(g))
+		# sp.draw_super_patch(patch_folder,'before_{0}'.format(g))
 		sp.correct_supper_patch_internally(SIFT_folder,patch_folder)
-		sp.draw_super_patch(patch_folder,'after_{0}'.format(g))
+		# sp.draw_super_patch(patch_folder,'after_{0}'.format(g))
 
 		sp.upper_kp, sp.upper_desc, sp.lower_kp, sp.lower_desc = sp.calculate_super_sift_points(SIFT_folder)
 		sp.remove_randomly()
