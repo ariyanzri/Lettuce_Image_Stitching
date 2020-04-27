@@ -2973,7 +2973,7 @@ class SuperPatch():
 			# print(st_x,st_y)
 			# print(p.size)
 			result[st_y:st_y+p.size[0],st_x:st_x+p.size[1],:] = p.rgb_img
-			cv2.rectangle(result,(st_x+1,st_y+1),(st_x+p.size[1]-1,st_y+p.size[0]-1),(0,0,255),20)
+			# cv2.rectangle(result,(st_x+1,st_y+1),(st_x+p.size[1]-1,st_y+p.size[0]-1),(0,0,255),20)
 			p.del_img()
 
 		result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
@@ -3388,7 +3388,7 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	# super_patches[1].correct_supper_patch_internally(SIFT_folder,patch_folder)
 	# super_patches[2].correct_supper_patch_internally(SIFT_folder,patch_folder)
 
-	# super_patches[2].correct_whole_based_on_super_patch(super_patches[1],SIFT_folder,patch_folder)
+	super_patches[2].correct_whole_based_on_super_patch(super_patches[1],SIFT_folder,patch_folder)
 	# super_patches[8].draw_super_patch(patch_folder,'new')
 
 	sp = create_supper_patch_parallel(super_patches[1].patches+super_patches[2].patches,1,SIFT_folder,patch_folder)
