@@ -3286,12 +3286,12 @@ def detect_rows(address):
 		patches_groups_by_rows[(round(min_row[0],7),round(min_row[1],7))].append(p)
 
 
-	patches_groups_by_rows_new = {}
-
+	patches_groups_by_rows_new = []
+	
 	for g in patches_groups_by_rows:
 		newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
 		
-		patches_groups_by_rows_new[g] = newlist[:4]
+		patches_groups_by_rows_new.append(newlist)
 
 	# print(len(patches_groups_by_rows))
 	# print(len(patches_groups_by_rows[g]))
@@ -3382,8 +3382,8 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	super_patches = []
 	args = []
 
-	for g in groups_by_rows:
-		args.append((groups_by_rows[g],g,SIFT_folder,patch_folder))
+	for g,grp in enumerate(groups_by_rows):
+		args.append((grp,g,SIFT_folder,patch_folder))
 
 	processes = multiprocessing.Pool(no_of_cores_to_use)
 	results = processes.map(create_supper_patch_parallel_helper,args)
@@ -3392,22 +3392,22 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	super_patches = results
 
 	# super_patches[8].draw_super_patch(patch_folder,'old')
-	super_patches[3].correct_supper_patch_internally(SIFT_folder,patch_folder)
-	super_patches[4].correct_supper_patch_internally(SIFT_folder,patch_folder)
+	# super_patches[3].correct_supper_patch_internally(SIFT_folder,patch_folder)
+	# super_patches[4].correct_supper_patch_internally(SIFT_folder,patch_folder)
 	
-	super_patches[3].upper_kp, super_patches[3].upper_desc, super_patches[3].lower_kp, super_patches[3].lower_desc = super_patches[3].calculate_super_sift_points(SIFT_folder)
-	super_patches[3].remove_randomly()
-	super_patches[4].upper_kp, super_patches[4].upper_desc, super_patches[4].lower_kp, super_patches[4].lower_desc = super_patches[4].calculate_super_sift_points(SIFT_folder)
-	super_patches[4].remove_randomly()
+	# super_patches[3].upper_kp, super_patches[3].upper_desc, super_patches[3].lower_kp, super_patches[3].lower_desc = super_patches[3].calculate_super_sift_points(SIFT_folder)
+	# super_patches[3].remove_randomly()
+	# super_patches[4].upper_kp, super_patches[4].upper_desc, super_patches[4].lower_kp, super_patches[4].lower_desc = super_patches[4].calculate_super_sift_points(SIFT_folder)
+	# super_patches[4].remove_randomly()
 
-	sp = create_supper_patch_parallel(super_patches[3].patches+super_patches[4].patches,1,SIFT_folder,patch_folder)
-	sp.draw_super_patch(patch_folder,'combine')
+	# sp = create_supper_patch_parallel(super_patches[3].patches+super_patches[4].patches,1,SIFT_folder,patch_folder)
+	# sp.draw_super_patch(patch_folder,'combine')
 
-	super_patches[4].correct_whole_based_on_super_patch(super_patches[3],SIFT_folder,patch_folder)
-	# super_patches[8].draw_super_patch(patch_folder,'new')
+	# super_patches[4].correct_whole_based_on_super_patch(super_patches[3],SIFT_folder,patch_folder)
+	# # super_patches[8].draw_super_patch(patch_folder,'new')
 
-	sp = create_supper_patch_parallel(super_patches[3].patches+super_patches[4].patches,1,SIFT_folder,patch_folder)
-	sp.draw_super_patch(patch_folder,'combine_n')
+	# sp = create_supper_patch_parallel(super_patches[3].patches+super_patches[4].patches,1,SIFT_folder,patch_folder)
+	# sp.draw_super_patch(patch_folder,'combine_n')
 
 	return super_patches
 
@@ -3443,8 +3443,10 @@ def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder):
 
 	sp = SuperPatch(g,patches,coord,SIFT_folder)
 	
-	# sp.correct_supper_patch_internally(SIFT_folder,patch_folder)
-	
+	sp.correct_supper_patch_internally(SIFT_folder,patch_folder)
+	sp.upper_kp, sp.upper_desc, sp.lower_kp, sp.lower_desc = sp.calculate_super_sift_points(SIFT_folder)
+	sp.remove_randomly()
+
 	print('Super patch for row {0} has been successfully created and revised internally. '.format(g))
 	sys.stdout.flush()
 
@@ -3640,7 +3642,7 @@ def main():
 		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 		
 		row_groups = detect_rows(coordinates_file)
-		generate_superpatches(row_groups,SIFT_folder,patch_folder)
+		generate_superpatches(row_groups[0:2],SIFT_folder,patch_folder)
 		# results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
 		# save_rows(row_groups,plot_npy_file)
 		# draw_rows(plot_npy_file)
