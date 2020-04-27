@@ -2898,25 +2898,25 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder,i):
 
 	matches = get_good_matches_for_horizontal(desc2,desc1,kp2,kp1,p1.size)
 	
-	p1.load_img(patch_folder)
-	p2.load_img(patch_folder)
+	# p1.load_img(patch_folder)
+	# p2.load_img(patch_folder)
 	# draw_matches(p2,p1,kp2,kp1,matches,i)
 
 	if len(matches)<3:
-		return
+		return None
 
 	H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
 	# print(round(percentage_inliers,2))
 
-	result,mse = stitch(p1.rgb_img,p2.rgb_img,p1.img,p2.img,H,overlap1)
-	result = cv2.resize(result,(int(result.shape[1]/5),int(result.shape[0]/5)))
-	cv2.imwrite('matches_{0}.bmp'.format(i),result)
+	# result,mse = stitch(p1.rgb_img,p2.rgb_img,p1.img,p2.img,H,overlap1)
+	# result = cv2.resize(result,(int(result.shape[1]/5),int(result.shape[0]/5)))
+	# cv2.imwrite('matches_{0}.bmp'.format(i),result)
 
 	coord = get_new_GPS_Coords(p1,p2,H)
 	if p1.GPS_coords.Center[1]-coord.Center[1]>abs(p1.GPS_coords.UL_coord[1]-p1.GPS_coords.LL_coord[1])/20:
-		return 
+		return None
 
-	p1.GPS_coords = coord
+	return coord
 
 def get_top_n_good_matches(desc1,desc2,kp1,kp2,n,size_patch):
 	bf = cv2.BFMatcher()
@@ -3066,7 +3066,10 @@ class SuperPatch():
 				prev_patch = p
 				continue
 
-			correct_horizontal_neighbors(p,prev_patch,SIFT_address,patch_folder,i)
+			coord = correct_horizontal_neighbors(p,prev_patch,SIFT_address,patch_folder,i)
+
+			if coord is not None:
+				p.GPS_coords = coord
 
 			prev_patch = p
 
@@ -3687,8 +3690,8 @@ def main():
 		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 		
 		row_groups = detect_rows(coordinates_file)
-		super_patches = generate_superpatches(row_groups[4:5],SIFT_folder,patch_folder)
-		# correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder)
+		super_patches = generate_superpatches(row_groups[3:5],SIFT_folder,patch_folder)
+		correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder)
 		# results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
 		# save_rows(row_groups,plot_npy_file)
 		# draw_rows(plot_npy_file)
