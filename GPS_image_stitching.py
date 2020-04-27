@@ -2893,7 +2893,7 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder):
 	kp1,desc1 = choose_SIFT_key_points(p1,overlap1[0],overlap1[1],overlap1[2],overlap1[3],SIFT_address)
 	kp2,desc2 = choose_SIFT_key_points(p2,overlap2[0],overlap2[1],overlap2[2],overlap2[3],SIFT_address)
 
-	matches = get_good_matches_for_horizontal(desc2,desc1,kp2,kp1,p1.size[0]/15)
+	matches = get_good_matches_for_horizontal(desc2,desc1,kp2,kp1,p1.size[0]/20)
 
 	if len(matches)<3:
 		return
@@ -3278,7 +3278,7 @@ def detect_rows(address):
 	for g in patches_groups_by_rows:
 		newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
 		
-		patches_groups_by_rows_new[g] = newlist[:2]
+		patches_groups_by_rows_new[g] = newlist[:7]
 
 	# print(len(patches_groups_by_rows))
 	# print(len(patches_groups_by_rows[g]))
@@ -3379,17 +3379,17 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	super_patches = results
 
 	# super_patches[8].draw_super_patch(patch_folder,'old')
-	# super_patches[1].correct_supper_patch_internally(SIFT_folder,patch_folder)
+	super_patches[1].correct_supper_patch_internally(SIFT_folder,patch_folder)
 	super_patches[2].correct_supper_patch_internally(SIFT_folder,patch_folder)
-	super_patches[2].draw_super_patch(patch_folder,'combine')
-	# sp = create_supper_patch_parallel(super_patches[1].patches+super_patches[2].patches,1,SIFT_folder,patch_folder)
-	# sp.draw_super_patch(patch_folder,'combine')
 
-	# super_patches[2].correct_whole_based_on_super_patch(super_patches[1],SIFT_folder,patch_folder)
+	sp = create_supper_patch_parallel(super_patches[1].patches+super_patches[2].patches,1,SIFT_folder,patch_folder)
+	sp.draw_super_patch(patch_folder,'combine')
+
+	super_patches[2].correct_whole_based_on_super_patch(super_patches[1],SIFT_folder,patch_folder)
 	# super_patches[8].draw_super_patch(patch_folder,'new')
 
-	# sp = create_supper_patch_parallel(super_patches[1].patches+super_patches[2].patches,1,SIFT_folder,patch_folder)
-	# sp.draw_super_patch(patch_folder,'combine_n')
+	sp = create_supper_patch_parallel(super_patches[1].patches+super_patches[2].patches,1,SIFT_folder,patch_folder)
+	sp.draw_super_patch(patch_folder,'combine_n')
 
 	return super_patches
 
