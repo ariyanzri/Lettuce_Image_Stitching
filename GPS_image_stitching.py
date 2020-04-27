@@ -2903,6 +2903,7 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder):
 
 	coord = get_new_GPS_Coords(p1,p2,H)
 	if p1.GPS_coords.Center[1]-coord.Center[1]>abs(p1.GPS_coords.UL_coord[1]-p1.GPS_coords.LL_coord[1]):
+		print('happen')
 		return 
 
 	p1.GPS_coords = coord
