@@ -2910,7 +2910,7 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder,i):
 
 	result,mse = stitch(p1.rgb_img,p2.rgb_img,p1.img,p2.img,H,overlap1)
 	result = cv2.resize(result,(int(result.shape[1]/5),int(result.shape[0]/5)))
-	cv2.imwrite('matches_{0}.bmp'.format(j),result)
+	cv2.imwrite('matches_{0}.bmp'.format(i),result)
 
 	coord = get_new_GPS_Coords(p1,p2,H)
 	if p1.GPS_coords.Center[1]-coord.Center[1]>abs(p1.GPS_coords.UL_coord[1]-p1.GPS_coords.LL_coord[1])/20:
