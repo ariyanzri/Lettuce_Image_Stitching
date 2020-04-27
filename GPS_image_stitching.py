@@ -2869,7 +2869,7 @@ def get_good_matches_for_horizontal(desc1,desc2,kp1,kp2,patch_size):
 
 	return matches
 
-def draw_matches(p1,p2,kp1,kp2,matches):
+def draw_matches(p1,p2,kp1,kp2,matches,i):
 	print(p1.size)
 	result = np.zeros((p1.size[0],p1.size[1]*2,3))
 	result[:,0:p1.size[1],:] = p1.rgb_img
@@ -2886,9 +2886,9 @@ def draw_matches(p1,p2,kp1,kp2,matches):
 		cv2.line(result,point_1,point_2,(0,0,255),2)
 		i+=1
 
-	cv2.imwrite('matches.bmp',result)
+	cv2.imwrite('matches_{0}.bmp'.format(i),result)
 
-def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder):
+def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder,i):
 	overlap1 = p1.get_overlap_rectangle(p2)
 	overlap2 = p2.get_overlap_rectangle(p1)
 	
@@ -2896,20 +2896,18 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder):
 	kp2,desc2 = choose_SIFT_key_points(p2,overlap2[0],overlap2[1],overlap2[2],overlap2[3],SIFT_address)
 
 	matches = get_good_matches_for_horizontal(desc2,desc1,kp2,kp1,p1.size)
+	draw_matches(p1,p2,kp1,kp2,matches,i)
 
 	if len(matches)<3:
-		print('not corrected')
 		return
 
 	H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
-	# print(round(percentage_inliers,2))
+	print(round(percentage_inliers,2))
 
 	coord = get_new_GPS_Coords(p1,p2,H)
 	if p1.GPS_coords.Center[1]-coord.Center[1]>abs(p1.GPS_coords.UL_coord[1]-p1.GPS_coords.LL_coord[1])/20:
-		print('not corrected')
 		return 
 
-	print('corrected')
 	p1.GPS_coords = coord
 
 def get_top_n_good_matches(desc1,desc2,kp1,kp2,n,size_patch):
@@ -3060,7 +3058,7 @@ class SuperPatch():
 				prev_patch = p
 				continue
 
-			correct_horizontal_neighbors(p,prev_patch,SIFT_address,patch_folder)
+			correct_horizontal_neighbors(p,prev_patch,SIFT_address,patch_folder,i)
 
 			prev_patch = p
 
@@ -3682,7 +3680,7 @@ def main():
 		
 		row_groups = detect_rows(coordinates_file)
 		super_patches = generate_superpatches(row_groups[3:5],SIFT_folder,patch_folder)
-		correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder)
+		# correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder)
 		# results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
 		# save_rows(row_groups,plot_npy_file)
 		# draw_rows(plot_npy_file)
