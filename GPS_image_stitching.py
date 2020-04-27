@@ -3095,7 +3095,7 @@ class SuperPatch():
 		kp2 = prev_super_patch.upper_kp
 		desc2 = prev_super_patch.upper_desc
 
-		matches = get_good_matches(desc2,desc1)
+		matches = get_top_n_good_matches(desc2,desc1,kp2,kp1,150000,19*(self.patches[0].size[0])/20)
 
 		H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
 
