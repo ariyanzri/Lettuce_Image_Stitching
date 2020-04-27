@@ -3366,6 +3366,9 @@ def draw_rows(path):
 
 def correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder):
 
+	spr = create_supper_patch_parallel([s.patches for s in super_patches],1,SIFT_folder,patch_folder)
+	spr.draw_super_patch(patch_folder,'combine')
+
 	prev_super_patch = None
 
 	for sp in super_patches:
@@ -3377,6 +3380,8 @@ def correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder):
 		sp.correct_whole_based_on_super_patch(prev_super_patch,SIFT_folder,patch_folder)
 
 
+	spr = create_supper_patch_parallel([s.patches for s in super_patches],1,SIFT_folder,patch_folder)
+	spr.draw_super_patch(patch_folder,'combine_new')
 
 def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	super_patches = []
@@ -3642,7 +3647,8 @@ def main():
 		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
 		
 		row_groups = detect_rows(coordinates_file)
-		generate_superpatches(row_groups[0:2],SIFT_folder,patch_folder)
+		super_patches = generate_superpatches(row_groups[0:2],SIFT_folder,patch_folder)
+		correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder)
 		# results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
 		# save_rows(row_groups,plot_npy_file)
 		# draw_rows(plot_npy_file)
