@@ -3037,7 +3037,7 @@ class SuperPatch():
 		self.recalculate_size_and_coords()
 	
 	def correct_all_patches_and_self_by_H(self,H,prev_super_patch):
-
+		print(H)
 		c1 = [0,0,1]
 		
 		c1 = H.dot(c1).astype(int)
