@@ -1026,9 +1026,6 @@ def Get_GPS_Error(H,ov_1_on_2,ov_2_on_1):
 
 def get_new_GPS_Coords(p1,p2,H):
 
-	rgb_img1 = p1.rgb_img
-	rgb_img2 = p2.rgb_img
-
 	c1 = [0,0,1]
 	
 	c1 = H.dot(c1).astype(int)
@@ -3037,35 +3034,20 @@ class SuperPatch():
 		self.recalculate_size_and_coords()
 	
 	def correct_all_patches_and_self_by_H(self,H,prev_super_patch):
-		
-		c1 = [0,0,1]
-		
-		c1 = H.dot(c1).astype(int)
-		
-		diff_x = -c1[0]
-		diff_y = -c1[1]
 
-		gps_scale_x = (prev_super_patch.patches[0].GPS_coords.UR_coord[0] - prev_super_patch.patches[0].GPS_coords.UL_coord[0])/(prev_super_patch.patches[0].size[1])
-		gps_scale_y = (prev_super_patch.patches[0].GPS_coords.LL_coord[1] - prev_super_patch.patches[0].GPS_coords.UL_coord[1])/(prev_super_patch.patches[0].size[0])
-
-		diff_x = diff_x*gps_scale_x
-		diff_y = diff_y*gps_scale_y
-
-		moved_point = (round(prev_super_patch.GPS_coords.UL_coord[0]-diff_x,7),round(prev_super_patch.GPS_coords.UL_coord[1]-diff_y,7))
-
-		diff_UL = (self.GPS_coords.UL_coord[0]-moved_point[0],self.GPS_coords.UL_coord[1]-moved_point[1])
+		new_coords = get_new_GPS_Coords(self,prev_super_patch,H)
+		diff_x = self.GPS_coords.UL_coord[0]-new_coords.UL_coord[0]
+		diff_y = self.GPS_coords.UL_coord[1]-new_coords.UL_coord[1]
 
 		for p in self.patches:
-			
-			new_UL = (p.GPS_coords.UR_coord[0]-diff_UL[0],p.GPS_coords.UR_coord[1]-diff_UL[1])
-			new_UR = (p.GPS_coords.UR_coord[0]-diff_UL[0],p.GPS_coords.UR_coord[1]-diff_UL[1])
-			new_LL = (p.GPS_coords.LL_coord[0]-diff_UL[0],p.GPS_coords.LL_coord[1]-diff_UL[1])
-			new_LR = (p.GPS_coords.LR_coord[0]-diff_UL[0],p.GPS_coords.LR_coord[1]-diff_UL[1])
-			new_center = (p.GPS_coords.Center[0]-diff_UL[0],p.GPS_coords.Center[1]-diff_UL[1])
+			new_UL = (p.GPS_coords.UL_coord[0]-diff_x,p.GPS_coords.UL_coord[1]-diff_y)
+			new_UR = (p.GPS_coords.UR_coord[0]-diff_x,p.GPS_coords.UR_coord[1]-diff_y)
+			new_LL = (p.GPS_coords.LL_coord[0]-diff_x,p.GPS_coords.LL_coord[1]-diff_y)
+			new_LR = (p.GPS_coords.LR_coord[0]-diff_x,p.GPS_coords.LR_coord[1]-diff_y)
+			new_center = (p.GPS_coords.Center[0]-diff_x,p.GPS_coords.Center[1]-diff_y)
 
-			new_coords = Patch_GPS_coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
-
-			p.GPS_coords = new_coords
+			new_p_coord = Patch_GPS_coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+			p.GPS_coords = new_p_coord
 
 		self.recalculate_size_and_coords()
 
