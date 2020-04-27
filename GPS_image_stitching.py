@@ -3400,7 +3400,7 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	return super_patches
 
 def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder):
-	if len(patches) != 2:
+	if g==1:
 		patches = patches[0:1]
 
 	up = patches[0].GPS_coords.UL_coord[1]
