@@ -3418,7 +3418,7 @@ def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder):
 
 	sp = SuperPatch(g,patches,coord,SIFT_folder)
 	
-	sp.correct_supper_patch_internally(SIFT_folder,patch_folder)
+	# sp.correct_supper_patch_internally(SIFT_folder,patch_folder)
 	
 	print('Super patch for row {0} has been successfully created and revised internally. '.format(g))
 	sys.stdout.flush()
