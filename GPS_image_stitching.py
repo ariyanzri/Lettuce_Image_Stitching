@@ -2958,7 +2958,7 @@ class SuperPatch():
 		self.GPS_coords = gps_coords
 		self.x_ratio_GPS_over_pixel = (list_patches[0].GPS_coords.UR_coord[0] - list_patches[0].GPS_coords.UL_coord[0])/list_patches[0].size[1]
 		self.y_ratio_GPS_over_pixel = (list_patches[0].GPS_coords.UL_coord[1] - list_patches[0].GPS_coords.LL_coord[1])/list_patches[0].size[0]
-
+		
 		self.size = (int((self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])/self.y_ratio_GPS_over_pixel),\
 			int((self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])/self.x_ratio_GPS_over_pixel))
 
@@ -2995,16 +2995,16 @@ class SuperPatch():
 		right = self.patches[0].GPS_coords.UR_coord[0]
 
 		for p in self.patches:
-			if p.GPS_coords.UL_coord[1]>up:
+			if p.GPS_coords.UL_coord[1]>=up:
 				up=p.GPS_coords.UL_coord[1]
 
-			if p.GPS_coords.LL_coord[1]<down:
+			if p.GPS_coords.LL_coord[1]<=down:
 				down=p.GPS_coords.LL_coord[1]
 
-			if p.GPS_coords.UL_coord[0]<left:
+			if p.GPS_coords.UL_coord[0]<=left:
 				left=p.GPS_coords.UL_coord[0]
 
-			if p.GPS_coords.UR_coord[0]>right:
+			if p.GPS_coords.UR_coord[0]>=right:
 				right=p.GPS_coords.UR_coord[0]
 
 		UL_coord = (left,up)
@@ -3397,16 +3397,16 @@ def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder):
 	right = patches[0].GPS_coords.UR_coord[0]
 
 	for p in patches:
-		if p.GPS_coords.UL_coord[1]>up:
+		if p.GPS_coords.UL_coord[1]>=up:
 			up=p.GPS_coords.UL_coord[1]
 
-		if p.GPS_coords.LL_coord[1]<down:
+		if p.GPS_coords.LL_coord[1]<=down:
 			down=p.GPS_coords.LL_coord[1]
 
-		if p.GPS_coords.UL_coord[0]<left:
+		if p.GPS_coords.UL_coord[0]<=left:
 			left=p.GPS_coords.UL_coord[0]
 
-		if p.GPS_coords.UR_coord[0]>right:
+		if p.GPS_coords.UR_coord[0]>=right:
 			right=p.GPS_coords.UR_coord[0]
 
 		# plt.scatter(p.GPS_coords.Center[0],p.GPS_coords.Center[1],color='green')
