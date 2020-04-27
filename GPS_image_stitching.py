@@ -3038,7 +3038,7 @@ class SuperPatch():
 		new_coords = get_new_GPS_Coords(self,prev_super_patch,H)
 		diff_x = self.GPS_coords.UL_coord[0]-new_coords.UL_coord[0]
 		diff_y = self.GPS_coords.UL_coord[1]-new_coords.UL_coord[1]
-
+		print(diff_x,diff_y)
 		for p in self.patches:
 			new_UL = (p.GPS_coords.UL_coord[0]-diff_x,p.GPS_coords.UL_coord[1]-diff_y)
 			new_UR = (p.GPS_coords.UR_coord[0]-diff_x,p.GPS_coords.UR_coord[1]-diff_y)
@@ -3077,9 +3077,6 @@ class SuperPatch():
 					prev_desc.append(desc2)
 					
 					matches.append(get_top_n_good_matches(desc2,desc1,kp2,kp1,100,19*(inner_p.size[0])/20))
-					draw_matches(prev_inner_p,inner_p,kp2,kp1,matches[-1])
-					break
-			break
 
 		H = calculate_homography_for_super_patches(prev_kp,prev_desc,kp,desc,matches)
 		
