@@ -1032,8 +1032,8 @@ def get_new_GPS_Coords(p1,p2,H):
 	
 	# print(c1)
 
-	diff_x = -c1[0]
-	diff_y = -c1[1]
+	diff_x = c1[0]
+	diff_y = c1[1]
 
 	gps_scale_x = (p2.GPS_coords.UR_coord[0] - p2.GPS_coords.UL_coord[0])/(p2.size[1])
 	gps_scale_y = (p2.GPS_coords.LL_coord[1] - p2.GPS_coords.UL_coord[1])/(p2.size[0])
@@ -3036,8 +3036,8 @@ class SuperPatch():
 	def correct_all_patches_and_self_by_H(self,H,prev_super_patch):
 
 		new_coords = get_new_GPS_Coords(self,prev_super_patch,H)
-		diff_x = self.GPS_coords.UL_coord[0]+new_coords.UL_coord[0]
-		diff_y = self.GPS_coords.UL_coord[1]+new_coords.UL_coord[1]
+		diff_x = self.GPS_coords.UL_coord[0]-new_coords.UL_coord[0]
+		diff_y = self.GPS_coords.UL_coord[1]-new_coords.UL_coord[1]
 
 		for p in self.patches:
 			new_UL = (p.GPS_coords.UL_coord[0]-diff_x,p.GPS_coords.UL_coord[1]-diff_y)
