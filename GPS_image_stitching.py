@@ -3058,7 +3058,7 @@ class SuperPatch():
 			p.GPS_coords = new_coords
 
 		self.recalculate_size_and_coords()
-		
+
 		
 
 	def correct_whole_based_on_super_patch(self,prev_super_patch,SIFT_folder,patch_folder):
@@ -3397,8 +3397,9 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	return super_patches
 
 def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder):
-	patches = patches[0:4]
-	
+	if len(patches) != 8:
+		patches = patches[0:4]
+
 	up = patches[0].GPS_coords.UL_coord[1]
 	down = patches[0].GPS_coords.LL_coord[1]
 	left = patches[0].GPS_coords.UL_coord[0]
