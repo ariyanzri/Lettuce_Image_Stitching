@@ -2907,7 +2907,7 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder):
 
 	p1.GPS_coords = coord
 
-def get_top_n_good_matches(desc1,desc2,kp1,kp2,n,diff_th):
+def get_top_n_good_matches(desc1,desc2,kp1,kp2,n,size_patch):
 	bf = cv2.BFMatcher()
 	matches = bf.knnMatch(desc1,desc2, k=2)
 
@@ -2916,7 +2916,7 @@ def get_top_n_good_matches(desc1,desc2,kp1,kp2,n,diff_th):
 		point_1 = kp1[m[0].queryIdx]
 		point_2 = kp2[m[0].trainIdx]
 
-		if m[0].distance < 0.8*m[1].distance:
+		if abs(point_1[1]-point_2[1]) >= diff_th and abs(point_1[0]-point_2[0]) <= diff_th and m[0].distance < 0.8*m[1].distance:
 			good.append(m)
 
 	sorted_matches = sorted(good, key=lambda x: x[0].distance)
@@ -2988,6 +2988,30 @@ class SuperPatch():
 		result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
 		cv2.imwrite('rows_{0}.bmp'.format(name_of),result)
 
+	def draw_super_patch_and_lines(self,matches,kp1,kp2,patch_folder,name_of):
+
+		result = np.zeros((self.size[0]+40,self.size[1]+40,3), np.uint8)
+
+		for p in self.patches:
+			p.load_img(patch_folder)
+			x_diff = p.GPS_coords.UL_coord[0] - self.GPS_coords.UL_coord[0]
+			y_diff = self.GPS_coords.UL_coord[1] - p.GPS_coords.UL_coord[1]
+			st_x = int(x_diff/self.x_ratio_GPS_over_pixel)
+			st_y = int(y_diff/self.y_ratio_GPS_over_pixel)
+			result[st_y:st_y+p.size[0],st_x:st_x+p.size[1],:] = p.rgb_img
+
+			for m in matches[:,0]:
+			
+				point_1 = kp1[m.queryIdx]
+				point_2 = kp2[m.trainIdx]
+				point_1 = (int(point_1[0]),int(point_1[1]))
+				point_2 = (int(point_2[0]),int(point_2[1]))
+				cv2.line(result,point_1,point_2,(0,0,255),2)
+
+			p.del_img()
+
+		result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
+		cv2.imwrite('rows_{0}.bmp'.format(name_of),result)
 
 	def recalculate_size_and_coords(self):
 		up = self.patches[0].GPS_coords.UL_coord[1]
@@ -3097,9 +3121,11 @@ class SuperPatch():
 
 		matches = get_top_n_good_matches(desc2,desc1,kp2,kp1,150000,19*(self.patches[0].size[0])/20)
 
-		H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
+		self.draw_super_patch_and_lines(matches,kp1,kp2,patch_folder,'lines')
+		
+		# H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
 
-		self.correct_all_patches_and_self_by_H(H,prev_super_patch)
+		# self.correct_all_patches_and_self_by_H(H,prev_super_patch)
 
 	def remove_randomly(self):
 		upper_indexes = range(0,np.shape(self.upper_desc)[0])
@@ -3380,8 +3406,8 @@ def correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder):
 		sp.correct_whole_based_on_super_patch(prev_super_patch,SIFT_folder,patch_folder)
 
 
-	spr = create_supper_patch_parallel(super_patches[0].patches+super_patches[1].patches,1,SIFT_folder,patch_folder)
-	spr.draw_super_patch(patch_folder,'combine_new')
+	# spr = create_supper_patch_parallel(super_patches[0].patches+super_patches[1].patches,1,SIFT_folder,patch_folder)
+	# spr.draw_super_patch(patch_folder,'combine_new')
 
 def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	super_patches = []
