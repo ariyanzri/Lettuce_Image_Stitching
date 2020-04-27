@@ -2908,7 +2908,7 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder,i):
 	H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
 	# print(round(percentage_inliers,2))
 
-	result = stitch(p1.rgb_img,p2.rgb_img,p1.img,p2.img,H,overlap1)
+	result,mse = stitch(p1.rgb_img,p2.rgb_img,p1.img,p2.img,H,overlap1)
 	result = cv2.resize(result,(int(result.shape[1]/5),int(result.shape[0]/5)))
 	cv2.imwrite('matches_{0}.bmp'.format(j),result)
 
