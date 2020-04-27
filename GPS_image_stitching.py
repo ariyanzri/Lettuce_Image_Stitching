@@ -2885,7 +2885,7 @@ def draw_matches(p1,p2,kp1,kp2,matches,j):
 		point_2 = (int(point_2[0])+p1.size[1],int(point_2[1]))
 		cv2.line(result,point_1,point_2,(0,0,255),2)
 		cv2.circle(result,point_1,10,(0,255,0),thickness=-1)
-		cv2.circle(result,point_1,10,(255,0,0),thickness=-1)
+		cv2.circle(result,point_2,10,(255,0,0),thickness=-1)
 		i+=1
 
 	result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
