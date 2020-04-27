@@ -3069,7 +3069,7 @@ class SuperPatch():
 				if inner_p.has_overlap(prev_inner_p) or prev_inner_p.has_overlap(inner_p):
 					overlap1 = inner_p.get_overlap_rectangle(prev_inner_p)
 					overlap2 = prev_inner_p.get_overlap_rectangle(inner_p)
-					
+					print(overlap1)
 					if overlap1[2]-overlap1[0]<inner_p.size[1]/5 and overlap1[3]-overlap1[1]<inner_p.size[0]/5:
 
 						continue
