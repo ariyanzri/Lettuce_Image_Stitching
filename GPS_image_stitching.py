@@ -2870,7 +2870,7 @@ def get_good_matches_for_horizontal(desc1,desc2,kp1,kp2,patch_size):
 	return matches
 
 def draw_matches(p1,p2,kp1,kp2,matches,i):
-	print(p1.size)
+	
 	result = np.zeros((p1.size[0],p1.size[1]*2,3))
 	result[:,0:p1.size[1],:] = p1.rgb_img
 	result[:,p1.size[1]:p1.size[1]*2,:] = p2.rgb_img
@@ -2896,7 +2896,7 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder,i):
 	kp2,desc2 = choose_SIFT_key_points(p2,overlap2[0],overlap2[1],overlap2[2],overlap2[3],SIFT_address)
 
 	matches = get_good_matches_for_horizontal(desc2,desc1,kp2,kp1,p1.size)
-	draw_matches(p1,p2,kp1,kp2,matches,i)
+	draw_matches(p2,p1,kp2,kp1,matches,i)
 
 	if len(matches)<3:
 		return
