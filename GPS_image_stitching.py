@@ -3096,7 +3096,7 @@ class SuperPatch():
 					
 					matches.append(get_top_n_good_matches(desc1,desc2,kp1,kp2,100,19*(inner_p.size[0])/20))
 
-		H = calculate_homography_for_super_patches(prev_kp,prev_desc,kp,desc,matches)
+		H = calculate_homography_for_super_patches(kp,desc,prev_kp,prev_desc,matches)
 		
 		self.correct_all_patches_and_self_by_H(H,prev_super_patch)
 
@@ -3398,13 +3398,13 @@ def generate_superpatches(groups_by_rows,SIFT_folder,patch_folder):
 	# super_patches[1].correct_supper_patch_internally(SIFT_folder,patch_folder)
 	# super_patches[2].correct_supper_patch_internally(SIFT_folder,patch_folder)
 
-	sp = create_supper_patch_parallel(super_patches[1].patches+super_patches[2].patches,1,SIFT_folder,patch_folder)
+	sp = create_supper_patch_parallel(super_patches[0].patches+super_patches[1].patches,1,SIFT_folder,patch_folder)
 	sp.draw_super_patch(patch_folder,'combine')
 
-	super_patches[2].correct_whole_based_on_super_patch(super_patches[1],SIFT_folder,patch_folder)
+	super_patches[1].correct_whole_based_on_super_patch(super_patches[0],SIFT_folder,patch_folder)
 	# super_patches[8].draw_super_patch(patch_folder,'new')
 
-	sp = create_supper_patch_parallel(super_patches[1].patches+super_patches[2].patches,1,SIFT_folder,patch_folder)
+	sp = create_supper_patch_parallel(super_patches[0].patches+super_patches[1].patches,1,SIFT_folder,patch_folder)
 	sp.draw_super_patch(patch_folder,'combine_n')
 
 	return super_patches
