@@ -101,6 +101,8 @@ class Field:
 
 		center_of_rows = sorted(center_of_rows, key=lambda x: x[1])
 
+		print(len(center_of_rows))
+
 		for c in center_of_rows:
 			patches_groups_by_rows[c] = []
 
