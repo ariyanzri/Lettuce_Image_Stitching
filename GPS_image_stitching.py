@@ -2972,7 +2972,7 @@ class SuperPatch():
 		self.row_number = row_n
 		self.patches = list_patches
 		for p in self.patches:
-			(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_address,patch.name.replace('.tif','')), "rb"))
+			(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_folder,p.name.replace('.tif','')), "rb"))
 			p.SIFT_kp_locations = kp_tmp
 			p.SIFT_kp_desc = desc_tmp
 
