@@ -16,6 +16,7 @@ PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
 NUMBER_OF_ROWS_IN_GROUPS = 10
+STIRDE_IN_GROUPS = 1
 
 class GPS_Coordinate:
 	
@@ -54,7 +55,7 @@ class Field:
 		while len(groups)*NUMBER_OF_ROWS_IN_GROUPS<len(rows):
 			
 			iterator = len(groups)
-			row_window = rows[iterator*NUMBER_OF_ROWS_IN_GROUPS:(iterator+1)*NUMBER_OF_ROWS_IN_GROUPS]
+			row_window = rows[iterator*NUMBER_OF_ROWS_IN_GROUPS:iterator*NUMBER_OF_ROWS_IN_GROUPS+(NUMBER_OF_ROWS_IN_GROUPS-STIRDE_IN_GROUPS)]
 			group = Group(row_window)
 			groups.append(group)
 
@@ -154,7 +155,7 @@ def visualize_plot(path):
 	for d in data:
 		c.append('red' if d[2] == 1 else 'green')
 
-	plt.scatter(data[:,0],data[:,1],color=c)
+	plt.scatter(data[:,0],data[:,1],color=c,alpha=0.5)
 
 	plt.show()
 
