@@ -91,7 +91,7 @@ class Field:
 				is_new = True
 
 				for c in center_of_rows:
-					if abs(center[1]-c[1]) < PATCH_SIZE_GPS[1]/HEIGHT_RATIO_FOR_ROW_SEPARATION:
+					if abs(center[1]-c[1]) < PATCH_SIZE_GPS[1]*HEIGHT_RATIO_FOR_ROW_SEPARATION:
 						is_new = False
 
 				if is_new:
@@ -100,8 +100,6 @@ class Field:
 		patches_groups_by_rows = {}
 
 		center_of_rows = sorted(center_of_rows, key=lambda x: x[1])
-
-		print(len(center_of_rows))
 
 		for c in center_of_rows:
 			patches_groups_by_rows[c] = []
