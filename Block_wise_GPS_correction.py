@@ -630,6 +630,7 @@ def main():
 	if server == 'coge':
 		print('RUNNING ON -- {0} --'.format(server))
 		field = Field()
+		field.groups[0].load_all_patches_SIFT_points()
 		field.groups[0].pre_calculate_internal_neighbors_and_transformation_parameters()
 		# field.save_plot()
 
