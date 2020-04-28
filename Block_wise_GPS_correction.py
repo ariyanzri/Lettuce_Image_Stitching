@@ -625,7 +625,7 @@ def main():
 
 	if server == 'coge':
 		print('RUNNING ON -- {0} --'.format(server))
-		field = Field(coordinates_file)
+		field = Field()
 		field.save_plot(plot_npy_file)
 
 
