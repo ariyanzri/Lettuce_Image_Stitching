@@ -59,9 +59,9 @@ def choose_SIFT_key_points(patch,x1,y1,x2,y2,SIFT_address,show=False):
 	kp = []
 	desc = []
 
-	(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_address,patch.name.replace('.tif','')), "rb"))
-	# kp_tmp = patch.SIFT_kp_locations
-	# desc_tmp = patch.SIFT_kp_desc
+	# (kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_address,patch.name.replace('.tif','')), "rb"))
+	kp_tmp = patch.SIFT_kp_locations
+	desc_tmp = patch.SIFT_kp_desc
 
 	for i,k in enumerate(kp_tmp):
 		if k[0]>= x1 and k[0]<=x2 and k[1]>=y1 and k[1]<=y2:
@@ -2971,6 +2971,11 @@ class SuperPatch():
 	def __init__(self,row_n,list_patches,gps_coords,SIFT_folder):
 		self.row_number = row_n
 		self.patches = list_patches
+		for p in self.patches:
+			(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_address,patch.name.replace('.tif','')), "rb"))
+			p.SIFT_kp_locations = kp_tmp
+			p.SIFT_kp_desc = desc_tmp
+
 		self.GPS_coords = gps_coords
 		self.x_ratio_GPS_over_pixel = (list_patches[0].GPS_coords.UR_coord[0] - list_patches[0].GPS_coords.UL_coord[0])/list_patches[0].size[1]
 		self.y_ratio_GPS_over_pixel = (list_patches[0].GPS_coords.UL_coord[1] - list_patches[0].GPS_coords.LL_coord[1])/list_patches[0].size[0]
@@ -3099,51 +3104,51 @@ class SuperPatch():
 
 	def correct_whole_based_on_super_patch(self,prev_super_patch,SIFT_folder,patch_folder):
 
-		matches = []
-		kp = []
-		desc = []
-		prev_kp = []
-		prev_desc = []
+		# matches = []
+		# kp = []
+		# desc = []
+		# prev_kp = []
+		# prev_desc = []
 
-		for inner_p in self.patches:
+		# for inner_p in self.patches:
 			
-			for prev_inner_p in prev_super_patch.patches:
-				if inner_p.has_overlap(prev_inner_p) or prev_inner_p.has_overlap(inner_p):
-					overlap1 = inner_p.get_overlap_rectangle(prev_inner_p)
-					overlap2 = prev_inner_p.get_overlap_rectangle(inner_p)
+		# 	for prev_inner_p in prev_super_patch.patches:
+		# 		if inner_p.has_overlap(prev_inner_p) or prev_inner_p.has_overlap(inner_p):
+		# 			overlap1 = inner_p.get_overlap_rectangle(prev_inner_p)
+		# 			overlap2 = prev_inner_p.get_overlap_rectangle(inner_p)
 					
-					# if overlap1[2]-overlap1[0]<inner_p.size[1]/2:
-					# 	continue
+		# 			# if overlap1[2]-overlap1[0]<inner_p.size[1]/2:
+		# 			# 	continue
 
-					kp1,desc1 = choose_SIFT_key_points(inner_p,overlap1[0],overlap1[1],overlap1[2],overlap1[3],SIFT_folder)
-					kp2,desc2 = choose_SIFT_key_points(prev_inner_p,overlap2[0],overlap2[1],overlap2[2],overlap2[3],SIFT_folder)
+		# 			kp1,desc1 = choose_SIFT_key_points(inner_p,overlap1[0],overlap1[1],overlap1[2],overlap1[3],SIFT_folder)
+		# 			kp2,desc2 = choose_SIFT_key_points(prev_inner_p,overlap2[0],overlap2[1],overlap2[2],overlap2[3],SIFT_folder)
 
-					kp.append(kp1)
-					desc.append(desc1)
-					prev_kp.append(kp2)
-					prev_desc.append(desc2)
+		# 			kp.append(kp1)
+		# 			desc.append(desc1)
+		# 			prev_kp.append(kp2)
+		# 			prev_desc.append(desc2)
 					
-					matches.append(get_top_n_good_matches(desc2,desc1,kp2,kp1,3000,inner_p.size))
+		# 			matches.append(get_top_n_good_matches(desc2,desc1,kp2,kp1,3000,inner_p.size))
 
-		H = calculate_homography_for_super_patches(prev_kp,prev_desc,kp,desc,matches)
+		# H = calculate_homography_for_super_patches(prev_kp,prev_desc,kp,desc,matches)
 		
-		self.correct_all_patches_and_self_by_H(H,prev_super_patch)
-
-		# overlap1 = self.get_overlap_rectangle(prev_super_patch)
-		# overlap2 = prev_super_patch.get_overlap_rectangle(self)
-		
-		# kp1 = self.lower_kp
-		# desc1 = self.lower_desc
-		# kp2 = prev_super_patch.upper_kp
-		# desc2 = prev_super_patch.upper_desc
-
-		# matches = get_top_n_good_matches(desc2,desc1,kp2,kp1,150000,self.patches[0].size)
-
-		# # self.draw_super_patch_and_lines(matches,kp1,kp2,patch_folder,'lines')
-
-		# H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
-
 		# self.correct_all_patches_and_self_by_H(H,prev_super_patch)
+
+		overlap1 = self.get_overlap_rectangle(prev_super_patch)
+		overlap2 = prev_super_patch.get_overlap_rectangle(self)
+		
+		kp1 = self.lower_kp
+		desc1 = self.lower_desc
+		kp2 = prev_super_patch.upper_kp
+		desc2 = prev_super_patch.upper_desc
+
+		matches = get_top_n_good_matches(desc2,desc1,kp2,kp1,150000,self.patches[0].size)
+
+		# self.draw_super_patch_and_lines(matches,kp1,kp2,patch_folder,'lines')
+
+		H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
+
+		self.correct_all_patches_and_self_by_H(H,prev_super_patch)
 
 	def remove_randomly(self):
 		upper_indexes = range(0,np.shape(self.upper_desc)[0])
