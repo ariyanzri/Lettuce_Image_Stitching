@@ -2900,9 +2900,9 @@ def correct_horizontal_neighbors(p1,p2,SIFT_address,patch_folder,i):
 
 	matches = get_good_matches_for_horizontal(desc2,desc1,kp2,kp1,p1.size)
 	
-	p1.load_img(patch_folder)
-	p2.load_img(patch_folder)
-	draw_matches(p2,p1,kp2,kp1,matches,i)
+	# p1.load_img(patch_folder)
+	# p2.load_img(patch_folder)
+	# draw_matches(p2,p1,kp2,kp1,matches,i)
 
 	if len(matches)<3:
 		return None
@@ -3335,7 +3335,7 @@ def detect_rows(address):
 	for g in patches_groups_by_rows:
 		newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.GPS_coords.Center[0], reverse=False)
 		
-		patches_groups_by_rows_new.append(newlist[0:10])
+		patches_groups_by_rows_new.append(newlist)
 
 	# print(len(patches_groups_by_rows))
 	# print(len(patches_groups_by_rows[g]))
@@ -3696,7 +3696,7 @@ def main():
 		
 		row_groups = detect_rows(coordinates_file)
 		super_patches = generate_superpatches(row_groups[3:5],SIFT_folder,patch_folder)
-		# correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder)
+		correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder)
 		# results = generate_superpatches_and_correct_GPS(row_groups,SIFT_folder)
 		# save_rows(row_groups,plot_npy_file)
 		# draw_rows(plot_npy_file)
