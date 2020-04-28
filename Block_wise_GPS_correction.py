@@ -630,7 +630,8 @@ def main():
 	if server == 'coge':
 		print('RUNNING ON -- {0} --'.format(server))
 		field = Field()
-		field.save_plot()
+		field.groups[0].pre_calculate_internal_neighbors_and_transformation_parameters()
+		# field.save_plot()
 
 
 	elif server == 'laplace.cs.arizona.edu':
