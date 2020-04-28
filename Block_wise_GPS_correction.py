@@ -481,7 +481,7 @@ class Field:
 			
 			iterator = len(groups)
 			indicator = 0 if iterator == 0 else 1
-			row_window = rows[iterator*NUMBER_OF_ROWS_IN_GROUPS-1*(indicator):(iterator+1)*NUMBER_OF_ROWS_IN_GROUPS]
+			row_window = rows[iterator*NUMBER_OF_ROWS_IN_GROUPS-1*(indicator):(iterator+1)*NUMBER_OF_ROWS_IN_GROUPS-1*(indicator)]
 			group = Group(iterator,row_window)
 			groups.append(group)
 
