@@ -137,7 +137,7 @@ class Field:
 			else:
 				color = 0
 
-			for row in g.rows:
+			for row in group.rows:
 				for p in row:
 					result.append([p.gps.Center[0],p.gps.Center[1],color])
 		
