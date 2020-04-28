@@ -631,16 +631,14 @@ def main():
 
 	if server == 'coge':
 		print('RUNNING ON -- {0} --'.format(server))
-		field = Field()
-		field.groups[0].load_all_patches_SIFT_points()
-		field.groups[0].pre_calculate_internal_neighbors_and_transformation_parameters()
-		# field.save_plot()
-
+		
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
-		os.system("taskset -p -c 1,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,44,45,46 %d" % os.getpid())
-
+		os.system("taskset -p -c 1,2,3,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,44,45,46 %d" % os.getpid())
+		field = Field()
+		field.groups[0].load_all_patches_SIFT_points()
+		field.groups[0].pre_calculate_internal_neighbors_and_transformation_parameters()
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
