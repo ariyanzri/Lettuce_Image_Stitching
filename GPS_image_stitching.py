@@ -3502,8 +3502,8 @@ def create_supper_patch_parallel(patches,g,SIFT_folder,patch_folder,not_revise_i
 		sp.correct_supper_patch_internally(SIFT_folder,patch_folder)
 		# sp.draw_super_patch(patch_folder,'after_{0}'.format(g))
 
-		# sp.upper_kp, sp.upper_desc, sp.lower_kp, sp.lower_desc = sp.calculate_super_sift_points(SIFT_folder)
-		# sp.remove_randomly()
+		sp.upper_kp, sp.upper_desc, sp.lower_kp, sp.lower_desc = sp.calculate_super_sift_points(SIFT_folder)
+		sp.remove_randomly()
 
 	print('Super patch for row {0} has been successfully created and revised internally. '.format(g))
 	sys.stdout.flush()
@@ -3711,7 +3711,7 @@ def main():
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
-		os.system("taskset -p -c 1,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,30,31,32,33,34,35,36,37,38,39,44,45,46 %d" % os.getpid())
+		os.system("taskset -p -c 1,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,44,45,46 %d" % os.getpid())
 		# lids = get_lids(lid_file)
 		# groups = get_groups_and_patches_with_lids(patch_folder,coordinates_file,SIFT_folder,lids)
 		# results = correct_GPS_MST_groups(groups,SIFT_folder,patch_folder)
