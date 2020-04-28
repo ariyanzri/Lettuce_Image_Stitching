@@ -54,7 +54,8 @@ class Field:
 		while len(groups)*NUMBER_OF_ROWS_IN_GROUPS<len(rows):
 			
 			iterator = len(groups)
-			row_window = rows[iterator*NUMBER_OF_ROWS_IN_GROUPS-1*(iterator):(iterator+1)*NUMBER_OF_ROWS_IN_GROUPS]
+			indicator = 0 if iterator == 0 else 1
+			row_window = rows[iterator*NUMBER_OF_ROWS_IN_GROUPS-1*(indicator):(iterator+1)*NUMBER_OF_ROWS_IN_GROUPS]
 			group = Group(row_window)
 			groups.append(group)
 
