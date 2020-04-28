@@ -401,7 +401,7 @@ class Patch:
 
 		num_matches = len(matches)
 
-		H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2,False)
+		H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2)
 
 		if H is None:
 			
@@ -428,6 +428,8 @@ class Group:
 	def load_all_patches_SIFT_points(self):
 		for p in self.patches:
 			p.load_SIFT_points()
+
+		print('SIFT for all patches in group {0} loaded.'.format(self.group_id))
 
 
 	def pre_calculate_internal_neighbors_and_transformation_parameters(self):
