@@ -3079,8 +3079,7 @@ class SuperPatch():
 				p.GPS_coords = coord
 
 			prev_patch = p
-			print('SuperPatch {0}: patch {1} revised.'.format(self.row_number,i))
-
+			
 		self.recalculate_size_and_coords()
 	
 	def correct_all_patches_and_self_by_H(self,H,prev_super_patch):
