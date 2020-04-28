@@ -3079,7 +3079,7 @@ class SuperPatch():
 				p.GPS_coords = coord
 
 			prev_patch = p
-			
+
 		self.recalculate_size_and_coords()
 	
 	def correct_all_patches_and_self_by_H(self,H,prev_super_patch):
@@ -3711,11 +3711,15 @@ def main():
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
-		os.system("taskset -p -c 6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,44,45,46 %d" % os.getpid())
-		lids = get_lids(lid_file)
-		groups = get_groups_and_patches_with_lids(patch_folder,coordinates_file,SIFT_folder,lids)
-		results = correct_GPS_MST_groups(groups,SIFT_folder,patch_folder)
-		save_coordinates_from_string(results,CORRECTED_coordinates_file)
+		os.system("taskset -p -c 1,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,26,28,29,30,31,32,33,34,35,36,37,38,39,44,45,46 %d" % os.getpid())
+		# lids = get_lids(lid_file)
+		# groups = get_groups_and_patches_with_lids(patch_folder,coordinates_file,SIFT_folder,lids)
+		# results = correct_GPS_MST_groups(groups,SIFT_folder,patch_folder)
+		# save_coordinates_from_string(results,CORRECTED_coordinates_file)
+		row_groups = detect_rows(coordinates_file)
+		super_patches = generate_superpatches(row_groups[3:5],SIFT_folder,patch_folder)
+		correct_supperpatches_iteratively(super_patches,SIFT_folder,patch_folder)
+
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
