@@ -3723,7 +3723,7 @@ def main():
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
-		# patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
+		patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
 		# patches[0].GPS_Corrected = True
 		
 		# results = correct_GPS_MST_groups({'131':patches},SIFT_folder,patch_folder)
@@ -3733,8 +3733,10 @@ def main():
 		# patches = read_all_data()
 		# final_patches = stitch_based_on_corrected_GPS(patches,True)
 		# show_and_save_final_patches(final_patches)
-
-		draw_rows(plot_npy_file)
+		print(patches[0].GPS_coords)
+		print(patches[1].GPS_coords.UL_coord[1]-patches[1].GPS_coords.LL_coord[1])
+		print(patches[1].GPS_coords.UR_coord[0]-patches[1].GPS_coords.UL_coord[0])
+		# draw_rows(plot_npy_file)
 		
 
 	# patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
