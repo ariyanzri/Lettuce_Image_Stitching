@@ -175,6 +175,55 @@ def get_dissimilarity_on_overlaps(p1,p2,H,ov1,ov2):
 
 	return dissimilarity
 
+def visualize_plot():
+	global plot_npy_file
+	import matplotlib.pyplot as plt
+
+	plt.axis('equal')
+
+	data = np.load(plot_npy_file)
+
+	c = []
+	for d in data:
+		c.append('red' if d[2] == 1 else 'green')
+
+	plt.scatter(data[:,0],data[:,1],color=c,alpha=0.5)
+
+	plt.show()
+
+def report_time(start,end):
+	print('-----------------------------------------------------------')
+	print('Start date time: {0}\nEnd date time: {1}\nTotal running time: {2}.'.format(start,end,end-start))
+
+def get_new_GPS_Coords(p1,p2,H):
+
+	c1 = [0,0,1]
+	
+	c1 = H.dot(c1).astype(int)
+
+	diff_x = -c1[0]
+	diff_y = -c1[1]
+
+	gps_scale_x = (PATCH_SIZE_GPS[0])/(PATCH_SIZE[1])
+	gps_scale_y = -(PATCH_SIZE_GPS[1])/(PATCH_SIZE[0])
+
+	diff_x = diff_x*gps_scale_x
+	diff_y = diff_y*gps_scale_y
+
+	new_UL = (round(p2.gps.UL_coord[0]-diff_x,7),round(p2.gps.UL_coord[1]-diff_y,7))
+
+	diff_UL = (p1.gps.UL_coord[0]-new_UL[0],p1.gps.UL_coord[1]-new_UL[1])
+
+	new_UR = (p1.gps.UR_coord[0]-diff_UL[0],p1.gps.UR_coord[1]-diff_UL[1])
+	new_LL = (p1.gps.LL_coord[0]-diff_UL[0],p1.gps.LL_coord[1]-diff_UL[1])
+	new_LR = (p1.gps.LR_coord[0]-diff_UL[0],p1.gps.LR_coord[1]-diff_UL[1])
+	new_center = (p1.gps.Center[0]-diff_UL[0],p1.GPS_coords.Center[1]-diff_UL[1])
+
+	new_coords = Patch_GPS_coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+
+	return new_coords
+
+
 class GPS_Coordinate:
 	
 	def __init__(self,UL_coord,UR_coord,LL_coord,LR_coord,Center):
@@ -189,6 +238,8 @@ class GPS_Coordinate:
 			return True
 		else:
 			return False
+
+
 
 class Graph():
 
@@ -206,19 +257,18 @@ class Graph():
 		
 		for p in patches:
 			for n in p.neighbors:
-				# print(p in [ne[0] for ne in n[0].neighbors])
-
+				
 				if self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]] == -1:
-					self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]] = round(n[7],2)
-					self.edges[self.vertex_name_to_index_dict[n[0].name]][self.vertex_name_to_index_dict[p.name]] =  round(n[7],2)
+					self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]] = round(n[1].dissimilarity,2)
+					self.edges[self.vertex_name_to_index_dict[n[0].name]][self.vertex_name_to_index_dict[p.name]] =  round(n[1].dissimilarity,2)
 				else:
-					if n[7] > self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]]:
-						self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]] = round(n[7],2)
-						self.edges[self.vertex_name_to_index_dict[n[0].name]][self.vertex_name_to_index_dict[p.name]] = round(n[7],2)
+					if n[1].dissimilarity > self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]]:
+						self.edges[self.vertex_name_to_index_dict[p.name]][self.vertex_name_to_index_dict[n[0].name]] = round(n[1].dissimilarity,2)
+						self.edges[self.vertex_name_to_index_dict[n[0].name]][self.vertex_name_to_index_dict[p.name]] = round(n[1].dissimilarity,2)
 
 
 	def find_min_key(self,keys,mstSet):
-		min_value = sys.maxsize
+		min_value = 1
 
 		for v in range(self.vertecis_number): 
 			if keys[v] < min_value and mstSet[v] == False: 
@@ -229,7 +279,7 @@ class Graph():
 
 
 	def generate_MST_prim(self,starting_vertex):
-		keys = [sys.maxsize]*self.vertecis_number
+		keys = [1]*self.vertecis_number
 		parents = [None]*self.vertecis_number
 		mstSet = [False]*self.vertecis_number
 
@@ -275,16 +325,10 @@ class Graph():
 
 					patch = dict_patches[self.vertex_index_to_name_dict[v]]
 					parent_patch = dict_patches[self.vertex_index_to_name_dict[p]]
-					H = [n[3] for n in parent_patch.neighbors if n[0] == patch]
+					H = [n[1].H for n in parent_patch.neighbors if n[0] == patch]
 					H = H[0]
 
 					patch.gps = get_new_GPS_Coords(patch,parent_patch,H)
-					patch.GPS_Corrected = True
-
-		string_corrected = get_corrected_string(patches)
-		return string_corrected
-
-
 
 
 class Neighbor_Parameters:
@@ -296,6 +340,8 @@ class Neighbor_Parameters:
 		self.num_matches = nm
 		self.percentage_inliers = pi
 		self.dissimilarity = d
+
+
 
 class Patch:
 	
@@ -417,6 +463,8 @@ class Patch:
 
 		return Neighbor_Parameters(overlap2,overlap1,H,num_matches,percentage_inliers,dissimilarity)
 
+
+
 class Group:
 	def __init__(self,gid,rows):
 		self.group_id = gid
@@ -434,7 +482,7 @@ class Group:
 
 	def pre_calculate_internal_neighbors_and_transformation_parameters(self):
 		remove_neighbors = []
-		
+
 		for p in self.patches:
 
 			for n in self.patches:
@@ -463,7 +511,16 @@ class Group:
 
 
 	def correct_internally(self):
-		pass
+		
+		self.load_all_patches_SIFT_points()
+		self.pre_calculate_internal_neighbors_and_transformation_parameters()
+
+		G = Graph(len(self.patches),[p.name for p in self.patches])
+		G.initialize_edge_weights(self.patches)
+
+		parents = G.generate_MST_prim(self.rows[0][0].name)
+		G.revise_GPS_from_generated_MST(self.patches,parents)
+
 
 
 class Field:
@@ -584,21 +641,7 @@ class Field:
 
 
 
-def visualize_plot():
-	global plot_npy_file
-	import matplotlib.pyplot as plt
 
-	plt.axis('equal')
-
-	data = np.load(plot_npy_file)
-
-	c = []
-	for d in data:
-		c.append('red' if d[2] == 1 else 'green')
-
-	plt.scatter(data[:,0],data[:,1],color=c,alpha=0.5)
-
-	plt.show()
 
 def main():
 	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path
@@ -636,18 +679,21 @@ def main():
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
 		os.system("taskset -p -c 1,2,3,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,44,45,46 %d" % os.getpid())
+		
 		field = Field()
-		field.groups[0].load_all_patches_SIFT_points()
-		field.groups[0].pre_calculate_internal_neighbors_and_transformation_parameters()
+
+		field.save_plot()
+
+		field.groups[0].correct_internally()
+
+		field.save_plot()
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
 		visualize_plot()
 
 
-def report_time(start,end):
-	print('-----------------------------------------------------------')
-	print('Start date time: {0}\nEnd date time: {1}\nTotal running time: {2}.'.format(start,end,end-start))
+
 
 server_core = {'coge':64,'laplace.cs.arizona.edu':20,'ariyan':4}
 
