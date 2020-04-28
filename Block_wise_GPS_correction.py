@@ -626,7 +626,7 @@ def main():
 	if server == 'coge':
 		print('RUNNING ON -- {0} --'.format(server))
 		field = Field()
-		field.save_plot(plot_npy_file)
+		field.save_plot()
 
 
 	elif server == 'laplace.cs.arizona.edu':
@@ -636,7 +636,7 @@ def main():
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
-		visualize_plot(plot_npy_file)
+		visualize_plot()
 
 
 def report_time(start,end):
