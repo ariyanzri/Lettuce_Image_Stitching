@@ -446,8 +446,8 @@ class Patch:
 		global SIFT_folder
 
 		(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_folder,self.name.replace('.tif','')), "rb"))
-		self.SIFT_kp_locations = kp_tmp
-		self.SIFT_kp_desc = desc_tmp
+		self.SIFT_kp_locations = kp_tmp.copy()
+		self.SIFT_kp_desc = desc_tmp.copy()
 
 	def load_img(self):
 		global patch_folder
@@ -622,7 +622,7 @@ class Group:
 					kp1,desc1 = choose_SIFT_key_points(self_patch,overlap1[0],overlap1[1],overlap1[2],overlap1[3])
 					kp2,desc2 = choose_SIFT_key_points(prev_patch,overlap2[0],overlap2[1],overlap2[2],overlap2[3])
 
-					print('overlap detected. {0}-\n\t{1}'.format(overlap1,overlap2))
+					# print('overlap detected. {0}-\n\t{1}'.format(overlap1,overlap2))
 
 					kp.append(kp1)
 					desc.append(desc1)
