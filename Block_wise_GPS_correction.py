@@ -828,6 +828,7 @@ class Field:
 			
 			p.delete_img()
 
+		result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
 		cv2.imwrite(field_image_path,result)
 		print('Field successfully printed.')
 
