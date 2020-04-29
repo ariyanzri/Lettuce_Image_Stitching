@@ -426,6 +426,8 @@ class Patch:
 		self.name = name
 		self.gps = coord
 		self.neighbors = []
+		self.SIFT_kp_locations = []
+		self.SIFT_kp_desc = []
 
 	def __eq__(self,other):
 
