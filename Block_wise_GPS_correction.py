@@ -448,8 +448,6 @@ class Patch:
 		(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_folder,self.name.replace('.tif','')), "rb"))
 		self.SIFT_kp_locations = kp_tmp.copy()
 		self.SIFT_kp_desc = desc_tmp.copy()
-		print(self.SIFT_kp_locations)
-		print(self.SIFT_kp_desc)
 
 	def load_img(self):
 		global patch_folder
