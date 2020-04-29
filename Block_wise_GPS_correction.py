@@ -448,6 +448,8 @@ class Patch:
 		(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_folder,self.name.replace('.tif','')), "rb"))
 		self.SIFT_kp_locations = kp_tmp.copy()
 		self.SIFT_kp_desc = desc_tmp.copy()
+		print(self.SIFT_kp_locations)
+		print(self.SIFT_kp_desc)
 
 	def load_img(self):
 		global patch_folder
@@ -592,7 +594,6 @@ class Group:
 
 	def correct_internally(self):
 		
-		self.load_all_patches_SIFT_points()
 		self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
 		G = Graph(len(self.patches),[p.name for p in self.patches])
@@ -645,6 +646,9 @@ class Field:
 		global coordinates_file
 
 		self.groups = self.initialize_field()
+
+		for group in self.groups:
+			group.load_all_patches_SIFT_points()
 
 	def initialize_field(self):
 		global coordinates_file
