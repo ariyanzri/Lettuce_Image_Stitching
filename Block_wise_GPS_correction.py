@@ -752,7 +752,7 @@ class Field:
 
 		for group in self.groups:
 
-			args_list.append((group))
+			args_list.append((group,1))
 
 		processes = multiprocessing.Pool(no_of_cores_to_use)
 		processes.map(correct_groups_internally_helper,args_list)
