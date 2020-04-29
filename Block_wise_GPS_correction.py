@@ -15,7 +15,7 @@ from heapq import heappush, heappop, heapify
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-NUMBER_OF_ROWS_IN_GROUPS = 10
+NUMBER_OF_ROWS_IN_GROUPS = 3
 
 def convert_to_gray(img):
 	
@@ -217,7 +217,7 @@ def get_new_GPS_Coords(p1,p2,H):
 	new_UR = (p1.gps.UR_coord[0]-diff_UL[0],p1.gps.UR_coord[1]-diff_UL[1])
 	new_LL = (p1.gps.LL_coord[0]-diff_UL[0],p1.gps.LL_coord[1]-diff_UL[1])
 	new_LR = (p1.gps.LR_coord[0]-diff_UL[0],p1.gps.LR_coord[1]-diff_UL[1])
-	new_center = (p1.gps.Center[0]-diff_UL[0],p1.GPS_coords.Center[1]-diff_UL[1])
+	new_center = (p1.gps.Center[0]-diff_UL[0],p1.gps.Center[1]-diff_UL[1])
 
 	new_coords = Patch_GPS_coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
 
