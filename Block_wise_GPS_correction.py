@@ -783,7 +783,7 @@ class Field:
 			previous_group = group
 
 	def draw_and_save_field(self):
-		global patch_folder
+		global patch_folder, field_image_path
 
 		all_patches = []
 
