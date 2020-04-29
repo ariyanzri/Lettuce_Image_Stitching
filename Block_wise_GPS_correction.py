@@ -288,8 +288,6 @@ def calculate_homography_for_super_patches(kp,prev_kp,matches):
 	dst_list = []
 
 	for i,mtch in enumerate(matches):
-		print(mtch)
-		print(mtch.shape)
 		src_list += [kp[i][m.queryIdx] for m in mtch[:,0]]
 		dst_list += [prev_kp[i][m.trainIdx] for m in mtch[:,0]]
 
@@ -798,7 +796,7 @@ class Field:
 		left = all_patches[0].gps.UL_coord[0]
 		right = all_patches[0].gps.UR_coord[0]
 
-		for p in all_patchess:
+		for p in all_patches:
 			if p.gps.UL_coord[1]>=up:
 				up=p.gps.UL_coord[1]
 
@@ -831,6 +829,7 @@ class Field:
 			p.delete_img()
 
 		cv2.imwrite(field_image_path,result)
+		print('Field successfully printed.')
 
 	def save_new_coordinate(self):
 
@@ -882,6 +881,7 @@ def main():
 		
 		field = Field()
 
+		field.draw_and_save_field()
 		field.correct_field()
 		field.draw_and_save_field()
 
