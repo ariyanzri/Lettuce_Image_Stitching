@@ -16,6 +16,9 @@ PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
 NUMBER_OF_ROWS_IN_GROUPS = 3
+NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 3000
+GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
+
 
 def convert_to_gray(img):
 	
@@ -222,6 +225,82 @@ def get_new_GPS_Coords(p1,p2,H):
 	new_coords = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
 
 	return new_coords
+
+def get_new_GPS_Coords_for_groups(p1,p2,H):
+
+	c1 = [0,0,1]
+	
+	c1 = H.dot(c1).astype(int)
+
+	diff_x = -c1[0]
+	diff_y = -c1[1]
+
+	gps_scale_x = (PATCH_SIZE_GPS[0])/(PATCH_SIZE[1])
+	gps_scale_y = -(PATCH_SIZE_GPS[1])/(PATCH_SIZE[0])
+
+	diff_x = diff_x*gps_scale_x
+	diff_y = diff_y*gps_scale_y
+
+	moved_UL = (round(p2.gps.UL_coord[0]-diff_x,7),round(p2.gps.UL_coord[1]-diff_y,7))
+
+	diff_UL = (p1.gps.UL_coord[0]-moved_UL[0],p1.gps.UL_coord[1]-moved_UL[1])
+
+	new_UL = (p1.gps.UL_coord[0]-diff_UL[0],p1.gps.UL_coord[1]-diff_UL[1])
+	new_UR = (p1.gps.UR_coord[0]-diff_UL[0],p1.gps.UR_coord[1]-diff_UL[1])
+	new_LL = (p1.gps.LL_coord[0]-diff_UL[0],p1.gps.LL_coord[1]-diff_UL[1])
+	new_LR = (p1.gps.LR_coord[0]-diff_UL[0],p1.gps.LR_coord[1]-diff_UL[1])
+	new_center = (p1.gps.Center[0]-diff_UL[0],p1.gps.Center[1]-diff_UL[1])
+
+	new_coords = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+
+	return new_coords
+
+def correct_groups_internally_helper(args):
+
+	return args[0].correct_internally()
+
+def get_top_n_good_matches(desc1,desc2,kp1,kp2):
+	bf = cv2.BFMatcher()
+	matches = bf.knnMatch(desc1,desc2, k=2)
+
+	good = []
+	for m in matches:
+		
+		if 	m[0].distance < 0.8*m[1].distance:
+			good.append(m)
+
+	sorted_matches = sorted(good, key=lambda x: x[0].distance)
+
+	good = []
+
+	if len(sorted_matches)>NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION:
+		good += sorted_matches[0:NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION]
+	else:
+		good += sorted_matches
+
+	matches = np.asarray(good)
+
+	return matches
+
+def calculate_homography_for_super_patches(kp,prev_kp,matches):
+
+	src_list = []
+	dst_list = []
+
+	for i,mtch in enumerate(matches):
+		src_list += [kp[i][m.queryIdx] for m in mtch[:,0]]
+		dst_list += [prev_kp[i][m.trainIdx] for m in mtch[:,0]]
+
+	src = np.float32(src_list).reshape(-1,1,2)
+	dst = np.float32(dst_list).reshape(-1,1,2)
+	
+	H, masked = cv2.estimateAffinePartial2D(dst, src, maxIters = 9000, confidence = 0.999, refineIters = 15)
+	
+	H = np.append(H,np.array([[0,0,1]]),axis=0)
+	H[0:2,0:2] = np.array([[1,0],[0,1]])
+	
+	return H
+
 
 
 class GPS_Coordinate:
@@ -518,6 +597,39 @@ class Group:
 		parents = G.generate_MST_prim(self.rows[0][0].name)
 		G.revise_GPS_from_generated_MST(self.patches,parents)
 
+	def correct_self_based_on_previous_group(self,previous_group):
+
+		matches = []
+		kp = []
+		desc = []
+		prev_kp = []
+		prev_desc = []
+
+		for self_patch in self.patches:
+			
+			for prev_patch in previous_group.patches:
+
+				if self_patch.has_overlap(prev_patch) or prev_patch.has_overlap(self_patch):
+					overlap1 = self_patch.get_overlap_rectangle(prev_patch)
+					overlap2 = prev_patch.get_overlap_rectangle(self_patch)
+
+					kp1,desc1 = choose_SIFT_key_points(self_patch,overlap1[0],overlap1[1],overlap1[2],overlap1[3])
+					kp2,desc2 = choose_SIFT_key_points(prev_patch,overlap2[0],overlap2[1],overlap2[2],overlap2[3])
+
+					kp.append(kp1)
+					desc.append(desc1)
+					prev_kp.append(kp2)
+					prev_desc.append(desc2)
+					
+					matches.append(get_top_n_good_matches(desc2,desc1,kp2,kp1))
+
+		H = calculate_homography_for_super_patches(prev_kp,kp,matches)
+
+		base_patch_from_prev = previous_group.rows[-1][0]
+
+		for patch in self.patches:
+
+			patch.gps = get_new_GPS_Coords_for_groups(patch,base_patch_from_prev,H)
 
 
 class Field:
@@ -545,7 +657,7 @@ class Field:
 			group = Group(iterator,row_window)
 			groups.append(group)
 
-		return groups
+		return groups[0:2]
 
 	def get_rows(self):
 		global coordinates_file
@@ -633,7 +745,85 @@ class Field:
 		
 		np.save(plot_npy_file,np.array(result))	
 
+	def correct_groups_internally(self):
+		global no_of_cores_to_use
+
+		args_list = []
+
+		for group in self.groups:
+
+			args_list.append((group))
+
+		processes = multiprocessing.Pool(no_of_cores_to_use)
+		processes.map(correct_groups_internally_helper,args_list)
+		processes.close()
+
 	def correct_field(self):
+		
+		self.correct_groups_internally()
+
+		previous_group = None
+
+		for group in self.groups:
+			
+			if previous_group is None:
+				previous_group = group
+				continue
+
+			group.correct_self_based_on_previous_group(previous_group)
+
+			previous_group = group
+
+	def draw_and_save_field(self):
+		global patch_folder
+
+		all_patches = []
+
+		for group in self.groups:
+
+			all_patches+=group.patches
+
+		up = all_patches[0].gps.UL_coord[1]
+		down = all_patches[0].gps.LL_coord[1]
+		left = all_patches[0].gps.UL_coord[0]
+		right = all_patches[0].gps.UR_coord[0]
+
+		for p in all_patchess:
+			if p.gps.UL_coord[1]>=up:
+				up=p.gps.UL_coord[1]
+
+			if p.gps.LL_coord[1]<=down:
+				down=p.gps.LL_coord[1]
+
+			if p.gps.UL_coord[0]<=left:
+				left=p.gps.UL_coord[0]
+
+			if p.gps.UR_coord[0]>=right:
+				right=p.gps.UR_coord[0]
+
+
+		super_patch_size = ((up-down)/GPS_TO_IMAGE_RATIO[1],(right-left)/GPS_TO_IMAGE_RATIO[0],3)
+		UL = (left,up)
+
+		result = np.zeros(super_patch_size)
+
+		for p in all_patches:
+			p.load_img()
+			
+			x_diff = p.gps.UL_coord[0] - UL[0]
+			y_diff = UL[1] - p.gps.UL_coord[1]
+			
+			st_x = int(x_diff/GPS_TO_IMAGE_RATIO[0])
+			st_y = int(y_diff/GPS_TO_IMAGE_RATIO[1])
+			
+			result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img
+			
+			p.delete_img()
+
+		cv2.imwrite(field_image_path,result)
+
+	def save_new_coordinate(self):
+
 		pass
 
 
@@ -651,6 +841,7 @@ def main():
 		CORRECTED_coordinates_file = '/storage/ariyanzarei/2020-01-08-rgb/2020-01-08_coordinates_CORRECTED.csv'
 		plot_npy_file = '/storage/ariyanzarei/2020-01-08-rgb/plt.npy'
 		row_save_path = '/storage/ariyanzarei/2020-01-08-rgb/rows'
+		field_image_path = 'field.bmp'
 
 	elif server == 'laplace.cs.arizona.edu':
 		patch_folder = '/data/plant/full_scans/2020-01-08-rgb/bin2tif_out'
@@ -659,6 +850,7 @@ def main():
 		coordinates_file = '/data/plant/full_scans/metadata/2020-01-08_coordinates.csv'
 		CORRECTED_coordinates_file = '/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv'
 		plot_npy_file = '/data/plant/full_scans/2020-01-08-rgb/plt.npy'
+		field_image_path = 'field.bmp'
 
 	elif server == 'ariyan':
 		patch_folder = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures'
@@ -667,6 +859,7 @@ def main():
 		coordinates_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt'
 		CORRECTED_coordinates_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt'
 		plot_npy_file = '/home/ariyan/Desktop/plt.npy'
+		field_image_path = '/home/ariyan/Desktop/field.bmp'
 
 
 	if server == 'coge':
@@ -679,16 +872,12 @@ def main():
 		
 		field = Field()
 
-		field.save_plot()
-
-		field.groups[0].correct_internally()
-
-		field.save_plot()
+		field.correct_field()
+		field.draw_and_save_field()
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
 		visualize_plot()
-
 
 
 
