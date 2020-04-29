@@ -219,7 +219,7 @@ def get_new_GPS_Coords(p1,p2,H):
 	new_LR = (p1.gps.LR_coord[0]-diff_UL[0],p1.gps.LR_coord[1]-diff_UL[1])
 	new_center = (p1.gps.Center[0]-diff_UL[0],p1.gps.Center[1]-diff_UL[1])
 
-	new_coords = Patch_GPS_coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+	new_coords = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
 
 	return new_coords
 
@@ -238,7 +238,6 @@ class GPS_Coordinate:
 			return True
 		else:
 			return False
-
 
 
 class Graph():
@@ -340,7 +339,6 @@ class Neighbor_Parameters:
 		self.num_matches = nm
 		self.percentage_inliers = pi
 		self.dissimilarity = d
-
 
 
 class Patch:
@@ -462,7 +460,6 @@ class Patch:
 			return None
 
 		return Neighbor_Parameters(overlap2,overlap1,H,num_matches,percentage_inliers,dissimilarity)
-
 
 
 class Group:
@@ -613,7 +610,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist)
+			rows.append(newlist[0:5])
 
 		return rows
 
