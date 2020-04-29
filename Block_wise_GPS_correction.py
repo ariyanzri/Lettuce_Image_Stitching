@@ -288,6 +288,8 @@ def calculate_homography_for_super_patches(kp,prev_kp,matches):
 	dst_list = []
 
 	for i,mtch in enumerate(matches):
+		print(mtch)
+		print(mtch.shape)
 		src_list += [kp[i][m.queryIdx] for m in mtch[:,0]]
 		dst_list += [prev_kp[i][m.trainIdx] for m in mtch[:,0]]
 
@@ -598,6 +600,8 @@ class Group:
 
 		parents = G.generate_MST_prim(self.rows[0][0].name)
 		G.revise_GPS_from_generated_MST(self.patches,parents)
+
+		print('Group {0} was corrected internally. '.format(self.group_id))
 
 	def correct_self_based_on_previous_group(self,previous_group):
 
