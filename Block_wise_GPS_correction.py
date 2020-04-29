@@ -810,7 +810,7 @@ class Field:
 				right=p.gps.UR_coord[0]
 
 
-		super_patch_size = (int(math.ceil((up-down)/GPS_TO_IMAGE_RATIO[1])),int(math.ceil((right-left)/GPS_TO_IMAGE_RATIO[0])),3)
+		super_patch_size = (int(math.ceil((up-down)/GPS_TO_IMAGE_RATIO[1]))+100,int(math.ceil((right-left)/GPS_TO_IMAGE_RATIO[0]))+100,3)
 		UL = (left,up)
 
 		result = np.zeros(super_patch_size)
