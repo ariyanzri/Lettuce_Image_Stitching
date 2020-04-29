@@ -622,6 +622,8 @@ class Group:
 					kp1,desc1 = choose_SIFT_key_points(self_patch,overlap1[0],overlap1[1],overlap1[2],overlap1[3])
 					kp2,desc2 = choose_SIFT_key_points(prev_patch,overlap2[0],overlap2[1],overlap2[2],overlap2[3])
 
+					print('overlap detected. {0}'.format(len(kp1)))
+
 					kp.append(kp1)
 					desc.append(desc1)
 					prev_kp.append(kp2)
