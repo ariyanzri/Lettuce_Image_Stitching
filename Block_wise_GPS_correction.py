@@ -840,7 +840,7 @@ class Field:
 
 
 def main():
-	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path
+	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path
 
 	if server == 'coge':
 		patch_folder = '/storage/ariyanzarei/2020-01-08-rgb/bin2tif_out'
