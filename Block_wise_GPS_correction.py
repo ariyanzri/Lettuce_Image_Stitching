@@ -671,7 +671,7 @@ class Field:
 			group = Group(iterator,row_window)
 			groups.append(group)
 
-		return groups[3:4]
+		return groups[3:5]
 
 	def get_rows(self):
 		global coordinates_file
@@ -795,7 +795,7 @@ class Field:
 
 		for group in self.groups:
 
-			all_patches+=group.patches
+			all_patches+=[p for p in group.patches if (p not in all_patches)]
 
 		up = all_patches[0].gps.UL_coord[1]
 		down = all_patches[0].gps.LL_coord[1]
@@ -888,12 +888,10 @@ def main():
 		
 		field = Field()
 
-		field.draw_and_save_field()
-		field.groups[0].correct_internally()
-		field.draw_and_save_field()
 
-		# field.correct_field()
-		# field.draw_and_save_field()
+		field.draw_and_save_field()
+		field.correct_field()
+		field.draw_and_save_field()
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
