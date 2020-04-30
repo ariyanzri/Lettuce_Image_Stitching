@@ -614,7 +614,7 @@ class Group:
 
 
 	def correct_internally(self):
-		
+		pass
 		# self.load_all_patches_SIFT_points()
 
 		# self.pre_calculate_internal_neighbors_and_transformation_parameters()
