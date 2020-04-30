@@ -242,9 +242,9 @@ def get_new_GPS_Coords_for_groups(p1,p2,H):
 	diff_x = diff_x*gps_scale_x
 	diff_y = diff_y*gps_scale_y
 
-	moved_UL = (round(p2.gps.UL_coord[0]-diff_x,7),round(p2.gps.UL_coord[1]-diff_y,7))
+	diff_UL = (round(p2.gps.UL_coord[0]-diff_x,7),round(p2.gps.UL_coord[1]-diff_y,7))
 
-	diff_UL = (p1.gps.UL_coord[0]-moved_UL[0],p1.gps.UL_coord[1]-moved_UL[1])
+	# diff_UL = (p1.gps.UL_coord[0]-moved_UL[0],p1.gps.UL_coord[1]-moved_UL[1])
 
 	new_UL = (p1.gps.UL_coord[0]-diff_UL[0],p1.gps.UL_coord[1]-diff_UL[1])
 	new_UR = (p1.gps.UR_coord[0]-diff_UL[0],p1.gps.UR_coord[1]-diff_UL[1])
@@ -797,8 +797,6 @@ class Field:
 		for group in self.groups:
 
 			all_patches+=[p for p in group.patches if (p not in all_patches)]
-
-		print(len(all_patches))
 
 		up = all_patches[0].gps.UL_coord[1]
 		down = all_patches[0].gps.LL_coord[1]
