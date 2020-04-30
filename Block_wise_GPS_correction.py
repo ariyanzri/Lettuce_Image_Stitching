@@ -11,6 +11,7 @@ import os
 import threading
 import socket
 from heapq import heappush, heappop, heapify
+from collections import OrderedDict
 
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
@@ -712,7 +713,7 @@ class Field:
 				if is_new:
 					center_of_rows.append(center)
 
-		patches_groups_by_rows = {}
+		patches_groups_by_rows = OrderedDict({})
 
 		center_of_rows = sorted(center_of_rows, key=lambda x: x[1])
 
@@ -730,9 +731,6 @@ class Field:
 					min_row = c
 
 			patches_groups_by_rows[min_row].append(p)
-
-
-		patches_groups_by_rows = sorted(patches_groups_by_rows.items(), key=lambda item: item[1])
 
 		rows = []
 		
