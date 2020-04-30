@@ -452,6 +452,13 @@ class Patch:
 		self.SIFT_kp_locations = kp_tmp.copy()
 		self.SIFT_kp_desc = desc_tmp.copy()
 
+	def delete_SIFT_points(self):
+		self.SIFT_kp_locations = None
+		self.SIFT_kp_desc = None
+
+		gc.collect()
+
+
 	def load_img(self):
 		global patch_folder
 
@@ -567,7 +574,14 @@ class Group:
 			p.load_SIFT_points()
 
 		print('SIFT for all patches in group {0} loaded.'.format(self.group_id))
+		sys.stdout.flush()
 
+	def delete_all_patches_SIFT_points(self):
+		for p in self.patches:
+			p.delete_SIFT_points()
+
+		print('SIFT for all patches in group {0} deleted.'.format(self.group_id))
+		sys.stdout.flush()
 
 	def pre_calculate_internal_neighbors_and_transformation_parameters(self):
 		remove_neighbors = []
@@ -601,6 +615,8 @@ class Group:
 
 	def correct_internally(self):
 		
+		self.load_all_patches_SIFT_points()
+
 		self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
 		G = Graph(len(self.patches),[p.name for p in self.patches])
@@ -609,7 +625,10 @@ class Group:
 		parents = G.generate_MST_prim(self.rows[0][0].name)
 		G.revise_GPS_from_generated_MST(self.patches,parents)
 
+		self.delete_all_patches_SIFT_points()
+
 		print('Group {0} was corrected internally. '.format(self.group_id))
+		sys.stdout.flush()
 
 
 	def correct_self_based_on_previous_group(self,previous_group):
@@ -655,9 +674,6 @@ class Field:
 
 		self.groups = self.initialize_field()
 
-		for group in self.groups:
-			group.load_all_patches_SIFT_points()
-
 	def initialize_field(self):
 		global coordinates_file
 
@@ -678,6 +694,7 @@ class Field:
 			groups.append(group)
 
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
+		sys.stdout.flush()
 
 		return groups
 
@@ -793,12 +810,15 @@ class Field:
 				previous_group = group
 				continue
 
+			group.load_all_patches_SIFT_points()
 			group.correct_self_based_on_previous_group(previous_group)
+			previous_group.delete_all_patches_SIFT_points()
 
 			previous_group = group
 
 		print('Field fully corrected.')
-
+		sys.stdout.flush()
+		
 	def draw_and_save_field(self):
 		global patch_folder, field_image_path
 
@@ -848,6 +868,7 @@ class Field:
 		result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
 		cv2.imwrite(field_image_path,result)
 		print('Field successfully printed.')
+		sys.stdout.flush()
 
 	def save_new_coordinate(self):
 		global CORRECTED_coordinates_file
@@ -877,6 +898,7 @@ class Field:
 			f.write(final_results)
 
 		print('Coordinates saved.')
+		sys.stdout.flush()
 
 def main():
 	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path
