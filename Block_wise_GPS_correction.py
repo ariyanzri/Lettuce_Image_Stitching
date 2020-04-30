@@ -889,7 +889,7 @@ def main():
 		field = Field()
 
 
-		field.draw_and_save_field()
+		# field.draw_and_save_field()
 		field.correct_field()
 		field.draw_and_save_field()
 
