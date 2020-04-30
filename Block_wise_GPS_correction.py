@@ -961,7 +961,7 @@ def main():
 
 
 
-server_core = {'coge':64,'laplace.cs.arizona.edu':40,'ariyan':4}
+server_core = {'coge':64,'laplace.cs.arizona.edu':30,'ariyan':4}
 
 server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
