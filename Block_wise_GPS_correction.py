@@ -615,20 +615,20 @@ class Group:
 
 	def correct_internally(self):
 		
-		self.load_all_patches_SIFT_points()
+		# self.load_all_patches_SIFT_points()
 
-		self.pre_calculate_internal_neighbors_and_transformation_parameters()
+		# self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
-		G = Graph(len(self.patches),[p.name for p in self.patches])
-		G.initialize_edge_weights(self.patches)
+		# G = Graph(len(self.patches),[p.name for p in self.patches])
+		# G.initialize_edge_weights(self.patches)
 
-		parents = G.generate_MST_prim(self.rows[0][0].name)
-		G.revise_GPS_from_generated_MST(self.patches,parents)
+		# parents = G.generate_MST_prim(self.rows[0][0].name)
+		# G.revise_GPS_from_generated_MST(self.patches,parents)
 
-		self.delete_all_patches_SIFT_points()
+		# self.delete_all_patches_SIFT_points()
 
-		print('Group {0} was corrected internally. '.format(self.group_id))
-		sys.stdout.flush()
+		# print('Group {0} was corrected internally. '.format(self.group_id))
+		# sys.stdout.flush()
 
 
 	def correct_self_based_on_previous_group(self,previous_group):
