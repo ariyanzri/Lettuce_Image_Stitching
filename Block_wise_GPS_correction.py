@@ -677,7 +677,7 @@ class Field:
 			group = Group(iterator,row_window)
 			groups.append(group)
 
-		print('Field initialized with {0} groups of {1} rows each.'.format(len(self.groups),NUMBER_OF_ROWS_IN_GROUPS))
+		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 
 		return groups
 
