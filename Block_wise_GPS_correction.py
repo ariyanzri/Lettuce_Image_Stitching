@@ -616,9 +616,9 @@ class Group:
 		prev_kp = []
 		prev_desc = []
 
-		for self_patch in self.patches:
+		for self_patch in self.rows[0]:
 			
-			for prev_patch in previous_group.patches:
+			for prev_patch in previous_group.rows[-1]:
 
 				if self_patch.has_overlap(prev_patch) or prev_patch.has_overlap(self_patch):
 					overlap1 = self_patch.get_overlap_rectangle(prev_patch)
