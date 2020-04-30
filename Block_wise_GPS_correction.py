@@ -16,7 +16,7 @@ from collections import OrderedDict
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-NUMBER_OF_ROWS_IN_GROUPS = 3
+NUMBER_OF_ROWS_IN_GROUPS = 10
 NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 3000
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 
@@ -677,7 +677,9 @@ class Field:
 			group = Group(iterator,row_window)
 			groups.append(group)
 
-		return groups[3:5]
+		print('Field initialized with {0} groups of {1} rows each.'.format(len(self.groups),NUMBER_OF_ROWS_IN_GROUPS))
+
+		return groups
 
 	def get_rows(self):
 		global coordinates_file
@@ -741,7 +743,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist[0:5])
+			rows.append(newlist)
 
 		return rows
 
@@ -773,7 +775,7 @@ class Field:
 
 			args_list.append((group,1))
 
-		processes = multiprocessing.Pool(no_of_cores_to_use)
+		processes = multiprocessing.Pool(int(no_of_cores_to_use/2))
 		new_groups = processes.map(correct_groups_internally_helper,args_list)
 		processes.close()
 
@@ -794,6 +796,8 @@ class Field:
 			group.correct_self_based_on_previous_group(previous_group)
 
 			previous_group = group
+
+		print('Field fully corrected.')
 
 	def draw_and_save_field(self):
 		global patch_folder, field_image_path
@@ -846,12 +850,33 @@ class Field:
 		print('Field successfully printed.')
 
 	def save_new_coordinate(self):
+		global CORRECTED_coordinates_file
 
-		pass
+		all_patches = []
 
+		for group in self.groups:
 
+			all_patches+=[p for p in group.patches if (p not in all_patches)]
 
+		final_results = 'Filename,Upper left,Lower left,Upper right,Lower right,Center\n'
 
+		for p in all_patches:
+			p.gps.UL_coord = (round(p.gps.UL_coord[0],7),round(p.gps.UL_coord[1],7))
+			p.gps.LL_coord = (round(p.gps.LL_coord[0],7),round(p.gps.LL_coord[1],7))
+			p.gps.UR_coord = (round(p.gps.UR_coord[0],7),round(p.gps.UR_coord[1],7))
+			p.gps.LR_coord = (round(p.gps.LR_coord[0],7),round(p.gps.LR_coord[1],7))
+			p.gps.Center = (round(p.gps.Center[0],7),round(p.gps.Center[1],7))
+
+			final_results += '{:s},"{:.7f},{:.7f}","{:.7f},{:.7f}","{:.7f},{:.7f}","{:.7f},{:.7f}","{:.7f},{:.7f}"\n'\
+			.format(p.name,p.gps.UL_coord[0],p.gps.UL_coord[1],p.gps.LL_coord[0],p.gps.LL_coord[1],p.gps.UR_coord[0],p.gps.UR_coord[1]\
+				,p.gps.LR_coord[0],p.gps.LR_coord[1],p.gps.Center[0],p.gps.Center[1])
+
+		final_results = final_results.replace('(','"').replace(')','"')
+
+		with open(CORRECTED_coordinates_file,'w') as f:
+			f.write(final_results)
+
+		print('Coordinates saved.')
 
 def main():
 	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path
@@ -891,14 +916,15 @@ def main():
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
-		os.system("taskset -p -c 1,2,3,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,44,45,46 %d" % os.getpid())
+		os.system("taskset -p -c 1,2,3,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,44,45,46 %d" % os.getpid())
 		
 		field = Field()
 
 
 		# field.draw_and_save_field()
 		field.correct_field()
-		field.draw_and_save_field()
+		# field.draw_and_save_field()
+		field.save_new_coordinate()
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
