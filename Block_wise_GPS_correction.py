@@ -260,7 +260,9 @@ def get_new_GPS_Coords_for_groups(p1,p2,H):
 
 def correct_groups_internally_helper(args):
 
-	return args[0].correct_internally()
+	args[0].correct_internally()
+
+	return args[0]
 
 def get_top_n_good_matches(desc1,desc2,kp1,kp2):
 	bf = cv2.BFMatcher()
@@ -772,8 +774,10 @@ class Field:
 			args_list.append((group,1))
 
 		processes = multiprocessing.Pool(no_of_cores_to_use)
-		processes.map(correct_groups_internally_helper,args_list)
+		new_groups = processes.map(correct_groups_internally_helper,args_list)
 		processes.close()
+
+		self.groups = new_groups
 
 	def correct_field(self):
 		
