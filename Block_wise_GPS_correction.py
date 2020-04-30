@@ -614,8 +614,6 @@ class Group:
 
 
 	def correct_internally(self):
-		
-		self.load_all_patches_SIFT_points()
 
 		self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
@@ -624,8 +622,6 @@ class Group:
 
 		parents = G.generate_MST_prim(self.rows[0][0].name)
 		G.revise_GPS_from_generated_MST(self.patches,parents)
-
-		self.delete_all_patches_SIFT_points()
 
 		print('Group {0} was corrected internally. '.format(self.group_id))
 		sys.stdout.flush()
@@ -673,6 +669,10 @@ class Field:
 		global coordinates_file
 
 		self.groups = self.initialize_field()
+
+		for group in self.groups:
+			group.load_all_patches_SIFT_points()
+
 
 	def initialize_field(self):
 		global coordinates_file
@@ -810,9 +810,7 @@ class Field:
 				previous_group = group
 				continue
 
-			group.load_all_patches_SIFT_points()
 			group.correct_self_based_on_previous_group(previous_group)
-			previous_group.delete_all_patches_SIFT_points()
 
 			previous_group = group
 
