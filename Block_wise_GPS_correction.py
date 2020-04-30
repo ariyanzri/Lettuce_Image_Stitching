@@ -546,10 +546,16 @@ class Patch:
 class Group:
 	def __init__(self,gid,rows):
 		self.group_id = gid
-		self.rows = rows
 		self.patches = []
+
+		new_rows = []
 		for row in rows:
-			self.patches += row
+			new_row = [Patch(p.name,p.gps) for p in row]
+			new_rows.append(new_row)
+			self.patches += new_row
+
+		self.rows = new_rows
+		
 
 	def load_all_patches_SIFT_points(self):
 		for p in self.patches:
