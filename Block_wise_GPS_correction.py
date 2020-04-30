@@ -667,6 +667,8 @@ class Group:
 
 			patch.gps = get_new_GPS_Coords_for_groups(patch,base_patch_from_prev,H)
 
+		print('Block {0} corrected based on previous block.'.format(self.group_id))
+		sys.stdout.flush()
 
 class Field:
 	def __init__(self):
@@ -804,6 +806,9 @@ class Field:
 	def correct_field(self):
 		
 		self.correct_groups_internally()
+
+		print('Internally correction is finished.')
+		sys.stdout.flush()
 
 		previous_group = None
 
