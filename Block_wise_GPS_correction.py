@@ -818,7 +818,7 @@ class Field:
 
 		print('Field fully corrected.')
 		sys.stdout.flush()
-		
+
 	def draw_and_save_field(self):
 		global patch_folder, field_image_path
 
@@ -935,6 +935,9 @@ def main():
 	if server == 'coge':
 		print('RUNNING ON -- {0} --'.format(server))
 		
+		field = Field()
+		field.correct_field()
+		field.save_new_coordinate()
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
