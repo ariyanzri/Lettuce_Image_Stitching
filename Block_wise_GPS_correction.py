@@ -309,15 +309,15 @@ def get_corrected_string(patches):
 	final_results = ''
 
 	for p in patches:
-		p.GPS_coords.UL_coord = (round(p.GPS_coords.UL_coord[0],7),round(p.GPS_coords.UL_coord[1],7))
-		p.GPS_coords.LL_coord = (round(p.GPS_coords.LL_coord[0],7),round(p.GPS_coords.LL_coord[1],7))
-		p.GPS_coords.UR_coord = (round(p.GPS_coords.UR_coord[0],7),round(p.GPS_coords.UR_coord[1],7))
-		p.GPS_coords.LR_coord = (round(p.GPS_coords.LR_coord[0],7),round(p.GPS_coords.LR_coord[1],7))
-		p.GPS_coords.Center = (round(p.GPS_coords.Center[0],7),round(p.GPS_coords.Center[1],7))
+		p.gps.UL_coord = (round(p.gps.UL_coord[0],7),round(p.gps.UL_coord[1],7))
+		p.gps.LL_coord = (round(p.gps.LL_coord[0],7),round(p.gps.LL_coord[1],7))
+		p.gps.UR_coord = (round(p.gps.UR_coord[0],7),round(p.gps.UR_coord[1],7))
+		p.gps.LR_coord = (round(p.gps.LR_coord[0],7),round(p.gps.LR_coord[1],7))
+		p.gps.Center = (round(p.gps.Center[0],7),round(p.gps.Center[1],7))
 
 		final_results += '{:s},{:.7f},{:.7f},{:.7f},{:.7f},{:.7f},{:.7f},{:.7f},{:.7f},{:.7f},{:.7f}\n'\
-		.format(p.name,p.GPS_coords.UL_coord[0],p.GPS_coords.UL_coord[1],p.GPS_coords.LL_coord[0],p.GPS_coords.LL_coord[1],p.GPS_coords.UR_coord[0],p.GPS_coords.UR_coord[1]\
-			,p.GPS_coords.LR_coord[0],p.GPS_coords.LR_coord[1],p.GPS_coords.Center[0],p.GPS_coords.Center[1])
+		.format(p.name,p.gps.UL_coord[0],p.gps.UL_coord[1],p.gps.LL_coord[0],p.gps.LL_coord[1],p.gps.UR_coord[0],p.gps.UR_coord[1]\
+			,p.gps.LR_coord[0],p.gps.LR_coord[1],p.gps.Center[0],p.gps.Center[1])
 
 	return final_results
 
