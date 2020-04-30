@@ -606,6 +606,7 @@ class Group:
 
 		print('Group {0} was corrected internally. '.format(self.group_id))
 
+
 	def correct_self_based_on_previous_group(self,previous_group):
 
 		matches = []
@@ -731,6 +732,8 @@ class Field:
 			patches_groups_by_rows[min_row].append(p)
 
 
+		patches_groups_by_rows = sorted(patches_groups_by_rows.items(), key=lambda item: item[1])
+
 		rows = []
 		
 		for g in patches_groups_by_rows:
@@ -796,6 +799,8 @@ class Field:
 		for group in self.groups:
 
 			all_patches+=[p for p in group.patches if (p not in all_patches)]
+
+		print(len(all_patches))
 
 		up = all_patches[0].gps.UL_coord[1]
 		down = all_patches[0].gps.LL_coord[1]
