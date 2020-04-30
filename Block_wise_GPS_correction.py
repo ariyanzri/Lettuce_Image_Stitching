@@ -260,9 +260,7 @@ def get_new_GPS_Coords_for_groups(p1,p2,H):
 
 def correct_groups_internally_helper(args):
 
-	args[0].correct_internally()
-
-	return args[0]
+	return args[0].correct_internally()
 
 def get_top_n_good_matches(desc1,desc2,kp1,kp2):
 	bf = cv2.BFMatcher()
@@ -306,7 +304,47 @@ def calculate_homography_for_super_patches(kp,prev_kp,matches):
 	
 	return H
 
+def get_corrected_string(patches):
 
+	final_results = ''
+
+	for p in patches:
+		p.GPS_coords.UL_coord = (round(p.GPS_coords.UL_coord[0],7),round(p.GPS_coords.UL_coord[1],7))
+		p.GPS_coords.LL_coord = (round(p.GPS_coords.LL_coord[0],7),round(p.GPS_coords.LL_coord[1],7))
+		p.GPS_coords.UR_coord = (round(p.GPS_coords.UR_coord[0],7),round(p.GPS_coords.UR_coord[1],7))
+		p.GPS_coords.LR_coord = (round(p.GPS_coords.LR_coord[0],7),round(p.GPS_coords.LR_coord[1],7))
+		p.GPS_coords.Center = (round(p.GPS_coords.Center[0],7),round(p.GPS_coords.Center[1],7))
+
+		final_results += '{:s},{:.7f},{:.7f},{:.7f},{:.7f},{:.7f},{:.7f},{:.7f},{:.7f},{:.7f},{:.7f}\n'\
+		.format(p.name,p.GPS_coords.UL_coord[0],p.GPS_coords.UL_coord[1],p.GPS_coords.LL_coord[0],p.GPS_coords.LL_coord[1],p.GPS_coords.UR_coord[0],p.GPS_coords.UR_coord[1]\
+			,p.GPS_coords.LR_coord[0],p.GPS_coords.LR_coord[1],p.GPS_coords.Center[0],p.GPS_coords.Center[1])
+
+	return final_results
+
+
+def get_result_dict_from_strings(strings):
+
+	res_dict = {}
+
+	for s in strings:
+		for l in s.split('\n'):
+				if l == '':
+					break
+				
+				features = l.split(',')
+
+				filename = features[0]
+				upper_left = (float(features[1]),float(features[2]))
+				lower_left = (float(features[3]),float(features[4]))
+				upper_right = (float(features[5]),float(features[6]))
+				lower_right = (float(features[7]),float(features[8]))
+				center = (float(features[9]),float(features[10]))
+
+				coord = GPS_Coordinate(upper_left,upper_right,lower_left,lower_right,center)
+				
+				res_dict[filename] = coord
+
+	return res_dict
 
 class GPS_Coordinate:
 	
@@ -413,6 +451,8 @@ class Graph():
 
 					patch.gps = get_new_GPS_Coords(patch,parent_patch,H)
 
+		string_corrected = get_corrected_string(patches)
+		return string_corrected
 
 class Neighbor_Parameters:
 	def __init__(self,o_p,o_n,h,nm,pi,d):
@@ -614,21 +654,23 @@ class Group:
 
 
 	def correct_internally(self):
-		pass
-		# self.load_all_patches_SIFT_points()
 
-		# self.pre_calculate_internal_neighbors_and_transformation_parameters()
+		self.load_all_patches_SIFT_points()
 
-		# G = Graph(len(self.patches),[p.name for p in self.patches])
-		# G.initialize_edge_weights(self.patches)
+		self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
-		# parents = G.generate_MST_prim(self.rows[0][0].name)
-		# G.revise_GPS_from_generated_MST(self.patches,parents)
+		G = Graph(len(self.patches),[p.name for p in self.patches])
+		G.initialize_edge_weights(self.patches)
 
-		# self.delete_all_patches_SIFT_points()
+		parents = G.generate_MST_prim(self.rows[0][0].name)
+		string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
 
-		# print('Group {0} was corrected internally. '.format(self.group_id))
-		# sys.stdout.flush()
+		self.delete_all_patches_SIFT_points()
+
+		print('Group {0} was corrected internally. '.format(self.group_id))
+		sys.stdout.flush()
+
+		return string_res
 
 
 	def correct_self_based_on_previous_group(self,previous_group):
@@ -701,7 +743,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups
+		return groups[3:5]
 
 	def get_rows(self):
 		global coordinates_file
@@ -765,7 +807,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist)
+			rows.append(newlist[0:5])
 
 		return rows
 
@@ -798,10 +840,15 @@ class Field:
 			args_list.append((group,1))
 
 		processes = multiprocessing.Pool(int(no_of_cores_to_use/2))
-		new_groups = processes.map(correct_groups_internally_helper,args_list)
+		str_results = processes.map(correct_groups_internally_helper,args_list)
 		processes.close()
 
-		self.groups = new_groups
+		result_dict = get_result_dict_from_strings(str_results)
+
+		for group in self.groups:
+			for patch in group.patches:
+				patch.gps = res_dict[patch.name]
+
 
 	def correct_field(self):
 		
@@ -955,10 +1002,10 @@ def main():
 		field = Field()
 
 
-		# field.draw_and_save_field()
+		field.draw_and_save_field()
 		field.correct_field()
-		# field.draw_and_save_field()
-		field.save_new_coordinate()
+		field.draw_and_save_field()
+		# field.save_new_coordinate()
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
