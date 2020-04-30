@@ -671,7 +671,7 @@ class Field:
 			group = Group(iterator,row_window)
 			groups.append(group)
 
-		return groups[0:2]
+		return groups[3:4]
 
 	def get_rows(self):
 		global coordinates_file
@@ -888,9 +888,12 @@ def main():
 		
 		field = Field()
 
-		# field.draw_and_save_field()
-		field.correct_field()
 		field.draw_and_save_field()
+		field.groups[0].correct_internally()
+		field.draw_and_save_field()
+
+		# field.correct_field()
+		# field.draw_and_save_field()
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
