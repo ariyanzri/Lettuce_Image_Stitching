@@ -810,6 +810,7 @@ class Field:
 		for group in self.groups:
 			
 			if previous_group is None:
+				group.load_all_patches_SIFT_points()				
 				previous_group = group
 				continue
 
