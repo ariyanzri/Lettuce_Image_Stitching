@@ -847,7 +847,7 @@ class Field:
 
 		for group in self.groups:
 			for patch in group.patches:
-				patch.gps = res_dict[patch.name]
+				patch.gps = result_dict[patch.name]
 
 
 	def correct_field(self):
