@@ -728,7 +728,7 @@ class Field:
 
 		groups = []
 
-		while len(groups)*NUMBER_OF_ROWS_IN_GROUPS<len(rows):
+		while len(groups)*NUMBER_OF_ROWS_IN_GROUPS-(len(groups)-1)<len(rows):
 			
 			iterator = len(groups)
 			
@@ -935,7 +935,7 @@ class Field:
 			total+=len(group.patches)
 			all_patches+=[p for p in group.patches if (p not in all_patches)]
 			print(len(group.patches))
-			
+
 		final_results = 'Filename,Upper left,Lower left,Upper right,Lower right,Center\n'
 		print(total)
 
