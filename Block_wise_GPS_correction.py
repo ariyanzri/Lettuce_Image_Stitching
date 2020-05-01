@@ -811,6 +811,8 @@ class Field:
 			
 			rows.append(newlist)
 
+		print('Rows calculated and created completely.')
+		
 		return rows
 
 	def save_plot(self):
