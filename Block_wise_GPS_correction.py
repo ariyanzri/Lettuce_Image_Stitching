@@ -728,7 +728,7 @@ class Field:
 
 		groups = []
 
-		while len(groups)*NUMBER_OF_ROWS_IN_GROUPS-(len(groups)-1)<len(rows):
+		while len(groups)*NUMBER_OF_ROWS_IN_GROUPS-1*len(groups)<len(rows):
 			
 			iterator = len(groups)
 			
