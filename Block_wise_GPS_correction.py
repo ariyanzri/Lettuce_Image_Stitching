@@ -930,14 +930,14 @@ class Field:
 		global CORRECTED_coordinates_file
 
 		all_patches = []
-
+		total = 0
 		for group in self.groups:
-
+			total+=len(group.patches)
 			all_patches+=[p for p in group.patches if (p not in all_patches)]
 
 		final_results = 'Filename,Upper left,Lower left,Upper right,Lower right,Center\n'
-		print(len(all_patches))
-		
+		print(total)
+
 		for p in all_patches:
 			p.gps.UL_coord = (round(p.gps.UL_coord[0],7),round(p.gps.UL_coord[1],7))
 			p.gps.LL_coord = (round(p.gps.LL_coord[0],7),round(p.gps.LL_coord[1],7))
