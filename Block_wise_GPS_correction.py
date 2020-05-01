@@ -743,7 +743,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups[0:3]
+		return groups
 
 	def get_rows(self):
 		global coordinates_file
@@ -851,29 +851,29 @@ class Field:
 
 
 	def correct_field(self):
-		
-		self.correct_groups_internally()
+		pass
+		# self.correct_groups_internally()
 
-		print('Internally correction is finished.')
-		sys.stdout.flush()
+		# print('Internally correction is finished.')
+		# sys.stdout.flush()
 
-		previous_group = None
+		# previous_group = None
 
-		for group in self.groups:
+		# for group in self.groups:
 			
-			if previous_group is None:
-				group.load_all_patches_SIFT_points()				
-				previous_group = group
-				continue
+		# 	if previous_group is None:
+		# 		group.load_all_patches_SIFT_points()				
+		# 		previous_group = group
+		# 		continue
 
-			group.load_all_patches_SIFT_points()
-			group.correct_self_based_on_previous_group(previous_group)
-			previous_group.delete_all_patches_SIFT_points()
+		# 	group.load_all_patches_SIFT_points()
+		# 	group.correct_self_based_on_previous_group(previous_group)
+		# 	previous_group.delete_all_patches_SIFT_points()
 
-			previous_group = group
+		# 	previous_group = group
 
-		print('Field fully corrected.')
-		sys.stdout.flush()
+		# print('Field fully corrected.')
+		# sys.stdout.flush()
 
 	def draw_and_save_field(self):
 		global patch_folder, field_image_path
