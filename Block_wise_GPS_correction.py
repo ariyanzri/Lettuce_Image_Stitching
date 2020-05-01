@@ -733,7 +733,13 @@ class Field:
 
 		while start<len(rows):
 			
-			end = min(end,len(rows))
+			if end >= len(rows):
+				end = len(rows)
+				row_window = rows[start:end]
+				group = Group(len(groups),row_window)
+				groups.append(group)
+				break
+					
 			row_window = rows[start:end]
 
 			group = Group(len(groups),row_window)
@@ -812,7 +818,7 @@ class Field:
 			rows.append(newlist)
 
 		print('Rows calculated and created completely.')
-		
+
 		return rows
 
 	def save_plot(self):
