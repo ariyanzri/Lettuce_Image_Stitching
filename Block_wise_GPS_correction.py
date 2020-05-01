@@ -947,7 +947,7 @@ class Field:
 			print(len(group.patches))
 
 		final_results = 'Filename,Upper left,Lower left,Upper right,Lower right,Center\n'
-		print(total)
+		print(len(all_patches))
 
 		for p in all_patches:
 			p.gps.UL_coord = (round(p.gps.UL_coord[0],7),round(p.gps.UL_coord[1],7))
