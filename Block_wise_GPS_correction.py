@@ -861,29 +861,29 @@ class Field:
 
 
 	def correct_field(self):
-		pass
-		# self.correct_groups_internally()
+		
+		self.correct_groups_internally()
 
-		# print('Internally correction is finished.')
-		# sys.stdout.flush()
+		print('Internally correction is finished.')
+		sys.stdout.flush()
 
-		# previous_group = None
+		previous_group = None
 
-		# for group in self.groups:
+		for group in self.groups:
 			
-		# 	if previous_group is None:
-		# 		group.load_all_patches_SIFT_points()				
-		# 		previous_group = group
-		# 		continue
+			if previous_group is None:
+				group.load_all_patches_SIFT_points()				
+				previous_group = group
+				continue
 
-		# 	group.load_all_patches_SIFT_points()
-		# 	group.correct_self_based_on_previous_group(previous_group)
-		# 	previous_group.delete_all_patches_SIFT_points()
+			group.load_all_patches_SIFT_points()
+			group.correct_self_based_on_previous_group(previous_group)
+			previous_group.delete_all_patches_SIFT_points()
 
-		# 	previous_group = group
+			previous_group = group
 
-		# print('Field fully corrected.')
-		# sys.stdout.flush()
+		print('Field fully corrected.')
+		sys.stdout.flush()
 
 	def draw_and_save_field(self):
 		global patch_folder, field_image_path
@@ -940,14 +940,12 @@ class Field:
 		global CORRECTED_coordinates_file
 
 		all_patches = []
-		total = 0
+
 		for group in self.groups:
-			total+=len(group.patches)
+
 			all_patches+=[p for p in group.patches if (p not in all_patches)]
-			print(len(group.patches))
 
 		final_results = 'Filename,Upper left,Lower left,Upper right,Lower right,Center\n'
-		print(len(all_patches))
 
 		for p in all_patches:
 			p.gps.UL_coord = (round(p.gps.UL_coord[0],7),round(p.gps.UL_coord[1],7))
@@ -1004,9 +1002,10 @@ def main():
 		print('RUNNING ON -- {0} --'.format(server))
 		
 		field = Field()
-		field.correct_field()
+		field.save_plot()
+		# field.correct_field()
 		# field.draw_and_save_field()
-		field.save_new_coordinate()
+		# field.save_new_coordinate()
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
