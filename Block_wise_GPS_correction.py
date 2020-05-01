@@ -934,7 +934,8 @@ class Field:
 		for group in self.groups:
 			total+=len(group.patches)
 			all_patches+=[p for p in group.patches if (p not in all_patches)]
-
+			print(len(group.patches))
+			
 		final_results = 'Filename,Upper left,Lower left,Upper right,Lower right,Center\n'
 		print(total)
 
