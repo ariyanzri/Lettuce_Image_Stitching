@@ -994,8 +994,8 @@ def main():
 		
 		field = Field()
 		field.correct_field()
-		field.draw_and_save_field()
-		# field.save_new_coordinate()
+		# field.draw_and_save_field()
+		field.save_new_coordinate()
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
