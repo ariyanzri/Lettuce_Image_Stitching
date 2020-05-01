@@ -728,17 +728,19 @@ class Field:
 
 		groups = []
 
-		while len(groups)*NUMBER_OF_ROWS_IN_GROUPS-1*len(groups)+1<len(rows):
-			
-			iterator = len(groups)
-			
-			if iterator == 0:
-				row_window = rows[0:NUMBER_OF_ROWS_IN_GROUPS]
-			else:
-				row_window = rows[iterator*NUMBER_OF_ROWS_IN_GROUPS-1*iterator:(iterator+1)*NUMBER_OF_ROWS_IN_GROUPS-1*iterator]
+		start = 0
+		end = NUMBER_OF_ROWS_IN_GROUPS
 
-			group = Group(iterator,row_window)
+		while start<len(rows):
+			
+			end = min(end,len(rows))
+			row_window = rows[start:end]
+
+			group = Group(len(groups),row_window)
 			groups.append(group)
+
+			start = end-1
+			end = start + NUMBER_OF_ROWS_IN_GROUPS
 
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
