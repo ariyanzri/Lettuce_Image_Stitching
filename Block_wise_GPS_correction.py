@@ -353,7 +353,7 @@ def find_all_neighbors(patches,patch):
 
 	neighbors = []
 	for p in patches:
-		if p.has_overlap(patch) or patch.has_overlap(p):
+		if (p.has_overlap(patch) or patch.has_overlap(p)) and p != patch:
 			neighbors.append(p)
 	return neighbors
 
