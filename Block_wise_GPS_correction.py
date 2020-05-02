@@ -472,7 +472,7 @@ def correct_patch_group_all_corrected_neighbors(patches):
 		patch.gps = coord
 
 		corrected_patches.append(patch)
-		can_be_corrected_patches+=[t for t in tmp_neighbors if (t not in corrected_patches) and (t not in can_be_corrected_patches)]
+		can_be_corrected_patches=[t for t in tmp_neighbors if (t not in corrected_patches) and (t not in can_be_corrected_patches)]+can_be_corrected_patches
 		# H = get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors)
 
 
