@@ -189,7 +189,7 @@ def visualize_plot():
 
 	c = []
 	for d in data:
-		c.append((d[2],d[3],d[4]))
+		c.append((d[2]/255,d[3]/255,d[4]/255))
 
 	plt.scatter(data[:,0],data[:,1],color=c,alpha=0.5)
 
@@ -261,6 +261,71 @@ def get_new_GPS_Coords_for_groups(p1,p2,H):
 def correct_groups_internally_helper(args):
 
 	return args[0].correct_internally()
+
+def find_all_neighbors(patches,patch):
+	neighbors = []
+	for p in patches:
+		if p.has_overlap(patch) or patch.has_overlap(p):
+			neighbors.append(p)
+	return neighbors
+
+def merge_all_neighbors(corrected_neighbors):
+	up = corrected_neighbors[0].gps.UL_coord[1]
+	down = corrected_neighbors[0].gps.LL_coord[1]
+	left = corrected_neighbors[0].gps.UL_coord[0]
+	right = corrected_neighbors[0].gps.UR_coord[0]
+
+	for p in corrected_neighbors:
+		if p.gps.UL_coord[1]>=up:
+			up=p.gps.UL_coord[1]
+
+		if p.gps.LL_coord[1]<=down:
+			down=p.gps.LL_coord[1]
+
+		if p.gps.UL_coord[0]<=left:
+			left=p.gps.UL_coord[0]
+
+		if p.gps.UR_coord[0]>=right:
+			right=p.gps.UR_coord[0]
+
+
+	super_patch_size = (int(math.ceil((up-down)/GPS_TO_IMAGE_RATIO[1]))+100,int(math.ceil((right-left)/GPS_TO_IMAGE_RATIO[0]))+100,3)
+	UL = (left,up)
+
+	result = np.zeros(super_patch_size)
+
+	for p in all_patches:
+		p.load_img()
+		
+		x_diff = p.gps.UL_coord[0] - UL[0]
+		y_diff = UL[1] - p.gps.UL_coord[1]
+		
+		st_x = int(x_diff/GPS_TO_IMAGE_RATIO[0])
+		st_y = int(y_diff/GPS_TO_IMAGE_RATIO[1])
+		
+		result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img
+		
+		p.delete_img()
+
+	cv2.imshow('fig',result)
+	cv2.waitKey(0)
+
+def get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors):
+	pass
+
+
+def correct_patch_group_all_corrected_neighbors(patches):
+	corrected_patches = [patches[0]]
+	can_be_corrected_patches = [find_all_neighbors(patches,patches[0])]
+
+	while len(corrected_patches)<len(patches):
+		patch = can_be_corrected_patches.pop()
+
+		tmp_neighbors = find_all_neighbors(patches,patch)
+		corrected_neighbors = [p for p in tmp_neighbors if p in corrected_patches]
+		merge_all_neighbors(corrected_neighbors)
+		# H = get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors)
+
 
 def get_top_n_good_matches(desc1,desc2,kp1,kp2):
 	bf = cv2.BFMatcher()
@@ -1023,12 +1088,12 @@ def main():
 		# os.system("taskset -p -c 1,2,3,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,44,45,46 %d" % os.getpid())
 		
 		field = Field()
-
+		correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
 		# field.draw_and_save_field()
-		field.correct_field()
+		# field.correct_field()
 		# field.draw_and_save_field()
-		field.save_new_coordinate()
+		# field.save_new_coordinate()
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
