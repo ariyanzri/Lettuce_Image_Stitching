@@ -435,7 +435,7 @@ def get_new_GPS_Coords_all_neighbors(p1,UL,H):
 	diff_x = diff_x*gps_scale_x
 	diff_y = diff_y*gps_scale_y
 
-	new_UL = (round(UL[0]-diff_x,7),round(UL[1]-diff_y,7))
+	new_UL = (UL[0]-diff_x,UL[1]-diff_y,7)
 
 	diff_UL = (p1.gps.UL_coord[0]-new_UL[0],p1.gps.UL_coord[1]-new_UL[1])
 
@@ -447,6 +447,9 @@ def get_new_GPS_Coords_all_neighbors(p1,UL,H):
 	new_coords = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
 
 	return new_coords
+
+def jitter_image_to_find_least_dissimilarity(patch,neighbors):
+	pass
 
 def correct_patch_group_all_corrected_neighbors(patches):
 	corrected_patches = [patches[0]]
