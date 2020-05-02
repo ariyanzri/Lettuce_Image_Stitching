@@ -384,6 +384,7 @@ def merge_all_neighbors(corrected_neighbors,patch):
 	result = np.zeros(super_patch_size)
 
 	patch.load_SIFT_points()
+	patch.load_img()
 
 	for p in corrected_neighbors:
 		p.load_img()
@@ -406,6 +407,8 @@ def merge_all_neighbors(corrected_neighbors,patch):
 
 	result = np.array(result).astype('uint8')
 	result = cv2.resize(result,(int(result.shape[1]/5),int(result.shape[0]/5)))
+	img = cv2.resize(img,(PATCH_SIZE[1]/5,PATCH_SIZE[0]/5))
+	cv2.imshow('fig',img)
 	cv2.imshow('fig',result)
 	cv2.waitKey(0)
 
