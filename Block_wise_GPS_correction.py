@@ -263,6 +263,8 @@ def correct_groups_internally_helper(args):
 	return args[0].correct_internally()
 
 def find_all_neighbors(patches,patch):
+	print(patch)
+	print(patches)
 	neighbors = []
 	for p in patches:
 		if p.has_overlap(patch) or patch.has_overlap(p):
