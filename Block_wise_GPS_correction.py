@@ -394,9 +394,7 @@ def merge_all_neighbors(corrected_neighbors,patch):
 
 		overlap = p.get_overlap_rectangle(patch)
 		kp,desc = choose_SIFT_key_points(p,overlap[0],overlap[1],overlap[2],overlap[3])
-		print(kp)
-		print(desc)
-		break
+		
 		x_diff = p.gps.UL_coord[0] - UL[0]
 		y_diff = UL[1] - p.gps.UL_coord[1]
 		
@@ -404,10 +402,14 @@ def merge_all_neighbors(corrected_neighbors,patch):
 		st_y = int(y_diff/GPS_TO_IMAGE_RATIO[1])
 		
 		# result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img
-		for k in kp:
-			total_kp.append(())
+		for i,k in enumerate(kp):
+			total_kp.append((k[0]+st_x,k[1]+st_y))
+			total_desc.append(desc[i,:])
 			# cv2.circle(result,(k[0]+st_x,k[1]+st_y),2,(0,0,255),-1)
 
+		total_desc = np.array(total_desc)
+		print(total_kp)
+		print(total_desc)
 		# p.delete_img()
 
 	# result = np.array(result).astype('uint8')
