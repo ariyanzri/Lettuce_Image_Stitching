@@ -306,8 +306,9 @@ def merge_all_neighbors(corrected_neighbors):
 		
 		result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img
 		
-		# p.delete_img()
+		p.delete_img()
 
+	print(result)
 	result = cv2.resize(result,(int(result.shape[0]/5),int(result.shape[1]/5)))
 	cv2.imshow('fig',result)
 	cv2.waitKey(0)
