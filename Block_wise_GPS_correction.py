@@ -297,8 +297,6 @@ def merge_all_neighbors(corrected_neighbors):
 
 	for p in corrected_neighbors:
 		p.load_img()
-		cv2.imshow('fig',p.rgb_img)
-		cv2.waitKey(0)
 		
 		x_diff = p.gps.UL_coord[0] - UL[0]
 		y_diff = UL[1] - p.gps.UL_coord[1]
@@ -308,7 +306,7 @@ def merge_all_neighbors(corrected_neighbors):
 		
 		result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img
 		
-		p.delete_img()
+		# p.delete_img()
 
 	result = cv2.resize(result,(int(result.shape[0]/5),int(result.shape[1]/5)))
 	cv2.imshow('fig',result)
