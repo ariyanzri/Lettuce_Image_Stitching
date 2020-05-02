@@ -409,7 +409,7 @@ def merge_all_neighbors(corrected_neighbors,patch):
 	result = cv2.resize(result,(int(result.shape[1]/5),int(result.shape[0]/5)))
 	img = patch.rgb_img.copy()
 	img = cv2.resize(img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
-	cv2.imshow('fig',img)
+	cv2.imshow('figmain',img)
 	cv2.imshow('fig',result)
 	cv2.waitKey(0)
 
