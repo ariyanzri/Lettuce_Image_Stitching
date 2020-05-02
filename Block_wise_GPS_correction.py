@@ -408,7 +408,7 @@ def merge_all_neighbors(corrected_neighbors,patch):
 			cv2.circle(result,(k[0]+st_x,k[1]+st_y),2,(0,0,255),-1)
 
 		p.delete_img()
-		
+
 	total_desc = np.array(total_desc)
 
 	result = np.array(result).astype('uint8')
@@ -472,6 +472,7 @@ def correct_patch_group_all_corrected_neighbors(patches):
 		patch.gps = coord
 
 		corrected_patches.append(patch)
+		can_be_corrected_patches+=[t for t in tmp_neighbors if (t not in corrected_patches) and (t not in can_be_corrected_patches)]
 		# H = get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors)
 
 
