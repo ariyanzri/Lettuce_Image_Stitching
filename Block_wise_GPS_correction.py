@@ -309,6 +309,7 @@ def merge_all_neighbors(corrected_neighbors):
 		
 		p.delete_img()
 
+	result = cv2.resize(result,(result.shape[0]/5,result.shape[1]/5))
 	cv2.imshow('fig',result)
 	cv2.waitKey(0)
 
