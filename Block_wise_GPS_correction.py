@@ -189,7 +189,7 @@ def visualize_plot():
 
 	c = []
 	for d in data:
-		c.append('red' if d[2] == 1 else 'green')
+		c.append((d[2],d[3],d[4]))
 
 	plt.scatter(data[:,0],data[:,1],color=c,alpha=0.5)
 
@@ -827,6 +827,10 @@ class Field:
 		result = []
 		color = 0
 
+		r = 0
+		g = 0
+		b = 0
+
 		for group in self.groups:
 			
 			if color == 0:
@@ -834,9 +838,16 @@ class Field:
 			else:
 				color = 0
 
+			r+=10
+			g = 0
+			b = 0
+
 			for row in group.rows:
+				g+=10
+				b=0
 				for p in row:
-					result.append([p.gps.Center[0],p.gps.Center[1],color])
+					b+=5
+					result.append([p.gps.Center[0],p.gps.Center[1],r,g,b])
 		
 		np.save(plot_npy_file,np.array(result))	
 
