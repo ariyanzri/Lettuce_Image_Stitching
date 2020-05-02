@@ -304,7 +304,7 @@ def merge_all_neighbors(corrected_neighbors):
 		st_x = int(x_diff/GPS_TO_IMAGE_RATIO[0])
 		st_y = int(y_diff/GPS_TO_IMAGE_RATIO[1])
 		
-		result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img
+		result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img.copy()
 		
 		p.delete_img()
 
