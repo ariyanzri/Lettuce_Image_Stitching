@@ -407,9 +407,9 @@ def merge_all_neighbors(corrected_neighbors,patch):
 			total_desc.append(desc[i,:])
 			cv2.circle(result,(k[0]+st_x,k[1]+st_y),2,(0,0,255),-1)
 
-	total_desc = np.array(total_desc)
-
 		p.delete_img()
+		
+	total_desc = np.array(total_desc)
 
 	result = np.array(result).astype('uint8')
 	result = cv2.resize(result,(int(result.shape[1]/5),int(result.shape[0]/5)))
