@@ -385,7 +385,7 @@ def merge_all_neighbors(corrected_neighbors,patch):
 
 	result = np.zeros(super_patch_size)
 
-	patch.load_SIFT_points()
+	# patch.load_SIFT_points()
 	# patch.load_img()
 
 	for p in corrected_neighbors:
@@ -408,8 +408,7 @@ def merge_all_neighbors(corrected_neighbors,patch):
 			# cv2.circle(result,(k[0]+st_x,k[1]+st_y),2,(0,0,255),-1)
 
 		total_desc = np.array(total_desc)
-		print(total_kp)
-		print(total_desc)
+
 		# p.delete_img()
 
 	# result = np.array(result).astype('uint8')
@@ -419,6 +418,8 @@ def merge_all_neighbors(corrected_neighbors,patch):
 	# cv2.imshow('figmain',img)
 	# cv2.imshow('fig',result)
 	# cv2.waitKey(0)
+
+	return UL,total_kp,total_desc
 
 def get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors):
 	pass
@@ -433,7 +434,7 @@ def correct_patch_group_all_corrected_neighbors(patches):
 
 		tmp_neighbors = find_all_neighbors(patches,patch)
 		corrected_neighbors = [p for p in tmp_neighbors if p in corrected_patches]
-		merge_all_neighbors(corrected_neighbors,patch)
+		UL_merged, kp,desc = merge_all_neighbors(corrected_neighbors,patch)
 		corrected_patches.append(patch)
 		# H = get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors)
 
