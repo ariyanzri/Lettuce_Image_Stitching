@@ -262,73 +262,6 @@ def correct_groups_internally_helper(args):
 
 	return args[0].correct_internally()
 
-def find_all_neighbors(patches,patch):
-
-	neighbors = []
-	for p in patches:
-		if p.has_overlap(patch) or patch.has_overlap(p):
-			neighbors.append(p)
-	return neighbors
-
-def merge_all_neighbors(corrected_neighbors):
-	up = corrected_neighbors[0].gps.UL_coord[1]
-	down = corrected_neighbors[0].gps.LL_coord[1]
-	left = corrected_neighbors[0].gps.UL_coord[0]
-	right = corrected_neighbors[0].gps.UR_coord[0]
-
-	for p in corrected_neighbors:
-		if p.gps.UL_coord[1]>=up:
-			up=p.gps.UL_coord[1]
-
-		if p.gps.LL_coord[1]<=down:
-			down=p.gps.LL_coord[1]
-
-		if p.gps.UL_coord[0]<=left:
-			left=p.gps.UL_coord[0]
-
-		if p.gps.UR_coord[0]>=right:
-			right=p.gps.UR_coord[0]
-
-
-	super_patch_size = (int(math.ceil((up-down)/GPS_TO_IMAGE_RATIO[1]))+100,int(math.ceil((right-left)/GPS_TO_IMAGE_RATIO[0]))+100,3)
-	UL = (left,up)
-
-	result = np.zeros(super_patch_size)
-
-	for p in corrected_neighbors:
-		p.load_img()
-		
-		x_diff = p.gps.UL_coord[0] - UL[0]
-		y_diff = UL[1] - p.gps.UL_coord[1]
-		
-		st_x = int(x_diff/GPS_TO_IMAGE_RATIO[0])
-		st_y = int(y_diff/GPS_TO_IMAGE_RATIO[1])
-		
-		result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img
-		
-		p.delete_img()
-
-	result = np.array(result).astype('uint8')
-	result = cv2.resize(result,(int(result.shape[1]/5),int(result.shape[0]/5)))
-	cv2.imshow('fig',result)
-	cv2.waitKey(0)
-
-def get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors):
-	pass
-
-
-def correct_patch_group_all_corrected_neighbors(patches):
-	corrected_patches = [patches[0]]
-	can_be_corrected_patches = find_all_neighbors(patches,patches[0])
-
-	while len(corrected_patches)<len(patches):
-		patch = can_be_corrected_patches.pop()
-
-		tmp_neighbors = find_all_neighbors(patches,patch)
-		corrected_neighbors = [p for p in tmp_neighbors if p in corrected_patches]
-		merge_all_neighbors(corrected_neighbors)
-		# H = get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors)
-
 
 def get_top_n_good_matches(desc1,desc2,kp1,kp2):
 	bf = cv2.BFMatcher()
@@ -413,6 +346,80 @@ def get_result_dict_from_strings(strings):
 				res_dict[filename] = coord
 
 	return res_dict
+
+# --------------- new method in which we consider all patches -------------------
+
+def find_all_neighbors(patches,patch):
+
+	neighbors = []
+	for p in patches:
+		if p.has_overlap(patch) or patch.has_overlap(p):
+			neighbors.append(p)
+	return neighbors
+
+def merge_all_neighbors(corrected_neighbors):
+	up = corrected_neighbors[0].gps.UL_coord[1]
+	down = corrected_neighbors[0].gps.LL_coord[1]
+	left = corrected_neighbors[0].gps.UL_coord[0]
+	right = corrected_neighbors[0].gps.UR_coord[0]
+
+	for p in corrected_neighbors:
+		if p.gps.UL_coord[1]>=up:
+			up=p.gps.UL_coord[1]
+
+		if p.gps.LL_coord[1]<=down:
+			down=p.gps.LL_coord[1]
+
+		if p.gps.UL_coord[0]<=left:
+			left=p.gps.UL_coord[0]
+
+		if p.gps.UR_coord[0]>=right:
+			right=p.gps.UR_coord[0]
+
+
+	super_patch_size = (int(math.ceil((up-down)/GPS_TO_IMAGE_RATIO[1]))+100,int(math.ceil((right-left)/GPS_TO_IMAGE_RATIO[0]))+100,3)
+	UL = (left,up)
+
+	result = np.zeros(super_patch_size)
+
+	for p in corrected_neighbors:
+		p.load_img()
+		
+		x_diff = p.gps.UL_coord[0] - UL[0]
+		y_diff = UL[1] - p.gps.UL_coord[1]
+		
+		st_x = int(x_diff/GPS_TO_IMAGE_RATIO[0])
+		st_y = int(y_diff/GPS_TO_IMAGE_RATIO[1])
+		
+		result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img
+		
+		p.delete_img()
+
+	result = np.array(result).astype('uint8')
+	result = cv2.resize(result,(int(result.shape[1]/5),int(result.shape[0]/5)))
+	cv2.imshow('fig',result)
+	cv2.waitKey(0)
+
+def get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors):
+	pass
+
+
+def correct_patch_group_all_corrected_neighbors(patches):
+	corrected_patches = [patches[0]]
+	can_be_corrected_patches = find_all_neighbors(patches,patches[0])
+
+	while len(corrected_patches)<len(patches):
+		patch = can_be_corrected_patches.pop()
+
+		tmp_neighbors = find_all_neighbors(patches,patch)
+		corrected_neighbors = [p for p in tmp_neighbors if p in corrected_patches]
+		merge_all_neighbors(corrected_neighbors)
+		corrected_patches.append(patch)
+		# H = get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors)
+
+
+# ----------------------------------------------------------------------
+
 
 class GPS_Coordinate:
 	
