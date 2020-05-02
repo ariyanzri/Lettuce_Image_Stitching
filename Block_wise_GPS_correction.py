@@ -296,7 +296,7 @@ def merge_all_neighbors(corrected_neighbors):
 
 	result = np.zeros(super_patch_size)
 
-	for p in all_patches:
+	for p in corrected_neighbors:
 		p.load_img()
 		
 		x_diff = p.gps.UL_coord[0] - UL[0]
