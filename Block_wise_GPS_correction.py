@@ -318,7 +318,7 @@ def get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors):
 
 def correct_patch_group_all_corrected_neighbors(patches):
 	corrected_patches = [patches[0]]
-	can_be_corrected_patches = [find_all_neighbors(patches,patches[0])]
+	can_be_corrected_patches = find_all_neighbors(patches,patches[0])
 
 	while len(corrected_patches)<len(patches):
 		patch = can_be_corrected_patches.pop()
