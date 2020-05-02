@@ -308,7 +308,7 @@ def merge_all_neighbors(corrected_neighbors):
 		
 		p.delete_img()
 
-	print(result)
+	result = np.array(result).astype('uint8')
 	result = cv2.resize(result,(int(result.shape[0]/5),int(result.shape[1]/5)))
 	cv2.imshow('fig',result)
 	cv2.waitKey(0)
