@@ -263,8 +263,7 @@ def correct_groups_internally_helper(args):
 	return args[0].correct_internally()
 
 def find_all_neighbors(patches,patch):
-	print(patch)
-	print(patches)
+
 	neighbors = []
 	for p in patches:
 		if p.has_overlap(patch) or patch.has_overlap(p):
@@ -309,7 +308,7 @@ def merge_all_neighbors(corrected_neighbors):
 		
 		p.delete_img()
 
-	result = cv2.resize(result,(result.shape[0]/5,result.shape[1]/5))
+	result = cv2.resize(result,(int(result.shape[0]/5),int(result.shape[1]/5)))
 	cv2.imshow('fig',result)
 	cv2.waitKey(0)
 
