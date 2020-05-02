@@ -358,6 +358,8 @@ def find_all_neighbors(patches,patch):
 	return neighbors
 
 def merge_all_neighbors(corrected_neighbors,patch):
+	total_kp = []
+	total_desc = []
 
 	up = corrected_neighbors[0].gps.UL_coord[1]
 	down = corrected_neighbors[0].gps.LL_coord[1]
@@ -384,34 +386,37 @@ def merge_all_neighbors(corrected_neighbors,patch):
 	result = np.zeros(super_patch_size)
 
 	patch.load_SIFT_points()
-	patch.load_img()
+	# patch.load_img()
 
 	for p in corrected_neighbors:
-		p.load_img()
+		# p.load_img()
 		p.load_SIFT_points()
 
 		overlap = p.get_overlap_rectangle(patch)
 		kp,desc = choose_SIFT_key_points(p,overlap[0],overlap[1],overlap[2],overlap[3])
-
+		print(kp)
+		print(desc)
+		break
 		x_diff = p.gps.UL_coord[0] - UL[0]
 		y_diff = UL[1] - p.gps.UL_coord[1]
 		
 		st_x = int(x_diff/GPS_TO_IMAGE_RATIO[0])
 		st_y = int(y_diff/GPS_TO_IMAGE_RATIO[1])
 		
-		result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img
+		# result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img
 		for k in kp:
-			cv2.circle(result,(k[0]+st_x,k[1]+st_y),2,(0,0,255),-1)
+			total_kp.append(())
+			# cv2.circle(result,(k[0]+st_x,k[1]+st_y),2,(0,0,255),-1)
 
-		p.delete_img()
+		# p.delete_img()
 
-	result = np.array(result).astype('uint8')
-	result = cv2.resize(result,(int(result.shape[1]/5),int(result.shape[0]/5)))
-	img = patch.rgb_img.copy()
-	img = cv2.resize(img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
-	cv2.imshow('figmain',img)
-	cv2.imshow('fig',result)
-	cv2.waitKey(0)
+	# result = np.array(result).astype('uint8')
+	# result = cv2.resize(result,(int(result.shape[1]/5),int(result.shape[0]/5)))
+	# img = patch.rgb_img.copy()
+	# img = cv2.resize(img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
+	# cv2.imshow('figmain',img)
+	# cv2.imshow('fig',result)
+	# cv2.waitKey(0)
 
 def get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors):
 	pass
