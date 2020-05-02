@@ -422,7 +422,7 @@ def correct_patch_group_all_corrected_neighbors(patches):
 
 		tmp_neighbors = find_all_neighbors(patches,patch)
 		corrected_neighbors = [p for p in tmp_neighbors if p in corrected_patches]
-		merge_all_neighbors(corrected_neighbors)
+		merge_all_neighbors(corrected_neighbors,patch)
 		corrected_patches.append(patch)
 		# H = get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors)
 
