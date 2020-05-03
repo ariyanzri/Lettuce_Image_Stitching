@@ -16,7 +16,7 @@ from collections import OrderedDict
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-NUMBER_OF_ROWS_IN_GROUPS = 10
+NUMBER_OF_ROWS_IN_GROUPS = 4
 NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 3000
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 
@@ -361,7 +361,7 @@ def find_all_neighbors(patches,patch):
 				continue
 
 			neighbors.append(p)
-			
+
 	return neighbors
 
 def draw_together(patches):
@@ -632,7 +632,7 @@ def jitter_image_to_find_least_dissimilarity(patch,neighbors):
 
 	return min_gps
 
-def correct_patch_group_all_corrected_neighbors(patches):
+def correct_patch_group_all_corrected_neighbors(group_id,patches):
 	corrected_patches = [patches[0]]
 	can_be_corrected_patches = find_all_neighbors(patches,patches[0])
 
@@ -642,7 +642,7 @@ def correct_patch_group_all_corrected_neighbors(patches):
 		tmp_neighbors = find_all_neighbors(patches,patch)
 		corrected_neighbors = [p for p in tmp_neighbors if p in corrected_patches]
 
-		draw_together([patch]+corrected_neighbors)
+		# draw_together([patch]+corrected_neighbors)
 
 		UL_merged, kp_merged, desc_merged = merge_all_neighbors(corrected_neighbors,patch)
 		patch.load_SIFT_points()
@@ -666,11 +666,16 @@ def correct_patch_group_all_corrected_neighbors(patches):
 		# patch.gps = jitter_image_to_find_least_dissimilarity(patch,corrected_neighbors)
 		# draw_together([patch]+corrected_neighbors)
 
-		draw_together([patch]+corrected_neighbors)
+		# draw_together([patch]+corrected_neighbors)
 
 		corrected_patches.append(patch)
 		can_be_corrected_patches=[t for t in tmp_neighbors if (t not in corrected_patches) and (t not in can_be_corrected_patches)]+can_be_corrected_patches
 		# H = get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors)
+
+		print('Group {0} - Patch {1} fixed based on {2} neighbors.'.format(group_id,patch.name,len(corrected_neighbors)))
+		sys.stdout.flush()
+
+	return get_corrected_string(patches)
 
 
 # ----------------------------------------------------------------------
@@ -986,20 +991,22 @@ class Group:
 
 	def correct_internally(self):
 
-		self.load_all_patches_SIFT_points()
+		# self.load_all_patches_SIFT_points()
 
-		self.pre_calculate_internal_neighbors_and_transformation_parameters()
+		# self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
-		G = Graph(len(self.patches),[p.name for p in self.patches])
-		G.initialize_edge_weights(self.patches)
+		# G = Graph(len(self.patches),[p.name for p in self.patches])
+		# G.initialize_edge_weights(self.patches)
 
-		parents = G.generate_MST_prim(self.rows[0][0].name)
-		string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
+		# parents = G.generate_MST_prim(self.rows[0][0].name)
+		# string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
 
-		self.delete_all_patches_SIFT_points()
+		# self.delete_all_patches_SIFT_points()
 
-		print('Group {0} was corrected internally. '.format(self.group_id))
-		sys.stdout.flush()
+		# print('Group {0} was corrected internally. '.format(self.group_id))
+		# sys.stdout.flush()
+
+		string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
 
 		return string_res
 
@@ -1082,7 +1089,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups
+		return groups[0]
 
 	def get_rows(self):
 		global coordinates_file
@@ -1146,7 +1153,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist)
+			rows.append(newlist[0:5])
 
 		print('Rows calculated and created completely.')
 
@@ -1354,11 +1361,12 @@ def main():
 		# os.system("taskset -p -c 1,2,3,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,44,45,46 %d" % os.getpid())
 		
 		field = Field()
-		correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
+		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
-		# field.draw_and_save_field()
+		field.draw_and_save_field()
 		# field.correct_field()
-		# field.draw_and_save_field()
+		field.groups[0].correct_internally()
+		field.draw_and_save_field()
 		# field.save_new_coordinate()
 
 	elif server == 'ariyan':
