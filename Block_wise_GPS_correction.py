@@ -580,8 +580,8 @@ def jitter_and_calculate_dissimilarity(patch,neighbors,jx,jy):
 
 def jitter_image_to_find_least_dissimilarity(patch,neighbors):
 	
-	list_jitter_x = np.arange(-0.0000007, 0.0000007, 0.00000005)
-	list_jitter_y = np.arange(-0.0000001, 0.0000001, 0.00000005)
+	list_jitter_x = np.arange(-0.0000007, 0.0000007, 0.00000003)
+	list_jitter_y = np.arange(-0.0000001, 0.0000001, 0.00000003)
 
 	min_dissimilarity = sys.maxsize
 	min_gps = None

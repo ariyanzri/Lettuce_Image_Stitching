@@ -3829,11 +3829,11 @@ def main():
 		print('RUNNING ON -- {0} --'.format(server))
 		patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
 		test_jittering(patches[0],patches[3])
-		patches[3].GPS_coords.UL_coord = (patches[3].GPS_coords.UL_coord[0]+0.0000004,patches[3].GPS_coords.UL_coord[1])
-		patches[3].GPS_coords.UR_coord = (patches[3].GPS_coords.UR_coord[0]+0.0000004,patches[3].GPS_coords.UR_coord[1])
-		patches[3].GPS_coords.LL_coord = (patches[3].GPS_coords.LL_coord[0]+0.0000004,patches[3].GPS_coords.LL_coord[1])
-		patches[3].GPS_coords.LR_coord = (patches[3].GPS_coords.LR_coord[0]+0.0000004,patches[3].GPS_coords.LR_coord[1])
-		patches[3].GPS_coords.Center = (patches[3].GPS_coords.Center[0]+0.0000004,patches[3].GPS_coords.Center[1])
+		patches[3].GPS_coords.UL_coord = (patches[3].GPS_coords.UL_coord[0]+0.00000003,patches[3].GPS_coords.UL_coord[1])
+		patches[3].GPS_coords.UR_coord = (patches[3].GPS_coords.UR_coord[0]+0.00000003,patches[3].GPS_coords.UR_coord[1])
+		patches[3].GPS_coords.LL_coord = (patches[3].GPS_coords.LL_coord[0]+0.00000003,patches[3].GPS_coords.LL_coord[1])
+		patches[3].GPS_coords.LR_coord = (patches[3].GPS_coords.LR_coord[0]+0.00000003,patches[3].GPS_coords.LR_coord[1])
+		patches[3].GPS_coords.Center = (patches[3].GPS_coords.Center[0]+0.00000003,patches[3].GPS_coords.Center[1])
 		test_jittering(patches[0],patches[3])
 		# patches[0].GPS_Corrected = True
 		
