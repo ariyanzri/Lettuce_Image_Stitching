@@ -465,19 +465,21 @@ def calculate_dissimilarity(p1,p2,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y
 	shape_2 = np.shape(overlap_2_img)
 
 	if shape_1 != shape_2:
-		if shape_1[0]<shape_2[0]:
-			overlap_2_img = overlap_2_img[:shape_1[0],:,:]
-			shape_2 = shape_1
-		if shape_1[1]<shape_2[1]:
-			overlap_2_img = overlap_2_img[:,:shape_1[1],:]
-			shape_2 = shape_1
+		# if shape_1[0]<shape_2[0]:
+		# 	overlap_2_img = overlap_2_img[:shape_1[0],:,:]
+		# 	shape_2 = shape_1
+		# if shape_1[1]<shape_2[1]:
+		# 	overlap_2_img = overlap_2_img[:,:shape_1[1],:]
+		# 	shape_2 = shape_1
 		
-		if shape_2[0]<shape_1[0]:
-			overlap_1_img = overlap_1_img[:shape_2[0],:,:]
-			shape_1 = shape_2
-		if shape_2[1]<shape_1[1]:
-			overlap_1_img = overlap_1_img[:,:shape_2[1],:]
-			shape_1 = shape_2
+		# if shape_2[0]<shape_1[0]:
+		# 	overlap_1_img = overlap_1_img[:shape_2[0],:,:]
+		# 	shape_1 = shape_2
+		# if shape_2[1]<shape_1[1]:
+		# 	overlap_1_img = overlap_1_img[:,:shape_2[1],:]
+		# 	shape_1 = shape_2
+		overlap_1_img = cv2.resize(overlap_1_img,shape_2)
+		shape_1 = shape_2
 
 	if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
 		return sys.maxsize
@@ -577,7 +579,7 @@ def correct_patch_group_all_corrected_neighbors(patches):
 
 		patch.gps = coord
 
-		# patch.gps = jitter_image_to_find_least_dissimilarity(patch,corrected_neighbors)
+		patch.gps = jitter_image_to_find_least_dissimilarity(patch,corrected_neighbors)
 
 		corrected_patches.append(patch)
 		can_be_corrected_patches=[t for t in tmp_neighbors if (t not in corrected_patches) and (t not in can_be_corrected_patches)]+can_be_corrected_patches
