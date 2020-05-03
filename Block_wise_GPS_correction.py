@@ -542,16 +542,16 @@ def calculate_dissimilarity(p1,p2,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y
 	ret1,overlap_1_img = cv2.threshold(overlap_1_img,0,255,cv2.THRESH_OTSU)
 	ret1,overlap_2_img = cv2.threshold(overlap_2_img,0,255,cv2.THRESH_OTSU)
 
-	# tmp_size = np.shape(overlap_1_img)
+	tmp_size = np.shape(overlap_1_img)
 	
-	# overlap_1_img[overlap_1_img==255] = 1
-	# overlap_2_img[overlap_2_img==255] = 1
+	overlap_1_img[overlap_1_img==255] = 1
+	overlap_2_img[overlap_2_img==255] = 1
 
-	# xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
+	xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
 
-	# dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
-	dissimilarity =  np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
-	dissimilarity /= float(overlap_1_img.shape[0] * overlap_1_img.shape[1])
+	dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
+	# dissimilarity =  np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
+	# dissimilarity /= float(overlap_1_img.shape[0] * overlap_1_img.shape[1])
 	
 
 	return dissimilarity
@@ -580,8 +580,8 @@ def jitter_and_calculate_dissimilarity(patch,neighbors,jx,jy):
 
 def jitter_image_to_find_least_dissimilarity(patch,neighbors):
 	
-	list_jitter_x = np.arange(-0.0000007, 0.0000007, 0.0000001)
-	list_jitter_y = np.arange(-0.0000001, 0.0000001, 0.0000001)
+	list_jitter_x = np.arange(-0.0000007, 0.0000007, 0.00000005)
+	list_jitter_y = np.arange(-0.0000001, 0.0000001, 0.00000005)
 
 	min_dissimilarity = sys.maxsize
 	min_gps = None
