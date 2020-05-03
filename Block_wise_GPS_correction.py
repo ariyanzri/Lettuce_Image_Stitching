@@ -478,7 +478,7 @@ def calculate_dissimilarity(p1,p2,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y
 		# if shape_2[1]<shape_1[1]:
 		# 	overlap_1_img = overlap_1_img[:,:shape_2[1],:]
 		# 	shape_1 = shape_2
-		overlap_1_img = cv2.resize(overlap_1_img,(shape_2[0],shape_2[1]))
+		overlap_1_img = cv2.resize(overlap_1_img,(shape_2[1],shape_2[0]))
 		shape_1 = shape_2
 
 	if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
