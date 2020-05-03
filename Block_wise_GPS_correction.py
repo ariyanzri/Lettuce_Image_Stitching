@@ -577,7 +577,7 @@ def correct_patch_group_all_corrected_neighbors(patches):
 
 		patch.gps = coord
 
-		patch.gps = jitter_image_to_find_least_dissimilarity(patch,corrected_neighbors)
+		# patch.gps = jitter_image_to_find_least_dissimilarity(patch,corrected_neighbors)
 
 		corrected_patches.append(patch)
 		can_be_corrected_patches=[t for t in tmp_neighbors if (t not in corrected_patches) and (t not in can_be_corrected_patches)]+can_be_corrected_patches
