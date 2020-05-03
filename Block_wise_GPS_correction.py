@@ -616,7 +616,7 @@ def correct_patch_group_all_corrected_neighbors(patches):
 		corrected_neighbors = [p for p in tmp_neighbors if p in corrected_patches]
 
 		draw_together([patch]+corrected_neighbors)
-		
+
 		UL_merged, kp_merged, desc_merged = merge_all_neighbors(corrected_neighbors,patch)
 		patch.load_SIFT_points()
 		kp = patch.SIFT_kp_locations
@@ -627,7 +627,7 @@ def correct_patch_group_all_corrected_neighbors(patches):
 		H, perc_in = find_homography(matches,kp_merged,kp,None,None)
 
 		coord = get_new_GPS_Coords_all_neighbors(patch,UL_merged,H)
-
+		print(perc_in)
 		patch.gps = coord
 		# draw_together([patch]+corrected_neighbors)
 		# patch.gps = jitter_image_to_find_least_dissimilarity(patch,corrected_neighbors)
@@ -1320,7 +1320,7 @@ def main():
 		# os.system("taskset -p -c 1,2,3,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,44,45,46 %d" % os.getpid())
 		
 		field = Field()
-		correct_patch_group_all_corrected_neighbors(field.groups[1].rows[0])
+		correct_patch_group_all_corrected_neighbors(field.groups[0])
 
 		# field.draw_and_save_field()
 		# field.correct_field()
