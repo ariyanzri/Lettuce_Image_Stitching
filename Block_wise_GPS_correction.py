@@ -520,7 +520,7 @@ def jitter_image_to_find_least_dissimilarity(patch,neighbors):
 	list_jitter_x = [-0.0000002,-0.0000001,0,0.0000001,0.0000002]
 	list_jitter_y = [-0.0000002,-0.0000001,0,0.0000001,0.0000002]
 
-	min_dissimilarity = 1
+	min_dissimilarity = sys.maxsize
 	min_gps = None
 
 	patch.load_img()
