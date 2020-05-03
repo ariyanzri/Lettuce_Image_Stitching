@@ -405,7 +405,7 @@ def merge_all_neighbors(corrected_neighbors,patch):
 		for i,k in enumerate(kp):
 			total_kp.append((k[0]+st_x,k[1]+st_y))
 			total_desc.append(desc[i,:])
-			cv2.circle(result,(k[0]+st_x,k[1]+st_y),2,(0,0,255),-1)
+			# cv2.circle(result,(k[0]+st_x,k[1]+st_y),2,(0,0,255),-1)
 
 		p.delete_img()
 
