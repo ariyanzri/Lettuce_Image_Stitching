@@ -677,7 +677,7 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 		if (perc_in<MINIMUM_PERCENTAGE_OF_INLIERS or len(matches)<MINIMUM_NUMBER_OF_MATCHES) and patch.previously_checked == False:
 			patch.previously_checked = True
 			can_be_corrected_patches.insert(0,patch)
-			# print('Group {0} - Patch {1} NOT FIXED {2} with neighbors. <Percentage Inliers:{3},# matches:{4}>'.format(group_id,patch.name,len(corrected_neighbors),perc_in,len(matches)))
+			print('Group {0} - Patch {1} NOT FIXED {2} with neighbors. <Percentage Inliers:{3},# matches:{4}>'.format(group_id,patch.name,len(corrected_neighbors),perc_in,len(matches)))
 			continue  
 
 		patch.gps = coord
