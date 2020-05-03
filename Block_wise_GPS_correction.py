@@ -670,16 +670,14 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 
 	# print(len(can_be_corrected_patches))
 
-	while len(corrected_patches)<len(patches):
+	while len(can_be_corrected_patches)==0:
 
 		patch = can_be_corrected_patches.pop()
 
 		tmp_neighbors = find_all_neighbors(patches,patch)
-		print(corrected_patches)
-		print('000')
-		print(tmp_neighbors)
-		corrected_neighbors = find_all_neighbors(corrected_patches,patch)
-		# corrected_neighbors = [p for p in tmp_neighbors if p in corrected_patches]
+
+		# corrected_neighbors = find_all_neighbors(corrected_patches,patch)
+		corrected_neighbors = [p for p in tmp_neighbors if p.Corrected]
 
 		# patch, corrected_neighbors = get_patch_with_max_number_of_corrected_neighbors(corrected_patches,can_be_corrected_patches)
 	
@@ -712,8 +710,8 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 
 		patch.gps = coord
 		
-		corrected_patches.append(patch)
-		can_be_corrected_patches+=[t for t in tmp_neighbors if (t not in corrected_patches) and (t not in can_be_corrected_patches)]
+		patch.Corrected = True
+		can_be_corrected_patches+=[t for t in tmp_neighbors if t.Corrected == False and (t not in can_be_corrected_patches)]
 
 		print('Group {0} - Patch {1} fixed{2} based on {3} neighbors. <Percentage Inliers:{4},# matches:{5}>'.format(group_id,patch.name,'*' if patch.previously_checked else '',len(corrected_neighbors),perc_in,len(matches)))
 		sys.stdout.flush()
@@ -852,10 +850,14 @@ class Patch:
 		self.SIFT_kp_locations = []
 		self.SIFT_kp_desc = []
 		self.previously_checked = False
+		self.Corrected = False
 
 	def __eq__(self,other):
 
 		return (self.name == other.name)
+
+	def __str__(self):
+		return self.name
 
 	def has_overlap(self,p):
 		if self.gps.is_coord_inside(p.gps.UL_coord) or self.gps.is_coord_inside(p.gps.UR_coord) or\
