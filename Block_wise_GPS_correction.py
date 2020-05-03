@@ -1004,6 +1004,7 @@ class Group:
 
 	def correct_internally(self):
 
+		print('Group {0} internally correction started.'.format(self.group_id))
 		# self.load_all_patches_SIFT_points()
 
 		# self.pre_calculate_internal_neighbors_and_transformation_parameters()
