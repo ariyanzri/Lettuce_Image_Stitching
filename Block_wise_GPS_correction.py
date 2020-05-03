@@ -398,8 +398,8 @@ def merge_all_neighbors(corrected_neighbors,patch):
 		x_diff = p.gps.UL_coord[0] - UL[0]
 		y_diff = UL[1] - p.gps.UL_coord[1]
 		
-		st_x = int(x_diff/GPS_TO_IMAGE_RATIO[0])
-		st_y = int(y_diff/GPS_TO_IMAGE_RATIO[1])
+		st_x = int(math.ceil(x_diff/GPS_TO_IMAGE_RATIO[0]))
+		st_y = int(math.ceil(y_diff/GPS_TO_IMAGE_RATIO[1]))
 		
 		result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img
 		for i,k in enumerate(kp):
