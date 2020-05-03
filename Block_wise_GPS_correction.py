@@ -353,8 +353,9 @@ def get_result_dict_from_strings(strings):
 def find_all_neighbors(patches,patch):
 
 	neighbors = []
+
 	for p in patches:
-		if (p.has_overlap(patch) or patch.has_overlap(p)) and p != patch:
+		if (p.has_overlap(patch) or patch.has_overlap(p)) and p.name != patch.name:
 			# overlap1 = patch.get_overlap_rectangle(p)
 			# overlap2 = p.get_overlap_rectangle(patch)
 			
@@ -670,7 +671,7 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 	# print(len(can_be_corrected_patches))
 
 	while len(corrected_patches)<len(patches):
-		print(len(can_be_corrected_patches))
+
 		patch = can_be_corrected_patches.pop()
 
 		tmp_neighbors = find_all_neighbors(patches,patch)
