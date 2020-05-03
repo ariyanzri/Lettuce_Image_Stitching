@@ -559,14 +559,18 @@ def calculate_dissimilarity(p1,p2,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y
 def calculate_average_dissimilarity(patch,neighbors):
 	average_dissimilarity = 0
 
-	
+	patch.load_img()
 	for n in neighbors:
+		n.load_img()
 
 		p1_x1,p1_y1,p1_x2,p1_y2 = patch.get_overlap_rectangle(n)
 		p2_x1,p2_y1,p2_x2,p2_y2 = n.get_overlap_rectangle(patch)
 
 		average_dissimilarity+= calculate_dissimilarity(patch,n,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y2)
 
+		n.delete_img()
+
+	patch.delete_img()
 
 	average_dissimilarity/=len(neighbors)
 
