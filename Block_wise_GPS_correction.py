@@ -479,7 +479,7 @@ def get_new_GPS_Coords_all_neighbors(p1,UL,H):
 	diff_x = diff_x*gps_scale_x
 	diff_y = diff_y*gps_scale_y
 
-	new_UL = (UL[0]-diff_x,UL[1]-diff_y,7)
+	new_UL = (UL[0]-diff_x,UL[1]-diff_y)
 
 	diff_UL = (p1.gps.UL_coord[0]-new_UL[0],p1.gps.UL_coord[1]-new_UL[1])
 
@@ -536,8 +536,8 @@ def calculate_dissimilarity(p1,p2,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y
 	overlap_1_img = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2GRAY)
 	overlap_2_img = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2GRAY)
 
-	# overlap_1_img = cv2.blur(overlap_1_img,(5,5))
-	# overlap_2_img = cv2.blur(overlap_2_img,(5,5))
+	overlap_1_img = cv2.blur(overlap_1_img,(20,20))
+	overlap_2_img = cv2.blur(overlap_2_img,(20,20))
 
 	# ret1,overlap_1_img = cv2.threshold(overlap_1_img,0,255,cv2.THRESH_OTSU)
 	# ret1,overlap_2_img = cv2.threshold(overlap_2_img,0,255,cv2.THRESH_OTSU)
