@@ -17,7 +17,7 @@ PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
 NUMBER_OF_ROWS_IN_GROUPS = 4
-NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 3000
+NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 8000
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 
 
@@ -649,7 +649,7 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 		kp = patch.SIFT_kp_locations
 		desc = patch.SIFT_kp_desc
 
-		matches = get_good_matches(desc_merged,desc)
+		matches = get_top_n_good_matches(desc,desc_merged,kp,kp_merged)
 
 		H, perc_in = find_homography(matches,kp_merged,kp,None,None)
 
