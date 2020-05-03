@@ -485,8 +485,8 @@ def calculate_dissimilarity(p1,p2,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y
 	overlap_1_img = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2GRAY)
 	overlap_2_img = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2GRAY)
 
-	overlap_1_img = cv2.blur(overlap_1_img,(9,9))
-	overlap_2_img = cv2.blur(overlap_2_img,(9,9))
+	overlap_1_img = cv2.blur(overlap_1_img,(5,5))
+	overlap_2_img = cv2.blur(overlap_2_img,(5,5))
 
 	ret1,overlap_1_img = cv2.threshold(overlap_1_img,0,255,cv2.THRESH_OTSU)
 	ret1,overlap_2_img = cv2.threshold(overlap_2_img,0,255,cv2.THRESH_OTSU)
@@ -496,11 +496,11 @@ def calculate_dissimilarity(p1,p2,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y
 	overlap_1_img[overlap_1_img==255] = 1
 	overlap_2_img[overlap_2_img==255] = 1
 
-	# xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
+	xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
 
-	# dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
-	dissimilarity =  np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
-	dissimilarity /= float(overlap_1_img.shape[0] * overlap_1_img.shape[1])
+	dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
+	# dissimilarity =  np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
+	# dissimilarity /= float(overlap_1_img.shape[0] * overlap_1_img.shape[1])
 	
 
 	return dissimilarity
@@ -1264,7 +1264,7 @@ def main():
 		# os.system("taskset -p -c 1,2,3,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,44,45,46 %d" % os.getpid())
 		
 		field = Field()
-		correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
+		correct_patch_group_all_corrected_neighbors(field.groups[1].patches)
 
 		# field.draw_and_save_field()
 		# field.correct_field()
