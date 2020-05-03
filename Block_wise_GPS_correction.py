@@ -675,6 +675,9 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 		patch = can_be_corrected_patches.pop()
 
 		tmp_neighbors = find_all_neighbors(patches,patch)
+		print(corrected_patches)
+		print('000')
+		print(tmp_neighbors)
 		corrected_neighbors = find_all_neighbors(corrected_patches,patch)
 		# corrected_neighbors = [p for p in tmp_neighbors if p in corrected_patches]
 
