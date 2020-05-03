@@ -3710,8 +3710,62 @@ def test_jittering(patch1,patch2):
 
 	result = np.array(result).astype('uint8')
 	result = cv2.resize(result,(int(result.shape[1]/5),int(result.shape[0]/5)))
+
+	p1_x1,p1_y1,p1_x2,p1_y2 = patch1.get_overlap_rectangle(patch2)
+	p2_x1,p2_y1,p2_x2,p2_y2 = patch2.get_overlap_rectangle(patch1)
+
+	calculate_dissimilarity(patch1,patch2,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y2) 
+
 	cv2.imshow('fig',result)
 	cv2.waitKey(0)
+
+def calculate_dissimilarity(p1,p2,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y2):
+	overlap_1_img = p1.rgb_img[p1_y1:p1_y2,p1_x1:p1_x2,:]
+	overlap_2_img = p2.rgb_img[p2_y1:p2_y2,p2_x1:p2_x2,:]
+
+	shape_1 = np.shape(overlap_1_img)
+	shape_2 = np.shape(overlap_2_img)
+
+	if shape_1 != shape_2:
+		if shape_1[0]<shape_2[0]:
+			overlap_2_img = overlap_2_img[:shape_1[0],:,:]
+			shape_2 = shape_1
+		if shape_1[1]<shape_2[1]:
+			overlap_2_img = overlap_2_img[:,:shape_1[1],:]
+			shape_2 = shape_1
+		
+		if shape_2[0]<shape_1[0]:
+			overlap_1_img = overlap_1_img[:shape_2[0],:,:]
+			shape_1 = shape_2
+		if shape_2[1]<shape_1[1]:
+			overlap_1_img = overlap_1_img[:,:shape_2[1],:]
+			shape_1 = shape_2
+
+	if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
+		return sys.maxsize
+
+	overlap_1_img = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2GRAY)
+	overlap_2_img = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2GRAY)
+
+	overlap_1_img = cv2.blur(overlap_1_img,(5,5))
+	overlap_2_img = cv2.blur(overlap_2_img,(5,5))
+
+	ret1,overlap_1_img = cv2.threshold(overlap_1_img,0,255,cv2.THRESH_OTSU)
+	ret1,overlap_2_img = cv2.threshold(overlap_2_img,0,255,cv2.THRESH_OTSU)
+
+	tmp_size = np.shape(overlap_1_img)
+	
+	overlap_1_img[overlap_1_img==255] = 1
+	overlap_2_img[overlap_2_img==255] = 1
+
+	xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
+
+	dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
+	# dissimilarity =  np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
+	# dissimilarity /= float(overlap_1_img.shape[0] * overlap_1_img.shape[1])
+	
+
+	return dissimilarity
 
 def main():
 	global server
