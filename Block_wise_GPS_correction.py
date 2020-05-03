@@ -643,8 +643,6 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 		if len(neighbors)>max_num:
 			max_num = len(neighbors)
 			max_patch = p
-			if max_num>=5:
-				break
 
 	corrected_patches = [max_patch]
 	can_be_corrected_patches = find_all_neighbors(patches,max_patch)
