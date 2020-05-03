@@ -19,7 +19,8 @@ HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
 NUMBER_OF_ROWS_IN_GROUPS = 4
 NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 8000
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
-
+MINIMUM_PERCENTAGE_OF_INLIERS = 0.12
+MINIMUM_NUMBER_OF_MATCHES = 500
 
 def convert_to_gray(img):
 	
@@ -76,7 +77,7 @@ def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2):
 	else:
 		return None,0
 
-	H, masked = cv2.estimateAffinePartial2D(dst, src, maxIters = 9000, confidence = 0.999, refineIters = 15)
+	H, masked = cv2.estimateAffinePartial2D(dst, src, maxIters = 1000, confidence = 0.99, refineIters = 5)
 	
 	H = np.append(H,np.array([[0,0,1]]),axis=0)
 	H[0:2,0:2] = np.array([[1,0],[0,1]])
@@ -642,8 +643,6 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 		tmp_neighbors = find_all_neighbors(patches,patch)
 		corrected_neighbors = [p for p in tmp_neighbors if p in corrected_patches]
 
-		# draw_together([patch]+corrected_neighbors)
-
 		UL_merged, kp_merged, desc_merged = merge_all_neighbors(corrected_neighbors,patch)
 		patch.load_SIFT_points()
 		kp = patch.SIFT_kp_locations
@@ -654,24 +653,17 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 		H, perc_in = find_homography(matches,kp_merged,kp,None,None)
 
 		coord = get_new_GPS_Coords_all_neighbors(patch,UL_merged,H)
-		# dis = calculate_average_dissimilarity(patch,corrected_neighbors)
-		
-		if (perc_in<0.10 or len(matches)<100) and patch.previously_checked == False:
+
+		if (perc_in<MINIMUM_PERCENTAGE_OF_INLIERS or len(matches)<MINIMUM_NUMBER_OF_MATCHES) and patch.previously_checked == False:
 			patch.previously_checked = True
 			can_be_corrected_patches.insert(0,patch)
-			print('Group {0} - Patch {1} NOT FIXED {2} with neighbors. <Percentage Inliers:{3},# matches:{4}>'.format(group_id,patch.name,len(corrected_neighbors),perc_in,len(matches)))
+			# print('Group {0} - Patch {1} NOT FIXED {2} with neighbors. <Percentage Inliers:{3},# matches:{4}>'.format(group_id,patch.name,len(corrected_neighbors),perc_in,len(matches)))
 			continue  
 
 		patch.gps = coord
-		# draw_together([patch]+corrected_neighbors)
-		# patch.gps = jitter_image_to_find_least_dissimilarity(patch,corrected_neighbors)
-		# draw_together([patch]+corrected_neighbors)
-
-		# draw_together([patch]+corrected_neighbors)
-
+		
 		corrected_patches.append(patch)
 		can_be_corrected_patches=[t for t in tmp_neighbors if (t not in corrected_patches) and (t not in can_be_corrected_patches)]+can_be_corrected_patches
-		# H = get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors)
 
 		print('Group {0} - Patch {1} fixed based on {2} neighbors. <Percentage Inliers:{3},# matches:{4}>'.format(group_id,patch.name,len(corrected_neighbors),perc_in,len(matches)))
 		sys.stdout.flush()
