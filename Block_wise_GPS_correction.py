@@ -16,7 +16,7 @@ from collections import OrderedDict
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-NUMBER_OF_ROWS_IN_GROUPS = 10
+NUMBER_OF_ROWS_IN_GROUPS = 4
 NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 8000
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.15
@@ -1103,7 +1103,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups
+		return groups[0:2]
 
 	def get_rows(self):
 		global coordinates_file
@@ -1167,7 +1167,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist)
+			rows.append(newlist[0:7])
 
 		print('Rows calculated and created completely.')
 
@@ -1379,11 +1379,11 @@ def main():
 		field = Field()
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
-		# field.draw_and_save_field()
+		field.draw_and_save_field()
 		field.correct_field()
 		# field.groups[0].correct_internally()
-		# field.draw_and_save_field()
-		field.save_new_coordinate()
+		field.draw_and_save_field()
+		# field.save_new_coordinate()
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
