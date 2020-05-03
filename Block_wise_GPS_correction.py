@@ -1351,7 +1351,8 @@ def main():
 		print('RUNNING ON -- {0} --'.format(server))
 		
 		field = Field()
-		field.save_plot()
+		field.groups[0].correct_internally()
+		field.draw_and_save_field()
 		# field.correct_field()
 		# field.draw_and_save_field()
 		# field.save_new_coordinate()
