@@ -694,7 +694,7 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 		kp = patch.SIFT_kp_locations
 		desc = patch.SIFT_kp_desc
 
-		matches = get_top_n_good_matches(desc_merged,desc,kp_merged,kp)
+		matches = get_good_matches(desc_merged,desc)
 
 		H, perc_in = find_homography(matches,kp_merged,kp,None,None)
 
@@ -709,7 +709,7 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 		patch.gps = coord
 		
 		patch.Corrected = True
-		tmp_neighbors = find_all_neighbors(patches,patch)
+		# tmp_neighbors = find_all_neighbors(patches,patch)
 		can_be_corrected_patches+=[t for t in tmp_neighbors if t.Corrected == False and (t not in can_be_corrected_patches)]
 
 		print('Group {0} - Patch {1} fixed{2} based on {3} neighbors. <Percentage Inliers:{4},# matches:{5}>'.format(group_id,patch.name,'*' if patch.previously_checked else '',len(corrected_neighbors),perc_in,len(matches)))
