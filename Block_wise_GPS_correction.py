@@ -660,9 +660,13 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 			max_num = len(neighbors)
 			max_patch = p
 
+	print(max_num)
+
 	corrected_patches = [max_patch]
 	can_be_corrected_patches = find_all_neighbors(patches,max_patch)
 
+	print(len(can_be_corrected_patches))
+	
 	while len(corrected_patches)<len(patches):
 		# patch = can_be_corrected_patches.pop()
 
@@ -670,7 +674,7 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 
 		patch, corrected_neighbors = get_patch_with_max_number_of_corrected_neighbors(corrected_patches,can_be_corrected_patches)
 		tmp_neighbors = find_all_neighbors(patches,patch)
-		
+
 		can_be_corrected_patches.remove(patch)
 
 		if len(tmp_neighbors) == 0:
