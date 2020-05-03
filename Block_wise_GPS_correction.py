@@ -672,7 +672,7 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 		can_be_corrected_patches=[t for t in tmp_neighbors if (t not in corrected_patches) and (t not in can_be_corrected_patches)]+can_be_corrected_patches
 		# H = get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors)
 
-		print('Group {0} - Patch {1} fixed based on {2} neighbors.'.format(group_id,patch.name,len(corrected_neighbors)))
+		print('Group {0} - Patch {1} fixed based on {2} neighbors. <Percentage Inliers:{3},# matches:{4}>'.format(group_id,patch.name,len(corrected_neighbors),perc_in,len(matches)))
 		sys.stdout.flush()
 
 	return get_corrected_string(patches)
@@ -1363,7 +1363,7 @@ def main():
 		field = Field()
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
-		field.draw_and_save_field()
+		# field.draw_and_save_field()
 		# field.correct_field()
 		field.groups[0].correct_internally()
 		field.draw_and_save_field()
