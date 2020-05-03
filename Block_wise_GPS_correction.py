@@ -488,9 +488,9 @@ def calculate_dissimilarity(p1,p2,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y
 	return dissimilarity
 
 def jitter_and_calculate_dissimilarity(patch,neighbors,jx,jy):
-	# old_gps = patch.gps
-	# new_gps = add_to_gps_coord(patch.gps,jx,jy)
-	# patch.gps = new_gps
+	old_gps = patch.gps
+	new_gps = add_to_gps_coord(patch.gps,jx,jy)
+	patch.gps = new_gps
 
 	average_dissimilarity = 0
 
@@ -525,7 +525,7 @@ def jitter_image_to_find_least_dissimilarity(patch,neighbors):
 		for jy in list_jitter_y:
 			dissimilarity,gps_jittered = jitter_and_calculate_dissimilarity(patch,neighbors,jx,jy)
 			print(dissimilarity)
-			
+
 			if dissimilarity<min_dissimilarity:
 				min_dissimilarity = dissimilarity
 				min_gps = gps_jittered
@@ -746,19 +746,19 @@ class Patch:
 
 		if patch.gps.UL_coord[1]>=self.gps.LL_coord[1] and patch.gps.UL_coord[1]<=self.gps.UL_coord[1]:
 			detect_overlap = True
-			p1_y = int(((patch.gps.UL_coord[1]-self.gps.UL_coord[1]) / (self.gps.LL_coord[1]-self.gps.UL_coord[1]))*PATCH_SIZE[0])
+			p1_y = int(math.ceil(((patch.gps.UL_coord[1]-self.gps.UL_coord[1]) / (self.gps.LL_coord[1]-self.gps.UL_coord[1]))*PATCH_SIZE[0]))
 		
 		if patch.gps.LL_coord[1]>=self.gps.LL_coord[1] and patch.gps.LL_coord[1]<=self.gps.UL_coord[1]:
 			detect_overlap = True
-			p2_y = int(((patch.gps.LR_coord[1]-self.gps.UL_coord[1]) / (self.gps.LL_coord[1]-self.gps.UL_coord[1]))*PATCH_SIZE[0])
+			p2_y = int(math.ceil(((patch.gps.LR_coord[1]-self.gps.UL_coord[1]) / (self.gps.LL_coord[1]-self.gps.UL_coord[1]))*PATCH_SIZE[0]))
 
 		if patch.gps.UR_coord[0]<=self.gps.UR_coord[0] and patch.gps.UR_coord[0]>=self.gps.UL_coord[0]:
 			detect_overlap = True
-			p2_x = int(((patch.gps.UR_coord[0]-self.gps.UL_coord[0]) / (self.gps.UR_coord[0]-self.gps.UL_coord[0]))*PATCH_SIZE[1])
+			p2_x = int(math.ceil(((patch.gps.UR_coord[0]-self.gps.UL_coord[0]) / (self.gps.UR_coord[0]-self.gps.UL_coord[0]))*PATCH_SIZE[1]))
 			
 		if patch.gps.UL_coord[0]<=self.gps.UR_coord[0] and patch.gps.UL_coord[0]>=self.gps.UL_coord[0]:
 			detect_overlap = True
-			p1_x = int(((patch.gps.LL_coord[0]-self.gps.UL_coord[0]) / (self.gps.UR_coord[0]-self.gps.UL_coord[0]))*PATCH_SIZE[1])
+			p1_x = int(math.ceil(((patch.gps.LL_coord[0]-self.gps.UL_coord[0]) / (self.gps.UR_coord[0]-self.gps.UL_coord[0]))*PATCH_SIZE[1]))
 			
 		if patch.gps.is_coord_inside(self.gps.UL_coord) and patch.gps.is_coord_inside(self.gps.UR_coord) and \
 		patch.gps.is_coord_inside(self.gps.LL_coord) and patch.gps.is_coord_inside(self.gps.LR_coord):
