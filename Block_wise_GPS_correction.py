@@ -363,7 +363,7 @@ def find_all_neighbors(patches,patch):
 			# 	continue
 
 			neighbors.append(p)
-	print(len(neighbors))
+
 	return neighbors
 
 def draw_together(patches):
@@ -675,7 +675,8 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 		patch = can_be_corrected_patches.pop()
 
 		tmp_neighbors = find_all_neighbors(patches,patch)
-		corrected_neighbors = [p for p in tmp_neighbors if p in corrected_patches]
+		corrected_neighbors = find_all_neighbors(corrected_patches,patch)
+		# corrected_neighbors = [p for p in tmp_neighbors if p in corrected_patches]
 
 		# patch, corrected_neighbors = get_patch_with_max_number_of_corrected_neighbors(corrected_patches,can_be_corrected_patches)
 	
