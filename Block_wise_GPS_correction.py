@@ -496,11 +496,11 @@ def calculate_dissimilarity(p1,p2,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y
 	overlap_1_img[overlap_1_img==255] = 1
 	overlap_2_img[overlap_2_img==255] = 1
 
-	xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
+	# xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
 
-	dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
-	# dissimilarity =  np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
-	# dissimilarity /= float(overlap_1_img.shape[0] * overlap_1_img.shape[1])
+	# dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
+	dissimilarity =  np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
+	dissimilarity /= float(overlap_1_img.shape[0] * overlap_1_img.shape[1])
 	
 
 	return dissimilarity
