@@ -634,8 +634,20 @@ def jitter_image_to_find_least_dissimilarity(patch,neighbors):
 	return min_gps
 
 def correct_patch_group_all_corrected_neighbors(group_id,patches):
-	corrected_patches = [patches[0]]
-	can_be_corrected_patches = find_all_neighbors(patches,patches[0])
+
+	max_patch = patches[0]
+	max_num = 0
+
+	for p in patches:
+		neighbors = find_all_neighbors(patches,p)
+		if len(neighbors)>max_num:
+			max_num = len(neighbors)
+			max_patch = p
+			if max_num>=5:
+				break
+
+	corrected_patches = [max_patch]
+	can_be_corrected_patches = find_all_neighbors(patches,max_patch)
 
 	while len(corrected_patches)<len(patches):
 		patch = can_be_corrected_patches.pop()
@@ -1353,7 +1365,7 @@ def main():
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
-		# os.system("taskset -p -c 1,2,3,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,44,45,46 %d" % os.getpid())
+		os.system("taskset -p -c 1,2,3,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,45,46 %d" % os.getpid())
 		
 		field = Field()
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
