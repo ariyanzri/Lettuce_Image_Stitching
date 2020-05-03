@@ -355,11 +355,11 @@ def find_all_neighbors(patches,patch):
 	neighbors = []
 	for p in patches:
 		if (p.has_overlap(patch) or patch.has_overlap(p)) and p != patch:
-			overlap1 = patch.get_overlap_rectangle(p)
-			overlap2 = p.get_overlap_rectangle(patch)
+			# overlap1 = patch.get_overlap_rectangle(p)
+			# overlap2 = p.get_overlap_rectangle(patch)
 			
-			if overlap1[2]-overlap1[0]<PATCH_SIZE[1]/10 and overlap1[3]-overlap1[1]<PATCH_SIZE[0]/10:
-				continue
+			# if overlap1[2]-overlap1[0]<PATCH_SIZE[1]/10 and overlap1[3]-overlap1[1]<PATCH_SIZE[0]/10:
+			# 	continue
 
 			neighbors.append(p)
 
@@ -633,6 +633,22 @@ def jitter_image_to_find_least_dissimilarity(patch,neighbors):
 
 	return min_gps
 
+def get_patch_with_max_number_of_corrected_neighbors(corrected,can_be_corrected_patches):
+
+	neighbors = None
+	best_patch = None
+	score = 0
+
+	for patch in can_be_corrected_patches:
+
+		corrected_neighbors = find_all_neighbors(corrected,patch)
+		if len(corrected_neighbors)> score:
+			score = len(corrected_neighbors)
+			best_patch = patch
+			neighbors = corrected_neighbors
+
+	return best_patch,corrected_neighbors
+
 def correct_patch_group_all_corrected_neighbors(group_id,patches):
 
 	max_patch = patches[0]
@@ -648,10 +664,13 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 	can_be_corrected_patches = find_all_neighbors(patches,max_patch)
 
 	while len(corrected_patches)<len(patches):
-		patch = can_be_corrected_patches.pop()
+		# patch = can_be_corrected_patches.pop()
 
 		tmp_neighbors = find_all_neighbors(patches,patch)
-		corrected_neighbors = [p for p in tmp_neighbors if p in corrected_patches]
+		# corrected_neighbors = [p for p in tmp_neighbors if p in corrected_patches]
+
+		patch, corrected_neighbors = get_patch_with_max_number_of_corrected_neighbors(corrected_patches,can_be_corrected_patches)
+		can_be_corrected_patches.remove(patch)
 
 		if len(tmp_neighbors) == 0:
 			if not patch.previously_checked:
