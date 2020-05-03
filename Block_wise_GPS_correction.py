@@ -488,9 +488,9 @@ def calculate_dissimilarity(p1,p2,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y
 	return dissimilarity
 
 def jitter_and_calculate_dissimilarity(patch,neighbors,jx,jy):
-	old_gps = patch.gps
-	new_gps = add_to_gps_coord(patch.gps,jx,jy)
-	patch.gps = new_gps
+	# old_gps = patch.gps
+	# new_gps = add_to_gps_coord(patch.gps,jx,jy)
+	# patch.gps = new_gps
 
 	average_dissimilarity = 0
 
