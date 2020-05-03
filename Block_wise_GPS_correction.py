@@ -358,7 +358,7 @@ def find_all_neighbors(patches,patch):
 			overlap1 = patch.get_overlap_rectangle(p)
 			overlap2 = p.get_overlap_rectangle(patch)
 			
-			if overlap1[2]-overlap1[0]<PATCH_SIZE[1]/5 and overlap1[3]-overlap1[1]<PATCH_SIZE[0]/5:
+			if overlap1[2]-overlap1[0]<PATCH_SIZE[1]/10 and overlap1[3]-overlap1[1]<PATCH_SIZE[0]/10:
 				continue
 
 			neighbors.append(p)
@@ -1017,10 +1017,10 @@ class Group:
 
 		# self.delete_all_patches_SIFT_points()
 
-		# print('Group {0} was corrected internally. '.format(self.group_id))
-		# sys.stdout.flush()
-
 		string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
+
+		print('Group {0} was corrected internally. '.format(self.group_id))
+		sys.stdout.flush()
 
 		return string_res
 
