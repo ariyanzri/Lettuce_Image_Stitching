@@ -401,8 +401,6 @@ def draw_together(patches):
 	cv2.imshow('fig',result)
 	cv2.waitKey(0)
 
-	return UL,total_kp,total_desc
-
 def merge_all_neighbors(corrected_neighbors,patch):
 	total_kp = []
 	total_desc = []
@@ -632,7 +630,7 @@ def correct_patch_group_all_corrected_neighbors(patches):
 		draw_together([patch]+corrected_neighbors)
 		patch.gps = jitter_image_to_find_least_dissimilarity(patch,corrected_neighbors)
 		draw_together([patch]+corrected_neighbors)
-		
+
 		corrected_patches.append(patch)
 		can_be_corrected_patches=[t for t in tmp_neighbors if (t not in corrected_patches) and (t not in can_be_corrected_patches)]+can_be_corrected_patches
 		# H = get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors)
