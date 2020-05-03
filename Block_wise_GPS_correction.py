@@ -556,6 +556,24 @@ def calculate_dissimilarity(p1,p2,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y
 
 	return dissimilarity
 
+def calculate_average_dissimilarity(patch,neighbors):
+	average_dissimilarity = 0
+
+	
+	for n in neighbors:
+
+		p1_x1,p1_y1,p1_x2,p1_y2 = patch.get_overlap_rectangle(n)
+		p2_x1,p2_y1,p2_x2,p2_y2 = n.get_overlap_rectangle(patch)
+
+		average_dissimilarity+= calculate_dissimilarity(patch,n,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y2)
+
+
+	average_dissimilarity/=len(neighbors)
+
+	patch.gps = old_gps
+
+	return average_dissimilarity,new_gps
+
 def jitter_and_calculate_dissimilarity(patch,neighbors,jx,jy):
 	old_gps = patch.gps
 	new_gps = add_to_gps_coord(patch.gps,jx,jy)
@@ -627,7 +645,9 @@ def correct_patch_group_all_corrected_neighbors(patches):
 		H, perc_in = find_homography(matches,kp_merged,kp,None,None)
 
 		coord = get_new_GPS_Coords_all_neighbors(patch,UL_merged,H)
-		print(perc_in)
+		dis = calculate_average_dissimilarity(patch,corrected_neighbors)
+		print(perc_in,len(matches),dis)
+
 		patch.gps = coord
 		# draw_together([patch]+corrected_neighbors)
 		# patch.gps = jitter_image_to_find_least_dissimilarity(patch,corrected_neighbors)
