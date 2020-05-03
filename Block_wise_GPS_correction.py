@@ -668,9 +668,7 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 	max_patch.Corrected = True
 	can_be_corrected_patches = find_all_neighbors(patches,max_patch)
 
-	print(len(can_be_corrected_patches))
-
-	while len(can_be_corrected_patches)==0:
+	while len(can_be_corrected_patches)>0:
 
 		patch = can_be_corrected_patches.pop()
 
