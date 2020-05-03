@@ -465,6 +465,8 @@ def calculate_dissimilarity(p1,p2,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y
 	shape_2 = np.shape(overlap_2_img)
 
 	if shape_1 != shape_2:
+		print(shape_1)
+		print(shape_2)
 		return sys.maxsize
 
 	if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
