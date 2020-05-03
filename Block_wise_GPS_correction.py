@@ -353,7 +353,7 @@ def get_result_dict_from_strings(strings):
 def find_all_neighbors(patches,patch):
 
 	neighbors = []
-	print(len(patches))
+
 	for p in patches:
 		if (p.has_overlap(patch) or patch.has_overlap(p)) and p != patch:
 			# overlap1 = patch.get_overlap_rectangle(p)
@@ -363,7 +363,7 @@ def find_all_neighbors(patches,patch):
 			# 	continue
 
 			neighbors.append(p)
-
+	print(len(neighbors))
 	return neighbors
 
 def draw_together(patches):
