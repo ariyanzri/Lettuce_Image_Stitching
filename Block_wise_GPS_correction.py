@@ -651,7 +651,7 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 
 		matches = get_top_n_good_matches(desc,desc_merged,kp,kp_merged)
 
-		H, perc_in = find_homography(matches,kp_merged,kp,None,None)
+		H, perc_in = find_homography(matches,kp,kp_merged,None,None)
 
 		coord = get_new_GPS_Coords_all_neighbors(patch,UL_merged,H)
 		# dis = calculate_average_dissimilarity(patch,corrected_neighbors)
