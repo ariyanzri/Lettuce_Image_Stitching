@@ -448,8 +448,92 @@ def get_new_GPS_Coords_all_neighbors(p1,UL,H):
 
 	return new_coords
 
+def add_to_gps_coord(gps,jx,jy):
+	UL_coord = (gps.UL_coord[0]+jx,gps.UL_coord[1]+jy)
+	UR_coord = (gps.UR_coord[0]+jx,gps.UR_coord[1]+jy)
+	LL_coord = (gps.LL_coord[0]+jx,gps.LL_coord[1]+jy)
+	LR_coord = (gps.LR_coord[0]+jx,gps.LR_coord[1]+jy)
+	Center = (gps.Center[0]+jx,gps.Center[1]+jy)
+
+	return GPS_Coordinate(UL_coord,UR_coord,LL_coord,LR_coord,Center)
+
+def calculate_dissimilarity(p1,p2,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y2):
+	overlap_1_img = p1.rgb_img[p1_y1:p1_y2,p1_x1:p1_x2,:]
+	overlap_2_img = p2.rgb_img[p2_y1:p2_y2,p2_x1:p2_x2,:]
+
+	shape_1 = np.shape(overlap_1_img)
+	shape_2 = np.shape(overlap_2_img)
+
+	if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
+		return 2
+
+	overlap_1_img = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2GRAY)
+	overlap_2_img = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2GRAY)
+
+	overlap_1_img = cv2.blur(overlap_1_img,(5,5))
+	overlap_2_img = cv2.blur(overlap_2_img,(5,5))
+
+	ret1,overlap_1_img = cv2.threshold(overlap_1_img,0,255,cv2.THRESH_OTSU)
+	ret1,overlap_2_img = cv2.threshold(overlap_2_img,0,255,cv2.THRESH_OTSU)
+
+	tmp_size = np.shape(overlap_1_img)
+	
+	overlap_1_img[overlap_1_img==255] = 1
+	overlap_2_img[overlap_2_img==255] = 1
+
+	xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
+
+	dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
+
+	return dissimilarity
+
+def jitter_and_calculate_dissimilarity(patch,neighbors,jx,jy):
+	old_gps = patch.gps
+	new_gps = add_to_gps_coord(patch.gps,jx,jy)
+	patch.gps = new_gps
+
+	average_dissimilarity = 0
+
+	
+	for n in neighbors:
+
+		p1_x1,p1_y1,p1_x2,p1_y2 = patch.get_overlap_rectangle(n)
+		p2_x1,p2_y1,p2_x2,p2_y2 = n.get_overlap_rectangle(patch)
+
+		average_dissimilarity+= calculate_dissimilarity(patch,n,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y2)
+
+
+	average_dissimilarity/=len(neighbors)
+
+	patch.gps = old_gps
+
+	return average_dissimilarity,new_gps
+
 def jitter_image_to_find_least_dissimilarity(patch,neighbors):
-	pass
+	
+	list_jitter_x = [-0.0000002,-0.0000001,0,0.0000001,0.0000002]
+	list_jitter_y = [-0.0000002,-0.0000001,0,0.0000001,0.0000002]
+
+	min_dissimilarity = 1
+	min_gps = None
+
+	patch.load_img()
+	for n in neighbors:
+		n.load_img()
+
+	for jx in list_jitter_x:
+		for jy in list_jitter_y:
+			dissimilarity,gps_jittered = jitter_and_calculate_dissimilarity(patch,neighbors,jx,jy)
+
+			if dissimilarity<min_dissimilarity:
+				min_dissimilarity = dissimilarity
+				min_gps = gps_jittered
+
+	patch.delete_img()
+	for n in neighbors:
+		n.delete_img()
+
+	return min_gps
 
 def correct_patch_group_all_corrected_neighbors(patches):
 	corrected_patches = [patches[0]]
@@ -474,6 +558,8 @@ def correct_patch_group_all_corrected_neighbors(patches):
 
 		patch.gps = coord
 
+		patch.gps = jitter_image_to_find_least_dissimilarity(patch,corrected_neighbors)
+		
 		corrected_patches.append(patch)
 		can_be_corrected_patches=[t for t in tmp_neighbors if (t not in corrected_patches) and (t not in can_be_corrected_patches)]+can_be_corrected_patches
 		# H = get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors)

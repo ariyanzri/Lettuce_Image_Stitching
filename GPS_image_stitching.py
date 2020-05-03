@@ -12,6 +12,13 @@ import threading
 import socket
 from heapq import heappush, heappop, heapify
 
+PATCH_SIZE = (3296, 2472)
+PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
+HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
+NUMBER_OF_ROWS_IN_GROUPS = 10
+NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 3000
+GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
+
 def convert_to_gray(img):
 	
 	coefficients = [-1,1,2] 
@@ -3663,6 +3670,49 @@ def save_corrected_from_super_patches_string(res_string,corrected_filename):
 		f.write(res_string)
 
 
+def test_jittering(patch1,patch2):
+
+	corrected_neighbors = [patch1,patch2]
+
+	up = corrected_neighbors[0].GPS_coords.UL_coord[1]
+	down = corrected_neighbors[0].GPS_coords.LL_coord[1]
+	left = corrected_neighbors[0].GPS_coords.UL_coord[0]
+	right = corrected_neighbors[0].GPS_coords.UR_coord[0]
+
+	for p in corrected_neighbors:
+		if p.GPS_coords.UL_coord[1]>=up:
+			up=p.GPS_coords.UL_coord[1]
+
+		if p.GPS_coords.LL_coord[1]<=down:
+			down=p.GPS_coords.LL_coord[1]
+
+		if p.GPS_coords.UL_coord[0]<=left:
+			left=p.GPS_coords.UL_coord[0]
+
+		if p.GPS_coords.UR_coord[0]>=right:
+			right=p.GPS_coords.UR_coord[0]
+
+
+	super_patch_size = (int(math.ceil((up-down)/GPS_TO_IMAGE_RATIO[1]))+100,int(math.ceil((right-left)/GPS_TO_IMAGE_RATIO[0]))+100,3)
+	UL = (left,up)
+
+	result = np.zeros(super_patch_size)
+
+	for p in corrected_neighbors:
+		p.load_img('/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures')	
+		x_diff = p.GPS_coords.UL_coord[0] - UL[0]
+		y_diff = UL[1] - p.GPS_coords.UL_coord[1]
+		
+		st_x = int(x_diff/GPS_TO_IMAGE_RATIO[0])
+		st_y = int(y_diff/GPS_TO_IMAGE_RATIO[1])
+		
+		result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img
+
+	result = np.array(result).astype('uint8')
+	result = cv2.resize(result,(int(result.shape[1]/5),int(result.shape[0]/5)))
+	cv2.imshow('fig',result)
+	cv2.waitKey(0)
+
 def main():
 	global server
 
@@ -3724,6 +3774,13 @@ def main():
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
 		patches = read_all_data_on_server(patch_folder,coordinates_file,SIFT_folder,False)
+		test_jittering(patches[0],patches[3])
+		patches[3].GPS_coords.UL_coord = (patches[3].GPS_coords.UL_coord[0]+0.0000001,patches[3].GPS_coords.UL_coord[1])
+		patches[3].GPS_coords.UR_coord = (patches[3].GPS_coords.UR_coord[0]+0.0000001,patches[3].GPS_coords.UR_coord[1])
+		patches[3].GPS_coords.LL_coord = (patches[3].GPS_coords.LL_coord[0]+0.0000001,patches[3].GPS_coords.LL_coord[1])
+		patches[3].GPS_coords.LR_coord = (patches[3].GPS_coords.LR_coord[0]+0.0000001,patches[3].GPS_coords.LR_coord[1])
+		patches[3].GPS_coords.Center = (patches[3].GPS_coords.Center[0]+0.0000001,patches[3].GPS_coords.Center[1])
+		test_jittering(patches[0],patches[3])
 		# patches[0].GPS_Corrected = True
 		
 		# results = correct_GPS_MST_groups({'131':patches},SIFT_folder,patch_folder)
@@ -3733,9 +3790,9 @@ def main():
 		# patches = read_all_data()
 		# final_patches = stitch_based_on_corrected_GPS(patches,True)
 		# show_and_save_final_patches(final_patches)
-		print(patches[0].GPS_coords)
-		print(patches[1].GPS_coords.UL_coord[1]-patches[1].GPS_coords.LL_coord[1])
-		print(patches[1].GPS_coords.UR_coord[0]-patches[1].GPS_coords.UL_coord[0])
+		# print(patches[0].GPS_coords)
+		# print(patches[1].GPS_coords.UL_coord[1]-patches[1].GPS_coords.LL_coord[1])
+		# print(patches[1].GPS_coords.UR_coord[0]-patches[1].GPS_coords.UL_coord[0])
 		# draw_rows(plot_npy_file)
 		
 
