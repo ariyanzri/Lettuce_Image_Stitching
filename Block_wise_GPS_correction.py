@@ -639,6 +639,8 @@ def get_patch_with_max_number_of_corrected_neighbors(corrected,can_be_corrected_
 	best_patch = None
 	score = 0
 
+	can_be_corrected_patches = sorted(can_be_corrected_patches, key=lambda x: x.previously_checked)
+
 	for patch in can_be_corrected_patches:
 
 		corrected_neighbors = find_all_neighbors(corrected,patch)
@@ -666,7 +668,7 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 	can_be_corrected_patches = find_all_neighbors(patches,max_patch)
 
 	print(len(can_be_corrected_patches))
-	
+
 	while len(corrected_patches)<len(patches):
 		# patch = can_be_corrected_patches.pop()
 
@@ -677,13 +679,13 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 
 		can_be_corrected_patches.remove(patch)
 
-		if len(tmp_neighbors) == 0:
-			if not patch.previously_checked:
-				patch.previously_checked = True
-				can_be_corrected_patches.insert(0,patch)
-				continue
-			else:
-				continue
+		# if len(tmp_neighbors) == 0:
+		# 	if not patch.previously_checked:
+		# 		patch.previously_checked = True
+		# 		can_be_corrected_patches.insert(0,patch)
+		# 		continue
+		# 	else:
+		# 		continue
 
 		UL_merged, kp_merged, desc_merged = merge_all_neighbors(corrected_neighbors,patch)
 		patch.load_SIFT_points()
