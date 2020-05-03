@@ -655,6 +655,14 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 		tmp_neighbors = find_all_neighbors(patches,patch)
 		corrected_neighbors = [p for p in tmp_neighbors if p in corrected_patches]
 
+		if len(tmp_neighbors) == 0:
+			if not patch.previously_checked:
+				patch.previously_checked = True
+				can_be_corrected_patches.insert(0,patch)
+				continue
+			else:
+				continue
+
 		UL_merged, kp_merged, desc_merged = merge_all_neighbors(corrected_neighbors,patch)
 		patch.load_SIFT_points()
 		kp = patch.SIFT_kp_locations
@@ -675,7 +683,7 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 		patch.gps = coord
 		
 		corrected_patches.append(patch)
-		can_be_corrected_patches=[t for t in tmp_neighbors if (t not in corrected_patches) and (t not in can_be_corrected_patches)]+can_be_corrected_patches
+		can_be_corrected_patches+=[t for t in tmp_neighbors if (t not in corrected_patches) and (t not in can_be_corrected_patches)]
 
 		print('Group {0} - Patch {1} fixed{2} based on {3} neighbors. <Percentage Inliers:{4},# matches:{5}>'.format(group_id,patch.name,'*' if patch.previously_checked else '',len(corrected_neighbors),perc_in,len(matches)))
 		sys.stdout.flush()
