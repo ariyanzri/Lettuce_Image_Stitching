@@ -354,7 +354,14 @@ def find_all_neighbors(patches,patch):
 	neighbors = []
 	for p in patches:
 		if (p.has_overlap(patch) or patch.has_overlap(p)) and p != patch:
+			overlap1 = patch.get_overlap_rectangle(p)
+			overlap2 = p.get_overlap_rectangle(patch)
+			
+			if overlap1[2]-overlap1[0]<PATCH_SIZE[1]/5 and overlap1[3]-overlap1[1]<PATCH_SIZE[0]/5:
+				continue
+
 			neighbors.append(p)
+			
 	return neighbors
 
 def draw_together(patches):
