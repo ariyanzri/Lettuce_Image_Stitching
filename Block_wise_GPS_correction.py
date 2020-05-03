@@ -647,8 +647,12 @@ def correct_patch_group_all_corrected_neighbors(patches):
 		H, perc_in = find_homography(matches,kp_merged,kp,None,None)
 
 		coord = get_new_GPS_Coords_all_neighbors(patch,UL_merged,H)
-		dis = calculate_average_dissimilarity(patch,corrected_neighbors)
-		print(perc_in,len(matches),dis)
+		# dis = calculate_average_dissimilarity(patch,corrected_neighbors)
+		
+		if (perc_in<0.10 or len(matches)<100) and patch.previously_checked == False:
+			patch.previously_checked = True
+			can_be_corrected_patches.insert(0,patch)
+			continue  
 
 		patch.gps = coord
 		# draw_together([patch]+corrected_neighbors)
@@ -792,6 +796,7 @@ class Patch:
 		self.neighbors = []
 		self.SIFT_kp_locations = []
 		self.SIFT_kp_desc = []
+		self.previously_checked = False
 
 	def __eq__(self,other):
 
