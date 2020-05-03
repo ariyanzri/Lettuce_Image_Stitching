@@ -666,10 +666,11 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 	while len(corrected_patches)<len(patches):
 		# patch = can_be_corrected_patches.pop()
 
-		tmp_neighbors = find_all_neighbors(patches,patch)
 		# corrected_neighbors = [p for p in tmp_neighbors if p in corrected_patches]
 
 		patch, corrected_neighbors = get_patch_with_max_number_of_corrected_neighbors(corrected_patches,can_be_corrected_patches)
+		tmp_neighbors = find_all_neighbors(patches,patch)
+		
 		can_be_corrected_patches.remove(patch)
 
 		if len(tmp_neighbors) == 0:
