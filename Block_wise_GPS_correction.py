@@ -524,7 +524,8 @@ def jitter_image_to_find_least_dissimilarity(patch,neighbors):
 	for jx in list_jitter_x:
 		for jy in list_jitter_y:
 			dissimilarity,gps_jittered = jitter_and_calculate_dissimilarity(patch,neighbors,jx,jy)
-
+			print(dissimilarity)
+			
 			if dissimilarity<min_dissimilarity:
 				min_dissimilarity = dissimilarity
 				min_gps = gps_jittered
@@ -559,7 +560,7 @@ def correct_patch_group_all_corrected_neighbors(patches):
 		patch.gps = coord
 
 		patch.gps = jitter_image_to_find_least_dissimilarity(patch,corrected_neighbors)
-		
+
 		corrected_patches.append(patch)
 		can_be_corrected_patches=[t for t in tmp_neighbors if (t not in corrected_patches) and (t not in can_be_corrected_patches)]+can_be_corrected_patches
 		# H = get_transformation_from_all_corrected_neighbors(patch,corrected_neighbors)
