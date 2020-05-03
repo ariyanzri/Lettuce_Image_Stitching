@@ -574,9 +574,7 @@ def calculate_average_dissimilarity(patch,neighbors):
 
 	average_dissimilarity/=len(neighbors)
 
-	patch.gps = old_gps
-
-	return average_dissimilarity,new_gps
+	return average_dissimilarity
 
 def jitter_and_calculate_dissimilarity(patch,neighbors,jx,jy):
 	old_gps = patch.gps
