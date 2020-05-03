@@ -482,8 +482,8 @@ def calculate_dissimilarity(p1,p2,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y
 	if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
 		return sys.maxsize
 
-	overlap_1_img = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2GRAY)
-	overlap_2_img = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2GRAY)
+	# overlap_1_img = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2GRAY)
+	# overlap_2_img = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2GRAY)
 
 	overlap_1_img = cv2.blur(overlap_1_img,(5,5))
 	overlap_2_img = cv2.blur(overlap_2_img,(5,5))
@@ -500,7 +500,7 @@ def calculate_dissimilarity(p1,p2,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y
 
 	# dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
 	dissimilarity =  np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
-	dissimilarity /= float(overlap_1_img.shape[0] * overlap_1_img.shape[1])
+	dissimilarity /= float(overlap_1_img.shape[0] * overlap_1_img.shape[1]* overlap_1_img.shape[2])
 	
 
 	return dissimilarity
