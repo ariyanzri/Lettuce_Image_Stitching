@@ -430,10 +430,10 @@ def merge_all_neighbors(corrected_neighbors,patch):
 	result = np.zeros(super_patch_size)
 
 	patch.load_SIFT_points()
-	patch.load_img()
+	# patch.load_img()
 
 	for p in corrected_neighbors:
-		p.load_img()
+		# p.load_img()
 		p.load_SIFT_points()
 
 		overlap = p.get_overlap_rectangle(patch)
@@ -445,23 +445,23 @@ def merge_all_neighbors(corrected_neighbors,patch):
 		st_x = int(math.ceil(x_diff/GPS_TO_IMAGE_RATIO[0]))
 		st_y = int(math.ceil(y_diff/GPS_TO_IMAGE_RATIO[1]))
 		
-		result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img
+		# result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img
 		for i,k in enumerate(kp):
 			total_kp.append((k[0]+st_x,k[1]+st_y))
 			total_desc.append(desc[i,:])
 			# cv2.circle(result,(k[0]+st_x,k[1]+st_y),2,(0,0,255),-1)
 
-		p.delete_img()
+		# p.delete_img()
 
 	total_desc = np.array(total_desc)
 
-	result = np.array(result).astype('uint8')
-	result = cv2.resize(result,(int(result.shape[1]/5),int(result.shape[0]/5)))
-	img = patch.rgb_img.copy()
-	img = cv2.resize(img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
-	cv2.imshow('figmain',img)
-	cv2.imshow('fig',result)
-	cv2.waitKey(0)
+	# result = np.array(result).astype('uint8')
+	# result = cv2.resize(result,(int(result.shape[1]/5),int(result.shape[0]/5)))
+	# img = patch.rgb_img.copy()
+	# img = cv2.resize(img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
+	# cv2.imshow('figmain',img)
+	# cv2.imshow('fig',result)
+	# cv2.waitKey(0)
 
 	return UL,total_kp,total_desc
 
@@ -615,20 +615,24 @@ def correct_patch_group_all_corrected_neighbors(patches):
 		tmp_neighbors = find_all_neighbors(patches,patch)
 		corrected_neighbors = [p for p in tmp_neighbors if p in corrected_patches]
 
-		# UL_merged, kp_merged, desc_merged = merge_all_neighbors(corrected_neighbors,patch)
-		# patch.load_SIFT_points()
-		# kp = patch.SIFT_kp_locations
-		# desc = patch.SIFT_kp_desc
-
-		# matches = get_good_matches(desc_merged,desc)
-
-		# H, perc_in = find_homography(matches,kp_merged,kp,None,None)
-
-		# coord = get_new_GPS_Coords_all_neighbors(patch,UL_merged,H)
-
-		# patch.gps = coord
 		draw_together([patch]+corrected_neighbors)
-		patch.gps = jitter_image_to_find_least_dissimilarity(patch,corrected_neighbors)
+		
+		UL_merged, kp_merged, desc_merged = merge_all_neighbors(corrected_neighbors,patch)
+		patch.load_SIFT_points()
+		kp = patch.SIFT_kp_locations
+		desc = patch.SIFT_kp_desc
+
+		matches = get_good_matches(desc_merged,desc)
+
+		H, perc_in = find_homography(matches,kp_merged,kp,None,None)
+
+		coord = get_new_GPS_Coords_all_neighbors(patch,UL_merged,H)
+
+		patch.gps = coord
+		# draw_together([patch]+corrected_neighbors)
+		# patch.gps = jitter_image_to_find_least_dissimilarity(patch,corrected_neighbors)
+		# draw_together([patch]+corrected_neighbors)
+
 		draw_together([patch]+corrected_neighbors)
 
 		corrected_patches.append(patch)
