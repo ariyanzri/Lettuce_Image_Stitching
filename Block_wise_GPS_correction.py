@@ -466,7 +466,7 @@ def calculate_dissimilarity(p1,p2,p1_x1,p1_y1,p1_x2,p1_y2,p2_x1,p2_y1,p2_x2,p2_y
 
 	if shape_1 != shape_2:
 		return 2
-		
+
 	if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
 		return 2
 
@@ -514,8 +514,8 @@ def jitter_and_calculate_dissimilarity(patch,neighbors,jx,jy):
 
 def jitter_image_to_find_least_dissimilarity(patch,neighbors):
 	
-	list_jitter_x = [-0.0000002,-0.0000001,0,0.0000001,0.0000002]
-	list_jitter_y = [-0.0000002,-0.0000001,0,0.0000001,0.0000002]
+	list_jitter_x = [-0.0000003,-0.0000002,-0.0000001,0,0.0000001,0.0000002,0.0000003]
+	list_jitter_y = [-0.0000003,-0.0000002,-0.0000001,0,0.0000001,0.0000002,0.0000003]
 
 	min_dissimilarity = 1
 	min_gps = None
