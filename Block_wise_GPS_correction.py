@@ -986,7 +986,7 @@ class Group:
 
 		new_rows = []
 		for row in rows:
-			new_row = [Patch(p.name,GPS_Coordinate(p.gps.UL_coord,p.gps.UR_coord,p.gps.LL_coord,p.gps.LR_coord,p.gps.Center)) for p in row]
+			new_row = [Patch(p.name,p.gps) for p in row]
 			new_rows.append(new_row)
 			self.patches += new_row
 
@@ -1347,7 +1347,6 @@ class Field:
 		for r in result:
 			
 			string_res = r[0]
-			print(string_res)
 
 			gid = r[1]
 			result_dict = get_result_dict_from_strings(string_res)
