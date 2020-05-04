@@ -1343,6 +1343,8 @@ class Field:
 		for r in result:
 			
 			string_res = r[0]
+			print(string_res)
+			
 			gid = r[1]
 			result_dict = get_result_dict_from_strings(string_res)
 
