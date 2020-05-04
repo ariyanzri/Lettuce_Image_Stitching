@@ -1119,10 +1119,16 @@ class Group:
 
 	def correct_self_based_on_previous_group(self,previous_group):
 
-		patch_self = self.rows[0][0]
-		patch_prev = previous_group.rows[-1][0]
+		diff_x = 0
+		diff_y = 0
 
-		diff = (patch_self.gps.UL_coord[0] - patch_prev.gps.UL_coord[0],patch_self.gps.UL_coord[1] - patch_prev.gps.UL_coord[1])
+		for i,patch_self in enumerate(self.rows[0]):
+			patch_prev = previous_group.rows[-1][i]
+			diff = (patch_self.gps.UL_coord[0] - patch_prev.gps.UL_coord[0],patch_self.gps.UL_coord[1] - patch_prev.gps.UL_coord[1])
+			diff_x+=diff[0]
+			diff_y+=diff[1]
+		
+		diff = (diff_x/(i+1),diff_y/(i+1))
 
 		for p in self.patches:
 
