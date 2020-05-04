@@ -1341,6 +1341,7 @@ class Field:
 		processes.close()
 
 		for r in result:
+			
 			string_res = r[0]
 			gid = r[1]
 			result_dict = get_result_dict_from_strings(string_res)
@@ -1350,12 +1351,8 @@ class Field:
 				if group.group_id == gid:
 
 					for patch in group.patches:
+						
 						patch.gps = result_dict[patch.name]
-
-		
-
-		for group in self.groups:
-			
 
 
 	def correct_field(self):
