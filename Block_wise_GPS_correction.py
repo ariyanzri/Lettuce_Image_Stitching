@@ -893,7 +893,7 @@ class Patch:
 
 		gc.collect()
 
-	def get_overlap_rectangle(self,patch,increase_size=True):
+	def get_overlap_rectangle(self,patch,increase_size=False):
 		p1_x = 0
 		p1_y = 0
 		p2_x = PATCH_SIZE[1]
@@ -1061,7 +1061,7 @@ class Group:
 				matches = get_good_matches(desc_merged,desc)
 
 				H, perc_in = find_homography(matches,kp_merged,kp,None,None)
-				
+
 				if H is not None:
 
 					coord = get_new_GPS_Coords_all_neighbors(patch,UL_merged,H)
