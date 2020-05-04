@@ -1053,6 +1053,9 @@ class Group:
 					down_side_neighbors = find_all_neighbors(self.rows[i-1],patch)
 					neighbors = down_side_neighbors+[left_side_neighbor]
 
+				draw_together(patch)
+				draw_together(neighbors)
+				
 				draw_together(neighbors+[patch])
 
 				UL_merged, kp_merged, desc_merged = merge_all_neighbors(neighbors,patch)
