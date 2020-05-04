@@ -284,7 +284,7 @@ def get_top_n_good_matches(desc1,desc2,kp1,kp2):
 	# 	good += sorted_matches
 
 	number_of_good_matches = int(math.floor(len(sorted_matches)*PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION))
-	sorted_matches[0:number_of_good_matches]
+	good = sorted_matches[0:number_of_good_matches]
 
 	matches = np.asarray(good)
 
@@ -1138,7 +1138,7 @@ class Group:
 
 		print('Block {0} corrected based on previous block.'.format(self.group_id))
 		sys.stdout.flush()
-		
+
 		# matches = []
 		# kp = []
 		# desc = []
