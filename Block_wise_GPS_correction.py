@@ -1109,8 +1109,8 @@ class Group:
 
 		# self.delete_all_patches_SIFT_points()
 
-		string_res = self.correct_row_by_row()
-
+		# string_res = self.correct_row_by_row()
+		string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
 		print('Group {0} was corrected internally. '.format(self.group_id))
 		sys.stdout.flush()
 
