@@ -1060,8 +1060,9 @@ class Group:
 
 				matches = get_good_matches(desc_merged,desc)
 
+				H, perc_in = find_homography(matches,kp_merged,kp,None,None)
+				
 				if H is not None:
-					H, perc_in = find_homography(matches,kp_merged,kp,None,None)
 
 					coord = get_new_GPS_Coords_all_neighbors(patch,UL_merged,H)
 
