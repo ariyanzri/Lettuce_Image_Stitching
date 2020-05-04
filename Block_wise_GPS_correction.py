@@ -1110,7 +1110,10 @@ class Group:
 		# self.delete_all_patches_SIFT_points()
 
 		# string_res = self.correct_row_by_row()
-		string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
+		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
+		for p in self.patches:
+			p.gps = add_to_gps_coord(p.gps,0.000001,0)
+			
 		print('Group {0} was corrected internally. '.format(self.group_id))
 		sys.stdout.flush()
 
@@ -1123,7 +1126,7 @@ class Group:
 		diff_y = 0
 
 		for i,patch_self in enumerate(self.rows[0]):
-			patch_prev = previous_group.rows[-1][i]
+			patch_prev = previous_group.rows[NUMBER_OF_ROWS_IN_GROUPS-1][i]
 			diff = (patch_self.gps.UL_coord[0] - patch_prev.gps.UL_coord[0],patch_self.gps.UL_coord[1] - patch_prev.gps.UL_coord[1])
 			print(diff)
 			diff_x+=diff[0]
