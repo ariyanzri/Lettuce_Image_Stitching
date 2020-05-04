@@ -261,7 +261,7 @@ def get_new_GPS_Coords_for_groups(p1,p2,H):
 
 def correct_groups_internally_helper(args):
 
-	return args[0].correct_internally()
+	return args[0].correct_internally(),args[0].group_id
 
 
 def get_top_n_good_matches(desc1,desc2,kp1,kp2):
@@ -327,27 +327,27 @@ def get_corrected_string(patches):
 	return final_results
 
 
-def get_result_dict_from_strings(strings):
+def get_result_dict_from_strings(s):
 
 	res_dict = {}
 
-	for s in strings:
-		for l in s.split('\n'):
-				if l == '':
-					break
-				
-				features = l.split(',')
+	for l in s.split('\n'):
+		if l == '':
+			break
+		
+		features = l.split(',')
 
-				filename = features[0]
-				upper_left = (float(features[1]),float(features[2]))
-				lower_left = (float(features[3]),float(features[4]))
-				upper_right = (float(features[5]),float(features[6]))
-				lower_right = (float(features[7]),float(features[8]))
-				center = (float(features[9]),float(features[10]))
+		filename = features[0]
+		upper_left = (float(features[1]),float(features[2]))
+		lower_left = (float(features[3]),float(features[4]))
+		upper_right = (float(features[5]),float(features[6]))
+		lower_right = (float(features[7]),float(features[8]))
+		center = (float(features[9]),float(features[10]))
 
-				coord = GPS_Coordinate(upper_left,upper_right,lower_left,lower_right,center)
-				
-				res_dict[filename] = coord
+		coord = GPS_Coordinate(upper_left,upper_right,lower_left,lower_right,center)
+		
+		res_dict[filename] = coord
+		
 
 	return res_dict
 
@@ -1337,14 +1337,25 @@ class Field:
 			args_list.append((group,1))
 
 		processes = multiprocessing.Pool(int(no_of_cores_to_use/2))
-		str_results = processes.map(correct_groups_internally_helper,args_list)
+		result = processes.map(correct_groups_internally_helper,args_list)
 		processes.close()
 
-		result_dict = get_result_dict_from_strings(str_results)
-		print(result_dict)
+		for r in result:
+			string_res = r[0]
+			gid = r[1]
+			result_dict = get_result_dict_from_strings(string_res)
+
+			for group in self.groups:
+				
+				if group.group_id == gid:
+
+					for patch in group.patches:
+						patch.gps = result_dict[patch.name]
+
+		
+
 		for group in self.groups:
-			for patch in group.patches:
-				patch.gps = result_dict[patch.name]
+			
 
 
 	def correct_field(self):
