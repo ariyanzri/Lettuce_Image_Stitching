@@ -1055,7 +1055,7 @@ class Group:
 					neighbors = down_side_neighbors+[left_side_neighbor]
 
 				patch.load_img()
-				main = cv2.resize(p.rgb_img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
+				main = cv2.resize(patch.rgb_img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
 				cv2.imshow('main',main)
 
 				draw_together(neighbors+[patch])
