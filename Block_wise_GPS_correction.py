@@ -1068,6 +1068,8 @@ class Group:
 				
 				patch.Corrected = True
 
+				print('Group {0} - Patch {1} fixed based on {2} neighbors. <Percentage Inliers:{3},# matches:{4}>'.format(self.group_id,patch.name,len(neighbors),perc_in,len(matches)))
+
 		self.delete_all_patches_SIFT_points()
 
 		return get_corrected_string(self.patches)
