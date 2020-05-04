@@ -702,6 +702,21 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 
 		H, perc_in = find_homography(matches,kp_merged,kp,None,None)
 
+		if H is None:
+			if patch.previously_checked:
+				patch.Corrected = True
+				tmp_neighbors = find_all_neighbors(patches,patch)
+				can_be_corrected_patches+=[t for t in tmp_neighbors if t.Corrected == False and (t not in can_be_corrected_patches)]
+
+				print('Group {0} - Patch {1} fixed with H problem based on {2} neighbors.'.format(group_id,patch.name,len(corrected_neighbors)))
+				sys.stdout.flush()
+				continue
+			else:
+				patch.previously_checked = True
+				can_be_corrected_patches.insert(0,patch)
+				print('Group {0} - Patch {1} NOT FIXED {2} with neighbors. <Percentage Inliers:{3},# matches:{4}>. H IS NONE.'.format(group_id,patch.name,len(corrected_neighbors),perc_in,len(matches)))
+				continue
+
 		coord = get_new_GPS_Coords_all_neighbors(patch,UL_merged,H)
 
 		if (perc_in<MINIMUM_PERCENTAGE_OF_INLIERS or len(matches)<MINIMUM_NUMBER_OF_MATCHES) and patch.previously_checked == False:
@@ -1504,7 +1519,7 @@ def main():
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
-		os.system("taskset -p -c 1,2,3,4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,45,46 %d" % os.getpid())
+		os.system("taskset -p -c 4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,45,46 %d" % os.getpid())
 		
 		field = Field()
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
@@ -1522,7 +1537,7 @@ def main():
 
 
 
-server_core = {'coge':64,'laplace.cs.arizona.edu':20,'ariyan':4}
+server_core = {'coge':64,'laplace.cs.arizona.edu':16,'ariyan':4}
 
 server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
