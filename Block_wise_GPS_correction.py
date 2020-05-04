@@ -1049,16 +1049,20 @@ class Group:
 					left_side_neighbor = r[j-1]
 					down_side_neighbors = []
 					neighbors = down_side_neighbors+[left_side_neighbor]
+				elif i>0 and j==0:
+					left_side_neighbor = None
+					down_side_neighbors = find_all_neighbors(self.rows[i-1],patch)
+					neighbors = down_side_neighbors
 				elif i>0 and j>0:
 					left_side_neighbor = r[j-1]
 					down_side_neighbors = find_all_neighbors(self.rows[i-1],patch)
-					neighbors = down_side_neighbors+[left_side_neighbor]
+					neighbors = down_side_neighbors
 
-				patch.load_img()
-				main = cv2.resize(patch.rgb_img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
-				cv2.imshow('main',main)
+				# patch.load_img()
+				# main = cv2.resize(patch.rgb_img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
+				# cv2.imshow('main',main)
 
-				draw_together(neighbors+[patch])
+				# draw_together(neighbors+[patch])
 
 				UL_merged, kp_merged, desc_merged = merge_all_neighbors(neighbors,patch)
 				
@@ -1081,7 +1085,7 @@ class Group:
 				else:
 					print('Group {0} - Patch {1} NOT FIXED on {2} neighbors. H is None. <Percentage Inliers:{3},# matches:{4}>'.format(self.group_id,patch.name,len(neighbors),perc_in,len(matches)))
 
-				draw_together(neighbors+[patch])
+				# draw_together(neighbors+[patch])
 
 		self.delete_all_patches_SIFT_points()
 
