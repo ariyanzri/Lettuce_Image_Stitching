@@ -1110,14 +1110,10 @@ class Group:
 		# self.delete_all_patches_SIFT_points()
 
 		# string_res = self.correct_row_by_row()
-		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
+		string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
 		
-		for p in self.patches:
-			p.gps = add_to_gps_coord(p.gps,0.0001,0)
-
 		print('Group {0} was corrected internally. '.format(self.group_id))
 		sys.stdout.flush()
-		string_res = get_corrected_string(self.patches)
 
 		return string_res
 
@@ -1338,8 +1334,6 @@ class Field:
 
 			args_list.append((group,1))
 
-		print('{0} - {1}'.format(self.groups[0].patches[0].name,self.groups[0].patches[0].gps.UL_coord))
-
 		processes = multiprocessing.Pool(int(no_of_cores_to_use/2))
 		result = processes.map(correct_groups_internally_helper,args_list)
 		processes.close()
@@ -1358,8 +1352,6 @@ class Field:
 					for patch in group.patches:
 						
 						patch.gps = result_dict[patch.name]
-
-		print('{0} - {1}'.format(self.groups[0].patches[0].name,self.groups[0].patches[0].gps.UL_coord))
 
 	def correct_field(self):
 		
