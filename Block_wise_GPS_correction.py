@@ -685,13 +685,14 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 	
 		# can_be_corrected_patches.remove(patch)
 
-		# if len(tmp_neighbors) == 0:
-		# 	if not patch.previously_checked:
-		# 		patch.previously_checked = True
-		# 		can_be_corrected_patches.insert(0,patch)
-		# 		continue
-		# 	else:
-		# 		continue
+		if len(corrected_neighbors) == 0:
+			if not patch.previously_checked:
+				patch.previously_checked = True
+				print('Group {0} - Patch {1} NOT FIXED on {2} neighbors. Corrected Neighbors are empty.'.format(group_id,patch.name,len(corrected_neighbors)))
+				can_be_corrected_patches.insert(0,patch)
+				continue
+			else:
+				continue
 
 		UL_merged, kp_merged, desc_merged = merge_all_neighbors(corrected_neighbors,patch)
 		patch.load_SIFT_points()
