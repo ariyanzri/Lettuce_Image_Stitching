@@ -1060,9 +1060,9 @@ class Group:
 				kp = patch.SIFT_kp_locations
 				desc = patch.SIFT_kp_desc
 
-				matches = get_top_n_good_matches(desc,desc_merged,kp,kp_merged)
+				matches = get_top_n_good_matches(desc_merged,desc,kp_merged,kp)
 
-				H, perc_in = find_homography(matches,kp,kp_merged,None,None)
+				H, perc_in = find_homography(matches,kp_merged,kp,None,None)
 
 				if H is not None:
 
