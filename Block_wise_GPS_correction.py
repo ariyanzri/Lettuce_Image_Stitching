@@ -17,7 +17,7 @@ PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
 NUMBER_OF_ROWS_IN_GROUPS = 4
-NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 8000
+PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
 MINIMUM_NUMBER_OF_MATCHES = 100
@@ -278,11 +278,14 @@ def get_top_n_good_matches(desc1,desc2,kp1,kp2):
 
 	good = []
 
-	if len(sorted_matches)>NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION:
-		good += sorted_matches[0:NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION]
-	else:
-		good += sorted_matches
+	# if len(sorted_matches)>NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION:
+	# 	good += sorted_matches[0:NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION]
+	# else:
+	# 	good += sorted_matches
 
+	number_of_good_matches = int(math.floor(len(sorted_matches)*PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION))
+	sorted_matches[0:number_of_good_matches]
+	
 	matches = np.asarray(good)
 
 	return matches
