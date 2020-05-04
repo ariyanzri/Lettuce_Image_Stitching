@@ -407,6 +407,7 @@ def draw_together(patches):
 
 	result = np.array(result).astype('uint8')
 	result = cv2.resize(result,(int(result.shape[1]/5),int(result.shape[0]/5)))
+
 	cv2.imshow('fig',result)
 	cv2.waitKey(0)
 
@@ -1053,8 +1054,9 @@ class Group:
 					down_side_neighbors = find_all_neighbors(self.rows[i-1],patch)
 					neighbors = down_side_neighbors+[left_side_neighbor]
 
-				draw_together([patch])
-				draw_together(neighbors)
+				patch.load_img()
+				main = cv2.resize(p.rgb_img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
+				cv2.imshow('main',main)
 
 				draw_together(neighbors+[patch])
 
