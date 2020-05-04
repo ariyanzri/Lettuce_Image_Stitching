@@ -1128,7 +1128,10 @@ class Group:
 		diff_y = 0
 
 		for i,patch_self in enumerate(self.rows[0]):
+
 			patch_prev = previous_group.rows[NUMBER_OF_ROWS_IN_GROUPS-1][i]
+			print(patch_self.gps.UL_coord)
+			print(patch_prev.gps.UL_coord)
 			diff = (patch_self.gps.UL_coord[0] - patch_prev.gps.UL_coord[0],patch_self.gps.UL_coord[1] - patch_prev.gps.UL_coord[1])
 			print(diff)
 			diff_x+=diff[0]
@@ -1375,9 +1378,7 @@ class Field:
 				group.load_all_patches_SIFT_points()				
 				previous_group = group
 				continue
-			print(group.group_id)
-			print(previous_group.group_id)
-			
+
 			group.load_all_patches_SIFT_points()
 			group.correct_self_based_on_previous_group(previous_group)
 			previous_group.delete_all_patches_SIFT_points()
