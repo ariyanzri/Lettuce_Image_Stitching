@@ -1060,15 +1060,18 @@ class Group:
 
 				matches = get_good_matches(desc_merged,desc)
 
-				H, perc_in = find_homography(matches,kp_merged,kp,None,None)
+				if H is not None:
+					H, perc_in = find_homography(matches,kp_merged,kp,None,None)
 
-				coord = get_new_GPS_Coords_all_neighbors(patch,UL_merged,H)
+					coord = get_new_GPS_Coords_all_neighbors(patch,UL_merged,H)
 
-				patch.gps = coord
+					patch.gps = coord
 				
-				patch.Corrected = True
+					patch.Corrected = True
 
-				print('Group {0} - Patch {1} fixed based on {2} neighbors. <Percentage Inliers:{3},# matches:{4}>'.format(self.group_id,patch.name,len(neighbors),perc_in,len(matches)))
+					print('Group {0} - Patch {1} fixed based on {2} neighbors. <Percentage Inliers:{3},# matches:{4}>'.format(self.group_id,patch.name,len(neighbors),perc_in,len(matches)))
+				else:
+					print('Group {0} - Patch {1} NOT FIXED on {2} neighbors. H is None. <Percentage Inliers:{3},# matches:{4}>'.format(self.group_id,patch.name,len(neighbors),perc_in,len(matches)))
 
 		self.delete_all_patches_SIFT_points()
 
