@@ -1343,7 +1343,7 @@ class Field:
 
 	def correct_field(self):
 		
-		# self.correct_groups_internally()
+		self.correct_groups_internally()
 
 		print('Internally correction is finished.')
 		sys.stdout.flush()
