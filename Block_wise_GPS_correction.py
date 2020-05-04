@@ -1120,19 +1120,19 @@ class Group:
 
 	def correct_self_based_on_previous_group(self,previous_group):
 
-		diff_x = 0
-		diff_y = 0
+		diff_x = []
+		diff_y = []
 
 		for i,patch_self in enumerate(self.rows[0]):
 
 			patch_prev = previous_group.rows[NUMBER_OF_ROWS_IN_GROUPS-1][i]
 
 			diff = (patch_self.gps.UL_coord[0] - patch_prev.gps.UL_coord[0],patch_self.gps.UL_coord[1] - patch_prev.gps.UL_coord[1])
-			print(diff)
-			diff_x+=diff[0]
-			diff_y+=diff[1]
+			
+			diff_x.append(diff[0])
+			diff_y.append(diff[1])
 		
-		diff = (diff_x/(i+1),diff_y/(i+1))
+		diff = (max(set(diff_x), key=diff_x.count),max(set(diff_y), key=diff_y.count))
 
 		for p in self.patches:
 
