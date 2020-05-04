@@ -1240,7 +1240,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups
+		return groups[1:3]
 
 	def get_rows(self):
 		global coordinates_file
