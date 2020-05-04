@@ -1111,11 +1111,13 @@ class Group:
 
 		# string_res = self.correct_row_by_row()
 		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
+		
+		print(self.patches[0].gps.Center)
 		for p in self.patches:
-			print(p.gps.Center)
 			p.gps = add_to_gps_coord(p.gps,0.0001,0)
-			print(p.gps.Center)
 
+		print(self.patches[0].gps.Center)
+		
 		print('Group {0} was corrected internally. '.format(self.group_id))
 		sys.stdout.flush()
 		string_res = get_corrected_string(self.patches)
