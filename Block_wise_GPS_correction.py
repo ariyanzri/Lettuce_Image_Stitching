@@ -310,7 +310,7 @@ def calculate_homography_for_super_patches(kp,prev_kp,matches):
 	return H
 
 def get_corrected_string(patches):
-
+	print(patches[0].gps.Center)
 	final_results = ''
 
 	for p in patches:
@@ -1116,8 +1116,7 @@ class Group:
 		for p in self.patches:
 			p.gps = add_to_gps_coord(p.gps,0.0001,0)
 
-		print(self.patches[0].gps.Center)
-		
+
 		print('Group {0} was corrected internally. '.format(self.group_id))
 		sys.stdout.flush()
 		string_res = get_corrected_string(self.patches)
