@@ -1041,7 +1041,7 @@ class Group:
 		for i,r in enumerate(self.rows):
 
 			for j,patch in enumerate(r):
-				print(i,j)
+				# print(i,j)
 				if i == 0 and j == 0:
 					patch.Corrected = True
 					continue
@@ -1469,8 +1469,8 @@ def main():
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
 		# field.draw_and_save_field()
-		field.groups[0].correct_internally()
-		# field.correct_field()
+		# field.groups[0].correct_internally()
+		field.correct_field()
 		# field.groups[0].correct_internally()
 		field.draw_and_save_field()
 		# field.save_new_coordinate()
