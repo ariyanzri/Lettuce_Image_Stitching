@@ -1053,6 +1053,8 @@ class Group:
 					down_side_neighbors = find_all_neighbors(self.rows[i-1],patch)
 					neighbors = down_side_neighbors+[left_side_neighbor]
 
+				draw_together(neighbors+[patch])
+
 				UL_merged, kp_merged, desc_merged = merge_all_neighbors(neighbors,patch)
 				
 				kp = patch.SIFT_kp_locations
@@ -1073,6 +1075,8 @@ class Group:
 					print('Group {0} - Patch {1} fixed based on {2} neighbors. <Percentage Inliers:{3},# matches:{4}>'.format(self.group_id,patch.name,len(neighbors),perc_in,len(matches)))
 				else:
 					print('Group {0} - Patch {1} NOT FIXED on {2} neighbors. H is None. <Percentage Inliers:{3},# matches:{4}>'.format(self.group_id,patch.name,len(neighbors),perc_in,len(matches)))
+
+				draw_together(neighbors+[patch])
 
 		self.delete_all_patches_SIFT_points()
 
