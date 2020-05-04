@@ -1496,7 +1496,7 @@ def main():
 		
 		field = Field()
 		# field.groups[0].correct_internally()
-		field.draw_and_save_field()
+		# field.draw_and_save_field()
 		field.correct_field()
 		field.draw_and_save_field()
 		# field.save_new_coordinate()
