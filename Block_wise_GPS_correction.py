@@ -310,7 +310,7 @@ def calculate_homography_for_super_patches(kp,prev_kp,matches):
 	return H
 
 def get_corrected_string(patches):
-	print('{0} - {1}'.format(patches[0].name,patches[0].gps.UL_coord))
+	
 	final_results = ''
 
 	for p in patches:
@@ -1111,7 +1111,7 @@ class Group:
 
 		# string_res = self.correct_row_by_row()
 		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
-		print('{0} - {1}'.format(self.patches[0].name,self.patches[0].gps.UL_coord))
+		
 		for p in self.patches:
 			p.gps = add_to_gps_coord(p.gps,0.0001,0)
 
@@ -1336,6 +1336,8 @@ class Field:
 
 			args_list.append((group,1))
 
+		print('{0} - {1}'.format(self.groups[0].patches[0].name,self.groups[0].patches[0].gps.UL_coord))
+
 		processes = multiprocessing.Pool(int(no_of_cores_to_use/2))
 		result = processes.map(correct_groups_internally_helper,args_list)
 		processes.close()
@@ -1356,7 +1358,8 @@ class Field:
 						
 						patch.gps = result_dict[patch.name]
 
-
+		print('{0} - {1}'.format(self.groups[0].patches[0].name,self.groups[0].patches[0].gps.UL_coord))
+		
 	def correct_field(self):
 		
 		self.correct_groups_internally()
