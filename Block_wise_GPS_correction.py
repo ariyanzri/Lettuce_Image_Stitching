@@ -1111,7 +1111,7 @@ class Group:
 
 		# string_res = self.correct_row_by_row()
 		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
-		print('{0} - {1}'.format(self.patches[0].name,patches[0].gps.UL_coord))
+		print('{0} - {1}'.format(self.patches[0].name,self.patches[0].gps.UL_coord))
 		for p in self.patches:
 			p.gps = add_to_gps_coord(p.gps,0.0001,0)
 
