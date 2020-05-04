@@ -1033,6 +1033,45 @@ class Group:
 			a.neighbors = new_neighbors
 
 
+	def correct_row_by_row(self):
+
+		self.load_all_patches_SIFT_points()
+
+		for i,r in enumerate(self.rows):
+
+			for j,patch in enumerate(r):
+				
+				if i == 0 and j == 0:
+					patch.Corrected = True
+					continue
+				elif i == 0 and j>0:
+					left_side_neighbor = r[j-1]
+					down_side_neighbors = []
+					neighbors = down_side_neighbors+[left_side_neighbor]
+				elif i>0 and j>0:
+					left_side_neighbor = r[j-1]
+					down_side_neighbors = find_all_neighbors(self.rows[i-1],patch)
+					neighbors = down_side_neighbors+[left_side_neighbor]
+
+				UL_merged, kp_merged, desc_merged = merge_all_neighbors(neighbors,patch)
+				
+				kp = patch.SIFT_kp_locations
+				desc = patch.SIFT_kp_desc
+
+				matches = get_good_matches(desc_merged,desc)
+
+				H, perc_in = find_homography(matches,kp_merged,kp,None,None)
+
+				coord = get_new_GPS_Coords_all_neighbors(patch,UL_merged,H)
+
+				patch.gps = coord
+				
+				patch.Corrected = True
+
+		self.delete_all_patches_SIFT_points()
+
+		return get_corrected_string(self.patches)
+
 	def correct_internally(self):
 
 		print('Group {0} internally correction started.'.format(self.group_id))
@@ -1048,7 +1087,7 @@ class Group:
 
 		# self.delete_all_patches_SIFT_points()
 
-		string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
+		string_res = self.correct_row_by_row()
 
 		print('Group {0} was corrected internally. '.format(self.group_id))
 		sys.stdout.flush()
