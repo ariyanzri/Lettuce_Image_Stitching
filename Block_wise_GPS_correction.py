@@ -1359,7 +1359,7 @@ class Field:
 						patch.gps = result_dict[patch.name]
 
 		print('{0} - {1}'.format(self.groups[0].patches[0].name,self.groups[0].patches[0].gps.UL_coord))
-		
+
 	def correct_field(self):
 		
 		self.correct_groups_internally()
@@ -1375,7 +1375,9 @@ class Field:
 				group.load_all_patches_SIFT_points()				
 				previous_group = group
 				continue
-
+			print(group.group_id)
+			print(previous_group.group_id)
+			
 			group.load_all_patches_SIFT_points()
 			group.correct_self_based_on_previous_group(previous_group)
 			previous_group.delete_all_patches_SIFT_points()
