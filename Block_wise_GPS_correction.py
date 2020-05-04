@@ -986,7 +986,7 @@ class Group:
 
 		new_rows = []
 		for row in rows:
-			new_row = [Patch(p.name,p.gps) for p in row]
+			new_row = [Patch(p.name,GPS_Coordinate(p.gps.UL_coord,p.gps.UR_coord,p.gps.LL_coord,p.gps.LR_coord,p.gps.Center)) for p in row]
 			new_rows.append(new_row)
 			self.patches += new_row
 
@@ -1130,8 +1130,7 @@ class Group:
 		for i,patch_self in enumerate(self.rows[0]):
 
 			patch_prev = previous_group.rows[NUMBER_OF_ROWS_IN_GROUPS-1][i]
-			print(patch_self.gps.UL_coord)
-			print(patch_prev.gps.UL_coord)
+
 			diff = (patch_self.gps.UL_coord[0] - patch_prev.gps.UL_coord[0],patch_self.gps.UL_coord[1] - patch_prev.gps.UL_coord[1])
 			print(diff)
 			diff_x+=diff[0]
