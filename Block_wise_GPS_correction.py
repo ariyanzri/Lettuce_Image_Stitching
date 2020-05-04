@@ -1133,19 +1133,19 @@ class Group:
 			diff_x+=diff[0]
 			diff_y+=diff[1]
 		
-		diff = (diff_x/(i+1),diff_y/(i+1))
+		# diff = (diff_x/(i+1),diff_y/(i+1))
 
-		for p in self.patches:
+		# for p in self.patches:
 
-			new_UL = (p.gps.UL_coord[0]-diff[0],p.gps.UL_coord[1]-diff[1])
-			new_UR = (p.gps.UR_coord[0]-diff[0],p.gps.UR_coord[1]-diff[1])
-			new_LL = (p.gps.LL_coord[0]-diff[0],p.gps.LL_coord[1]-diff[1])
-			new_LR = (p.gps.LR_coord[0]-diff[0],p.gps.LR_coord[1]-diff[1])
-			new_center = (p.gps.Center[0]-diff[0],p.gps.Center[1]-diff[1])
+		# 	new_UL = (p.gps.UL_coord[0]-diff[0],p.gps.UL_coord[1]-diff[1])
+		# 	new_UR = (p.gps.UR_coord[0]-diff[0],p.gps.UR_coord[1]-diff[1])
+		# 	new_LL = (p.gps.LL_coord[0]-diff[0],p.gps.LL_coord[1]-diff[1])
+		# 	new_LR = (p.gps.LR_coord[0]-diff[0],p.gps.LR_coord[1]-diff[1])
+		# 	new_center = (p.gps.Center[0]-diff[0],p.gps.Center[1]-diff[1])
 
-			new_coords = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+		# 	new_coords = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
 
-			p.gps = new_coords
+		# 	p.gps = new_coords
 
 		print('Block {0} corrected based on previous block.'.format(self.group_id))
 		sys.stdout.flush()
