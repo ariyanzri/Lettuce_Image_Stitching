@@ -1051,7 +1051,7 @@ class Group:
 					neighbors = down_side_neighbors+[left_side_neighbor]
 				elif i>0 and j>0:
 					left_side_neighbor = r[j-1]
-					down_side_neighbors = find_all_neighbors(self.rows[i-1],patch)
+					down_side_neighbors = find_all_neighbors(self.rows[i-1][j-1:j+1],patch)
 					neighbors = down_side_neighbors+[left_side_neighbor]
 
 				patch.load_img()
