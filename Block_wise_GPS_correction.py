@@ -913,7 +913,7 @@ class Patch:
 
 		gc.collect()
 
-	def get_overlap_rectangle(self,patch,increase_size=False):
+	def get_overlap_rectangle(self,patch,increase_size=True):
 		p1_x = 0
 		p1_y = 0
 		p2_x = PATCH_SIZE[1]
