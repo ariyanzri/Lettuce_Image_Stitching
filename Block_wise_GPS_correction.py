@@ -1342,14 +1342,14 @@ class Field:
 		# np.save(plot_npy_file,np.array(result))	
 
 		result = []
-		color = 'red'
+		color = 0
 
 		for group in self.groups:
 			
-			if color == 'red':
-				color = 'green'
+			if color == 0:
+				color = 1
 			else:
-				color = 'red'
+				color = 0
 
 			for row in group.rows:
 				
