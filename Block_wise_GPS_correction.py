@@ -1241,7 +1241,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups[1:3]
+		return groups
 
 	def get_rows(self):
 		global coordinates_file
@@ -1475,26 +1475,26 @@ class Field:
 		print('Coordinates saved.')
 		sys.stdout.flush()
 
-def main():
+def main(scan_date):
 	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path
 
 	if server == 'coge':
-		patch_folder = '/storage/ariyanzarei/2020-01-08-rgb/bin2tif_out'
-		SIFT_folder = '/storage/ariyanzarei/2020-01-08-rgb/SIFT'
-		lid_file = '/storage/ariyanzarei/2020-01-08-rgb/lids.txt'
-		coordinates_file = '/storage/ariyanzarei/2020-01-08-rgb/2020-01-08_coordinates.csv'
-		CORRECTED_coordinates_file = '/storage/ariyanzarei/2020-01-08-rgb/2020-01-08_coordinates_CORRECTED.csv'
-		plot_npy_file = '/storage/ariyanzarei/2020-01-08-rgb/plt.npy'
-		row_save_path = '/storage/ariyanzarei/2020-01-08-rgb/rows'
+		patch_folder = '/storage/ariyanzarei/{0}-rgb/bin2tif_out'.format(scan_date)
+		SIFT_folder = '/storage/ariyanzarei/{0}-rgb/SIFT'.format(scan_date)
+		lid_file = '/storage/ariyanzarei/{0}-rgb/lids.txt'.format(scan_date)
+		coordinates_file = '/storage/ariyanzarei/{0}-rgb/{0}_coordinates.csv'.format(scan_date)
+		CORRECTED_coordinates_file = '/storage/ariyanzarei/{0}-rgb/{0}_coordinates_CORRECTED.csv'.format(scan_date)
+		plot_npy_file = '/storage/ariyanzarei/{0}-rgb/plt.npy'.format(scan_date)
+		row_save_path = '/storage/ariyanzarei/{0}-rgb/rows'.format(scan_date)
 		field_image_path = 'field.bmp'
 
 	elif server == 'laplace.cs.arizona.edu':
-		patch_folder = '/data/plant/full_scans/2020-01-08-rgb/bin2tif_out'
-		SIFT_folder = '/data/plant/full_scans/2020-01-08-rgb/SIFT'
-		lid_file = '/data/plant/full_scans/2020-01-08-rgb/lids.txt'
-		coordinates_file = '/data/plant/full_scans/metadata/2020-01-08_coordinates.csv'
-		CORRECTED_coordinates_file = '/data/plant/full_scans/metadata/2020-01-08_coordinates_CORRECTED.csv'
-		plot_npy_file = '/data/plant/full_scans/2020-01-08-rgb/plt.npy'
+		patch_folder = '/data/plant/full_scans/{0}-rgb/bin2tif_out'.format(scan_date)
+		SIFT_folder = '/data/plant/full_scans/{0}-rgb/SIFT'.format(scan_date)
+		lid_file = '/data/plant/full_scans/{0}-rgb/lids.txt'.format(scan_date)
+		coordinates_file = '/data/plant/full_scans/metadata/{0}_coordinates.csv'.format(scan_date)
+		CORRECTED_coordinates_file = '/data/plant/full_scans/metadata/{0}_coordinates_CORRECTED.csv'.format(scan_date)
+		plot_npy_file = '/data/plant/full_scans/{0}-rgb/plt.npy'.format(scan_date)
 		field_image_path = 'field.bmp'
 
 	elif server == 'ariyan':
@@ -1511,10 +1511,12 @@ def main():
 		print('RUNNING ON -- {0} --'.format(server))
 		
 		field = Field()
+		field.save_plot()
+
 		# field.groups[0].correct_internally()
 		# field.draw_and_save_field()
-		field.correct_field()
-		field.draw_and_save_field()
+		# field.correct_field()
+		# field.draw_and_save_field()
 		# field.save_new_coordinate()
 
 
@@ -1544,6 +1546,6 @@ server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
 
 start_time = datetime.datetime.now()
-main()
+main('2020-02-24')
 end_time = datetime.datetime.now()
 report_time(start_time,end_time)
