@@ -188,11 +188,11 @@ def visualize_plot():
 
 	data = np.load(plot_npy_file)
 
-	# c = []
-	# for d in data:
-	# 	c.append((d[2]/255,d[3]/255,d[4]/255))
+	c = []
+	for d in data:
+		c.append('red' if d[2] == 0 else 'green')
 
-	plt.scatter(data[:,0],data[:,1],color=data[:2],alpha=0.5)
+	plt.scatter(data[:,0],data[:,1],color=c,alpha=0.5)
 
 	plt.show()
 
@@ -705,7 +705,7 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 
 		if H is None:
 			if patch.previously_checked:
-				patch.Corrected = True
+				patch.Corrected = False
 				tmp_neighbors = find_all_neighbors(patches,patch)
 				can_be_corrected_patches+=[t for t in tmp_neighbors if t.Corrected == False and (t not in can_be_corrected_patches)]
 
@@ -728,7 +728,11 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 
 		patch.gps = coord
 		
-		patch.Corrected = True
+		if patch.previously_checked == False:
+			patch.Corrected = True
+		else:
+			patch.Corrected = False
+
 		tmp_neighbors = find_all_neighbors(patches,patch)
 		can_be_corrected_patches+=[t for t in tmp_neighbors if t.Corrected == False and (t not in can_be_corrected_patches)]
 
