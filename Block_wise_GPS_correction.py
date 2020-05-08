@@ -1567,6 +1567,7 @@ server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
 
 start_time = datetime.datetime.now()
-main('2020-02-24')
+main('2020-01-08')
+# main('2020-02-24')
 end_time = datetime.datetime.now()
 report_time(start_time,end_time)
