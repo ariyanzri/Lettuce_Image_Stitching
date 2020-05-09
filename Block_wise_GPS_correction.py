@@ -1356,10 +1356,10 @@ class Field:
 
 		for group in self.groups:
 			for patch in group.patches:
-				args_list.append((patch))
+				args_list.append(patch)
 		
 		processes = multiprocessing.Pool(no_of_cores_to_use)
-		processes.map(parallel_patch_creator_helper,args_list)
+		processes.map(parallel_patch_creator,args_list)
 		processes.close()
 
 	def save_plot(self):
