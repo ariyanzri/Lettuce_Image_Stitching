@@ -1609,7 +1609,7 @@ def main(scan_date):
 
 
 
-server_core = {'coge':64,'laplace.cs.arizona.edu':16,'ariyan':4}
+server_core = {'coge':48,'laplace.cs.arizona.edu':16,'ariyan':4}
 
 server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
