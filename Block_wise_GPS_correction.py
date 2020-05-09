@@ -744,6 +744,41 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 
 # ----------------------------------------------------------------------
 
+def detect_SIFT_key_points(img,x1,y1,x2,y2):
+	sift = cv2.xfeatures2d.SIFT_create()
+	
+	img = img[y1:y2,x1:x2]
+	kp,desc = sift.detectAndCompute(img,None)
+
+	kp_n = []
+	for k in kp:
+		kp_n.append(cv2.KeyPoint(k.pt[0]+x1,k.pt[1]+y1,k.size))
+
+	kp = kp_n
+
+	return kp_n,desc
+
+def parallel_patch_creator(patch):
+	
+	global SIFT_folder,patch_folder
+
+	patch.load_img()
+	img = patch.rgb_img
+	kp,desc = detect_SIFT_key_points(img,0,0,PATCH_SIZE[1],PATCH_SIZE[0])
+
+	kp_tmp = [(p.pt[0], p.pt[1]) for p in kp]
+	pickle.dump((kp_tmp,desc), open('{0}/{1}_SIFT.data'.format(SIFT_folder,patch.filename.replace('.tif','')), "wb"))
+
+	del kp,kp_tmp,desc
+	patch.delete_img()
+
+	print('Patch created and SIFT generated for {0}'.format(patch.filename))
+	sys.stdout.flush()
+	
+
+def parallel_patch_creator_helper(args):
+
+	return parallel_patch_creator(*args)
 
 class GPS_Coordinate:
 	
@@ -1245,7 +1280,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups[1:3]
+		return groups
 
 	def get_rows(self):
 		global coordinates_file
@@ -1314,6 +1349,18 @@ class Field:
 		print('Rows calculated and created completely.')
 
 		return rows
+
+	def create_patches_SIFT_files(self):
+
+		args_list = []
+
+		for group in self.groups:
+			for patch in group.patches:
+				args_list.append((patch))
+		
+		processes = multiprocessing.Pool(no_of_cores_to_use)
+		processes.map(parallel_patch_creator_helper,args_list)
+		processes.close()
 
 	def save_plot(self):
 		global plot_npy_file
@@ -1532,12 +1579,13 @@ def main(scan_date):
 		print('RUNNING ON -- {0} --'.format(server))
 		
 		field = Field()
-		# field.save_plot()
+		field.save_plot()
+		field.create_patches_SIFT_files()
 
 		# field.groups[0].correct_internally()
 		# field.draw_and_save_field()
-		field.correct_field()
-		field.draw_and_save_field()
+		# field.correct_field()
+		# field.draw_and_save_field()
 		# field.save_new_coordinate()
 
 
@@ -1567,7 +1615,7 @@ server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
 
 start_time = datetime.datetime.now()
-main('2020-01-08')
+main('2020-02-18')
 # main('2020-02-24')
 end_time = datetime.datetime.now()
 report_time(start_time,end_time)
