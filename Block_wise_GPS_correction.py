@@ -10,6 +10,7 @@ import pickle
 import os
 import threading
 import socket
+
 from heapq import heappush, heappop, heapify
 from collections import OrderedDict
 
@@ -952,6 +953,31 @@ class Patch:
 
 		gc.collect()
 
+	def get_hog_for_reagion(self,x1,y1,x2,y2):
+		import matplotlib.pyplot as plt
+		from skimage.feature import hog
+		from skimage import data, exposure
+
+		self.load_img()
+
+		fd, hog_image = hog(self.rgb_img, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1, 1), visualize=True, multichannel=True)
+
+		fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4), sharex=True, sharey=True)
+
+		ax1.axis('off')
+		ax1.imshow(self.rgb_img, cmap=plt.cm.gray)
+		ax1.set_title('Input image')
+
+		hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(0, 10))
+
+		ax2.axis('off')
+		ax2.imshow(hog_image_rescaled, cmap=plt.cm.gray)
+		ax2.set_title('Histogram of Oriented Gradients')
+		plt.show()
+
+		self.delete_img()
+
+
 	def get_overlap_rectangle(self,patch,increase_size=True):
 		p1_x = 0
 		p1_y = 0
@@ -1594,14 +1620,15 @@ def main(scan_date):
 		os.system("taskset -p -c 4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,45,46 %d" % os.getpid())
 		
 		field = Field()
+		field.groups[0].patches[0].get_hog_for_reagion(0,0,PATCH_SIZE[0],PATCH_SIZE[1])
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
 		# field.draw_and_save_field()
 		# field.groups[0].correct_internally()
-		field.correct_field()
+		# field.correct_field()
 		# field.groups[0].correct_internally()
 		# field.draw_and_save_field()
-		field.save_new_coordinate()
+		# field.save_new_coordinate()
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
@@ -1615,7 +1642,7 @@ server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
 
 start_time = datetime.datetime.now()
-main('2020-02-18')
-# main('2020-02-24')
+# main('2020-02-18')
+main('2020-01-08')
 end_time = datetime.datetime.now()
 report_time(start_time,end_time)
