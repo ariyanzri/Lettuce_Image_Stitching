@@ -671,6 +671,7 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 	# print(max_num)
 
 	max_patch.Corrected = True
+	max_patch.good_corrected = True
 	can_be_corrected_patches = find_all_neighbors(patches,max_patch)
 
 	while len(can_be_corrected_patches)>0:
@@ -680,20 +681,22 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 		tmp_neighbors = find_all_neighbors(patches,patch)
 
 		# corrected_neighbors = find_all_neighbors(corrected_patches,patch)
-		corrected_neighbors = [p for p in tmp_neighbors if p.Corrected]
+		corrected_neighbors = [p for p in tmp_neighbors if p.good_corrected]
 
 		# patch, corrected_neighbors = get_patch_with_max_number_of_corrected_neighbors(corrected_patches,can_be_corrected_patches)
 	
 		# can_be_corrected_patches.remove(patch)
 
 		if len(corrected_neighbors) == 0:
-			if not patch.previously_checked:
-				patch.previously_checked = True
-				print('Group {0} - Patch {1} NOT FIXED on {2} neighbors. Corrected Neighbors are empty.'.format(group_id,patch.name,len(corrected_neighbors)))
-				can_be_corrected_patches.insert(0,patch)
-				continue
-			else:
-				continue
+			# if not patch.previously_checked:
+			# 	patch.previously_checked = True
+			# 	print('Group {0} - Patch {1} NOT FIXED on {2} neighbors. Corrected Neighbors are empty.'.format(group_id,patch.name,len(corrected_neighbors)))
+			# 	can_be_corrected_patches.insert(0,patch)
+			# 	continue
+			# else:
+			# 	continue
+			print('wierd')
+			continue
 
 		UL_merged, kp_merged, desc_merged = merge_all_neighbors(corrected_neighbors,patch)
 		patch.load_SIFT_points()
@@ -705,40 +708,53 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 		H, perc_in = find_homography(matches,kp_merged,kp,None,None)
 
 		if H is None:
-			if patch.previously_checked:
-				patch.Corrected = False
-				tmp_neighbors = find_all_neighbors(patches,patch)
-				can_be_corrected_patches+=[t for t in tmp_neighbors if t.Corrected == False and (t not in can_be_corrected_patches)]
+			# if patch.previously_checked:
+			# 	patch.Corrected = False
+			# 	tmp_neighbors = find_all_neighbors(patches,patch)
+			# 	can_be_corrected_patches+=[t for t in tmp_neighbors if t.Corrected == False and (t not in can_be_corrected_patches)]
 
-				print('Group {0} - Patch {1} fixed with H problem based on {2} neighbors.'.format(group_id,patch.name,len(corrected_neighbors)))
-				sys.stdout.flush()
-				continue
-			else:
-				patch.previously_checked = True
-				can_be_corrected_patches.insert(0,patch)
-				print('Group {0} - Patch {1} NOT FIXED {2} with neighbors. <Percentage Inliers:{3},# matches:{4}>. H IS NONE.'.format(group_id,patch.name,len(corrected_neighbors),perc_in,len(matches)))
-				continue
+			# 	print('Group {0} - Patch {1} fixed with H problem based on {2} neighbors.'.format(group_id,patch.name,len(corrected_neighbors)))
+			# 	sys.stdout.flush()
+			# 	continue
+			# else:
+			# 	patch.previously_checked = True
+			# 	can_be_corrected_patches.insert(0,patch)
+			# 	print('Group {0} - Patch {1} NOT FIXED {2} with neighbors. <Percentage Inliers:{3},# matches:{4}>. H IS NONE.'.format(group_id,patch.name,len(corrected_neighbors),perc_in,len(matches)))
+			# 	continue
+			continue
 
 		coord = get_new_GPS_Coords_all_neighbors(patch,UL_merged,H)
 
-		if (perc_in<MINIMUM_PERCENTAGE_OF_INLIERS or len(matches)<MINIMUM_NUMBER_OF_MATCHES) and patch.previously_checked == False:
-			patch.previously_checked = True
-			can_be_corrected_patches.insert(0,patch)
-			print('Group {0} - Patch {1} NOT FIXED {2} with neighbors. <Percentage Inliers:{3},# matches:{4}>'.format(group_id,patch.name,len(corrected_neighbors),perc_in,len(matches)))
-			continue  
+		if (perc_in<MINIMUM_PERCENTAGE_OF_INLIERS or len(matches)<MINIMUM_NUMBER_OF_MATCHES):
+			if patch.previously_checked == False:
 
-		patch.gps = coord
-		
-		if patch.previously_checked == False:
-			patch.Corrected = True
+				patch.previously_checked = True
+				can_be_corrected_patches.insert(0,patch)
+				print('Group {0} - Patch {1} NOT FIXED {2} with neighbors. <Percentage Inliers:{3},# matches:{4}>'.format(group_id,patch.name,len(corrected_neighbors),perc_in,len(matches)))
+				continue  
+			else:
+				patch.gps = coord
+
+				patch.good_corrected = False
+				patch.Corrected = True
+
+				print('Group {0} - Patch {1} fixed{2} based on {3} neighbors. <Percentage Inliers:{4},# matches:{5}>'.format(group_id,patch.name,'*' if patch.previously_checked else '',len(corrected_neighbors),perc_in,len(matches)))
+				sys.stdout.flush()
+
 		else:
-			patch.Corrected = False
+			patch.gps = coord
 
-		tmp_neighbors = find_all_neighbors(patches,patch)
-		can_be_corrected_patches+=[t for t in tmp_neighbors if t.Corrected == False and (t not in can_be_corrected_patches)]
+			tmp_neighbors = find_all_neighbors(patches,patch)
+			can_be_corrected_patches+=[t for t in tmp_neighbors if t.Corrected == False and (t not in can_be_corrected_patches)]
 
-		print('Group {0} - Patch {1} fixed{2} based on {3} neighbors. <Percentage Inliers:{4},# matches:{5}>'.format(group_id,patch.name,'*' if patch.previously_checked else '',len(corrected_neighbors),perc_in,len(matches)))
-		sys.stdout.flush()
+			patch.good_corrected = True
+			patch.Corrected = True
+
+			print('Group {0} - Patch {1} fixed{2} based on {3} neighbors. <Percentage Inliers:{4},# matches:{5}>'.format(group_id,patch.name,'*' if patch.previously_checked else '',len(corrected_neighbors),perc_in,len(matches)))
+			sys.stdout.flush()
+
+
+		
 
 	return get_corrected_string(patches)
 
