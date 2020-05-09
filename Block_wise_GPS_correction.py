@@ -959,8 +959,9 @@ class Patch:
 		from skimage import data, exposure
 
 		self.load_img()
-
-		fd, hog_image = hog(self.rgb_img, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1, 1), visualize=True, multichannel=True)
+		img = self.rgb_img.copy()
+		img = cv2.resize(img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
+		fd, hog_image = hog(img, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1, 1), visualize=True, multichannel=True)
 
 		cv2.imshow('hog',hog_image)
 		cv2.waitKey(0)
