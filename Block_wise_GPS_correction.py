@@ -954,7 +954,7 @@ class Patch:
 		gc.collect()
 
 	def get_hog_for_reagion(self,x1,y1,x2,y2):
-		import matplotlib.pyplot as plt
+		# import matplotlib.pyplot as plt
 		from skimage.feature import hog
 		from skimage import data, exposure
 
@@ -962,18 +962,20 @@ class Patch:
 
 		fd, hog_image = hog(self.rgb_img, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1, 1), visualize=True, multichannel=True)
 
-		fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4), sharex=True, sharey=True)
+		cv2.imshow('hog',hog_image)
+		cv2.waitKey(0)
+		# fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4), sharex=True, sharey=True)
 
-		ax1.axis('off')
-		ax1.imshow(self.rgb_img, cmap=plt.cm.gray)
-		ax1.set_title('Input image')
+		# ax1.axis('off')
+		# ax1.imshow(self.rgb_img, cmap=plt.cm.gray)
+		# ax1.set_title('Input image')
 
-		hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(0, 10))
+		# hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(0, 10))
 
-		ax2.axis('off')
-		ax2.imshow(hog_image_rescaled, cmap=plt.cm.gray)
-		ax2.set_title('Histogram of Oriented Gradients')
-		plt.show()
+		# ax2.axis('off')
+		# ax2.imshow(hog_image_rescaled, cmap=plt.cm.gray)
+		# ax2.set_title('Histogram of Oriented Gradients')
+		# plt.show()
 
 		self.delete_img()
 
