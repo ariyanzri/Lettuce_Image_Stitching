@@ -17,7 +17,7 @@ from collections import OrderedDict
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-NUMBER_OF_ROWS_IN_GROUPS = 10
+NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -953,39 +953,6 @@ class Patch:
 
 		gc.collect()
 
-	def get_hog_for_reagion(self,x1,y1,x2,y2):
-		# import matplotlib.pyplot as plt
-		from skimage.feature import hog
-		from skimage import data, exposure
-		print('started')
-		sys.stdout.flush()
-
-		self.load_img()
-		img = self.rgb_img.copy()
-		# img = cv2.resize(img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
-		fd = hog(img, orientations=8, pixels_per_cell=(164, 164), cells_per_block=(1, 1), visualize=False, multichannel=True)
-
-		print(len(fd))
-
-		# hog_image = cv2.resize(hog_image,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
-		# cv2.imshow('hog',hog_image)
-		# cv2.waitKey(0)
-		# fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4), sharex=True, sharey=True)
-
-		# ax1.axis('off')
-		# ax1.imshow(self.rgb_img, cmap=plt.cm.gray)
-		# ax1.set_title('Input image')
-
-		# hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(0, 10))
-
-		# ax2.axis('off')
-		# ax2.imshow(hog_image_rescaled, cmap=plt.cm.gray)
-		# ax2.set_title('Histogram of Oriented Gradients')
-		# plt.show()
-
-		self.delete_img()
-
-
 	def get_overlap_rectangle(self,patch,increase_size=True):
 		p1_x = 0
 		p1_y = 0
@@ -1314,7 +1281,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups
+		return groups[1:3]
 
 	def get_rows(self):
 		global coordinates_file
@@ -1378,7 +1345,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist)
+			rows.append(newlist[0:7])
 
 		print('Rows calculated and created completely.')
 
@@ -1628,14 +1595,14 @@ def main(scan_date):
 		os.system("taskset -p -c 4,5,6,7,8,9,10,11,12,14,15,16,17,18,19,20,21,22,23,24,25,27,28,29,30,31,32,33,34,35,36,37,38,39,45,46 %d" % os.getpid())
 		
 		field = Field()
-		field.groups[0].patches[0].get_hog_for_reagion(0,0,PATCH_SIZE[0],PATCH_SIZE[1])
+
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
-		# field.draw_and_save_field()
+		field.draw_and_save_field()
 		# field.groups[0].correct_internally()
-		# field.correct_field()
+		field.correct_field()
 		# field.groups[0].correct_internally()
-		# field.draw_and_save_field()
+		field.draw_and_save_field()
 		# field.save_new_coordinate()
 
 	elif server == 'ariyan':
