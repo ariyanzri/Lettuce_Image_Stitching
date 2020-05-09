@@ -767,12 +767,12 @@ def parallel_patch_creator(patch):
 	kp,desc = detect_SIFT_key_points(img,0,0,PATCH_SIZE[1],PATCH_SIZE[0])
 
 	kp_tmp = [(p.pt[0], p.pt[1]) for p in kp]
-	pickle.dump((kp_tmp,desc), open('{0}/{1}_SIFT.data'.format(SIFT_folder,patch.filename.replace('.tif','')), "wb"))
+	pickle.dump((kp_tmp,desc), open('{0}/{1}_SIFT.data'.format(SIFT_folder,patch.name.replace('.tif','')), "wb"))
 
 	del kp,kp_tmp,desc
 	patch.delete_img()
 
-	print('Patch created and SIFT generated for {0}'.format(patch.filename))
+	print('Patch created and SIFT generated for {0}'.format(patch.name))
 	sys.stdout.flush()
 	
 
