@@ -926,6 +926,7 @@ class Patch:
 		self.SIFT_kp_desc = []
 		self.previously_checked = False
 		self.Corrected = False
+		self.good_corrected = False
 
 	def __eq__(self,other):
 
