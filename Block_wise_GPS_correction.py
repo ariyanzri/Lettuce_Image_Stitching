@@ -963,14 +963,13 @@ class Patch:
 		self.load_img()
 		img = self.rgb_img.copy()
 		# img = cv2.resize(img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
-		fd, hog_image = hog(img, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1, 1), visualize=False, multichannel=True)
+		fd = hog(img, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1, 1), visualize=False, multichannel=True)
 
 		print(len(fd))
-		print(hog_image)
 
-		hog_image = cv2.resize(hog_image,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
-		cv2.imshow('hog',hog_image)
-		cv2.waitKey(0)
+		# hog_image = cv2.resize(hog_image,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
+		# cv2.imshow('hog',hog_image)
+		# cv2.waitKey(0)
 		# fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(8, 4), sharex=True, sharey=True)
 
 		# ax1.axis('off')
