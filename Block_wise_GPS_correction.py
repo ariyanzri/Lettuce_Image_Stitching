@@ -957,13 +957,15 @@ class Patch:
 		# import matplotlib.pyplot as plt
 		from skimage.feature import hog
 		from skimage import data, exposure
+		print('started')
+		sys.stdout.flush()
 
 		self.load_img()
 		img = self.rgb_img.copy()
 		# img = cv2.resize(img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
 		fd, hog_image = hog(img, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1, 1), visualize=True, multichannel=True)
 
-		print(fd)
+		print(len(fd))
 		print(hog_image)
 
 		hog_image = cv2.resize(hog_image,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
