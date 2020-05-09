@@ -963,7 +963,7 @@ class Patch:
 		self.load_img()
 		img = self.rgb_img.copy()
 		# img = cv2.resize(img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
-		fd, hog_image = hog(img, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1, 1), visualize=True, multichannel=True)
+		fd, hog_image = hog(img, orientations=8, pixels_per_cell=(16, 16), cells_per_block=(1, 1), visualize=False, multichannel=True)
 
 		print(len(fd))
 		print(hog_image)
