@@ -86,8 +86,8 @@ def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2):
 
 	H, masked = cv2.estimateAffinePartial2D(dst, src, maxIters = 1000, confidence = 0.99, refineIters = 5)
 	
-	print(matches)
-	print(H)
+	# print(matches)
+	# print(H)
 	if H is None or H.shape != (2,3):
 		return None
 
