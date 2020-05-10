@@ -1329,7 +1329,8 @@ class Field:
 				upper_right = (float(features[5]),float(features[6]))
 				lower_right = (float(features[7]),float(features[8]))
 				center = (float(features[9]),float(features[10]))
-
+				if filename == 'd9b1c9a3-daca-491d-a361-383462991563_right.tif':
+					continue
 				coord = GPS_Coordinate(upper_left,upper_right,lower_left,lower_right,center)
 				patches.append(Patch(filename,coord))
 
