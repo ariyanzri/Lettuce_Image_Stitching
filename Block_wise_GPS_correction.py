@@ -88,9 +88,9 @@ def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2):
 	
 	print(matches)
 	print(H)
-	if H is None or H.shape != (2,3)
+	if H is None or H.shape != (2,3):
 		return None
-		
+
 	H = np.append(H,np.array([[0,0,1]]),axis=0)
 	H[0:2,0:2] = np.array([[1,0],[0,1]])
 	return H,np.sum(masked)/len(masked)
