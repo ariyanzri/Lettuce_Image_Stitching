@@ -1048,7 +1048,7 @@ class Patch:
 		print(matches)
 		sys.stdout.flush()
 
-		if matches == None or matches is None or len(matches) == 0:
+		if matches is None or len(matches) == 0:
 
 			return None
 
