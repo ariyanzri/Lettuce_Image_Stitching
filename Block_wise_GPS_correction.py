@@ -17,7 +17,7 @@ from collections import OrderedDict
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-NUMBER_OF_ROWS_IN_GROUPS = 10
+NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -782,7 +782,6 @@ def parallel_patch_creator(patch):
 	if os.path.exists('{0}/{1}_SIFT.data'.format(SIFT_folder,patch.name.replace('.tif',''))):
 		return
 
-	print(patch.name)
 	patch.load_img()
 	img = patch.rgb_img
 	kp,desc = detect_SIFT_key_points(img,0,0,PATCH_SIZE[1],PATCH_SIZE[0])
@@ -1302,7 +1301,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups
+		return groups[1:3]
 
 	def get_rows(self):
 		global coordinates_file
@@ -1329,8 +1328,7 @@ class Field:
 				upper_right = (float(features[5]),float(features[6]))
 				lower_right = (float(features[7]),float(features[8]))
 				center = (float(features[9]),float(features[10]))
-				if filename == 'd9b1c9a3-daca-491d-a361-383462991563_right.tif':
-					continue
+				
 				coord = GPS_Coordinate(upper_left,upper_right,lower_left,lower_right,center)
 				patches.append(Patch(filename,coord))
 
@@ -1367,7 +1365,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist)
+			rows.append(newlist[0:10])
 
 		print('Rows calculated and created completely.')
 
@@ -1603,13 +1601,13 @@ def main(scan_date):
 		
 		field = Field()
 		# field.save_plot()
-		field.create_patches_SIFT_files()
+		# field.create_patches_SIFT_files()
 
 		# field.groups[0].correct_internally()
 		# field.draw_and_save_field()
-		# field.correct_field()
+		field.correct_field()
 		# field.draw_and_save_field()
-		# field.save_new_coordinate()
+		field.save_new_coordinate()
 
 
 	elif server == 'laplace.cs.arizona.edu':
