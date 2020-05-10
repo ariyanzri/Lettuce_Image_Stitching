@@ -681,7 +681,7 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 		tmp_neighbors = find_all_neighbors(patches,patch)
 
 		# corrected_neighbors = find_all_neighbors(corrected_patches,patch)
-		corrected_neighbors = [p for p in tmp_neighbors if p.good_corrected]
+		corrected_neighbors = [p for p in tmp_neighbors if p.Corrected]
 
 		# patch, corrected_neighbors = get_patch_with_max_number_of_corrected_neighbors(corrected_patches,can_be_corrected_patches)
 	
@@ -779,6 +779,10 @@ def parallel_patch_creator(patch):
 	
 	global SIFT_folder,patch_folder
 
+	if os.path.exists('{0}/{1}_SIFT.data'.format(SIFT_folder,patch.name.replace('.tif',''))):
+		return
+
+	print(patch.name)
 	patch.load_img()
 	img = patch.rgb_img
 	kp,desc = detect_SIFT_key_points(img,0,0,PATCH_SIZE[1],PATCH_SIZE[0])
@@ -1170,20 +1174,20 @@ class Group:
 	def correct_internally(self):
 
 		print('Group {0} internally correction started.'.format(self.group_id))
-		# self.load_all_patches_SIFT_points()
+		self.load_all_patches_SIFT_points()
 
-		# self.pre_calculate_internal_neighbors_and_transformation_parameters()
+		self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
-		# G = Graph(len(self.patches),[p.name for p in self.patches])
-		# G.initialize_edge_weights(self.patches)
+		G = Graph(len(self.patches),[p.name for p in self.patches])
+		G.initialize_edge_weights(self.patches)
 
-		# parents = G.generate_MST_prim(self.rows[0][0].name)
-		# string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
+		parents = G.generate_MST_prim(self.rows[0][0].name)
+		string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
 
-		# self.delete_all_patches_SIFT_points()
+		self.delete_all_patches_SIFT_points()
 
 		# string_res = self.correct_row_by_row()
-		string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
+		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
 		
 		print('Group {0} was corrected internally. '.format(self.group_id))
 		sys.stdout.flush()
@@ -1298,7 +1302,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups[1:3]
+		return groups
 
 	def get_rows(self):
 		global coordinates_file
@@ -1597,7 +1601,7 @@ def main(scan_date):
 		print('RUNNING ON -- {0} --'.format(server))
 		
 		field = Field()
-		field.save_plot()
+		# field.save_plot()
 		field.create_patches_SIFT_files()
 
 		# field.groups[0].correct_internally()
@@ -1634,7 +1638,7 @@ server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
 
 start_time = datetime.datetime.now()
-# main('2020-02-18')
-main('2020-01-08')
+main('2020-02-18')
+# main('2020-01-08')
 end_time = datetime.datetime.now()
 report_time(start_time,end_time)
