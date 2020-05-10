@@ -62,6 +62,9 @@ def get_good_matches(desc1,desc2):
 	bf = cv2.BFMatcher()
 	matches = bf.knnMatch(desc1,desc2, k=2)
 
+	if len(matches)<=1:
+		return None
+
 	good = []
 	for m in matches:
 		if m[0].distance < 0.8*m[1].distance:
@@ -1035,6 +1038,10 @@ class Patch:
 		kp2,desc2 = choose_SIFT_key_points(self,overlap2[0],overlap2[1],overlap2[2],overlap2[3])
 
 		matches = get_good_matches(desc2,desc1)
+
+		if matches is None:
+
+			return None
 
 		num_matches = len(matches)
 
