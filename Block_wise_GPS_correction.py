@@ -67,8 +67,11 @@ def get_good_matches(desc1,desc2):
 
 	good = []
 	for m in matches:
-		if m[0].distance < 0.8*m[1].distance:
+		if len(m)>=2 and m[0].distance < 0.8*m[1].distance:
 			good.append(m)
+		elif len(m)<2:
+			good.append(m)
+			
 	matches = np.asarray(good)
 
 	return matches
