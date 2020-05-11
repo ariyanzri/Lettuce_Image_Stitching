@@ -100,22 +100,40 @@ def calculate_error_for_translation(T,matches,kp1,kp2):
 
 	return error
 
-def find_translation(matches,kp1,kp2):
-	min_T = None
-	min_error = sys.maxsize
-	max_possible_sampe = min(len(matches),RANSAC_MAX_ITER)
-	min_per_inlier = 100.0
+def ransac_parallel(i,matches,kp1,kp2,return_dict):
+	m = matches[i,0]
+	p1 = kp1[m.queryIdx]
+	p2 = kp2[m.trainIdx]
+	T = get_translation_from_single_matches(p1[0],p1[1],p2[0],p2[1])	
+	error = calculate_error_for_translation(T,matches,kp1,kp2)
 
-	samples_indices = random.sample(range(0,len(matches)),max_possible_sampe)
+	return_dict[i] = (T,error)
+
+def find_translation(matches,kp1,kp2):
+	
+	max_possible_sampel = min(len(matches),RANSAC_MAX_ITER)
+
+	samples_indices = random.sample(range(0,len(matches)),max_possible_sampel)
+	manager = multiprocessing.Manager()
+	return_dict = manager.dict()
+	jobs = []
 
 	for i in samples_indices:
-		m = matches[i,0]
-		p1 = kp1[m.queryIdx]
-		p2 = kp2[m.trainIdx]
-
-		T = get_translation_from_single_matches(p1[0],p1[1],p2[0],p2[1])
 		
-		error = calculate_error_for_translation(T,matches,kp1,kp2)
+		p = multiprocessing.Process(target=ransac_parallel, args=(i,matches,kp1,kp2,return_dict))
+		jobs.append(p)
+		p.daemon = False
+		p.start()		
+
+	for proc in jobs:
+		proc.join()
+
+	min_T = None
+	min_error = sys.maxsize
+	min_per_inlier = 100.0
+	
+	for i in return_dict:
+		T,error = return_dict[i]
 
 		if error < min_error:
 			min_error = error
