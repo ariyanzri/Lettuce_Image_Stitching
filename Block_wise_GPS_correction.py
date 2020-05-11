@@ -333,11 +333,13 @@ def get_new_GPS_Coords_for_groups(p1,p2,H):
 
 	return new_coords
 
-def correct_groups_internally_helper(gid,group,result_dict):
+def correct_groups_internally_helper(args):
 
-	# return args[0].correct_internally(),args[0].group_id
-	result_dict[gid] = group.correct_internally()
+	return args[0].correct_internally(),args[0].group_id
 
+# def correct_groups_internally_helper(gid,group,result_dict):
+
+# 	result_dict[gid] = group.correct_internally()
 
 def get_top_n_good_matches(desc1,desc2,kp1,kp2):
 	bf = cv2.BFMatcher()
