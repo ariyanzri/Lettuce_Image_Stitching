@@ -1584,7 +1584,7 @@ class Field:
 
 		for group in self.groups:
 			
-			p = multiprocessing.Process(target=correct_groups_internally_helper, args=(group.group_id,group,return_dict,))
+			p = multiprocessing.Process(target=correct_groups_internally_helper, args=([group.group_id,group,return_dict]))
 			jobs.append(p)
 			p.daemon = False
 			p.start()		
