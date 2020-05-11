@@ -122,7 +122,7 @@ def find_translation(matches,kp1,kp2):
 		
 		p = multiprocessing.Process(target=ransac_parallel, args=(i,matches,kp1,kp2,return_dict))
 		jobs.append(p)
-		p.daemon = True
+		p.daemon = False
 		p.start()		
 
 	for proc in jobs:
@@ -337,7 +337,8 @@ def get_new_GPS_Coords_for_groups(p1,p2,H):
 
 def correct_groups_internally_helper(args):
 
-	return args[0].correct_internally(),args[0].group_id
+	# return args[0].correct_internally(),args[0].group_id
+	args[2][args[0]] = args[1].correct_internally()
 
 
 def get_top_n_good_matches(desc1,desc2,kp1,kp2):
@@ -1552,30 +1553,56 @@ class Field:
 	def correct_groups_internally(self):
 		global no_of_cores_to_use
 
-		args_list = []
+		# args_list = []
+
+		# for group in self.groups:
+
+		# 	args_list.append((group,1))
+
+		# processes = multiprocessing.Pool(int(no_of_cores_to_use/2))
+		# result = processes.map(correct_groups_internally_helper,args_list)
+		# processes.close()
+
+		# for r in result:
+			
+		# 	string_res = r[0]
+
+		# 	gid = r[1]
+		# 	result_dict = get_result_dict_from_strings(string_res)
+
+		# 	for group in self.groups:
+				
+		# 		if group.group_id == gid:
+
+		# 			for patch in group.patches:
+						
+		# 				patch.gps = result_dict[patch.name]
+
+		manager = multiprocessing.Manager()
+		return_dict = manager.dict()
+		jobs = []
 
 		for group in self.groups:
-
-			args_list.append((group,1))
-
-		processes = multiprocessing.Pool(int(no_of_cores_to_use/2))
-		result = processes.map(correct_groups_internally_helper,args_list)
-		processes.close()
-
-		for r in result:
 			
-			string_res = r[0]
+			p = multiprocessing.Process(target=correct_groups_internally_helper, args=(group.group_id,group,return_dict))
+			jobs.append(p)
+			p.daemon = False
+			p.start()		
 
-			gid = r[1]
+		for proc in jobs:
+			proc.join()
+
+		for i in return_dict:
+			string_res = return_dict[i]
 			result_dict = get_result_dict_from_strings(string_res)
 
-			for group in self.groups:
-				
-				if group.group_id == gid:
+				for group in self.groups:
+					
+					if group.group_id == i:
 
-					for patch in group.patches:
-						
-						patch.gps = result_dict[patch.name]
+						for patch in group.patches:
+							
+							patch.gps = result_dict[patch.name]
 
 	def correct_field(self):
 		
