@@ -71,8 +71,6 @@ def get_good_matches(desc1,desc2):
 	for m in matches:
 		if len(m)>=2 and m[0].distance < 0.8*m[1].distance:
 			good.append(m)
-		elif len(m)<2:
-			good.append(m)
 			
 	matches = np.asarray(good)
 
@@ -1553,56 +1551,56 @@ class Field:
 	def correct_groups_internally(self):
 		global no_of_cores_to_use
 
-		# args_list = []
-
-		# for group in self.groups:
-
-		# 	args_list.append((group,1))
-
-		# processes = multiprocessing.Pool(int(no_of_cores_to_use/2))
-		# result = processes.map(correct_groups_internally_helper,args_list)
-		# processes.close()
-
-		# for r in result:
-			
-		# 	string_res = r[0]
-
-		# 	gid = r[1]
-		# 	result_dict = get_result_dict_from_strings(string_res)
-
-		# 	for group in self.groups:
-				
-		# 		if group.group_id == gid:
-
-		# 			for patch in group.patches:
-						
-		# 				patch.gps = result_dict[patch.name]
-
-		manager = multiprocessing.Manager()
-		return_dict = manager.dict()
-		jobs = []
+		args_list = []
 
 		for group in self.groups:
+
+			args_list.append((group,1))
+
+		processes = multiprocessing.Pool(int(no_of_cores_to_use/2))
+		result = processes.map(correct_groups_internally_helper,args_list)
+		processes.close()
+
+		for r in result:
 			
-			p = multiprocessing.Process(target=correct_groups_internally_helper, args=(group.group_id,group,return_dict))
-			jobs.append(p)
-			p.daemon = False
-			p.start()		
+			string_res = r[0]
 
-		for proc in jobs:
-			proc.join()
-
-		for i in return_dict:
-			string_res = return_dict[i]
+			gid = r[1]
 			result_dict = get_result_dict_from_strings(string_res)
 
 			for group in self.groups:
 				
-				if group.group_id == i:
+				if group.group_id == gid:
 
 					for patch in group.patches:
 						
 						patch.gps = result_dict[patch.name]
+
+		# manager = multiprocessing.Manager()
+		# return_dict = manager.dict()
+		# jobs = []
+
+		# for group in self.groups:
+			
+		# 	p = multiprocessing.Process(target=correct_groups_internally_helper, args=(group.group_id,group,return_dict))
+		# 	jobs.append(p)
+		# 	p.daemon = False
+		# 	p.start()		
+
+		# for proc in jobs:
+		# 	proc.join()
+
+		# for i in return_dict:
+		# 	string_res = return_dict[i]
+		# 	result_dict = get_result_dict_from_strings(string_res)
+
+		# 	for group in self.groups:
+				
+		# 		if group.group_id == i:
+
+		# 			for patch in group.patches:
+						
+		# 				patch.gps = result_dict[patch.name]
 
 	def correct_field(self):
 		
