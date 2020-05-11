@@ -122,7 +122,7 @@ def find_translation(matches,kp1,kp2):
 		
 		p = multiprocessing.Process(target=ransac_parallel, args=(i,matches,kp1,kp2,return_dict))
 		jobs.append(p)
-		p.daemon = False
+		p.daemon = True
 		p.start()		
 
 	for proc in jobs:
@@ -131,7 +131,7 @@ def find_translation(matches,kp1,kp2):
 	min_T = None
 	min_error = sys.maxsize
 	min_per_inlier = 100.0
-	
+
 	for i in return_dict:
 		T,error = return_dict[i]
 
