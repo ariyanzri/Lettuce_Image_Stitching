@@ -11,19 +11,27 @@ import os
 import threading
 import socket
 
+from sklearn.linear_model import RANSACRegressor
+from sklearn.datasets import make_regression
+from sklearn.base import BaseEstimator
 from heapq import heappush, heappop, heapify
-from collections import OrderedDict
+from collections import OrderedDict,Counter
+
 
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-NUMBER_OF_ROWS_IN_GROUPS = 4
+NUMBER_OF_ROWS_IN_GROUPS = 10
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
 MINIMUM_NUMBER_OF_MATCHES = 100
 RANSAC_MAX_ITER = 1000
 RANSAC_ERROR_THRESHOLD = 5
+PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
+
+GPS_ERROR_Y = 0.0000005
+GPS_ERROR_X = 0.0000010
 
 def convert_to_gray(img):
 	
@@ -69,7 +77,7 @@ def get_good_matches(desc1,desc2):
 
 	good = []
 	for m in matches:
-		if len(m)>=2 and m[0].distance < 0.8*m[1].distance:
+		if len(m)>=2 and m[0].distance <= PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
 			good.append(m)
 			
 	matches = np.asarray(good)
@@ -82,21 +90,33 @@ def get_translation_from_single_matches(x1,y1,x2,y2):
 
 	return np.array([[1,0,x_t],[0,1,y_t],[0,0,1]])
 
-def calculate_error_for_translation(T,matches,kp1,kp2):
-	error = 0
+# def calculate_error_for_translation(T,matches,kp1,kp2):
+# 	error = 0
 
-	for m in matches[:,0]:
-		p1 = kp1[m.queryIdx]
-		p2 = kp2[m.trainIdx]
+# 	for m in matches[:,0]:
+# 		p1 = kp1[m.queryIdx]
+# 		p2 = kp2[m.trainIdx]
 
-		translated_p1 = T.dot([p1[0],p1[1],1]).astype(int)
+# 		translated_p1 = T.dot([p1[0],p1[1],1]).astype(int)
 
-		distance = math.sqrt((translated_p1[0]-p2[0])**2 + (translated_p1[1]-p2[1])**2)
+# 		distance = math.sqrt((translated_p1[0]-p2[0])**2 + (translated_p1[1]-p2[1])**2)
 
-		if distance>RANSAC_ERROR_THRESHOLD:
-			error+=1
+# 		if distance>RANSAC_ERROR_THRESHOLD:
+# 			error+=1
 
-	return error
+# 	return error
+
+def calculate_error_for_translation(T,P1,P2):
+	
+	squared_diff = (T.dot(P1.T)-P2.T)**2
+	squared_diff = squared_diff.T
+	squared_diff = squared_diff[:,0:2]
+	distances = np.sqrt(np.sum(squared_diff,axis=1))
+	thresholded_distances = distances.copy()
+	thresholded_distances[thresholded_distances<=RANSAC_ERROR_THRESHOLD] = 0
+	thresholded_distances[thresholded_distances>RANSAC_ERROR_THRESHOLD] = 1
+
+	return np.sum(thresholded_distances)
 
 def ransac_parallel(i,matches,kp1,kp2,return_dict):
 	m = matches[i,0]
@@ -109,36 +129,89 @@ def ransac_parallel(i,matches,kp1,kp2,return_dict):
 
 def find_translation(matches,kp1,kp2):
 	
-	max_possible_sampel = min(len(matches),RANSAC_MAX_ITER)
+	# max_possible_sampel = min(len(matches),RANSAC_MAX_ITER)
 
-	samples_indices = random.sample(range(0,len(matches)),max_possible_sampel)
-	manager = multiprocessing.Manager()
-	return_dict = manager.dict()
-	jobs = []
+	# samples_indices = random.sample(range(0,len(matches)),max_possible_sampel)
+	# manager = multiprocessing.Manager()
+	# return_dict = manager.dict()
+	# jobs = []
 
-	for i in samples_indices:
+	# for i in samples_indices:
 		
-		p = multiprocessing.Process(target=ransac_parallel, args=(i,matches,kp1,kp2,return_dict))
-		jobs.append(p)
-		p.daemon = False
-		p.start()		
+	# 	p = multiprocessing.Process(target=ransac_parallel, args=(i,matches,kp1,kp2,return_dict))
+	# 	jobs.append(p)
+	# 	p.daemon = False
+	# 	p.start()		
 
-	for proc in jobs:
-		proc.join()
+	# for proc in jobs:
+	# 	proc.join()
 
-	min_T = None
-	min_error = sys.maxsize
-	min_per_inlier = 100.0
+	# min_T = None
+	# min_error = sys.maxsize
+	# min_per_inlier = 100.0
 
-	for i in return_dict:
-		T,error = return_dict[i]
+	# for i in return_dict:
+	# 	T,error = return_dict[i]
 
-		if error < min_error:
-			min_error = error
-			min_T = T
-			min_per_inlier = (len(matches)-error)/len(matches)
+	# 	if error < min_error:
+	# 		min_error = error
+	# 		min_T = T
+	# 		min_per_inlier = (len(matches)-error)/len(matches)
 
-	return min_T,min_per_inlier
+	# return min_T,min_per_inlier
+
+	P1 = np.zeros((len(matches),3))
+	P2 = np.zeros((len(matches),3))
+
+	for i,m in enumerate(matches[:,0]):
+		p1 = kp1[m.queryIdx]
+		p2 = kp2[m.trainIdx]
+
+		P1[i,0] = p1[0]
+		P1[i,1] = p1[1]
+		P1[i,2] = 1
+		P2[i,0] = p2[0]
+		P2[i,1] = p2[1]
+		P2[i,2] = 1
+
+	diff = P2-P1
+	diff_x = diff[:,0]
+	diff_y = diff[:,1]
+
+	# max_possible_sampel = min(len(matches),RANSAC_MAX_ITER)
+	# samples_indices = random.sample(range(0,len(matches)),max_possible_sampel)
+	# min_T = None
+	# min_error = sys.maxsize
+	# min_per_inlier = 100.0
+
+	# for i in samples_indices:
+	# 	T = get_translation_from_single_matches(P1[i,0],P1[i,1],P2[i,0],P2[i,1])
+	# 	error = calculate_error_for_translation(T,P1,P2)
+	# 	if error < min_error:
+	# 		min_error = error
+	# 		min_T = T
+	# 		min_per_inlier = (len(matches)-error)/len(matches)
+
+	# return min_T,min_per_inlier
+
+	import matplotlib.pyplot as plt
+
+	plt.axis('equal')
+
+	plt.scatter(diff_x,diff_y)
+
+	plt.show()
+
+	diff_x_counter = Counter(list(diff_x))
+	t_x = diff_x_counter.most_common(1)[0][0]
+	diff_y_counter = Counter(list(diff_y))
+	t_y = diff_y_counter.most_common(1)[0][0]
+	print(t_x)
+	print(t_y)
+
+	return np.array([[1,0,t_x],[0,1,t_y],[0,0,1]]),0
+
+	
 
 def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2):	
 	
@@ -333,13 +406,41 @@ def get_new_GPS_Coords_for_groups(p1,p2,H):
 
 	return new_coords
 
-# def correct_groups_internally_helper(args):
+def correct_groups_internally_helper(args):
 
-# 	return args[0].correct_internally(),args[0].group_id
+	return args[0].correct_internally(),args[0].group_id
 
-def correct_groups_internally_helper(gid,group,result_dict):
+# def correct_groups_internally_helper(gid,group,result_dict):
 
-	result_dict[gid] = group.correct_internally()
+# 	result_dict[gid] = group.correct_internally()
+
+def get_good_matches_based_on_GPS_error(desc1,desc2,kp1,kp2):
+	bf = cv2.BFMatcher()
+	matches = bf.knnMatch(desc1,desc2, k=2)
+
+	good = []
+	for m in matches:
+		p1 = kp1[m[0].queryIdx]
+		p2 = kp2[m[0].trainIdx]
+
+		if 	abs(p1[0]-p2[0])<=GPS_ERROR_X/GPS_TO_IMAGE_RATIO[0] and abs(p1[1]-p2[1])<=GPS_ERROR_Y/GPS_TO_IMAGE_RATIO[1]:
+			good.append(m)
+
+	sorted_matches = sorted(good, key=lambda x: x[0].distance)
+
+	good = []
+
+	# if len(sorted_matches)>NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION:
+	# 	good += sorted_matches[0:NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION]
+	# else:
+	# 	good += sorted_matches
+
+	number_of_good_matches = int(math.floor(len(sorted_matches)*PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION))
+	good = sorted_matches[0:number_of_good_matches]
+
+	matches = np.asarray(good)
+
+	return matches
 
 def get_top_n_good_matches(desc1,desc2,kp1,kp2):
 	bf = cv2.BFMatcher()
@@ -348,7 +449,7 @@ def get_top_n_good_matches(desc1,desc2,kp1,kp2):
 	good = []
 	for m in matches:
 		
-		if 	m[0].distance < 0.8*m[1].distance:
+		if 	m[0].distance < PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
 			good.append(m)
 
 	sorted_matches = sorted(good, key=lambda x: x[0].distance)
@@ -1147,9 +1248,11 @@ class Patch:
 		kp2,desc2 = choose_SIFT_key_points(self,overlap2[0],overlap2[1],overlap2[2],overlap2[3])
 
 		matches = get_good_matches(desc2,desc1)
+		# matches = get_top_n_good_matches(desc2,desc1,kp2,kp1)
+		# matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1)
 
 		# print(matches)
-		sys.stdout.flush()
+		# sys.stdout.flush()
 
 		if matches is None or len(matches) == 0:
 
@@ -1157,8 +1260,8 @@ class Patch:
 
 		num_matches = len(matches)
 
-		# H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2)
-		H,percentage_inliers = find_translation(matches,kp2,kp1)
+		H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2)
+		# H,percentage_inliers = find_translation(matches,kp2,kp1)
 		
 		# print(H)
 		# print(percentage_inliers)
@@ -1465,7 +1568,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups[1:3]
+		return groups
 
 	def get_rows(self):
 		global coordinates_file
@@ -1529,7 +1632,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist[0:10])
+			rows.append(newlist)
 
 		print('Rows calculated and created completely.')
 
@@ -1595,58 +1698,58 @@ class Field:
 		np.save(plot_npy_file,np.array(result))	
 
 	def correct_groups_internally(self):
-		# global no_of_cores_to_use
+		global no_of_cores_to_use
 
-		# args_list = []
-
-		# for group in self.groups:
-
-		# 	args_list.append((group,1))
-
-		# processes = multiprocessing.Pool(int(no_of_cores_to_use/2))
-		# result = processes.map(correct_groups_internally_helper,args_list)
-		# processes.close()
-
-		# for r in result:
-			
-		# 	string_res = r[0]
-
-		# 	gid = r[1]
-		# 	result_dict = get_result_dict_from_strings(string_res)
-
-		# 	for group in self.groups:
-				
-		# 		if group.group_id == gid:
-
-		# 			for patch in group.patches:
-						
-		# 				patch.gps = result_dict[patch.name]
-
-		manager = multiprocessing.Manager()
-		return_dict = manager.dict()
-		jobs = []
+		args_list = []
 
 		for group in self.groups:
+
+			args_list.append((group,1))
+
+		processes = multiprocessing.Pool(int(no_of_cores_to_use/2))
+		result = processes.map(correct_groups_internally_helper,args_list)
+		processes.close()
+
+		for r in result:
 			
-			p = multiprocessing.Process(target=correct_groups_internally_helper, args=(group.group_id,group,return_dict))
-			jobs.append(p)
-			p.daemon = False
-			p.start()		
+			string_res = r[0]
 
-		for proc in jobs:
-			proc.join()
-
-		for i in return_dict:
-			string_res = return_dict[i]
+			gid = r[1]
 			result_dict = get_result_dict_from_strings(string_res)
 
 			for group in self.groups:
 				
-				if group.group_id == i:
+				if group.group_id == gid:
 
 					for patch in group.patches:
 						
 						patch.gps = result_dict[patch.name]
+
+		# manager = multiprocessing.Manager()
+		# return_dict = manager.dict()
+		# jobs = []
+
+		# for group in self.groups:
+			
+		# 	p = multiprocessing.Process(target=correct_groups_internally_helper, args=(group.group_id,group,return_dict))
+		# 	jobs.append(p)
+		# 	p.daemon = False
+		# 	p.start()		
+
+		# for proc in jobs:
+		# 	proc.join()
+
+		# for i in return_dict:
+		# 	string_res = return_dict[i]
+		# 	result_dict = get_result_dict_from_strings(string_res)
+
+		# 	for group in self.groups:
+				
+		# 		if group.group_id == i:
+
+		# 			for patch in group.patches:
+						
+		# 				patch.gps = result_dict[patch.name]
 
 	def correct_field(self):
 		
@@ -1796,8 +1899,8 @@ def main(scan_date):
 		# field.groups[0].correct_internally()
 		# field.draw_and_save_field()
 		field.correct_field()
-		field.draw_and_save_field()
-		# field.save_new_coordinate()
+		# field.draw_and_save_field()
+		field.save_new_coordinate()
 
 
 	elif server == 'laplace.cs.arizona.edu':
@@ -1818,26 +1921,26 @@ def main(scan_date):
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
 
-		# visualize_plot()
+		visualize_plot()
 
-		patches = read_all_data()
-		p1 = patches[0]
-		p2 = patches[1]
+		# patches = read_all_data()
+		# p1 = patches[0]
+		# p2 = patches[1]
 
-		for p in patches:
-			if p.has_overlap(p1) and p1.has_overlap(p) and p1 != p:
-				p2 = p
+		# for p in patches:
+		# 	if p.has_overlap(p1) and p1.has_overlap(p) and p1 != p:
+		# 		p2 = p
 
-				draw_together([p1,p2])
+		# 		draw_together([p1,p2])
 
-				p1.load_SIFT_points()
-				p2.load_SIFT_points()
+		# 		p1.load_SIFT_points()
+		# 		p2.load_SIFT_points()
 
-				prms = p2.get_pairwise_transformation_info(p1)
-				p2.gps = get_new_GPS_Coords(p2,p1,prms.H)
-				
+		# 		prms = p2.get_pairwise_transformation_info(p1)
+		# 		p2.gps = get_new_GPS_Coords(p2,p1,prms.H)
+		# 		# p2.gps = add_to_gps_coord(p2.gps,GPS_ERROR_X,GPS_ERROR_Y)
 
-				draw_together([p1,p2])
+		# 		draw_together([p1,p2])
 
 		
 
