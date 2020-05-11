@@ -1596,13 +1596,13 @@ class Field:
 			string_res = return_dict[i]
 			result_dict = get_result_dict_from_strings(string_res)
 
-				for group in self.groups:
-					
-					if group.group_id == i:
+			for group in self.groups:
+				
+				if group.group_id == i:
 
-						for patch in group.patches:
-							
-							patch.gps = result_dict[patch.name]
+					for patch in group.patches:
+						
+						patch.gps = result_dict[patch.name]
 
 	def correct_field(self):
 		
