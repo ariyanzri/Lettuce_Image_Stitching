@@ -910,7 +910,7 @@ def read_all_data():
 
 def get_pairwise_transformation_info_helper(p,n,return_dict):
 
-	return_dict[n] = p.get_pairwise_transformation_info(n)
+	return_dict[n.name] = (p.get_pairwise_transformation_info(n),n)
 
 class GPS_Coordinate:
 	
@@ -1255,8 +1255,9 @@ class Group:
 			for proc in jobs:
 				proc.join()
 
-			for n in return_dict:
-				neighbor_param = return_dict[n]
+			for name in return_dict:
+				neighbor_param = return_dict[name][0]
+				n = return_dict[name][1]
 				if neighbor_param == None:
 					remove_neighbors.append((n,p))
 					continue
