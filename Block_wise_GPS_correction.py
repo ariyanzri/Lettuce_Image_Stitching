@@ -22,6 +22,8 @@ PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
 MINIMUM_NUMBER_OF_MATCHES = 100
+RANSAC_MAX_ITER = 1000
+RANSAC_ERROR_THRESHOLD = 5
 
 def convert_to_gray(img):
 	
@@ -75,6 +77,52 @@ def get_good_matches(desc1,desc2):
 	matches = np.asarray(good)
 
 	return matches
+
+def get_translation_from_single_matches(x1,y1,x2,y2):
+	x_t = x2-x1
+	y_t = y2-y1
+
+	return np.array([[1,0,x_t],[0,1,y_t],[0,0,1]])
+
+def calculate_error_for_translation(T,matches,kp1,kp2):
+	error = 0
+
+	for m in matches[:,0]:
+		p1 = kp1[m.queryIdx]
+		p2 = kp2[m.trainIdx]
+
+		translated_p1 = T.dot([p1[0],p1[1],1]).astype(int)
+
+		distance = math.sqrt((translated_p1[0]-p2[0])**2 + (translated_p1[1]-p2[1])**2)
+
+		if distance>RANSAC_ERROR_THRESHOLD:
+			error+=1
+
+	return error
+
+def find_translation(matches,kp1,kp2):
+	min_T = None
+	min_error = sys.maxsize
+	max_possible_sampe = min(len(matches),RANSAC_MAX_ITER)
+	min_per_inlier = 100.0
+
+	samples_indices = random.sample(range(0,len(matches)),max_possible_sampe)
+
+	for i in samples_indices:
+		m = matches[i,0]
+		p1 = kp1[m.queryIdx]
+		p2 = kp2[m.trainIdx]
+
+		T = get_translation_from_single_matches(p1[0],p1[1],p2[0],p2[1])
+		
+		error = calculate_error_for_translation(T,matches,kp1,kp2)
+
+		if error < min_error:
+			min_error = error
+			min_T = T
+			min_per_inlier = (len(matches)-error)/len(matches)
+
+	return min_T,min_per_inlier
 
 def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2):	
 	
@@ -809,6 +857,39 @@ def parallel_patch_creator_helper(args):
 
 	return parallel_patch_creator(*args)
 
+def read_all_data():
+
+	global patch_folder,coordinates_file
+	patches = []
+
+	with open(coordinates_file) as f:
+		lines = f.read()
+		lines = lines.replace('"','')
+
+		for l in lines.split('\n'):
+			if l == '':
+				break
+			if l == 'Filename,Upper left,Lower left,Upper right,Lower right,Center' or l == 'name,upperleft,lowerleft,uperright,lowerright,center':
+				continue
+
+			features = l.split(',')
+
+			rgb,img = load_preprocess_image('{0}/{1}'.format(patch_folder,features[0]))
+
+			upper_left = (float(features[1]),float(features[2]))
+			lower_left = (float(features[3]),float(features[4]))
+			upper_right = (float(features[5]),float(features[6]))
+			lower_right = (float(features[7]),float(features[8]))
+			center = (float(features[9]),float(features[10]))
+
+			coord = GPS_Coordinate(upper_left,upper_right,lower_left,lower_right,center)
+
+			patch = Patch(features[0],coord)
+			patches.append(patch)
+
+	return patches
+
+
 class GPS_Coordinate:
 	
 	def __init__(self,UL_coord,UR_coord,LL_coord,LR_coord,Center):
@@ -1045,7 +1126,7 @@ class Patch:
 
 		matches = get_good_matches(desc2,desc1)
 
-		print(matches)
+		# print(matches)
 		sys.stdout.flush()
 
 		if matches is None or len(matches) == 0:
@@ -1054,7 +1135,11 @@ class Patch:
 
 		num_matches = len(matches)
 
-		H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2)
+		# H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2)
+		H,percentage_inliers = find_translation(matches,kp2,kp1)
+		
+		# print(H)
+		# print(percentage_inliers)
 
 		if H is None:
 			
@@ -1643,7 +1728,47 @@ def main(scan_date):
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
-		visualize_plot()
+
+		# visualize_plot()
+
+		patches = read_all_data()
+		p1 = patches[0]
+		p2 = patches[1]
+
+		for p in patches:
+			if p.has_overlap(p1) and p1.has_overlap(p) and p1 != p:
+				p2 = p
+
+				draw_together([p1,p2])
+
+				p1.load_SIFT_points()
+				p2.load_SIFT_points()
+
+				prms = p2.get_pairwise_transformation_info(p1)
+				p2.gps = get_new_GPS_Coords(p2,p1,prms.H)
+				
+
+				draw_together([p1,p2])
+
+		
+
+		# p1.load_img()
+		# p2.load_img()
+
+		# cv2.namedWindow('p1',cv2.WINDOW_NORMAL)
+		# cv2.namedWindow('p2',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('p1', 500,500)
+		# cv2.resizeWindow('p2', 500,500)
+
+		# cv2.imshow('p1',p1.rgb_img)
+		# cv2.imshow('p2',p2.rgb_img)
+		# cv2.waitKey(0)
+
+		
+
+
+
+
 
 
 
