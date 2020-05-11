@@ -335,10 +335,10 @@ def get_new_GPS_Coords_for_groups(p1,p2,H):
 
 	return new_coords
 
-def correct_groups_internally_helper(args):
+def correct_groups_internally_helper(gid,group,result_dict):
 
 	# return args[0].correct_internally(),args[0].group_id
-	args[2][args[0]] = args[1].correct_internally()
+	result_dict[gid] = group.correct_internally()
 
 
 def get_top_n_good_matches(desc1,desc2,kp1,kp2):
@@ -1584,7 +1584,7 @@ class Field:
 
 		for group in self.groups:
 			
-			p = multiprocessing.Process(target=correct_groups_internally_helper, args=([group.group_id,group,return_dict]))
+			p = multiprocessing.Process(target=correct_groups_internally_helper, args=(group.group_id,group,return_dict))
 			jobs.append(p)
 			p.daemon = False
 			p.start()		
