@@ -1154,8 +1154,8 @@ class Patch:
 
 		num_matches = len(matches)
 
-		# H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2)
-		H,percentage_inliers = find_translation(matches,kp2,kp1)
+		H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2)
+		# H,percentage_inliers = find_translation(matches,kp2,kp1)
 		
 		# print(H)
 		# print(percentage_inliers)
