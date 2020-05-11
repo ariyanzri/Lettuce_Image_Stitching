@@ -333,13 +333,13 @@ def get_new_GPS_Coords_for_groups(p1,p2,H):
 
 	return new_coords
 
-# def correct_groups_internally_helper(args):
+def correct_groups_internally_helper(args):
 
-# 	return args[0].correct_internally(),args[0].group_id
+	return args[0].correct_internally(),args[0].group_id
 
-def correct_groups_internally_helper(gid,group,result_dict):
+# def correct_groups_internally_helper(gid,group,result_dict):
 
-	result_dict[gid] = group.correct_internally()
+# 	result_dict[gid] = group.correct_internally()
 
 def get_top_n_good_matches(desc1,desc2,kp1,kp2):
 	bf = cv2.BFMatcher()
@@ -1207,62 +1207,21 @@ class Group:
 		sys.stdout.flush()
 
 	def pre_calculate_internal_neighbors_and_transformation_parameters(self):
-		# remove_neighbors = []
-
-		# for p in self.patches:
-
-		# 	for n in self.patches:
-
-		# 		if n != p and (p.has_overlap(n) or n.has_overlap(p)):
-
-		# 			neighbor_param = p.get_pairwise_transformation_info(n)
-					
-		# 			if neighbor_param == None:
-		# 				remove_neighbors.append((n,p))
-		# 				continue
-					
-		# 			p.neighbors.append((n,neighbor_param))
-
-		# 	print('GROPU ID: {0} - Calculated Transformation and error values for {1} neighbors of {2}'.format(self.group_id,len(p.neighbors),p.name))
-		# 	sys.stdout.flush()
-
-		# for a,b in remove_neighbors:
-		# 	new_neighbors = []
-
-		# 	for n in a.neighbors:
-		# 		if b != n[0]:
-		# 			new_neighbors.append(n)
-				
-		# 	a.neighbors = new_neighbors
-
 		remove_neighbors = []
 
 		for p in self.patches:
-
-			manager = multiprocessing.Manager()
-			return_dict = manager.dict()
-			jobs = []
 
 			for n in self.patches:
 
 				if n != p and (p.has_overlap(n) or n.has_overlap(p)):
 
-					process = multiprocessing.Process(target=get_pairwise_transformation_info_helper, args=(p,n,return_dict))
-					jobs.append(process)
-					process.daemon = False
-					process.start()	
+					neighbor_param = p.get_pairwise_transformation_info(n)
 					
-			for proc in jobs:
-				proc.join()
-
-			for name in return_dict:
-				neighbor_param = return_dict[name][0]
-				n = return_dict[name][1]
-				if neighbor_param == None:
-					remove_neighbors.append((n,p))
-					continue
-
-				p.neighbors.append((n,neighbor_param))
+					if neighbor_param == None:
+						remove_neighbors.append((n,p))
+						continue
+					
+					p.neighbors.append((n,neighbor_param))
 
 			print('GROPU ID: {0} - Calculated Transformation and error values for {1} neighbors of {2}'.format(self.group_id,len(p.neighbors),p.name))
 			sys.stdout.flush()
@@ -1275,6 +1234,47 @@ class Group:
 					new_neighbors.append(n)
 				
 			a.neighbors = new_neighbors
+
+		# remove_neighbors = []
+
+		# for p in self.patches:
+
+		# 	manager = multiprocessing.Manager()
+		# 	return_dict = manager.dict()
+		# 	jobs = []
+
+		# 	for n in self.patches:
+
+		# 		if n != p and (p.has_overlap(n) or n.has_overlap(p)):
+
+		# 			process = multiprocessing.Process(target=get_pairwise_transformation_info_helper, args=(p,n,return_dict))
+		# 			jobs.append(process)
+		# 			process.daemon = False
+		# 			process.start()	
+					
+		# 	for proc in jobs:
+		# 		proc.join()
+
+		# 	for name in return_dict:
+		# 		neighbor_param = return_dict[name][0]
+		# 		n = return_dict[name][1]
+		# 		if neighbor_param == None:
+		# 			remove_neighbors.append((n,p))
+		# 			continue
+
+		# 		p.neighbors.append((n,neighbor_param))
+
+		# 	print('GROPU ID: {0} - Calculated Transformation and error values for {1} neighbors of {2}'.format(self.group_id,len(p.neighbors),p.name))
+		# 	sys.stdout.flush()
+
+		# for a,b in remove_neighbors:
+		# 	new_neighbors = []
+
+		# 	for n in a.neighbors:
+		# 		if b != n[0]:
+		# 			new_neighbors.append(n)
+				
+		# 	a.neighbors = new_neighbors
 
 
 	def correct_row_by_row(self):
@@ -1597,56 +1597,56 @@ class Field:
 	def correct_groups_internally(self):
 		global no_of_cores_to_use
 
-		# args_list = []
-
-		# for group in self.groups:
-
-		# 	args_list.append((group,1))
-
-		# processes = multiprocessing.Pool(int(no_of_cores_to_use/2))
-		# result = processes.map(correct_groups_internally_helper,args_list)
-		# processes.close()
-
-		# for r in result:
-			
-		# 	string_res = r[0]
-
-		# 	gid = r[1]
-		# 	result_dict = get_result_dict_from_strings(string_res)
-
-		# 	for group in self.groups:
-				
-		# 		if group.group_id == gid:
-
-		# 			for patch in group.patches:
-						
-		# 				patch.gps = result_dict[patch.name]
-
-		manager = multiprocessing.Manager()
-		return_dict = manager.dict()
-		jobs = []
+		args_list = []
 
 		for group in self.groups:
+
+			args_list.append((group,1))
+
+		processes = multiprocessing.Pool(int(no_of_cores_to_use/2))
+		result = processes.map(correct_groups_internally_helper,args_list)
+		processes.close()
+
+		for r in result:
 			
-			p = multiprocessing.Process(target=correct_groups_internally_helper, args=(group.group_id,group,return_dict))
-			jobs.append(p)
-			p.daemon = False
-			p.start()		
+			string_res = r[0]
 
-		for proc in jobs:
-			proc.join()
-
-		for i in return_dict:
-			string_res = return_dict[i]
+			gid = r[1]
 			result_dict = get_result_dict_from_strings(string_res)
 
 			for group in self.groups:
 				
-				if group.group_id == i:
+				if group.group_id == gid:
 
 					for patch in group.patches:
 						
 						patch.gps = result_dict[patch.name]
+
+		# manager = multiprocessing.Manager()
+		# return_dict = manager.dict()
+		# jobs = []
+
+		# for group in self.groups:
+			
+		# 	p = multiprocessing.Process(target=correct_groups_internally_helper, args=(group.group_id,group,return_dict))
+		# 	jobs.append(p)
+		# 	p.daemon = False
+		# 	p.start()		
+
+		# for proc in jobs:
+		# 	proc.join()
+
+		# for i in return_dict:
+		# 	string_res = return_dict[i]
+		# 	result_dict = get_result_dict_from_strings(string_res)
+
+		# 	for group in self.groups:
+				
+		# 		if group.group_id == i:
+
+		# 			for patch in group.patches:
+						
+		# 				patch.gps = result_dict[patch.name]
 
 	def correct_field(self):
 		
