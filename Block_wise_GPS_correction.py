@@ -226,7 +226,7 @@ def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2):
 	H, masked = cv2.estimateAffinePartial2D(dst, src, maxIters = 1000, confidence = 0.99, refineIters = 5)
 
 	if H is None or H.shape != (2,3):
-		return None
+		return None,0
 
 	H = np.append(H,np.array([[0,0,1]]),axis=0)
 	H[0:2,0:2] = np.array([[1,0],[0,1]])
@@ -1301,15 +1301,6 @@ class Patch:
 		matches = get_good_matches(desc2,desc1)
 		# matches = get_top_n_good_matches(desc2,desc1,kp2,kp1)
 		# matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1)
-
-		print('------')
-		print(kp2)
-		print(kp1)
-		print(overlap1)
-		print(overlap2)
-		print(matches)
-		print(len(matches))
-		sys.stdout.flush()
 
 		if matches is None or len(matches) == 0:
 
