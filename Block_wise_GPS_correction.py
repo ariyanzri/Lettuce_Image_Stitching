@@ -14,6 +14,8 @@ import socket
 from sklearn.linear_model import RANSACRegressor
 from sklearn.datasets import make_regression
 from sklearn.base import BaseEstimator
+from skimage.feature import hog
+
 from heapq import heappush, heappop, heapify
 from collections import OrderedDict,Counter
 
@@ -1143,6 +1145,9 @@ class Patch:
 		self.previously_checked = False
 		self.Corrected = False
 		self.good_corrected = False
+		self.rgb_img = None
+		self.gray_img = None
+
 
 	def __eq__(self,other):
 
@@ -1186,6 +1191,22 @@ class Patch:
 
 		gc.collect()
 
+	def get_hog_region(self,x1,y1,x2,y2):
+		
+		if self.rgb_img is None:
+			self.load_img()
+
+		img = self.rgb_img[y1:y2,x1:x2]
+
+		fd = hog(img, orientations=8, pixels_per_cell=(8, 8),cells_per_block=(1, 1), visualize=False, multichannel=True)
+		# cv2.imshow('fig 1',img)
+		# cv2.imshow('fig 2',hog_image)
+		# cv2.waitKey(0)
+
+		self.delete_img()
+
+		return np.array(fd)
+
 	def get_overlap_rectangle(self,patch,increase_size=True):
 		p1_x = 0
 		p1_y = 0
@@ -1196,19 +1217,19 @@ class Patch:
 
 		if patch.gps.UL_coord[1]>=self.gps.LL_coord[1] and patch.gps.UL_coord[1]<=self.gps.UL_coord[1]:
 			detect_overlap = True
-			p1_y = int(math.ceil(((patch.gps.UL_coord[1]-self.gps.UL_coord[1]) / (self.gps.LL_coord[1]-self.gps.UL_coord[1]))*PATCH_SIZE[0]))
+			p1_y = int(math.ceil(((patch.gps.UL_coord[1]-self.gps.UL_coord[1]) / (self.gps.LL_coord[1]-self.gps.UL_coord[1])*PATCH_SIZE[0])))
 		
 		if patch.gps.LL_coord[1]>=self.gps.LL_coord[1] and patch.gps.LL_coord[1]<=self.gps.UL_coord[1]:
 			detect_overlap = True
-			p2_y = int(math.ceil(((patch.gps.LR_coord[1]-self.gps.UL_coord[1]) / (self.gps.LL_coord[1]-self.gps.UL_coord[1]))*PATCH_SIZE[0]))
+			p2_y = int(math.ceil(((patch.gps.LR_coord[1]-self.gps.UL_coord[1]) / (self.gps.LL_coord[1]-self.gps.UL_coord[1])*PATCH_SIZE[0])))
 
 		if patch.gps.UR_coord[0]<=self.gps.UR_coord[0] and patch.gps.UR_coord[0]>=self.gps.UL_coord[0]:
 			detect_overlap = True
-			p2_x = int(math.ceil(((patch.gps.UR_coord[0]-self.gps.UL_coord[0]) / (self.gps.UR_coord[0]-self.gps.UL_coord[0]))*PATCH_SIZE[1]))
+			p2_x = int(math.ceil(((patch.gps.UR_coord[0]-self.gps.UL_coord[0]) / (self.gps.UR_coord[0]-self.gps.UL_coord[0])*PATCH_SIZE[1])))
 			
 		if patch.gps.UL_coord[0]<=self.gps.UR_coord[0] and patch.gps.UL_coord[0]>=self.gps.UL_coord[0]:
 			detect_overlap = True
-			p1_x = int(math.ceil(((patch.gps.LL_coord[0]-self.gps.UL_coord[0]) / (self.gps.UR_coord[0]-self.gps.UL_coord[0]))*PATCH_SIZE[1]))
+			p1_x = int(math.ceil(((patch.gps.LL_coord[0]-self.gps.UL_coord[0]) / (self.gps.UR_coord[0]-self.gps.UL_coord[0])*PATCH_SIZE[1])))
 			
 		if patch.gps.is_coord_inside(self.gps.UL_coord) and patch.gps.is_coord_inside(self.gps.UR_coord) and \
 		patch.gps.is_coord_inside(self.gps.LL_coord) and patch.gps.is_coord_inside(self.gps.LR_coord):
@@ -1235,6 +1256,37 @@ class Patch:
 			return 0,0,0,0
 
 		return int(p1_x),int(p1_y),int(p2_x),int(p2_y)
+
+	def get_overlap_rectangles(self,patch,increase_size=True):
+		
+		p1_x1 = 0
+		p1_y1 = 0
+		p1_x2 = PATCH_SIZE[1]
+		p1_y2 = PATCH_SIZE[0]
+
+		p2_x1 = 0
+		p2_y1 = 0
+		p2_x2 = PATCH_SIZE[1]
+		p2_y2 = PATCH_SIZE[0]
+
+		if patch.gps.UL_coord[1]>=self.gps.LL_coord[1] and patch.gps.UL_coord[1]<=self.gps.UL_coord[1]:
+			p1_y1 = int(math.ceil((self.gps.UL_coord[1]-patch.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1]))
+			p2_y2 = PATCH_SIZE[0]-p1_y1
+		
+		if patch.gps.LL_coord[1]>=self.gps.LL_coord[1] and patch.gps.LL_coord[1]<=self.gps.UL_coord[1]:
+			p1_y2 = int(math.ceil((self.gps.UL_coord[1]-patch.gps.LL_coord[1])/GPS_TO_IMAGE_RATIO[1]))
+			p2_y1 = PATCH_SIZE[0]-p1_y2
+
+		if patch.gps.UR_coord[0]<=self.gps.UR_coord[0] and patch.gps.UR_coord[0]>=self.gps.UL_coord[0]:
+			p1_x2 = int(math.ceil((patch.gps.UR_coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0]))
+			p2_x1 = PATCH_SIZE[1]-p1_x2
+
+		if patch.gps.UL_coord[0]<=self.gps.UR_coord[0] and patch.gps.UL_coord[0]>=self.gps.UL_coord[0]:
+			p1_x1 = int(math.ceil((patch.gps.UL_coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0]))
+			p2_x2 = PATCH_SIZE[1]-p1_x1
+
+		return (p1_x1,p1_y1,p1_x2,p1_y2),(p2_x1,p2_y1,p2_x2,p2_y2)
+
 
 	def get_pairwise_transformation_info(self,neighbor):
 		overlap1 = neighbor.get_overlap_rectangle(self)
@@ -1439,7 +1491,7 @@ class Group:
 
 	def correct_internally(self):
 
-		print('Group {0} internally correction started.'.format(self.group_id))
+		print('Group {0} with {1} rows and {2} patches internally correction started.'.format(self.group_id,len(self.rows),len(self.patches)))
 		self.load_all_patches_SIFT_points()
 
 		self.pre_calculate_internal_neighbors_and_transformation_parameters()
@@ -1534,7 +1586,7 @@ class Field:
 		global coordinates_file
 
 		self.groups = self.initialize_field()
-
+		print([g.group_id for g in self.groups])
 		# for group in self.groups:
 		# 	group.load_all_patches_SIFT_points()
 		
@@ -1921,26 +1973,66 @@ def main(scan_date):
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
 
-		visualize_plot()
+		# visualize_plot()
 
 		# patches = read_all_data()
 		# p1 = patches[0]
+		
 		# p2 = patches[1]
 
 		# for p in patches:
 		# 	if p.has_overlap(p1) and p1.has_overlap(p) and p1 != p:
 		# 		p2 = p
 
-		# 		draw_together([p1,p2])
+		# 		break
+		
+		# p1.load_SIFT_points()
+		# p2.load_SIFT_points()
+		# p1.load_img()
+		# p2.load_img()
+		# tx = 0
+		# ty = 0
 
-		# 		p1.load_SIFT_points()
-		# 		p2.load_SIFT_points()
+		# while True:
+		# 	p1.load_img()
+		# 	p2.load_img()
 
-		# 		prms = p2.get_pairwise_transformation_info(p1)
-		# 		p2.gps = get_new_GPS_Coords(p2,p1,prms.H)
-		# 		# p2.gps = add_to_gps_coord(p2.gps,GPS_ERROR_X,GPS_ERROR_Y)
+		# 	p2.gps = add_to_gps_coord(p2.gps,tx,ty)
+		# 	overlap_1,overlap_2 = p1.get_overlap_rectangles(p2)
 
-		# 		draw_together([p1,p2])
+		# 	img1 = p1.rgb_img.copy()
+		# 	img2 = p2.rgb_img.copy()
+			
+		# 	fd1 = p1.get_hog_region(overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
+		# 	fd2 = p2.get_hog_region(overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
+
+		# 	print(np.sqrt(np.sum((fd1-fd2)**2)/len(fd1)))
+
+		# 	cv2.rectangle(img1,(overlap_1[0],overlap_1[1]),(overlap_1[2],overlap_1[3]),(0,0,255),20)
+		# 	cv2.rectangle(img2,(overlap_2[0],overlap_2[1]),(overlap_2[2],overlap_2[3]),(0,0,255),20)
+
+		# 	cv2.namedWindow('p1',cv2.WINDOW_NORMAL)
+		# 	cv2.namedWindow('p2',cv2.WINDOW_NORMAL)
+		# 	cv2.resizeWindow('p1', 500,500)
+		# 	cv2.resizeWindow('p2', 500,500)
+		# 	cv2.imshow('p1',img1)
+		# 	cv2.imshow('p2',img2)
+		# 	key_pressed = cv2.waitKey(0)
+
+			
+		# 	if key_pressed == ord('a'):
+		# 		tx = -0.000001
+		# 		ty = 0
+		# 	elif key_pressed == ord('d'):
+		# 		tx = +0.000001
+		# 		ty = 0
+		# 	elif key_pressed == ord('w'):
+		# 		tx = 0
+		# 		ty = 0.000001
+		# 	elif key_pressed == ord('s'):
+		# 		tx = 0
+		# 		ty = -0.000001
+
 
 		
 
