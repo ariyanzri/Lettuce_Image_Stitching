@@ -1302,8 +1302,14 @@ class Patch:
 		# matches = get_top_n_good_matches(desc2,desc1,kp2,kp1)
 		# matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1)
 
-		# print(matches)
-		# sys.stdout.flush()
+		print('------')
+		print(kp2)
+		print(kp1)
+		print(overlap1)
+		print(overlap2)
+		print(matches)
+		print(len(matches))
+		sys.stdout.flush()
 
 		if matches is None or len(matches) == 0:
 
