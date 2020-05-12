@@ -14,7 +14,7 @@ import socket
 from sklearn.linear_model import RANSACRegressor
 from sklearn.datasets import make_regression
 from sklearn.base import BaseEstimator
-from skimage.feature import hog
+# from skimage.feature import hog
 
 from heapq import heappush, heappop, heapify
 from collections import OrderedDict,Counter
