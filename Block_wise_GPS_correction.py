@@ -22,7 +22,7 @@ from collections import OrderedDict,Counter
 
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
-HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.025
+HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.05
 NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
@@ -1619,7 +1619,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups[4:6]
+		return groups[6:8]
 
 	def get_rows(self):
 		global coordinates_file
@@ -1948,7 +1948,7 @@ def main(scan_date):
 		# field.create_patches_SIFT_files()
 
 		# field.groups[0].correct_internally()
-		field.draw_and_save_field()
+		# field.draw_and_save_field()
 		field.correct_field()
 		field.draw_and_save_field()
 		# field.save_new_coordinate()
