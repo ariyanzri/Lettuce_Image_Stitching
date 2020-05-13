@@ -24,7 +24,7 @@ from collections import OrderedDict,Counter
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-NUMBER_OF_ROWS_IN_GROUPS = 4
+NUMBER_OF_ROWS_IN_GROUPS = 10
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -1564,6 +1564,9 @@ class Group:
 				# 	print('Group {0} - Patch {1} NOT FIXED on {2} neighbors. H is None. <Percentage Inliers:{3},# matches:{4}>'.format(self.group_id,patch.name,len(neighbors),perc_in,len(matches)))
 
 				# draw_together(neighbors+[patch])
+			
+			print('Group ID {0}: row {1} corrected.'.format(self.group_id,i+1))
+			sys.stdout.flush()
 
 		# self.delete_all_patches_SIFT_points()
 
@@ -1572,19 +1575,19 @@ class Group:
 	def correct_internally(self):
 
 		print('Group {0} with {1} rows and {2} patches internally correction started.'.format(self.group_id,len(self.rows),len(self.patches)))
-		# self.load_all_patches_SIFT_points()
+		self.load_all_patches_SIFT_points()
 
-		# self.pre_calculate_internal_neighbors_and_transformation_parameters()
+		self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
-		# G = Graph(len(self.patches),[p.name for p in self.patches])
-		# G.initialize_edge_weights(self.patches)
+		G = Graph(len(self.patches),[p.name for p in self.patches])
+		G.initialize_edge_weights(self.patches)
 
-		# parents = G.generate_MST_prim(self.rows[0][0].name)
-		# string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
+		parents = G.generate_MST_prim(self.rows[0][0].name)
+		string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
 
-		# self.delete_all_patches_SIFT_points()
+		self.delete_all_patches_SIFT_points()
 
-		string_res = self.correct_row_by_row()
+		# string_res = self.correct_row_by_row()
 		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
 		
 		print('Group {0} was corrected internally. '.format(self.group_id))
@@ -1700,7 +1703,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups[7:9]
+		return groups
 
 	def get_rows(self):
 		global coordinates_file
@@ -1764,7 +1767,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist[0:5])
+			rows.append(newlist)
 
 		print('Rows calculated and created completely.')
 
@@ -2168,7 +2171,7 @@ server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
 
 start_time = datetime.datetime.now()
-# main('2020-02-18')
-main('2020-01-08')
+main('2020-02-18')
+# main('2020-01-08')
 end_time = datetime.datetime.now()
 report_time(start_time,end_time)
