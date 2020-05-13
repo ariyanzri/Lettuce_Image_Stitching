@@ -16,6 +16,7 @@ from sklearn.datasets import make_regression
 from sklearn.base import BaseEstimator
 # from skimage.feature import hog
 
+from Customized_myltiprocessing import MyPool
 from heapq import heappush, heappop, heapify
 from collections import OrderedDict,Counter
 
@@ -23,7 +24,7 @@ from collections import OrderedDict,Counter
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-NUMBER_OF_ROWS_IN_GROUPS = 10
+NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -32,8 +33,10 @@ RANSAC_MAX_ITER = 1000
 RANSAC_ERROR_THRESHOLD = 5
 PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
 
-GPS_ERROR_Y = 0.0000005
-GPS_ERROR_X = 0.0000010
+GPS_ERROR_Y = 0.0000003
+GPS_ERROR_X = 0.0000006
+
+FFT_PARALLEL_CORES_TO_USE = 10
 
 def convert_to_gray(img):
 	
@@ -71,20 +74,28 @@ def choose_SIFT_key_points(patch,x1,y1,x2,y2):
 	return kp,desc
 
 def get_good_matches(desc1,desc2):
-	bf = cv2.BFMatcher()
-	matches = bf.knnMatch(desc1,desc2, k=2)
+	
+	try:
+		bf = cv2.BFMatcher()
+	
+		matches = bf.knnMatch(desc1,desc2, k=2)
 
-	if len(matches)<=1:
+		if len(matches)<=1:
+			return None
+
+		good = []
+		for m in matches:
+			if len(m)>=2 and m[0].distance <= PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
+				good.append(m)
+				
+		matches = np.asarray(good)
+		return matches
+			
+	except Exception as e:
+		print('Error in get_good_matches: {0}'.format(e))
 		return None
 
-	good = []
-	for m in matches:
-		if len(m)>=2 and m[0].distance <= PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
-			good.append(m)
-			
-	matches = np.asarray(good)
-
-	return matches
+	
 
 def get_translation_from_single_matches(x1,y1,x2,y2):
 	x_t = x2-x1
@@ -200,7 +211,7 @@ def find_translation(matches,kp1,kp2):
 
 	plt.axis('equal')
 
-	plt.scatter(diff_x,diff_y)
+	plt.scatter(diff_x,diff_y,alpha=0.2)
 
 	plt.show()
 
@@ -232,7 +243,7 @@ def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2):
 	H[0:2,0:2] = np.array([[1,0],[0,1]])
 	return H,np.sum(masked)/len(masked)
 
-def get_dissimilarity_on_overlaps(p1,p2,H,ov1,ov2):
+def get_dissimilarity_on_overlaps(p1,p2,H):
 
 	p1_ul = [0,0,1]
 	p1_ur = [PATCH_SIZE[1],0,1]
@@ -1015,6 +1026,30 @@ def get_pairwise_transformation_info_helper(p,n,return_dict):
 
 	return_dict[n.name] = (p.get_pairwise_transformation_info(n),n)
 
+def jitter_and_calculate_fft(p1,neighbors,jx,jy):
+	old_gps = p1.gps
+	p1.gps = add_to_gps_coord(p1.gps,jx,jy)
+
+	sum_differences = 0
+
+	for p2 in neighbors:
+
+		overlap_1,overlap_2 = p1.get_overlap_rectangles(p2)
+		fft1 = p1.get_fft_region(overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
+		fft2 = p2.get_fft_region(overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
+		fft_difference = np.sqrt(np.sum((fft1-fft2)**2)/(fft1.shape[0]*fft1.shape[1]*fft1.shape[2]))
+		sum_differences+=fft_difference
+
+	print(sum_differences)
+
+	new_gps = p1.gps
+	p1.gps = old_gps
+
+	return fft_difference,new_gps
+
+def jitter_and_calculate_fft_helper(args):
+	return jitter_and_calculate_fft(*args)
+
 class GPS_Coordinate:
 	
 	def __init__(self,UL_coord,UR_coord,LL_coord,LR_coord,Center):
@@ -1320,7 +1355,7 @@ class Patch:
 
 		percentage_inliers = round(percentage_inliers*100,2)
 
-		dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H,overlap1,overlap2)
+		dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
 
 		if dissimilarity == -1:
 			
@@ -1328,6 +1363,50 @@ class Patch:
 
 		return Neighbor_Parameters(overlap2,overlap1,H,num_matches,percentage_inliers,dissimilarity)
 
+	def get_fft_region(self,x1,y1,x2,y2):
+		
+		if self.rgb_img is None:
+			self.load_img()
+
+		f = np.fft.fft2(self.rgb_img[y1:y2,x1:x2])
+		fshift = np.fft.fftshift(f)
+		magnitude_spectrum = 20*np.log(np.abs(fshift))
+		# magnitude_spectrum = f
+
+		return magnitude_spectrum.astype('uint8')
+
+	def correct_based_on_neighbors(self,neighbor):
+
+		list_jitter_x = np.arange(-GPS_ERROR_X, GPS_ERROR_X, 0.0000001)
+		list_jitter_y = np.arange(-GPS_ERROR_Y, GPS_ERROR_Y, 0.0000001)
+
+		self.load_img()
+		neighbor.load_img()
+		old_gps = self.gps
+
+		args_list = []
+
+		for jx in list_jitter_x:
+			for jy in list_jitter_y:
+				
+				args_list.append((self,[neighbor],jx,jy))
+
+		process = MyPool(FFT_PARALLEL_CORES_TO_USE)
+		result = process.map(jitter_and_calculate_fft_helper,args_list)
+
+		neighbor.delete_img()
+		self.delete_img()
+
+		min_dissimilarity = sys.maxsize
+		min_gps = None
+
+		for fft_difference,gps_current in result:
+		
+			if fft_difference<min_dissimilarity:
+				min_dissimilarity = fft_difference
+				min_gps = gps_current
+
+		return min_gps
 
 class Group:
 	def __init__(self,gid,rows):
@@ -1368,7 +1447,7 @@ class Group:
 
 					neighbor_param = p.get_pairwise_transformation_info(n)
 					
-					if neighbor_param == None:
+					if neighbor_param is None:
 						remove_neighbors.append((n,p))
 						continue
 					
@@ -1430,7 +1509,7 @@ class Group:
 
 	def correct_row_by_row(self):
 
-		self.load_all_patches_SIFT_points()
+		# self.load_all_patches_SIFT_points()
 
 		for i,r in enumerate(self.rows):
 
@@ -1452,55 +1531,57 @@ class Group:
 					down_side_neighbors = find_all_neighbors(self.rows[i-1],patch)
 					neighbors = down_side_neighbors
 
+				patch.gps = patch.correct_based_on_neighbors(neighbors)
+
 				# patch.load_img()
 				# main = cv2.resize(patch.rgb_img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
 				# cv2.imshow('main',main)
 
 				# draw_together(neighbors+[patch])
 
-				UL_merged, kp_merged, desc_merged = merge_all_neighbors(neighbors,patch)
+				# UL_merged, kp_merged, desc_merged = merge_all_neighbors(neighbors,patch)
 				
-				kp = patch.SIFT_kp_locations
-				desc = patch.SIFT_kp_desc
+				# kp = patch.SIFT_kp_locations
+				# desc = patch.SIFT_kp_desc
 
-				matches = get_top_n_good_matches(desc_merged,desc,kp_merged,kp)
+				# matches = get_top_n_good_matches(desc_merged,desc,kp_merged,kp)
 
-				H, perc_in = find_homography(matches,kp_merged,kp,None,None)
+				# H, perc_in = find_homography(matches,kp_merged,kp,None,None)
 
-				if H is not None:
+				# if H is not None:
 
-					coord = get_new_GPS_Coords_all_neighbors(patch,UL_merged,H)
+				# 	coord = get_new_GPS_Coords_all_neighbors(patch,UL_merged,H)
 
-					patch.gps = coord
+				# 	patch.gps = coord
 				
-					patch.Corrected = True
+				# 	patch.Corrected = True
 
-					print('Group {0} - Patch {1} fixed based on {2} neighbors. <Percentage Inliers:{3},# matches:{4}>'.format(self.group_id,patch.name,len(neighbors),perc_in,len(matches)))
-				else:
-					print('Group {0} - Patch {1} NOT FIXED on {2} neighbors. H is None. <Percentage Inliers:{3},# matches:{4}>'.format(self.group_id,patch.name,len(neighbors),perc_in,len(matches)))
+				# 	print('Group {0} - Patch {1} fixed based on {2} neighbors. <Percentage Inliers:{3},# matches:{4}>'.format(self.group_id,patch.name,len(neighbors),perc_in,len(matches)))
+				# else:
+				# 	print('Group {0} - Patch {1} NOT FIXED on {2} neighbors. H is None. <Percentage Inliers:{3},# matches:{4}>'.format(self.group_id,patch.name,len(neighbors),perc_in,len(matches)))
 
 				# draw_together(neighbors+[patch])
 
-		self.delete_all_patches_SIFT_points()
+		# self.delete_all_patches_SIFT_points()
 
 		return get_corrected_string(self.patches)
 
 	def correct_internally(self):
 
 		print('Group {0} with {1} rows and {2} patches internally correction started.'.format(self.group_id,len(self.rows),len(self.patches)))
-		self.load_all_patches_SIFT_points()
+		# self.load_all_patches_SIFT_points()
 
-		self.pre_calculate_internal_neighbors_and_transformation_parameters()
+		# self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
-		G = Graph(len(self.patches),[p.name for p in self.patches])
-		G.initialize_edge_weights(self.patches)
+		# G = Graph(len(self.patches),[p.name for p in self.patches])
+		# G.initialize_edge_weights(self.patches)
 
-		parents = G.generate_MST_prim(self.rows[0][0].name)
-		string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
+		# parents = G.generate_MST_prim(self.rows[0][0].name)
+		# string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
 
-		self.delete_all_patches_SIFT_points()
+		# self.delete_all_patches_SIFT_points()
 
-		# string_res = self.correct_row_by_row()
+		string_res = self.correct_row_by_row()
 		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
 		
 		print('Group {0} was corrected internally. '.format(self.group_id))
@@ -1616,7 +1697,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups
+		return groups[7:9]
 
 	def get_rows(self):
 		global coordinates_file
@@ -1680,7 +1761,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist)
+			rows.append(newlist[0:5])
 
 		print('Rows calculated and created completely.')
 
@@ -1754,7 +1835,7 @@ class Field:
 
 			args_list.append((group,1))
 
-		processes = multiprocessing.Pool(int(no_of_cores_to_use/2))
+		processes = MyPool(int(no_of_cores_to_use/2))
 		result = processes.map(correct_groups_internally_helper,args_list)
 		processes.close()
 
@@ -1959,7 +2040,7 @@ def main(scan_date):
 
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
-		# field.draw_and_save_field()
+		field.draw_and_save_field()
 		# field.groups[0].correct_internally()
 		field.correct_field()
 		# field.groups[0].correct_internally()
@@ -1971,17 +2052,34 @@ def main(scan_date):
 
 		# visualize_plot()
 
-		# patches = read_all_data()
-		# p1 = patches[0]
+		patches = read_all_data()
+		p1 = patches[0]
 		
-		# p2 = patches[1]
+		# fft = p1.get_fft_region(0,0,PATCH_SIZE[1],PATCH_SIZE[0])
+		# print(fft)
+		# p1.load_img()
+		# cv2.namedWindow('img',cv2.WINDOW_NORMAL)
+		# cv2.namedWindow('fft',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('img', 500,500)
+		# cv2.resizeWindow('fft', 500,500)
+		# cv2.imshow('img',p1.rgb_img)
+		# cv2.imshow('fft',fft)
+		# cv2.waitKey(0)
 
-		# for p in patches:
-		# 	if p.has_overlap(p1) and p1.has_overlap(p) and p1 != p:
-		# 		p2 = p
+		p2 = patches[1]
 
-		# 		break
+		for p in patches:
+			if p.has_overlap(p1) and p1.has_overlap(p) and p1 != p:
+				p2 = p
+
+				break
 		
+		draw_together([p1,p2])
+
+		p2.gps = p2.correct_based_on_neighbors(p1)
+
+		draw_together([p1,p2])
+
 		# p1.load_SIFT_points()
 		# p2.load_SIFT_points()
 		# p1.load_img()
@@ -1999,35 +2097,44 @@ def main(scan_date):
 		# 	img1 = p1.rgb_img.copy()
 		# 	img2 = p2.rgb_img.copy()
 			
-		# 	fd1 = p1.get_hog_region(overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
-		# 	fd2 = p2.get_hog_region(overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
+		# 	# fd1 = p1.get_hog_region(overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
+		# 	# fd2 = p2.get_hog_region(overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
 
-		# 	print(np.sqrt(np.sum((fd1-fd2)**2)/len(fd1)))
+		# 	fft1 = p1.get_fft_region(overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
+		# 	fft2 = p2.get_fft_region(overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
+
+		# 	print(np.sqrt(np.sum((fft1-fft2)**2)/(fft1.shape[0]*fft1.shape[1]*fft1.shape[2])))
 
 		# 	cv2.rectangle(img1,(overlap_1[0],overlap_1[1]),(overlap_1[2],overlap_1[3]),(0,0,255),20)
 		# 	cv2.rectangle(img2,(overlap_2[0],overlap_2[1]),(overlap_2[2],overlap_2[3]),(0,0,255),20)
 
 		# 	cv2.namedWindow('p1',cv2.WINDOW_NORMAL)
 		# 	cv2.namedWindow('p2',cv2.WINDOW_NORMAL)
+		# 	cv2.namedWindow('fft1',cv2.WINDOW_NORMAL)
+		# 	cv2.namedWindow('fft2',cv2.WINDOW_NORMAL)
 		# 	cv2.resizeWindow('p1', 500,500)
 		# 	cv2.resizeWindow('p2', 500,500)
+		# 	cv2.resizeWindow('fft1', 500,500)
+		# 	cv2.resizeWindow('fft2', 500,500)
 		# 	cv2.imshow('p1',img1)
 		# 	cv2.imshow('p2',img2)
+		# 	cv2.imshow('fft1',fft1)
+		# 	cv2.imshow('fft2',fft2)
 		# 	key_pressed = cv2.waitKey(0)
 
 			
 		# 	if key_pressed == ord('a'):
-		# 		tx = -0.000001
+		# 		tx = -0.0000001
 		# 		ty = 0
 		# 	elif key_pressed == ord('d'):
-		# 		tx = +0.000001
+		# 		tx = +0.0000001
 		# 		ty = 0
 		# 	elif key_pressed == ord('w'):
 		# 		tx = 0
-		# 		ty = 0.000001
+		# 		ty = 0.0000001
 		# 	elif key_pressed == ord('s'):
 		# 		tx = 0
-		# 		ty = -0.000001
+		# 		ty = -0.0000001
 
 
 		
@@ -2058,7 +2165,7 @@ server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
 
 start_time = datetime.datetime.now()
-main('2020-02-18')
-# main('2020-01-08')
+# main('2020-02-18')
+main('2020-01-08')
 end_time = datetime.datetime.now()
 report_time(start_time,end_time)
