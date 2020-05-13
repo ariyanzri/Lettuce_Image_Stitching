@@ -1375,7 +1375,7 @@ class Patch:
 
 		return magnitude_spectrum.astype('uint8')
 
-	def correct_based_on_neighbors(self,neighbor):
+	def correct_based_on_neighbors(self,neighbors):
 
 		list_jitter_x = np.arange(-GPS_ERROR_X, GPS_ERROR_X, 0.0000001)
 		list_jitter_y = np.arange(-GPS_ERROR_Y, GPS_ERROR_Y, 0.0000001)
@@ -1391,7 +1391,7 @@ class Patch:
 		for jx in list_jitter_x:
 			for jy in list_jitter_y:
 				
-				args_list.append((self,,jx,jy))
+				args_list.append((self,neighbors,jx,jy))
 
 		process = MyPool(FFT_PARALLEL_CORES_TO_USE)
 		result = process.map(jitter_and_calculate_fft_helper,args_list)
