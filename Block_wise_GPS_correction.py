@@ -1040,7 +1040,7 @@ def jitter_and_calculate_fft(p1,neighbors,jx,jy):
 		fft_difference = np.sqrt(np.sum((fft1-fft2)**2)/(fft1.shape[0]*fft1.shape[1]*fft1.shape[2]))
 		sum_differences+=fft_difference
 
-	print(sum_differences)
+	# print(sum_differences)
 
 	new_gps = p1.gps
 	p1.gps = old_gps
@@ -1381,7 +1381,9 @@ class Patch:
 		list_jitter_y = np.arange(-GPS_ERROR_Y, GPS_ERROR_Y, 0.0000001)
 
 		self.load_img()
-		neighbor.load_img()
+		for n in neighbors:
+			n.load_img()
+
 		old_gps = self.gps
 
 		args_list = []
@@ -1389,14 +1391,15 @@ class Patch:
 		for jx in list_jitter_x:
 			for jy in list_jitter_y:
 				
-				args_list.append((self,[neighbor],jx,jy))
+				args_list.append((self,,jx,jy))
 
 		process = MyPool(FFT_PARALLEL_CORES_TO_USE)
 		result = process.map(jitter_and_calculate_fft_helper,args_list)
 
-		neighbor.delete_img()
 		self.delete_img()
-
+		for n in neighbors:
+			n.delete_img()
+		
 		min_dissimilarity = sys.maxsize
 		min_gps = None
 
