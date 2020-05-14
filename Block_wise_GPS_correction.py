@@ -353,10 +353,23 @@ def get_dissimilarity_on_overlaps(p1,p2,H):
 
 	## HOG dissimilarity
 
-	hog1 = p1.get_hog_region(p1_x1,p1_y1,p1_x2,p1_y2)
-	hog2 = p2.get_hog_region(p2_x1,p2_y1,p2_x2,p2_y2)
-	
-	dissimilarity = np.sqrt(np.sum((hog1-hog2)**2)/(hog1.shape[0]))
+	# hog1 = p1.get_hog_region(p1_x1,p1_y1,p1_x2,p1_y2)
+	# hog2 = p2.get_hog_region(p2_x1,p2_y1,p2_x2,p2_y2)
+
+	# dissimilarity = np.sqrt(np.sum((hog1-hog2)**2)/(hog1.shape[0]))
+
+	## RMSE simple
+
+	p1.load_img()
+	p2.load_img()
+
+	overlap_1_img = p1.rgb_img[p1_y1:p1_y2,p1_x1:p1_x2,:]
+	overlap_2_img = p2.rgb_img[p2_y1:p2_y2,p2_x1:p2_x2,:]
+
+	dissimilarity = np.sqrt(np.sum((overlap_1_img-overlap_2_img)**2)/(overlap_2_img.shape[0]*overlap_2_img.shape[1]*overlap_2_img.shape[2]))
+
+	p1.delete_img()
+	p2.delete_img()
 
 	return dissimilarity
 
