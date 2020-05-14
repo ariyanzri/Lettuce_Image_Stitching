@@ -24,7 +24,8 @@ from collections import OrderedDict,Counter
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-NUMBER_OF_ROWS_IN_GROUPS = 10
+# NUMBER_OF_ROWS_IN_GROUPS = 10
+NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -1035,6 +1036,11 @@ def jitter_and_calculate_fft(p1,neighbors,jx,jy):
 	for p2 in neighbors:
 
 		overlap_1,overlap_2 = p1.get_overlap_rectangles(p2)
+
+		if overlap_1[2]-overlap_1[0] == 0 or overlap_1[3]-overlap_1[1] == 0 or \
+		overlap_2[2]-overlap_2[0] == 0 or overlap_2[3]-overlap_2[1] == 0:
+			continue
+
 		fft1 = p1.get_fft_region(overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
 		fft2 = p2.get_fft_region(overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
 		fft_difference = np.sqrt(np.sum((fft1-fft2)**2)/(fft1.shape[0]*fft1.shape[1]*fft1.shape[2]))
@@ -1045,7 +1051,7 @@ def jitter_and_calculate_fft(p1,neighbors,jx,jy):
 	new_gps = p1.gps
 	p1.gps = old_gps
 
-	return fft_difference,new_gps
+	return sum_differences,new_gps
 
 def jitter_and_calculate_fft_helper(args):
 	return jitter_and_calculate_fft(*args)
@@ -1404,7 +1410,9 @@ class Patch:
 		min_gps = None
 
 		for fft_difference,gps_current in result:
-		
+			if fft_difference == 0:
+				continue
+
 			if fft_difference<min_dissimilarity:
 				min_dissimilarity = fft_difference
 				min_gps = gps_current
@@ -1575,19 +1583,19 @@ class Group:
 	def correct_internally(self):
 
 		print('Group {0} with {1} rows and {2} patches internally correction started.'.format(self.group_id,len(self.rows),len(self.patches)))
-		self.load_all_patches_SIFT_points()
+		# self.load_all_patches_SIFT_points()
 
-		self.pre_calculate_internal_neighbors_and_transformation_parameters()
+		# self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
-		G = Graph(len(self.patches),[p.name for p in self.patches])
-		G.initialize_edge_weights(self.patches)
+		# G = Graph(len(self.patches),[p.name for p in self.patches])
+		# G.initialize_edge_weights(self.patches)
 
-		parents = G.generate_MST_prim(self.rows[0][0].name)
-		string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
+		# parents = G.generate_MST_prim(self.rows[0][0].name)
+		# string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
 
-		self.delete_all_patches_SIFT_points()
+		# self.delete_all_patches_SIFT_points()
 
-		# string_res = self.correct_row_by_row()
+		string_res = self.correct_row_by_row()
 		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
 		
 		print('Group {0} was corrected internally. '.format(self.group_id))
@@ -1703,7 +1711,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups
+		return groups[7:9]
 
 	def get_rows(self):
 		global coordinates_file
@@ -1767,7 +1775,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist)
+			rows.append(newlist[0:5])
 
 		print('Rows calculated and created completely.')
 
