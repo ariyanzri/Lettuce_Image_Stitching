@@ -309,37 +309,37 @@ def get_dissimilarity_on_overlaps(p1,p2,H):
 
 	## XOR dissimilarity 
 
-	p1.load_img()
-	p2.load_img()
-	overlap_1_img = p1.rgb_img[p1_y1:p1_y2,p1_x1:p1_x2,:]
-	overlap_2_img = p2.rgb_img[p2_y1:p2_y2,p2_x1:p2_x2,:]
+	# p1.load_img()
+	# p2.load_img()
+	# overlap_1_img = p1.rgb_img[p1_y1:p1_y2,p1_x1:p1_x2,:]
+	# overlap_2_img = p2.rgb_img[p2_y1:p2_y2,p2_x1:p2_x2,:]
 
-	shape_1 = np.shape(overlap_1_img)
-	shape_2 = np.shape(overlap_2_img)
+	# shape_1 = np.shape(overlap_1_img)
+	# shape_2 = np.shape(overlap_2_img)
 
-	if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
-		return -1
+	# if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
+	# 	return -1
 
-	overlap_1_img = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2GRAY)
-	overlap_2_img = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2GRAY)
+	# overlap_1_img = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2GRAY)
+	# overlap_2_img = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2GRAY)
 
-	overlap_1_img = cv2.blur(overlap_1_img,(5,5))
-	overlap_2_img = cv2.blur(overlap_2_img,(5,5))
+	# overlap_1_img = cv2.blur(overlap_1_img,(5,5))
+	# overlap_2_img = cv2.blur(overlap_2_img,(5,5))
 
-	ret1,overlap_1_img = cv2.threshold(overlap_1_img,0,255,cv2.THRESH_OTSU)
-	ret1,overlap_2_img = cv2.threshold(overlap_2_img,0,255,cv2.THRESH_OTSU)
+	# ret1,overlap_1_img = cv2.threshold(overlap_1_img,0,255,cv2.THRESH_OTSU)
+	# ret1,overlap_2_img = cv2.threshold(overlap_2_img,0,255,cv2.THRESH_OTSU)
 
-	tmp_size = np.shape(overlap_1_img)
+	# tmp_size = np.shape(overlap_1_img)
 	
-	overlap_1_img[overlap_1_img==255] = 1
-	overlap_2_img[overlap_2_img==255] = 1
+	# overlap_1_img[overlap_1_img==255] = 1
+	# overlap_2_img[overlap_2_img==255] = 1
 
-	xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
+	# xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
 
-	dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
+	# dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
 	
-	p1.delete_img()
-	p2.delete_img()
+	# p1.delete_img()
+	# p2.delete_img()
 
 	## FFT dissimilarity 
 
@@ -354,8 +354,8 @@ def get_dissimilarity_on_overlaps(p1,p2,H):
 	## HOG dissimilarity
 
 	hog1 = p1.get_hog_region(p1_x1,p1_y1,p1_x2,p1_y2)
-	hog2 = p2.get_fft_region(p2_x1,p2_y1,p2_x2,p2_y2)
-	print(hog1.shape)
+	hog2 = p2.get_hog_region(p2_x1,p2_y1,p2_x2,p2_y2)
+	
 	dissimilarity = np.sqrt(np.sum((hog1-hog2)**2)/(hog1.shape[0]))
 
 	return dissimilarity
