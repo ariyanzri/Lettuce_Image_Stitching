@@ -307,6 +307,8 @@ def get_dissimilarity_on_overlaps(p1,p2,H):
 	if not flag:
 		return -1
 
+	## XOR dissimilarity 
+
 	p1.load_img()
 	p2.load_img()
 	overlap_1_img = p1.rgb_img[p1_y1:p1_y2,p1_x1:p1_x2,:]
@@ -339,6 +341,8 @@ def get_dissimilarity_on_overlaps(p1,p2,H):
 	p1.delete_img()
 	p2.delete_img()
 
+	## FFT dissimilarity 
+
 	# fft1 = p1.get_fft_region(p1_x1,p1_y1,p1_x2,p1_y2)
 	# fft2 = p2.get_fft_region(p2_x1,p2_y1,p2_x2,p2_y2)
 
@@ -346,6 +350,13 @@ def get_dissimilarity_on_overlaps(p1,p2,H):
 
 	# p1.delete_img()
 	# p2.delete_img()
+
+	## HOG dissimilarity
+
+	hog1 = p1.get_hog_region(p1_x1,p1_y1,p1_x2,p1_y2)
+	hog2 = p2.get_fft_region(p2_x1,p2_y1,p2_x2,p2_y2)
+	print(hog1.shape)
+	dissimilarity = np.sqrt(np.sum((hog1-hog2)**2)/(hog1.shape[0]))
 
 	return dissimilarity
 
