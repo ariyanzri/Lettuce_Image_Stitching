@@ -37,7 +37,7 @@ PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
 GPS_ERROR_Y = 0.0000003
 GPS_ERROR_X = 0.0000006
 
-FFT_PARALLEL_CORES_TO_USE = 10
+FFT_PARALLEL_CORES_TO_USE = 20
 
 def convert_to_gray(img):
 	
@@ -1043,6 +1043,10 @@ def jitter_and_calculate_fft(p1,neighbors,jx,jy):
 
 		fft1 = p1.get_fft_region(overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
 		fft2 = p2.get_fft_region(overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
+
+		if fft1 is None or fft2 is None:
+			continue
+
 		fft_difference = np.sqrt(np.sum((fft1-fft2)**2)/(fft1.shape[0]*fft1.shape[1]*fft1.shape[2]))
 		sum_differences+=fft_difference
 
@@ -1374,9 +1378,11 @@ class Patch:
 		if self.rgb_img is None:
 			self.load_img()
 
-		img = self.rgb_img[y1:y2,x1:x2]
-		print(img.shape)
-		
+		img = self.rgb_img[y1:y2,x1:x2,:]
+
+		if img is None or len(img.shape) !=3 or img.shape[0] == 0 or img.shape[1] == 0 or img.shape[2] == 0:
+			return None
+
 		f = np.fft.fft2(img)
 		fshift = np.fft.fftshift(f)
 		
@@ -2065,10 +2071,10 @@ def main(scan_date):
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
 		# field.draw_and_save_field()
+		field.groups[7].correct_internally()
+		# field.correct_field()
 		# field.groups[0].correct_internally()
-		field.correct_field()
-		# field.groups[0].correct_internally()
-		field.draw_and_save_field()
+		# field.draw_and_save_field()
 		# field.save_new_coordinate()
 
 	elif server == 'ariyan':
