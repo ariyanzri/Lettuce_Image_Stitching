@@ -1374,9 +1374,19 @@ class Patch:
 		if self.rgb_img is None:
 			self.load_img()
 
-		f = np.fft.fft2(self.rgb_img[y1:y2,x1:x2])
+		img = self.rgb_img[y1:y2,x1:x2]
+		print(img.shape)
+		
+		f = np.fft.fft2(img)
 		fshift = np.fft.fftshift(f)
+		
+		zeros = fshift==0
+		fshift[zeros] = 1e-10
+		
 		magnitude_spectrum = 20*np.log(np.abs(fshift))
+		
+		magnitude_spectrum[zeros] = 0
+
 		# magnitude_spectrum = f
 
 		return magnitude_spectrum.astype('uint8')
@@ -2090,7 +2100,7 @@ def main(scan_date):
 		
 		draw_together([p1,p2])
 
-		p2.gps = p2.correct_based_on_neighbors(p1)
+		p2.gps = p2.correct_based_on_neighbors([p1])
 
 		draw_together([p1,p2])
 
