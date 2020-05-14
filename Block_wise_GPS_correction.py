@@ -307,35 +307,43 @@ def get_dissimilarity_on_overlaps(p1,p2,H):
 	if not flag:
 		return -1
 
-	p1.load_img()
-	p2.load_img()
-	overlap_1_img = p1.rgb_img[p1_y1:p1_y2,p1_x1:p1_x2,:]
-	overlap_2_img = p2.rgb_img[p2_y1:p2_y2,p2_x1:p2_x2,:]
+	# p1.load_img()
+	# p2.load_img()
+	# overlap_1_img = p1.rgb_img[p1_y1:p1_y2,p1_x1:p1_x2,:]
+	# overlap_2_img = p2.rgb_img[p2_y1:p2_y2,p2_x1:p2_x2,:]
 
-	shape_1 = np.shape(overlap_1_img)
-	shape_2 = np.shape(overlap_2_img)
+	# shape_1 = np.shape(overlap_1_img)
+	# shape_2 = np.shape(overlap_2_img)
 
-	if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
-		return -1
+	# if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
+	# 	return -1
 
-	overlap_1_img = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2GRAY)
-	overlap_2_img = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2GRAY)
+	# overlap_1_img = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2GRAY)
+	# overlap_2_img = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2GRAY)
 
-	overlap_1_img = cv2.blur(overlap_1_img,(5,5))
-	overlap_2_img = cv2.blur(overlap_2_img,(5,5))
+	# overlap_1_img = cv2.blur(overlap_1_img,(5,5))
+	# overlap_2_img = cv2.blur(overlap_2_img,(5,5))
 
-	ret1,overlap_1_img = cv2.threshold(overlap_1_img,0,255,cv2.THRESH_OTSU)
-	ret1,overlap_2_img = cv2.threshold(overlap_2_img,0,255,cv2.THRESH_OTSU)
+	# ret1,overlap_1_img = cv2.threshold(overlap_1_img,0,255,cv2.THRESH_OTSU)
+	# ret1,overlap_2_img = cv2.threshold(overlap_2_img,0,255,cv2.THRESH_OTSU)
 
-	tmp_size = np.shape(overlap_1_img)
+	# tmp_size = np.shape(overlap_1_img)
 	
-	overlap_1_img[overlap_1_img==255] = 1
-	overlap_2_img[overlap_2_img==255] = 1
+	# overlap_1_img[overlap_1_img==255] = 1
+	# overlap_2_img[overlap_2_img==255] = 1
 
-	xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
+	# xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
 
-	dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
+	# dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
 	
+	# p1.delete_img()
+	# p2.delete_img()
+
+	fft1 = p1.get_fft_region(p1_x1,p1_y1,p1_x2,p1_y2)
+	fft2 = p2.get_fft_region(p2_x1,p2_y1,p2_x2,p2_y2)
+
+	dissimilarity = np.sqrt(np.sum((fft1-fft2)**2)/(fft1.shape[0]*fft1.shape[1]*fft1.shape[2]))
+
 	p1.delete_img()
 	p2.delete_img()
 
@@ -1103,7 +1111,7 @@ class Graph():
 
 
 	def find_min_key(self,keys,mstSet):
-		min_value = 1
+		min_value = sys.maxsize
 
 		for v in range(self.vertecis_number): 
 			if keys[v] < min_value and mstSet[v] == False: 
@@ -1114,7 +1122,7 @@ class Graph():
 
 
 	def generate_MST_prim(self,starting_vertex):
-		keys = [1]*self.vertecis_number
+		keys = [sys.maxsize]*self.vertecis_number
 		parents = [None]*self.vertecis_number
 		mstSet = [False]*self.vertecis_number
 
@@ -1599,19 +1607,19 @@ class Group:
 	def correct_internally(self):
 
 		print('Group {0} with {1} rows and {2} patches internally correction started.'.format(self.group_id,len(self.rows),len(self.patches)))
-		# self.load_all_patches_SIFT_points()
+		self.load_all_patches_SIFT_points()
 
-		# self.pre_calculate_internal_neighbors_and_transformation_parameters()
+		self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
-		# G = Graph(len(self.patches),[p.name for p in self.patches])
-		# G.initialize_edge_weights(self.patches)
+		G = Graph(len(self.patches),[p.name for p in self.patches])
+		G.initialize_edge_weights(self.patches)
 
-		# parents = G.generate_MST_prim(self.rows[0][0].name)
-		# string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
+		parents = G.generate_MST_prim(self.rows[0][0].name)
+		string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
 
-		# self.delete_all_patches_SIFT_points()
+		self.delete_all_patches_SIFT_points()
 
-		string_res = self.correct_row_by_row()
+		# string_res = self.correct_row_by_row()
 		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
 		
 		print('Group {0} was corrected internally. '.format(self.group_id))
@@ -2085,30 +2093,30 @@ def main(scan_date):
 		patches = read_all_data()
 		p1 = patches[0]
 		
-		# fft = p1.get_fft_region(0,0,PATCH_SIZE[1],PATCH_SIZE[0])
+		fft = p1.get_fft_region(0,0,PATCH_SIZE[1],PATCH_SIZE[0])
 		# print(fft)
-		# p1.load_img()
-		# cv2.namedWindow('img',cv2.WINDOW_NORMAL)
-		# cv2.namedWindow('fft',cv2.WINDOW_NORMAL)
-		# cv2.resizeWindow('img', 500,500)
-		# cv2.resizeWindow('fft', 500,500)
-		# cv2.imshow('img',p1.rgb_img)
-		# cv2.imshow('fft',fft)
-		# cv2.waitKey(0)
+		p1.load_img()
+		cv2.namedWindow('img',cv2.WINDOW_NORMAL)
+		cv2.namedWindow('fft',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('img', 500,500)
+		cv2.resizeWindow('fft', 500,500)
+		cv2.imshow('img',p1.rgb_img)
+		cv2.imshow('fft',fft)
+		cv2.waitKey(0)
 
-		p2 = patches[1]
+		# p2 = patches[1]
 
-		for p in patches:
-			if p.has_overlap(p1) and p1.has_overlap(p) and p1 != p:
-				p2 = p
+		# for p in patches:
+		# 	if p.has_overlap(p1) and p1.has_overlap(p) and p1 != p:
+		# 		p2 = p
 
-				break
+		# 		break
 		
-		draw_together([p1,p2])
+		# draw_together([p1,p2])
 
-		p2.gps = p2.correct_based_on_neighbors([p1])
+		# p2.gps = p2.correct_based_on_neighbors([p1])
 
-		draw_together([p1,p2])
+		# draw_together([p1,p2])
 
 		# p1.load_SIFT_points()
 		# p2.load_SIFT_points()
