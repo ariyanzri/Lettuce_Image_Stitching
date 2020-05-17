@@ -1492,12 +1492,12 @@ class Patch:
 
 		min_p = np.amin(img)
 		max_p = np.amax(img)
-		print(min_p,max_p)
+		# print(min_p,max_p)
 		# rng = (max_p-min_p)
 		
 		# img = ((img - min_p)/(max_p-min_p))*255
-		# img =img.astype('uint8')
-
+		img =img.astype('uint8')
+		print(min(img),max(img))
 		
 		# img[img>=0.7*rng+min_p] = 255
 		# img[img>=0.7*rng+min_p] = 255
