@@ -2172,7 +2172,7 @@ def main(scan_date):
 		field = Field()
 
 		lettuce_coords = read_lettuce_heads_coordinates()
-		p1 = field.groups[4].patches[8]
+		p1 = field.groups[3].patches[8]
 		p1.get_lettuce_contours(lettuce_coords)
 
 
