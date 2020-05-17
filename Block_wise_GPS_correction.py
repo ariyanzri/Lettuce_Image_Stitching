@@ -1543,7 +1543,7 @@ class Patch:
 		cv2.resizeWindow('gr', 500,500)
 
 		cv2.imshow('fig',self.rgb_img)
-		cv2.imshow('fig',img)
+		cv2.imshow('gr',img)
 		cv2.waitKey(0)
 
 
