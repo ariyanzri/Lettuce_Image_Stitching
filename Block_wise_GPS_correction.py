@@ -1508,8 +1508,8 @@ class Patch:
 		# 	img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
 
 		# img  = cv2.medianBlur(img,13)
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))
-		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
+		# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))
+		# img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
 		# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (4, 4))
 		# img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
@@ -1524,13 +1524,13 @@ class Patch:
 		# 	cY = int(M["m01"] / M["m00"])
 		# 	cv2.circle(self.rgb_img, (cX, cY), 20, (0, 255, 0), -1)
 
-		# for coord in list_lettuce_heads:
-		# 	if self.gps.is_coord_inside(coord):
-		# 		# print(coord)
-		# 		# print(self.gps.UL_coord)
-		# 		pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
-		# 		pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
-		# 		cv2.circle(self.rgb_img, (pX, pY), 20, (0, 0, 255 ), -1)
+		for coord in list_lettuce_heads:
+			if self.gps.is_coord_inside(coord):
+				# print(coord)
+				# print(self.gps.UL_coord)
+				pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
+				pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
+				cv2.circle(self.rgb_img, (pX, pY), 20, (0, 0, 255 ), -1)
 			
 		cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
 		cv2.namedWindow('gr',cv2.WINDOW_NORMAL)
