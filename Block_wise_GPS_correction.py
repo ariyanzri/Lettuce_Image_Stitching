@@ -1514,7 +1514,7 @@ class Patch:
 
 		img  = cv2.medianBlur(img,17)
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (17,17))
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (34,34))
 		img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
 
 		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (80,80))
