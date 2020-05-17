@@ -1496,7 +1496,7 @@ class Patch:
 		# rng = (max_p-min_p)
 		
 		# img = ((img - min_p)/(max_p-min_p))*255
-		# img =img.astype('uint8')
+		img = cv2.normalize(img, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
 		print(np.amin(img),np.amax(img))
 		
 		# img[img>=0.7*rng+min_p] = 255
