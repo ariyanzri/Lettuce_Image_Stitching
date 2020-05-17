@@ -43,7 +43,7 @@ def remove_shadow(image):
 
 	hsvImg = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
 
-	hsvImg[...,2] = hsvImg[...,2]*1.2
+	hsvImg[...,2] = np.amax(hsvImg[...,2])
 
 	rgb_img = cv2.cvtColor(hsvImg,cv2.COLOR_HSV2BGR)
 
