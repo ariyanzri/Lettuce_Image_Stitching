@@ -1489,38 +1489,38 @@ class Patch:
 
 		img = green_channel-0.61*blue_channel-0.39*red_channel
 		# img =img.astype('uint8')
-		min_p = np.amin(img)
-		max_p = np.amax(img)
+		# min_p = np.amin(img)
+		# max_p = np.amax(img)
 
-		rng = (max_p-min_p)
+		# rng = (max_p-min_p)
 
-		img[img<0.57*rng+min_p] = 0
-		img[img>=0.57*rng+min_p] = 255
-		# ret1,img = cv2.threshold(img,0,255,cv2.THRESH_OTSU)
+		# img[img<0.57*rng+min_p] = 0
+		# img[img>=0.57*rng+min_p] = 255
+		# # ret1,img = cv2.threshold(img,0,255,cv2.THRESH_OTSU)
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (20, 20))
-		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
+		# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (20, 20))
+		# img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (40, 40))
-		img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
-		img = img.astype('uint8')
-		image, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+		# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (40, 40))
+		# img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
+		# img = img.astype('uint8')
+		# image, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
-		cv2.drawContours(self.rgb_img, contours, -1, (0,255,0),10)
+		# cv2.drawContours(self.rgb_img, contours, -1, (0,255,0),10)
 
-		for c in contours:
-			M = cv2.moments(c)
-			cX = int(M["m10"] / M["m00"])
-			cY = int(M["m01"] / M["m00"])
-			cv2.circle(self.rgb_img, (cX, cY), 20, (0, 255, 0), -1)
+		# for c in contours:
+		# 	M = cv2.moments(c)
+		# 	cX = int(M["m10"] / M["m00"])
+		# 	cY = int(M["m01"] / M["m00"])
+		# 	cv2.circle(self.rgb_img, (cX, cY), 20, (0, 255, 0), -1)
 
-		for coord in list_lettuce_heads:
-			if self.gps.is_coord_inside(coord):
-				# print(coord)
-				# print(self.gps.UL_coord)
-				pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
-				pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
-				cv2.circle(self.rgb_img, (pX, pY), 20, (0, 0, 255 ), -1)
+		# for coord in list_lettuce_heads:
+		# 	if self.gps.is_coord_inside(coord):
+		# 		# print(coord)
+		# 		# print(self.gps.UL_coord)
+		# 		pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
+		# 		pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
+		# 		cv2.circle(self.rgb_img, (pX, pY), 20, (0, 0, 255 ), -1)
 			
 		cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
 		cv2.namedWindow('gr',cv2.WINDOW_NORMAL)
