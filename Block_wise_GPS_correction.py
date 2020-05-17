@@ -1124,7 +1124,7 @@ def calculate_average_min_distance_lettuce_heads(contour_centers,inside_lettuce_
 		for l in inside_lettuce_heads:
 			new_l = (l[0]-T[0],l[1]-T[1])
 
-			distance = sqrt((c[0]-new_l[0])**2+(c[1]-new_l[1])**2)
+			distance = math.sqrt((c[0]-new_l[0])**2+(c[1]-new_l[1])**2)
 
 			if distance<min_distance:
 				min_distance = distance
