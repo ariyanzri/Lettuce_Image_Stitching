@@ -1494,8 +1494,8 @@ class Patch:
 
 		rng = (max_p-min_p)
 
-		img[img<0.5*rng+min_p] = 0
-		img[img>=0.5*rng+min_p] = 255
+		img[img<0.55*rng+min_p] = 0
+		img[img>=0.55*rng+min_p] = 255
 
 		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (20, 20))
 		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
