@@ -1494,8 +1494,8 @@ class Patch:
 
 		rng = (max_p-min_p)
 
-		img[img<0.57*rng+min_p] = 0
-		img[img>=0.57*rng+min_p] = 255
+		img[img<0.7*rng+min_p] = 0
+		img[img>=0.7*rng+min_p] = 255
 		# ret1,img = cv2.threshold(img,0,255,cv2.THRESH_OTSU)
 
 		# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (20, 20))
