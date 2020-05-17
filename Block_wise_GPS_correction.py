@@ -1488,15 +1488,17 @@ class Patch:
 		blue_channel = self.rgb_img[:,:,0].copy()
 
 		img = green_channel-0.61*blue_channel-0.39*red_channel
-		# img =img.astype('uint8')
-		# min_p = np.amin(img)
-		# max_p = np.amax(img)
+		img =img.astype('uint8')
+		min_p = np.amin(img)
+		max_p = np.amax(img)
+
+		img = cv2.medianBlur(img,5)
 
 		# rng = (max_p-min_p)
 
 		# img[img<0.57*rng+min_p] = 0
 		# img[img>=0.57*rng+min_p] = 255
-		# # ret1,img = cv2.threshold(img,0,255,cv2.THRESH_OTSU)
+		# ret1,img = cv2.threshold(img,0,255,cv2.THRESH_OTSU)
 
 		# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (20, 20))
 		# img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
