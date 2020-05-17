@@ -1517,8 +1517,8 @@ class Patch:
 		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (150,150))
 		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
-		# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (34,34))
-		# img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (150,150))
+		img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
 
 		# img = img.astype('uint8')
 		# image, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
