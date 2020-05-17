@@ -2138,7 +2138,7 @@ def main(scan_date):
 		CORRECTED_coordinates_file = '/data/plant/full_scans/metadata/{0}_coordinates_CORRECTED.csv'.format(scan_date)
 		plot_npy_file = '/data/plant/full_scans/{0}-rgb/plt.npy'.format(scan_date)
 		field_image_path = 'field.bmp'
-		# lettuce_heads_coordinates_file = '/storage/ariyanzarei/{0}-rgb/{0}_coordinates.csv'.format(scan_date)
+		lettuce_heads_coordinates_file = 'season10_lettuce_latlon.csv'
 
 	elif server == 'ariyan':
 		patch_folder = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures'
@@ -2171,13 +2171,18 @@ def main(scan_date):
 		
 		field = Field()
 
+		lettuce_coords = read_lettuce_heads_coordinates()
+		p1 = field.groups[5].patches[5]
+		p1.get_lettuce_contours(lettuce_coords)
+
+
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
 		# field.draw_and_save_field()
 		# field.groups[0].correct_internally()
-		field.correct_field()
+		# field.correct_field()
 		# field.groups[0].correct_internally()
-		field.draw_and_save_field()
+		# field.draw_and_save_field()
 		# field.save_new_coordinate()
 
 	elif server == 'ariyan':
@@ -2301,7 +2306,7 @@ server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
 
 start_time = datetime.datetime.now()
-main('2020-02-18')
-# main('2020-01-08')
+# main('2020-02-18')
+main('2020-01-08')
 end_time = datetime.datetime.now()
 report_time(start_time,end_time)
