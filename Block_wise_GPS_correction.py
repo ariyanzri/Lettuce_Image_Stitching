@@ -1488,7 +1488,7 @@ class Patch:
 		blue_channel = self.rgb_img[:,:,0].copy()
 
 		img = green_channel-0.61*blue_channel-0.39*red_channel
-		img[img<=0] = 0
+		# img[img<=0] = 0
 
 		min_p = np.amin(img)
 		max_p = np.amax(img)
@@ -1497,7 +1497,7 @@ class Patch:
 		
 		# img = ((img - min_p)/(max_p-min_p))*255
 		img = cv2.normalize(img, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
-		print(np.amin(img),np.amax(img))
+		# print(np.amin(img),np.amax(img))
 		
 		# img[img>=0.7*rng+min_p] = 255
 		# img[img>=0.7*rng+min_p] = 255
