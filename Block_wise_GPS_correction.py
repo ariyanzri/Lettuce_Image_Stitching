@@ -40,7 +40,21 @@ GPS_ERROR_X = 0.0000006
 FFT_PARALLEL_CORES_TO_USE = 20
 
 def remove_shadow(image):
-	pass
+
+	hsvImg = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
+
+	hsvImg[...,2] = hsvImg[...,2]*1.2
+
+	rgb_img = cv2.cvtColor(hsvImg,cv2.COLOR_HSV2BGR)
+
+	cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
+	cv2.namedWindow('gr',cv2.WINDOW_NORMAL)
+	cv2.resizeWindow('fig', 500,500)
+	cv2.resizeWindow('gr', 500,500)
+
+	cv2.imshow('fig',image)
+	cv2.imshow('gr',rgb_img)
+	cv2.waitKey(0)
 	
 
 def convert_to_gray(img):
@@ -1487,6 +1501,10 @@ class Patch:
 		if self.rgb_img is None:
 			self.load_img()
 
+		remove_shadow(self.rgb_img.copy())
+
+		return
+		
 		green_channel = self.rgb_img[:,:,1].copy()
 		red_channel = self.rgb_img[:,:,2].copy()
 		blue_channel = self.rgb_img[:,:,0].copy()
