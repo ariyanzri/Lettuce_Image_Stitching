@@ -1574,6 +1574,13 @@ class Patch:
 
 	def correct_based_on_contours_and_lettuce_heads(self,list_lettuce_heads):
 
+		cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('fig', 500,500)
+
+		cv2.imshow('fig',self.rgb_img)
+		cv2.waitKey(0)
+
+
 		contour_centers = self.get_lettuce_contours()
 		inside_lettuce_heads = []
 
@@ -1598,7 +1605,14 @@ class Patch:
 					best_error = mean_error
 					best_T = T
 
-		print(T)
+		for c in contour_centers:
+			cv2.circle(self.rgb_img, (c[0], c[1]), 20, (0, 255, 0), -1)
+
+		for l in inside_lettuce_heads:
+			cv2.circle(self.rgb_img, (l[0], l[1]), 20, (0, 0, 255 ), -1)
+			
+		cv2.imshow('fig',self.rgb_img)
+		cv2.waitKey(0)
 
 class Group:
 	def __init__(self,gid,rows):
