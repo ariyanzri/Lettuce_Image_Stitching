@@ -1489,10 +1489,10 @@ class Patch:
 
 		img = green_channel-0.61*blue_channel-0.39*red_channel
 		img[img<=0] = 0
-		
-		# min_p = np.amin(img)
-		# max_p = np.amax(img)
 
+		min_p = np.amin(img)
+		max_p = np.amax(img)
+		print(min_p,max_p)
 		# rng = (max_p-min_p)
 		
 		# img = ((img - min_p)/(max_p-min_p))*255
