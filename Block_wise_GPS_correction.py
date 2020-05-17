@@ -1499,15 +1499,15 @@ class Patch:
 		img = cv2.normalize(img, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
 		# print(np.amin(img),np.amax(img))
 		
-		img[img>=140] = 255
-		img[img<140] = 0
+		img[img>=150] = 255
+		img[img<150] = 0
 		# ret1,img = cv2.threshold(img,0,255,cv2.THRESH_OTSU)
 
 		# for i in [2,5,10,20,30]:
 		# 	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (i, i))
 		# 	img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
 
-		# img  = cv2.medianBlur(img,13)
+		img  = cv2.medianBlur(img,21)
 		# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5,5))
 		# img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
