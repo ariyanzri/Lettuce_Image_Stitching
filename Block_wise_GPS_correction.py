@@ -1528,15 +1528,15 @@ class Patch:
 		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (50,50))
 		img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
 
-		# image, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+		image, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
-		# cv2.drawContours(self.rgb_img, contours, -1, (0,255,0),10)
+		cv2.drawContours(self.rgb_img, contours, -1, (0,255,0),10)
 
-		# for c in contours:
-		# 	M = cv2.moments(c)
-		# 	cX = int(M["m10"] / M["m00"])
-		# 	cY = int(M["m01"] / M["m00"])
-		# 	cv2.circle(self.rgb_img, (cX, cY), 20, (0, 255, 0), -1)
+		for c in contours:
+			M = cv2.moments(c)
+			cX = int(M["m10"] / M["m00"])
+			cY = int(M["m01"] / M["m00"])
+			cv2.circle(self.rgb_img, (cX, cY), 20, (0, 255, 0), -1)
 
 		for coord in list_lettuce_heads:
 			if self.gps.is_coord_inside(coord):
