@@ -1508,8 +1508,8 @@ class Patch:
 		# 	img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
 
 		# img  = cv2.medianBlur(img,13)
-		# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (20, 20))
-		# img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10, 10))
+		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
 		# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (4, 4))
 		# img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
