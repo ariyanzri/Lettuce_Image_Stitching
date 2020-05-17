@@ -1114,6 +1114,27 @@ def read_lettuce_heads_coordinates():
 
 	return lettuce_coords
 
+def calculate_average_min_distance_lettuce_heads(contour_centers,inside_lettuce_heads,T):
+	
+	average_distance = 0
+
+	for c in contour_centers:
+		min_distance = sys.maxsize
+
+		for l in inside_lettuce_heads:
+			new_l = (l[0]-T[0],l[1]-T[1])
+
+			distance = sqrt((c[0]-new_l[0])**2+(c[1]-new_l[1])**2)
+
+			if distance<min_distance:
+				min_distance = distance
+
+		average_distance+=min_distance
+
+	average_distance/=len(contour_centers)
+
+	return average_distance
+
 class GPS_Coordinate:
 	
 	def __init__(self,UL_coord,UR_coord,LL_coord,LR_coord,Center):
@@ -1489,7 +1510,7 @@ class Patch:
 
 		return min_gps
 
-	def get_lettuce_contours(self,list_lettuce_heads):
+	def get_lettuce_contours(self,list_lettuce_heads=None):
 		if self.rgb_img is None:
 			self.load_img()
 
@@ -1500,25 +1521,16 @@ class Patch:
 		blue_channel = img[:,:,0].copy()
 
 		img = green_channel-0.61*blue_channel-0.39*red_channel
-		# img[img<=0] = 0
 
 		min_p = np.amin(img)
 		max_p = np.amax(img)
-		# print(min_p,max_p)
 		rng = (max_p-min_p)
 		
-		# img = ((img - min_p)/(max_p-min_p))*255
+
 		img = cv2.normalize(img, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
-		# print(np.amin(img),np.amax(img))
 		
 		img[img>=150] = 255
 		img[img<150] = 0
-
-		# ret1,img = cv2.threshold(img,0,255,cv2.THRESH_OTSU)
-
-		# for i in [2,5,10,20,30]:
-		# 	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (i, i))
-		# 	img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
 
 		img  = cv2.medianBlur(img,17)
 
@@ -1532,29 +1544,61 @@ class Patch:
 
 		cv2.drawContours(self.rgb_img, contours, -1, (0,255,0),10)
 
+		contour_centers = []
+
 		for c in contours:
 			M = cv2.moments(c)
 			cX = int(M["m10"] / M["m00"])
 			cY = int(M["m01"] / M["m00"])
-			cv2.circle(self.rgb_img, (cX, cY), 20, (0, 255, 0), -1)
+			contour_centers.append((cX,cY))
+			# cv2.circle(self.rgb_img, (cX, cY), 20, (0, 255, 0), -1)
+
+		# for coord in list_lettuce_heads:
+		# 	if self.gps.is_coord_inside(coord):
+
+		# 		pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
+		# 		pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
+		# 		cv2.circle(self.rgb_img, (pX, pY), 20, (0, 0, 255 ), -1)
+			
+		# cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
+		# cv2.namedWindow('gr',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('fig', 500,500)
+		# cv2.resizeWindow('gr', 500,500)
+
+		# cv2.imshow('fig',self.rgb_img)
+		# cv2.imshow('gr',img)
+		# cv2.waitKey(0)
+
+		return contour_centers
+
+
+	def correct_based_on_contours_and_lettuce_heads(self,list_lettuce_heads):
+
+		contour_centers = self.get_lettuce_contours()
+		inside_lettuce_heads = []
 
 		for coord in list_lettuce_heads:
 			if self.gps.is_coord_inside(coord):
-				# print(coord)
-				# print(self.gps.UL_coord)
+
 				pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
 				pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
-				cv2.circle(self.rgb_img, (pX, pY), 20, (0, 0, 255 ), -1)
-			
-		cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
-		cv2.namedWindow('gr',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('fig', 500,500)
-		cv2.resizeWindow('gr', 500,500)
+				inside_lettuce_heads.append((pX,pY))
 
-		cv2.imshow('fig',self.rgb_img)
-		cv2.imshow('gr',img)
-		cv2.waitKey(0)
+		best_T = None
+		best_error = sys.maxsize
 
+		for c in contour_centers:
+			for l in inside_lettuce_heads:
+
+				T = get_translation_from_single_matches(c[0],c[1],l[0],l[1])
+
+				mean_error = calculate_average_min_distance_lettuce_heads(contour_centers,inside_lettuce_heads,T)
+
+				if mean_error<best_error:
+					best_error = mean_error
+					best_T = T
+
+		print(T)
 
 class Group:
 	def __init__(self,gid,rows):
@@ -2198,7 +2242,8 @@ def main(scan_date):
 
 		lettuce_coords = read_lettuce_heads_coordinates()
 		p1 = field.groups[3].patches[8]
-		p1.get_lettuce_contours(lettuce_coords)
+		# p1.get_lettuce_contours(lettuce_coords)
+		p1.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
 
 
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
