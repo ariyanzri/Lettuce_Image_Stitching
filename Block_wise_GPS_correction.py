@@ -1496,7 +1496,7 @@ class Patch:
 		# rng = (max_p-min_p)
 		
 		# img = ((img - min_p)/(max_p-min_p))*255
-		img =img.astype('uint8')
+		# img =img.astype('uint8')
 		print(np.amin(img),np.amax(img))
 		
 		# img[img>=0.7*rng+min_p] = 255
@@ -1532,7 +1532,7 @@ class Patch:
 		cv2.resizeWindow('fig', 500,500)
 		cv2.resizeWindow('gr', 500,500)
 
-		cv2.imshow('fig',self.rgb_img)
+		# cv2.imshow('fig',self.rgb_img)
 		cv2.imshow('gr',img)
 		cv2.waitKey(0)
 
