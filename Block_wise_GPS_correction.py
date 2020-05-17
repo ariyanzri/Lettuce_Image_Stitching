@@ -1573,7 +1573,8 @@ class Patch:
 
 
 	def correct_based_on_contours_and_lettuce_heads(self,list_lettuce_heads):
-
+		self.load_img()
+		
 		cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
 		cv2.resizeWindow('fig', 500,500)
 
