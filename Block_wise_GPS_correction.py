@@ -24,8 +24,8 @@ from collections import OrderedDict,Counter
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-# NUMBER_OF_ROWS_IN_GROUPS = 10
-NUMBER_OF_ROWS_IN_GROUPS = 4
+NUMBER_OF_ROWS_IN_GROUPS = 10
+# NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -1092,6 +1092,18 @@ def jitter_and_calculate_fft(p1,neighbors,jx,jy):
 def jitter_and_calculate_fft_helper(args):
 	return jitter_and_calculate_fft(*args)
 
+def read_lettuce_heads_coordinates():
+	global lettuce_heads_coordinates_file
+	from numpy import genfromtxt
+
+	lettuce_coords = genfromtxt(lettuce_heads_coordinates_file, delimiter=',',skip_header=1)
+
+	col1 = lettuce_coords[:,0].copy()
+	lettuce_coords[:,0] = lettuce_coords[:,1].copy()
+	lettuce_coords[:,1] = col1
+
+	return lettuce_coords
+
 class GPS_Coordinate:
 	
 	def __init__(self,UL_coord,UR_coord,LL_coord,LR_coord,Center):
@@ -1467,6 +1479,58 @@ class Patch:
 
 		return min_gps
 
+	def get_lettuce_contours(self,list_lettuce_heads):
+		if self.rgb_img is None:
+			self.load_img()
+
+		green_channel = self.rgb_img[:,:,1].copy()
+		red_channel = self.rgb_img[:,:,2].copy()
+		blue_channel = self.rgb_img[:,:,0].copy()
+
+		img = green_channel-0.61*blue_channel-0.39*red_channel
+
+		min_p = np.amin(img)
+		max_p = np.amax(img)
+
+		rng = (max_p-min_p)
+
+		img[img<0.6*rng+min_p] = 0
+		img[img>=0.6*rng+min_p] = 255
+
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (20, 20))
+		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
+
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (40, 40))
+		img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
+		img = img.astype('uint8')
+		image, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+
+		cv2.drawContours(self.rgb_img, contours, -1, (0,255,0),10)
+
+		for c in contours:
+			M = cv2.moments(c)
+			cX = int(M["m10"] / M["m00"])
+			cY = int(M["m01"] / M["m00"])
+			cv2.circle(self.rgb_img, (cX, cY), 20, (0, 255, 0), -1)
+
+		# for coord in list_lettuce_heads:
+		# 	if self.gps.is_coord_inside(coord):
+		# 		print(coord)
+		# 		print(self.gps.UL_coord)
+		# 		pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
+		# 		pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
+		# 		cv2.circle(self.rgb_img, (pX, pY), 20, (0, 0, 255 ), -1)
+			
+		cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
+		cv2.namedWindow('gr',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('fig', 500,500)
+		cv2.resizeWindow('gr', 500,500)
+
+		cv2.imshow('fig',self.rgb_img)
+		cv2.imshow('gr',img)
+		cv2.waitKey(0)
+
+
 class Group:
 	def __init__(self,gid,rows):
 		self.group_id = gid
@@ -1638,8 +1702,12 @@ class Group:
 		G = Graph(len(self.patches),[p.name for p in self.patches])
 		G.initialize_edge_weights(self.patches)
 
-		parents = G.generate_MST_prim(self.rows[0][0].name)
-		string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
+		try:
+			parents = G.generate_MST_prim(self.rows[0][0].name)
+			string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
+		except Exception as e:
+			print(e)
+			string_res = get_corrected_string(self.patches)
 
 		self.delete_all_patches_SIFT_points()
 
@@ -1759,7 +1827,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups[7:9]
+		return groups
 
 	def get_rows(self):
 		global coordinates_file
@@ -1823,7 +1891,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist[0:5])
+			rows.append(newlist)
 
 		print('Rows calculated and created completely.')
 
@@ -2049,7 +2117,7 @@ class Field:
 		sys.stdout.flush()
 
 def main(scan_date):
-	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path
+	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path,lettuce_heads_coordinates_file
 
 	if server == 'coge':
 		patch_folder = '/storage/ariyanzarei/{0}-rgb/bin2tif_out'.format(scan_date)
@@ -2060,6 +2128,7 @@ def main(scan_date):
 		plot_npy_file = '/storage/ariyanzarei/{0}-rgb/plt.npy'.format(scan_date)
 		row_save_path = '/storage/ariyanzarei/{0}-rgb/rows'.format(scan_date)
 		field_image_path = 'field.bmp'
+		# lettuce_heads_coordinates_file = '/storage/ariyanzarei/{0}-rgb/{0}_coordinates.csv'.format(scan_date)
 
 	elif server == 'laplace.cs.arizona.edu':
 		patch_folder = '/data/plant/full_scans/{0}-rgb/bin2tif_out'.format(scan_date)
@@ -2069,6 +2138,7 @@ def main(scan_date):
 		CORRECTED_coordinates_file = '/data/plant/full_scans/metadata/{0}_coordinates_CORRECTED.csv'.format(scan_date)
 		plot_npy_file = '/data/plant/full_scans/{0}-rgb/plt.npy'.format(scan_date)
 		field_image_path = 'field.bmp'
+		# lettuce_heads_coordinates_file = '/storage/ariyanzarei/{0}-rgb/{0}_coordinates.csv'.format(scan_date)
 
 	elif server == 'ariyan':
 		patch_folder = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures'
@@ -2078,6 +2148,7 @@ def main(scan_date):
 		CORRECTED_coordinates_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt'
 		plot_npy_file = '/home/ariyan/Desktop/plt.npy'
 		field_image_path = '/home/ariyan/Desktop/field.bmp'
+		lettuce_heads_coordinates_file = '/home/ariyan/Desktop/season10_lettuce_latlon.csv'
 
 
 	if server == 'coge':
@@ -2117,16 +2188,19 @@ def main(scan_date):
 		patches = read_all_data()
 		p1 = patches[0]
 		
-		fft = p1.get_fft_region(0,0,PATCH_SIZE[1],PATCH_SIZE[0])
-		# print(fft)
-		p1.load_img()
-		cv2.namedWindow('img',cv2.WINDOW_NORMAL)
-		cv2.namedWindow('fft',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('img', 500,500)
-		cv2.resizeWindow('fft', 500,500)
-		cv2.imshow('img',p1.rgb_img)
-		cv2.imshow('fft',fft)
-		cv2.waitKey(0)
+		lettuce_coords = read_lettuce_heads_coordinates()
+		p1.get_lettuce_contours(lettuce_coords)
+		
+		# fft = p1.get_fft_region(0,0,PATCH_SIZE[1],PATCH_SIZE[0])
+		# # print(fft)
+		# p1.load_img()
+		# cv2.namedWindow('img',cv2.WINDOW_NORMAL)
+		# cv2.namedWindow('fft',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('img', 500,500)
+		# cv2.resizeWindow('fft', 500,500)
+		# cv2.imshow('img',p1.rgb_img)
+		# cv2.imshow('fft',fft)
+		# cv2.waitKey(0)
 
 		# p2 = patches[1]
 
@@ -2227,7 +2301,7 @@ server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
 
 start_time = datetime.datetime.now()
-# main('2020-02-18')
-main('2020-01-08')
+main('2020-02-18')
+# main('2020-01-08')
 end_time = datetime.datetime.now()
 report_time(start_time,end_time)
