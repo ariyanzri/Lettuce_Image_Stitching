@@ -1515,8 +1515,8 @@ class Patch:
 
 		for coord in list_lettuce_heads:
 			if self.gps.is_coord_inside(coord):
-				print(coord)
-				print(self.gps.UL_coord)
+				# print(coord)
+				# print(self.gps.UL_coord)
 				pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
 				pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
 				cv2.circle(self.rgb_img, (pX, pY), 20, (0, 0, 255 ), -1)
@@ -2172,7 +2172,7 @@ def main(scan_date):
 		field = Field()
 
 		lettuce_coords = read_lettuce_heads_coordinates()
-		p1 = field.groups[7].patches[50]
+		p1 = field.groups[4].patches[8]
 		p1.get_lettuce_contours(lettuce_coords)
 
 
