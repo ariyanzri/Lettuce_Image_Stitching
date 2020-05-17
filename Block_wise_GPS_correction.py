@@ -47,15 +47,7 @@ def remove_shadow(image):
 
 	rgb_img = cv2.cvtColor(hsvImg,cv2.COLOR_HSV2BGR)
 
-	cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
-	cv2.namedWindow('gr',cv2.WINDOW_NORMAL)
-	cv2.resizeWindow('fig', 500,500)
-	cv2.resizeWindow('gr', 500,500)
-
-	cv2.imshow('fig',image)
-	cv2.imshow('gr',rgb_img)
-	cv2.waitKey(0)
-	
+	return rgb_img
 
 def convert_to_gray(img):
 	
@@ -1501,13 +1493,11 @@ class Patch:
 		if self.rgb_img is None:
 			self.load_img()
 
-		remove_shadow(self.rgb_img.copy())
-
-		return
+		img = remove_shadow(self.rgb_img.copy())
 		
-		green_channel = self.rgb_img[:,:,1].copy()
-		red_channel = self.rgb_img[:,:,2].copy()
-		blue_channel = self.rgb_img[:,:,0].copy()
+		green_channel = img[:,:,1].copy()
+		red_channel = img[:,:,2].copy()
+		blue_channel = img[:,:,0].copy()
 
 		img = green_channel-0.61*blue_channel-0.39*red_channel
 		# img[img<=0] = 0
@@ -1521,22 +1511,22 @@ class Patch:
 		img = cv2.normalize(img, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
 		# print(np.amin(img),np.amax(img))
 		
-		img[img>=150] = 255
-		img[img<150] = 0
+		# img[img>=150] = 255
+		# img[img<150] = 0
 
-		# ret1,img = cv2.threshold(img,0,255,cv2.THRESH_OTSU)
+		# # ret1,img = cv2.threshold(img,0,255,cv2.THRESH_OTSU)
 
-		# for i in [2,5,10,20,30]:
-		# 	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (i, i))
-		# 	img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
+		# # for i in [2,5,10,20,30]:
+		# # 	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (i, i))
+		# # 	img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
 
-		img  = cv2.medianBlur(img,17)
+		# img  = cv2.medianBlur(img,17)
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (150,150))
-		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
+		# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (150,150))
+		# img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (150,150))
-		img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
+		# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (150,150))
+		# img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
 
 		# img = img.astype('uint8')
 		# image, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
