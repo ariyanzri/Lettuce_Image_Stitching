@@ -1488,13 +1488,14 @@ class Patch:
 		blue_channel = self.rgb_img[:,:,0].copy()
 
 		img = green_channel-0.61*blue_channel-0.39*red_channel
-		# img =img.astype('uint8')
+		
 		min_p = np.amin(img)
 		max_p = np.amax(img)
 
 		rng = (max_p-min_p)
-		print(img)
-		print(min_p,max_p)
+		
+		img = ((img - min_p)/(max_p-min_p))*255
+		img =img.astype('uint8')
 
 		# img[img<0.7*rng+min_p] = 0
 		# img[img>=0.7*rng+min_p] = 255
