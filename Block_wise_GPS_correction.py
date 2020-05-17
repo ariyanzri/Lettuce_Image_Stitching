@@ -39,6 +39,10 @@ GPS_ERROR_X = 0.0000006
 
 FFT_PARALLEL_CORES_TO_USE = 20
 
+def remove_shadow(image):
+	pass
+	
+
 def convert_to_gray(img):
 	
 	coefficients = [-1,1,2] 
@@ -1487,23 +1491,6 @@ class Patch:
 		red_channel = self.rgb_img[:,:,2].copy()
 		blue_channel = self.rgb_img[:,:,0].copy()
 
-		cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
-		cv2.namedWindow('gr',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('fig', 500,500)
-		cv2.resizeWindow('gr', 500,500)
-
-		cv2.imshow('fig',self.rgb_img)
-		cv2.waitKey(0)
-
-		cv2.imshow('gr',green_channel)
-		cv2.waitKey(0)
-
-		cv2.imshow('gr',red_channel)
-		cv2.waitKey(0)
-
-		cv2.imshow('gr',blue_channel)
-		cv2.waitKey(0)
-
 		img = green_channel-0.61*blue_channel-0.39*red_channel
 		# img[img<=0] = 0
 
@@ -1526,8 +1513,8 @@ class Patch:
 
 		# img  = cv2.medianBlur(img,21)
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (20,20))
-		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
+		# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (20,20))
+		# img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
 		# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (50, 50))
 		# img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
@@ -1550,7 +1537,14 @@ class Patch:
 				pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
 				cv2.circle(self.rgb_img, (pX, pY), 20, (0, 0, 255 ), -1)
 			
-		
+		cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
+		cv2.namedWindow('gr',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('fig', 500,500)
+		cv2.resizeWindow('gr', 500,500)
+
+		cv2.imshow('fig',self.rgb_img)
+		cv2.imshow('fig',img)
+		cv2.waitKey(0)
 
 
 class Group:
