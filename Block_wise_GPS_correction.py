@@ -1505,6 +1505,7 @@ class Patch:
 		
 		img[img>=150] = 255
 		img[img<150] = 0
+
 		# ret1,img = cv2.threshold(img,0,255,cv2.THRESH_OTSU)
 
 		# for i in [2,5,10,20,30]:
@@ -1513,11 +1514,13 @@ class Patch:
 
 		# img  = cv2.medianBlur(img,21)
 
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10,10))
+		img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
+
 		# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (20,20))
 		# img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
-		# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (50, 50))
-		# img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
+		
 		# img = img.astype('uint8')
 		# image, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 
