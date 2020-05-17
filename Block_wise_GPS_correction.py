@@ -1493,7 +1493,7 @@ class Patch:
 		min_p = np.amin(img)
 		max_p = np.amax(img)
 		# print(min_p,max_p)
-		# rng = (max_p-min_p)
+		rng = (max_p-min_p)
 		
 		# img = ((img - min_p)/(max_p-min_p))*255
 		img = cv2.normalize(img, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
