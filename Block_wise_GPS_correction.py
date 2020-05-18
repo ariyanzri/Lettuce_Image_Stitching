@@ -47,9 +47,9 @@ def remove_shadow(image):
 
 	rgb_img = cv2.cvtColor(hsvImg,cv2.COLOR_HSV2BGR)
 
-	cv2.namedWindow('shd',cv2.WINDOW_NORMAL)
-	cv2.resizeWindow('shd', 500,500)
-	cv2.imshow('shd',rgb_img)
+	# cv2.namedWindow('shd',cv2.WINDOW_NORMAL)
+	# cv2.resizeWindow('shd', 500,500)
+	# cv2.imshow('shd',rgb_img)
 
 	return rgb_img
 
