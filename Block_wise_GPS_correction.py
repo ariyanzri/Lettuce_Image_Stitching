@@ -1822,6 +1822,8 @@ class Group:
 			print('Group ID {0}: patch {1} corrected.'.format(self.group_id,p.name))
 			sys.stdout.flush()
 		
+		string_res = get_corrected_string(self.patches)
+		
 		print('Group {0} was corrected internally. '.format(self.group_id))
 		sys.stdout.flush()
 
