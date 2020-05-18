@@ -1625,6 +1625,8 @@ class Patch:
 					best_error = mean_error
 					best_T = T
 
+		self.move_GPS_based_on_lettuce(best_T)
+
 		imgg = self.rgb_img.copy()
 
 		for c in contour_centers:
@@ -1638,9 +1640,9 @@ class Patch:
 				pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
 				pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
 				inside_lettuce_heads.append((pX,pY))
-				
+
 		for l in inside_lettuce_heads:
-			cv2.circle(imgg, (l[0]-best_T[0,2], l[1]-best_T[1,2]), 20, (0, 0, 255 ), -1)
+			cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
 			
 		cv2.imshow('reg',imgg)
 		cv2.waitKey(0)
