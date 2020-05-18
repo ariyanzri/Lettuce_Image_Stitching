@@ -1621,14 +1621,15 @@ class Patch:
 
 				if abs(T[0,2])>=GPS_ERROR_X/GPS_TO_IMAGE_RATIO[0] or abs(T[1,2])>=GPS_ERROR_Y/GPS_TO_IMAGE_RATIO[1]:
 					continue
-				
+
 				mean_error = calculate_average_min_distance_lettuce_heads(contour_centers,inside_lettuce_heads,T)
 
 				if mean_error<best_error:
 					best_error = mean_error
 					best_T = T
 
-		self.move_GPS_based_on_lettuce(best_T)
+		if best_T is not None:
+			self.move_GPS_based_on_lettuce(best_T)
 
 		# imgg = self.rgb_img.copy()
 
