@@ -1630,6 +1630,15 @@ class Patch:
 		for c in contour_centers:
 			cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
 
+		inside_lettuce_heads = []
+
+		for coord in list_lettuce_heads:
+			if self.gps.is_coord_inside(coord):
+
+				pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
+				pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
+				inside_lettuce_heads.append((pX,pY))
+				
 		for l in inside_lettuce_heads:
 			cv2.circle(imgg, (l[0]-best_T[0,2], l[1]-best_T[1,2]), 20, (0, 0, 255 ), -1)
 			
