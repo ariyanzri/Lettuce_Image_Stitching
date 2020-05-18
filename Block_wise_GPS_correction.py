@@ -24,8 +24,8 @@ from collections import OrderedDict,Counter
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-NUMBER_OF_ROWS_IN_GROUPS = 10
-# NUMBER_OF_ROWS_IN_GROUPS = 4
+# NUMBER_OF_ROWS_IN_GROUPS = 10
+NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -1575,12 +1575,11 @@ class Patch:
 	def correct_based_on_contours_and_lettuce_heads(self,list_lettuce_heads):
 		self.load_img()
 
-		cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('fig', 500,500)
+		# cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('fig', 500,500)
 
-		cv2.imshow('fig',self.rgb_img)
-		cv2.waitKey(0)
-
+		# cv2.imshow('fig',self.rgb_img)
+		# cv2.waitKey(0)
 		
 		contour_centers = self.get_lettuce_contours()
 		inside_lettuce_heads = []
@@ -1606,14 +1605,32 @@ class Patch:
 					best_error = mean_error
 					best_T = T
 
-		for c in contour_centers:
-			cv2.circle(self.rgb_img, (c[0], c[1]), 20, (0, 255, 0), -1)
+		# for c in contour_centers:
+		# 	cv2.circle(self.rgb_img, (c[0], c[1]), 20, (0, 255, 0), -1)
 
-		for l in inside_lettuce_heads:
-			cv2.circle(self.rgb_img, (l[0]-best_T[0,2], l[1]-best_T[1,2]), 20, (0, 0, 255 ), -1)
+		# for l in inside_lettuce_heads:
+		# 	cv2.circle(self.rgb_img, (l[0]-best_T[0,2], l[1]-best_T[1,2]), 20, (0, 0, 255 ), -1)
 			
-		cv2.imshow('fig',self.rgb_img)
-		cv2.waitKey(0)
+		# cv2.imshow('fig',self.rgb_img)
+		# cv2.waitKey(0)
+
+		self.move_GPS_based_on_lettuce(best_T)
+
+
+	def move_GPS_based_on_lettuce(self,T):
+		diff_x = T[0,2]*GPS_TO_IMAGE_RATIO[1]
+		diff_y = -T[1,2]*GPS_TO_IMAGE_RATIO[0]
+		diff = (diff_x,diff_y)
+
+		new_UL = (self.gps.UL_coord[0]-diff[0],self.gps.UL_coord[1]-diff[1])
+		new_UR = (self.gps.UR_coord[0]-diff[0],self.gps.UR_coord[1]-diff[1])
+		new_LL = (self.gps.LL_coord[0]-diff[0],self.gps.LL_coord[1]-diff[1])
+		new_LR = (self.gps.LR_coord[0]-diff[0],self.gps.LR_coord[1]-diff[1])
+		new_center = (self.gps.Center[0]-diff[0],self.gps.Center[1]-diff[1])
+
+		self.gps = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+
+
 
 class Group:
 	def __init__(self,gid,rows):
@@ -1778,22 +1795,29 @@ class Group:
 
 	def correct_internally(self):
 
+		global lettuce_coords
+
 		print('Group {0} with {1} rows and {2} patches internally correction started.'.format(self.group_id,len(self.rows),len(self.patches)))
-		self.load_all_patches_SIFT_points()
+		# self.load_all_patches_SIFT_points()
 
-		self.pre_calculate_internal_neighbors_and_transformation_parameters()
+		# self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
-		G = Graph(len(self.patches),[p.name for p in self.patches])
-		G.initialize_edge_weights(self.patches)
+		# G = Graph(len(self.patches),[p.name for p in self.patches])
+		# G.initialize_edge_weights(self.patches)
 
-		try:
-			parents = G.generate_MST_prim(self.rows[0][0].name)
-			string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
-		except Exception as e:
-			print(e)
-			string_res = get_corrected_string(self.patches)
+		# try:
+		# 	parents = G.generate_MST_prim(self.rows[0][0].name)
+		# 	string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
+		# except Exception as e:
+		# 	print(e)
+		# 	string_res = get_corrected_string(self.patches)
 
-		self.delete_all_patches_SIFT_points()
+		# self.delete_all_patches_SIFT_points()
+
+		for p in self.patches:
+			p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
+			print('Group ID {0}: patch {1} corrected.'.format(self.group_id,p.name))
+			sys.stdout.flush()
 
 		# string_res = self.correct_row_by_row()
 		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
@@ -1911,7 +1935,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups
+		return groups[6:8]
 
 	def get_rows(self):
 		global coordinates_file
@@ -1975,7 +1999,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist)
+			rows.append(newlist[5:10])
 
 		print('Rows calculated and created completely.')
 
@@ -2201,7 +2225,7 @@ class Field:
 		sys.stdout.flush()
 
 def main(scan_date):
-	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path,lettuce_heads_coordinates_file
+	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path,lettuce_heads_coordinates_file,lettuce_coords
 
 	if server == 'coge':
 		patch_folder = '/storage/ariyanzarei/{0}-rgb/bin2tif_out'.format(scan_date)
@@ -2256,14 +2280,14 @@ def main(scan_date):
 		field = Field()
 
 		lettuce_coords = read_lettuce_heads_coordinates()
-		p1 = field.groups[3].patches[8]
+		# p1 = field.groups[3].patches[8]
 		# p1.get_lettuce_contours(lettuce_coords)
-		p1.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
+		# p1.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
 
 
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
-		# field.draw_and_save_field()
+		field.draw_and_save_field()
 		# field.groups[0].correct_internally()
 		# field.correct_field()
 		# field.groups[0].correct_internally()
