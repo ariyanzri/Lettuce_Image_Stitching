@@ -1649,8 +1649,8 @@ class Patch:
 
 
 	def move_GPS_based_on_lettuce(self,T):
-		diff_x = T[0,2]*GPS_TO_IMAGE_RATIO[0]
-		diff_y = -T[1,2]*GPS_TO_IMAGE_RATIO[1]
+		diff_x = -T[0,2]*GPS_TO_IMAGE_RATIO[0]
+		diff_y = T[1,2]*GPS_TO_IMAGE_RATIO[1]
 		diff = (diff_x,diff_y)
 
 		new_UL = (self.gps.UL_coord[0]-diff[0],self.gps.UL_coord[1]-diff[1])
