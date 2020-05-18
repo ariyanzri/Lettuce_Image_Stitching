@@ -1575,10 +1575,10 @@ class Patch:
 	def correct_based_on_contours_and_lettuce_heads(self,list_lettuce_heads):
 		self.load_img()
 
-		# cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
-		# cv2.resizeWindow('fig', 500,500)
+		cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('fig', 500,500)
 
-		# cv2.imshow('fig',self.rgb_img)
+		cv2.imshow('fig',self.rgb_img)
 		# cv2.waitKey(0)
 		
 		contour_centers = self.get_lettuce_contours()
@@ -1590,6 +1590,23 @@ class Patch:
 				pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
 				pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
 				inside_lettuce_heads.append((pX,pY))
+
+		cv2.namedWindow('reg',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('reg', 500,500)
+
+		imgg = self.rgb_img.copy()
+
+		for c in contour_centers:
+			cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
+
+		for l in inside_lettuce_heads:
+			cv2.circle(imgg, (l[0]-best_T[0,2], l[1]-best_T[1,2]), 20, (0, 0, 255 ), -1)
+			
+
+
+		cv2.imshow('reg',imgg)
+		cv2.waitKey(0)
+
 
 		best_T = None
 		best_error = sys.maxsize
@@ -1605,16 +1622,16 @@ class Patch:
 					best_error = mean_error
 					best_T = T
 
-		# for c in contour_centers:
-		# 	cv2.circle(self.rgb_img, (c[0], c[1]), 20, (0, 255, 0), -1)
+		imgg = self.rgb_img.copy()
 
-		# for l in inside_lettuce_heads:
-		# 	cv2.circle(self.rgb_img, (l[0]-best_T[0,2], l[1]-best_T[1,2]), 20, (0, 0, 255 ), -1)
+		for c in contour_centers:
+			cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
+
+		for l in inside_lettuce_heads:
+			cv2.circle(imgg, (l[0]-best_T[0,2], l[1]-best_T[1,2]), 20, (0, 0, 255 ), -1)
 			
-		# cv2.imshow('fig',self.rgb_img)
-		# cv2.waitKey(0)
-
-		self.move_GPS_based_on_lettuce(best_T)
+		cv2.imshow('reg',imgg)
+		cv2.waitKey(0)
 
 
 	def move_GPS_based_on_lettuce(self,T):
@@ -2282,18 +2299,18 @@ def main(scan_date):
 		field = Field()
 
 		lettuce_coords = read_lettuce_heads_coordinates()
-		# p1 = field.groups[3].patches[8]
+		p1 = field.groups[3].patches[8]
 		# p1.get_lettuce_contours(lettuce_coords)
-		# p1.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
+		p1.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
 
 
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
 		# field.draw_and_save_field()
 		# field.groups[0].correct_internally()
-		field.correct_field()
+		# field.correct_field()
 		# field.groups[0].correct_internally()
-		field.draw_and_save_field()
+		# field.draw_and_save_field()
 		# field.save_new_coordinate()
 
 	elif server == 'ariyan':
