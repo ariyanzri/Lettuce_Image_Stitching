@@ -1795,7 +1795,7 @@ class Group:
 
 	def correct_internally(self):
 
-		global lettuce_coords
+		global lettuce_coords,no_of_cores_to_use
 
 		print('Group {0} with {1} rows and {2} patches internally correction started.'.format(self.group_id,len(self.rows),len(self.patches)))
 		# self.load_all_patches_SIFT_points()
@@ -1814,13 +1814,13 @@ class Group:
 
 		# self.delete_all_patches_SIFT_points()
 
+		# string_res = self.correct_row_by_row()
+		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
+
 		for p in self.patches:
 			p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
 			print('Group ID {0}: patch {1} corrected.'.format(self.group_id,p.name))
 			sys.stdout.flush()
-
-		# string_res = self.correct_row_by_row()
-		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
 		
 		print('Group {0} was corrected internally. '.format(self.group_id))
 		sys.stdout.flush()
@@ -2287,11 +2287,11 @@ def main(scan_date):
 
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
-		field.draw_and_save_field()
-		# field.groups[0].correct_internally()
-		# field.correct_field()
-		# field.groups[0].correct_internally()
 		# field.draw_and_save_field()
+		# field.groups[0].correct_internally()
+		field.correct_field()
+		# field.groups[0].correct_internally()
+		field.draw_and_save_field()
 		# field.save_new_coordinate()
 
 	elif server == 'ariyan':
