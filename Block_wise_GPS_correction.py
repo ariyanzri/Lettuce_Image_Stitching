@@ -1600,9 +1600,8 @@ class Patch:
 			cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
 
 		for l in inside_lettuce_heads:
-			cv2.circle(imgg, (l[0]-best_T[0,2], l[1]-best_T[1,2]), 20, (0, 0, 255 ), -1)
+			cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
 			
-
 
 		cv2.imshow('reg',imgg)
 		cv2.waitKey(0)
