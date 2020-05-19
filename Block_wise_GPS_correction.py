@@ -1154,6 +1154,14 @@ class GPS_Coordinate:
 		else:
 			return False
 
+	def is_coord_in_GPS_error_proximity(self,coord):
+		if coord[0]>=self.UL_coord[0] and coord[0]<=self.UR_coord[0] and (abs(coord[1]-self.LL_coord[1])<GPS_ERROR_Y*2 or abs(coord[1]-self.UL_coord[1])<GPS_ERROR_Y*2):
+			return True
+
+		if coord[1]<=self.UL_coord[1] and coord[1]>=self.LL_coord[1] and (abs(coord[0]-self.LL_coord[0])<GPS_ERROR_X*2 or abs(coord[0]-self.LR_coord[0])<GPS_ERROR_X*2):
+			return True
+
+		return False
 
 class Graph():
 
@@ -2324,7 +2332,7 @@ def main(scan_date):
 
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
-		field.draw_and_save_field()
+		# field.draw_and_save_field()
 		# field.groups[0].correct_internally()
 		field.correct_field()
 		# field.groups[0].correct_internally()
