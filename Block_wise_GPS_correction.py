@@ -47,9 +47,9 @@ def remove_shadow(image):
 
 	rgb_img = cv2.cvtColor(hsvImg,cv2.COLOR_HSV2BGR)
 
-	# cv2.namedWindow('shd',cv2.WINDOW_NORMAL)
-	# cv2.resizeWindow('shd', 500,500)
-	# cv2.imshow('shd',rgb_img)
+	cv2.namedWindow('shd',cv2.WINDOW_NORMAL)
+	cv2.resizeWindow('shd', 500,500)
+	cv2.imshow('shd',rgb_img)
 
 	return rgb_img
 
@@ -1587,11 +1587,11 @@ class Patch:
 	def correct_based_on_contours_and_lettuce_heads(self,list_lettuce_heads):
 		self.load_img()
 
-		# cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
-		# cv2.resizeWindow('fig', 500,500)
+		cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('fig', 500,500)
 
-		# cv2.imshow('fig',self.rgb_img)
-		# cv2.waitKey(0)
+		cv2.imshow('fig',self.rgb_img)
+		cv2.waitKey(0)
 		
 		contour_centers = self.get_lettuce_contours()
 		inside_lettuce_heads = []
@@ -2329,17 +2329,17 @@ def main(scan_date):
 		lettuce_coords = read_lettuce_heads_coordinates()
 		# p1 = field.groups[0].patches[3]
 		# p1.get_lettuce_contours(lettuce_coords)
-		# p1.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
+		p1.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
 
 
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
 		# field.draw_and_save_field()
 		# field.groups[0].correct_internally()
-		field.correct_field()
+		# field.correct_field()
 		# field.groups[0].correct_internally()
 		# field.draw_and_save_field()
-		field.save_new_coordinate()
+		# field.save_new_coordinate()
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
