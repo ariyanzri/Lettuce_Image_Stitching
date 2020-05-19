@@ -2120,7 +2120,7 @@ class Field:
 
 			args_list.append((group,1))
 
-		processes = MyPool(int(no_of_cores_to_use/2))
+		processes = MyPool(int(no_of_cores_to_use))
 		result = processes.map(correct_groups_internally_helper,args_list)
 		processes.close()
 
