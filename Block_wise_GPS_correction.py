@@ -1658,7 +1658,7 @@ class Patch:
 			
 		# cv2.imshow('reg',imgg)
 		# cv2.waitKey(0)
-
+		self.delete_img()
 		return best_error
 
 
