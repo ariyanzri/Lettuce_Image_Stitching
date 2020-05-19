@@ -1982,7 +1982,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups[6:8]
+		return groups
 
 	def get_rows(self):
 		global coordinates_file
@@ -2334,12 +2334,12 @@ def main(scan_date):
 
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
-		field.draw_and_save_field()
+		# field.draw_and_save_field()
 		# field.groups[0].correct_internally()
 		field.correct_field()
 		# field.groups[0].correct_internally()
-		field.draw_and_save_field()
-		# field.save_new_coordinate()
+		# field.draw_and_save_field()
+		field.save_new_coordinate()
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
@@ -2456,7 +2456,7 @@ def main(scan_date):
 
 
 
-server_core = {'coge':20,'laplace.cs.arizona.edu':16,'ariyan':4}
+server_core = {'coge':20,'laplace.cs.arizona.edu':30,'ariyan':4}
 
 server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
