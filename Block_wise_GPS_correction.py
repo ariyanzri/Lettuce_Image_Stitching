@@ -24,8 +24,8 @@ from collections import OrderedDict,Counter
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-# NUMBER_OF_ROWS_IN_GROUPS = 10
-NUMBER_OF_ROWS_IN_GROUPS = 4
+NUMBER_OF_ROWS_IN_GROUPS = 10
+# NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -1659,6 +1659,8 @@ class Patch:
 		# cv2.imshow('reg',imgg)
 		# cv2.waitKey(0)
 
+		return best_error
+
 
 	def move_GPS_based_on_lettuce(self,T):
 		diff_x = -T[0,2]*GPS_TO_IMAGE_RATIO[0]
@@ -1861,8 +1863,8 @@ class Group:
 		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
 
 		for p in self.patches:
-			p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
-			print('Group ID {0}: patch {1} corrected.'.format(self.group_id,p.name))
+			err = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
+			print('Group ID {0}: patch {1} corrected with {2} error.'.format(self.group_id,p.name,err))
 			sys.stdout.flush()
 		
 		string_res = get_corrected_string(self.patches)
@@ -2044,7 +2046,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist[15:20])
+			rows.append(newlist)
 
 		print('Rows calculated and created completely.')
 
