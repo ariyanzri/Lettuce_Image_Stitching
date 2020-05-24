@@ -24,8 +24,8 @@ from collections import OrderedDict,Counter
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-NUMBER_OF_ROWS_IN_GROUPS = 10
-# NUMBER_OF_ROWS_IN_GROUPS = 4
+# NUMBER_OF_ROWS_IN_GROUPS = 10
+NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -47,10 +47,10 @@ def remove_shadow(image):
 
 	rgb_img = cv2.cvtColor(hsvImg,cv2.COLOR_HSV2BGR)
 
-	cv2.namedWindow('shd',cv2.WINDOW_NORMAL)
-	cv2.resizeWindow('shd', 500,500)
-	cv2.imshow('shd',rgb_img)
-	cv2.waitKey(0)
+	# cv2.namedWindow('shd',cv2.WINDOW_NORMAL)
+	# cv2.resizeWindow('shd', 500,500)
+	# cv2.imshow('shd',rgb_img)
+	# cv2.waitKey(0)
 	
 	return rgb_img
 
@@ -88,6 +88,31 @@ def choose_SIFT_key_points(patch,x1,y1,x2,y2):
 	desc = np.array(desc)
 	
 	return kp,desc
+
+def detect_SIFT_key_points(img,x1,y1,x2,y2):
+	sift = cv2.xfeatures2d.SIFT_create()
+	main_img = img.copy()
+	img = img[y1:y2,x1:x2]
+	kp,desc = sift.detectAndCompute(img,None)
+
+	kp_n = []
+	for k in kp:
+		kp_n.append(cv2.KeyPoint(k.pt[0]+x1,k.pt[1]+y1,k.size))
+
+	return kp_n,desc
+
+def get_top_percentage_of_matches_no_KNN(p1,p2,desc1,desc2,kp1,kp2):
+
+	bf = cv2.BFMatcher(cv2.NORM_L1, crossCheck=False)
+	# matches = bf.match(desc1,desc2)
+	matches = bf.knnMatch(desc1,desc2, k=2)
+	matches = sorted(matches, key = lambda x:x[0].distance)
+	img3 = None
+	img3 = cv2.drawMatches(p1.rgb_img,kp1,p2.rgb_img,kp2,[m[0] for m in matches[:20]],img3,matchColor=(0,255,0))
+	cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
+	cv2.resizeWindow('fig', 500,500)
+	cv2.imshow('fig',img3)
+	cv2.waitKey(0)
 
 def get_good_matches(desc1,desc2):
 	
@@ -1140,6 +1165,24 @@ def calculate_average_min_distance_lettuce_heads(contour_centers,inside_lettuce_
 
 	return average_distance
 
+def calculate_remaining_contour_matches_error(matches,T):
+	average_distance = 0
+
+	for m in matches:
+		c1 = m[0]
+		c2 = m[1]
+
+		new_c2 = (c2[0]-T[0,2],c2[1]-T[1,2])
+			
+		distance = math.sqrt((c1[0]-new_c2[0])**2+(c1[1]-new_c2[1])**2)
+
+		average_distance+=distance
+
+	average_distance/=len(matches)
+			
+
+	return average_distance
+
 class GPS_Coordinate:
 	
 	def __init__(self,UL_coord,UR_coord,LL_coord,LR_coord,Center):
@@ -1523,12 +1566,48 @@ class Patch:
 
 		return min_gps
 
-	def get_lettuce_contours(self,list_lettuce_heads=None):
+	def get_all_contours(self,overlap=None):
+		if self.rgb_img is None:
+			self.load_img()
+		
+		img = self.gray_img.copy()
+		
+		if overlap is not None:
+			img = img[overlap[1]:overlap[3],overlap[0]:overlap[2]]
+
+
+		ret1,img = cv2.threshold(img,0,255,cv2.THRESH_OTSU)
+
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10,10))
+		img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (10,10))
+		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)		
+
+		cv2.namedWindow('figg',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('figg', 500,500)
+		cv2.imshow('figg',img)
+		cv2.waitKey(0)
+
+		image, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+		
+		# contours_new = []
+		# for cnt in contours:
+		# 	contours_new.append(cnt+(overlap[0],overlap[1]))
+
+		# cv2.drawContours(self.rgb_img, contours, -1, (0,255,0),10)
+
+		return contours
+
+	def get_lettuce_contours(self,list_lettuce_heads=None,overlap=None):
 		if self.rgb_img is None:
 			self.load_img()
 
 		img = remove_shadow(self.rgb_img.copy())
 		
+		if overlap is not None:
+			img = img[overlap[1]:overlap[3],overlap[0]:overlap[2]]
+
 		green_channel = img[:,:,1].copy()
 		red_channel = img[:,:,2].copy()
 		blue_channel = img[:,:,0].copy()
@@ -1553,9 +1632,21 @@ class Patch:
 		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (50,50))
 		img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
 
-		image, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+		
 
-		cv2.drawContours(self.rgb_img, contours, -1, (0,255,0),10)
+		image, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+		
+		# contours_new = []
+		# for cnt in contours:
+		# 	contours_new.append(cnt+(overlap[0],overlap[1]))
+
+		# cv2.drawContours(self.rgb_img, contours, -1, (0,255,0),10)
+
+		return contours
+
+	def get_lettuce_contours_centers(self,list_lettuce_heads=None):
+		
+		contours = self.get_lettuce_contours(list_lettuce_heads)
 
 		contour_centers = []
 
@@ -1584,17 +1675,103 @@ class Patch:
 
 		return contour_centers
 
+	def correct_based_on_matched_contour_centers(self,p2):
+
+		self.load_img()
+		p2.load_img()
+		overlap_1,overlap_2 = self.get_overlap_rectangles(p2)
+
+
+		contours1 = self.get_lettuce_contours(overlap=overlap_1)
+		contours2 = p2.get_lettuce_contours(overlap=overlap_2)
+		# contours1 = self.get_all_contours(overlap=overlap_1)
+		# contours2 = p2.get_all_contours(overlap=overlap_2)
+
+		pairs = []
+
+		for i,cnt1 in enumerate(contours1):
+			for j,cnt2 in enumerate(contours2):
+				scr = cv2.matchShapes(cnt1,cnt2,1,0.0)
+				
+				pairs.append((i,j,scr))
+		
+		sorted_pairs = sorted(pairs, key = lambda x:x[2])
+		used_i = []
+		used_j = []
+		matches = []
+
+		for p in sorted_pairs:
+			if p[0] in used_i or p[1] in used_j:
+				continue
+
+			M = cv2.moments(contours1[p[0]])
+			cX = int(M["m10"] / M["m00"])
+			cY = int(M["m01"] / M["m00"])
+			center_1 = (cX,cY)
+
+			M = cv2.moments(contours2[p[1]])
+			cX = int(M["m10"] / M["m00"])
+			cY = int(M["m01"] / M["m00"])
+			center_2 = (cX,cY)
+
+
+			matches.append((center_1,center_2))
+			used_i.append(p[0])
+			used_j.append(p[1])
+
+			r = random.randint(0,256)
+			g = random.randint(0,256)
+			b = random.randint(0,256)
+
+			cnt1 = contours1[p[0]]+(overlap_1[0],overlap_1[1])
+			cnt2 = contours2[p[1]]+(overlap_2[0],overlap_2[1])
+
+			cv2.drawContours(self.rgb_img, cnt1, -1, (b,g,r),10)
+			cv2.drawContours(p2.rgb_img, cnt2, -1, (b,g,r),10)
+
+		best_T = None
+		best_error = sys.maxsize
+
+		for m in matches:
+			c1 = m[0]
+			c2 = m[1]
+			T = get_translation_from_single_matches(c1[0],c1[1],c2[0],c2[1])
+			
+			if abs(T[0,2])>=GPS_ERROR_X/GPS_TO_IMAGE_RATIO[0] or abs(T[1,2])>=GPS_ERROR_Y/GPS_TO_IMAGE_RATIO[1]:
+					continue
+
+			mean_error = calculate_remaining_contour_matches_error(matches,T)
+
+			if mean_error<best_error:
+				best_error = mean_error
+				best_T = T
+				
+
+		if best_T is not None:
+			self.move_GPS_based_on_lettuce(best_T)
+
+		cv2.namedWindow('img1',cv2.WINDOW_NORMAL)
+		cv2.namedWindow('img2',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('img1', 500,500)
+		cv2.resizeWindow('img2', 500,500)
+		cv2.imshow('img1',self.rgb_img)
+		cv2.imshow('img2',p2.rgb_img)
+		cv2.waitKey(0)
+
+		self.delete_img()
+		p2.delete_img()
+		
 
 	def correct_based_on_contours_and_lettuce_heads(self,list_lettuce_heads):
 		self.load_img()
 
-		cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('fig', 500,500)
+		# cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('fig', 500,500)
 
-		cv2.imshow('fig',self.rgb_img)
-		cv2.waitKey(0)
+		# cv2.imshow('fig',self.rgb_img)
+		# cv2.waitKey(0)
 		
-		contour_centers = self.get_lettuce_contours()
+		contour_centers = self.get_lettuce_contours_centers()
 		inside_lettuce_heads = []
 
 		for coord in list_lettuce_heads:
@@ -1604,20 +1781,20 @@ class Patch:
 				pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
 				inside_lettuce_heads.append((pX,pY))
 
-		cv2.namedWindow('reg',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('reg', 500,500)
+		# cv2.namedWindow('reg',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('reg', 500,500)
 
-		imgg = self.rgb_img.copy()
+		# imgg = self.rgb_img.copy()
 
-		for c in contour_centers:
-			cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
+		# for c in contour_centers:
+		# 	cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
 
-		for l in inside_lettuce_heads:
-			cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
+		# for l in inside_lettuce_heads:
+		# 	cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
 			
 
-		cv2.imshow('reg',imgg)
-		cv2.waitKey(0)
+		# cv2.imshow('reg',imgg)
+		# cv2.waitKey(0)
 
 
 		best_T = None
@@ -1640,25 +1817,25 @@ class Patch:
 		if best_T is not None:
 			self.move_GPS_based_on_lettuce(best_T)
 
-		imgg = self.rgb_img.copy()
+		# imgg = self.rgb_img.copy()
 
-		for c in contour_centers:
-			cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
+		# for c in contour_centers:
+		# 	cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
 
-		inside_lettuce_heads = []
+		# inside_lettuce_heads = []
 
-		for coord in list_lettuce_heads:
-			if self.gps.is_coord_inside(coord):
+		# for coord in list_lettuce_heads:
+		# 	if self.gps.is_coord_inside(coord):
 
-				pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
-				pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
-				inside_lettuce_heads.append((pX,pY))
+		# 		pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
+		# 		pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
+		# 		inside_lettuce_heads.append((pX,pY))
 
-		for l in inside_lettuce_heads:
-			cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
+		# for l in inside_lettuce_heads:
+		# 	cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
 			
-		cv2.imshow('reg',imgg)
-		cv2.waitKey(0)
+		# cv2.imshow('reg',imgg)
+		# cv2.waitKey(0)
 		self.delete_img()
 		return best_error
 
@@ -1677,7 +1854,52 @@ class Patch:
 		self.gps = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
 
 
+class Super_Patch:
+	def __init__(self,patches):
+		self.patches = patches
 
+	def has_overlap(self,sp):
+		for p1 in self.patches:
+			for p2 in sp.patches:
+				if p1.has_overlap(p2) or p2.has_overlap(p1):
+					return True
+
+		return False
+
+	def calculate_merge_score(self,sp):
+		pass
+
+	def find_best_super_patch_for_merging(self,super_patches):
+		best_sp = None
+		best_score = sys.maxsize
+
+		for sp in super_patches:
+			if self.has_overlap(sp):
+				score = self.calculate_merge_score(sp)
+
+				if score<best_score:
+					best_score = score
+					best_sp = sp
+
+		return best_sp
+
+
+class Row:
+	def __init__(self,patches):
+		self.patches = patches
+
+	def correct_row_by_matching_lettuce_contours(self):
+		previous_patch = None
+
+		for i,patch in enumerate(self.patches):
+			if i == 0:
+				previous_patch = patch
+				continue
+
+		patch.correct_based_on_matched_contour_centers(previous_patch)
+
+		previous_patch = patch
+			
 class Group:
 	def __init__(self,gid,rows):
 		self.group_id = gid
@@ -1983,7 +2205,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups
+		return groups[5:7]
 
 	def get_rows(self):
 		global coordinates_file
@@ -2047,7 +2269,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist)
+			rows.append(newlist[5:10])
 
 		print('Rows calculated and created completely.')
 
@@ -2327,12 +2549,16 @@ def main(scan_date):
 		
 		field = Field()
 
-		lettuce_coords = read_lettuce_heads_coordinates()
-		p1 = field.groups[0].patches[3]
-		# p1.get_lettuce_contours(lettuce_coords)
-		p1.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
+		# lettuce_coords = read_lettuce_heads_coordinates()
+		# p1 = field.groups[0].patches[3]
+		# p1.get_lettuce_contours_centers(lettuce_coords)
+		# p1.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
 
-
+		r = Row(field.groups[0].rows[0])
+		draw_together(r.patches)
+		r.correct_row_by_matching_lettuce_contours()
+		draw_together(r.patches)
+		
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
 		# field.draw_and_save_field()
@@ -2350,33 +2576,82 @@ def main(scan_date):
 		patches = read_all_data()
 		p1 = patches[0]
 		
-		lettuce_coords = read_lettuce_heads_coordinates()
-		p1.get_lettuce_contours(lettuce_coords)
+		# lettuce_coords = read_lettuce_heads_coordinates()
+		# p1.get_lettuce_contours_centers(lettuce_coords)
 		
 		# fft = p1.get_fft_region(0,0,PATCH_SIZE[1],PATCH_SIZE[0])
 		# # print(fft)
 		# p1.load_img()
-		# cv2.namedWindow('img',cv2.WINDOW_NORMAL)
-		# cv2.namedWindow('fft',cv2.WINDOW_NORMAL)
-		# cv2.resizeWindow('img', 500,500)
-		# cv2.resizeWindow('fft', 500,500)
-		# cv2.imshow('img',p1.rgb_img)
-		# cv2.imshow('fft',fft)
+
+		p2 = patches[1]
+
+		for p in patches:
+			if p.has_overlap(p1) and p1.has_overlap(p) and p1 != p:
+				p2 = p
+
+				break
+				
+		
+		# p1.load_SIFT_points()
+		# p2.load_SIFT_points()
+		# p1.load_img()
+		# p2.load_img()
+		# overlap_1,overlap_2 = p1.get_overlap_rectangles(p2)
+
+		# kp1,desc1 = choose_SIFT_key_points(p1,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
+		# kp2,desc2 = choose_SIFT_key_points(p2,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
+		# kp1,desc1 = detect_SIFT_key_points(p1.rgb_img,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
+		# kp2,desc2 = detect_SIFT_key_points(p2.rgb_img,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
+
+		# get_top_percentage_of_matches_no_KNN(p1,p2,desc1,desc2,kp1,kp2)
+
+
+		# contours1 = p1.get_lettuce_contours(overlap=overlap_1)
+		# contours2 = p2.get_lettuce_contours(overlap=overlap_2)
+
+		# pairs = []
+
+		# for i,cnt1 in enumerate(contours1):
+		# 	for j,cnt2 in enumerate(contours2):
+		# 		scr = cv2.matchShapes(cnt1,cnt2,1,0.0)
+				
+		# 		pairs.append((i,j,scr))
+		
+		# sorted_pairs = sorted(pairs, key = lambda x:x[2])
+		# used_i = []
+		# used_j = []
+
+		# for p in sorted_pairs:
+		# 	if p[0] in used_i or p[1] in used_j:
+		# 		continue
+
+		# 	r = random.randint(0,256)
+		# 	g = random.randint(0,256)
+		# 	b = random.randint(0,256)
+
+		# 	cv2.drawContours(p1.rgb_img, contours1, p[0], (b,g,r),10)
+		# 	cv2.drawContours(p2.rgb_img, contours2, p[1], (b,g,r),10)
+
+		# 	used_i.append(p[0])
+		# 	used_j.append(p[1])
+
+
+
+
+		# cv2.namedWindow('img1',cv2.WINDOW_NORMAL)
+		# cv2.namedWindow('img2',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('img1', 500,500)
+		# cv2.resizeWindow('img2', 500,500)
+		# cv2.imshow('img1',p1.rgb_img)
+		# cv2.imshow('img2',p2.rgb_img)
 		# cv2.waitKey(0)
 
-		# p2 = patches[1]
-
-		# for p in patches:
-		# 	if p.has_overlap(p1) and p1.has_overlap(p) and p1 != p:
-		# 		p2 = p
-
-		# 		break
-		
-		# draw_together([p1,p2])
+		draw_together([p1,p2])
 
 		# p2.gps = p2.correct_based_on_neighbors([p1])
+		p2.correct_based_on_matched_contour_centers(p1)
 
-		# draw_together([p1,p2])
+		draw_together([p1,p2])
 
 		# p1.load_SIFT_points()
 		# p2.load_SIFT_points()
@@ -2463,7 +2738,7 @@ server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
 
 start_time = datetime.datetime.now()
-main('2020-02-18')
-# main('2020-01-08')
+# main('2020-02-18')
+main('2020-01-08')
 end_time = datetime.datetime.now()
 report_time(start_time,end_time)
