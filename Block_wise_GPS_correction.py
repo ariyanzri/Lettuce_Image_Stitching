@@ -1886,7 +1886,8 @@ class Super_Patch:
 
 class Row:
 	def __init__(self,patches):
-		self.patches = patches
+		sorted_patches = sorted(patches, key=lambda x: x.gps.Center[0])
+		self.patches = sorted_patches
 
 	def correct_row_by_matching_lettuce_contours(self):
 		previous_patch = None
@@ -2558,7 +2559,7 @@ def main(scan_date):
 		draw_together(r.patches)
 		r.correct_row_by_matching_lettuce_contours()
 		draw_together(r.patches)
-		
+
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
 		# field.draw_and_save_field()
