@@ -1223,7 +1223,7 @@ def super_patch_pool_merging_method(patches):
 				continue
 
 			super_patches.remove(sp2)
-
+			print(params.H)
 			diff = sp1.get_total_gps_diff_from_params(sp2,params)
 			sp2.correct_based_on_best_diff(diff)
 
@@ -1980,7 +1980,7 @@ class Super_Patch:
 				param_current = params['{0}{1}'.format(p1.name,p2.name)]
 				if param_current is None:
 					continue
-					
+
 				gps_diff = get_gps_diff_from_H(p2,p1,param_current.H)
 				gps_diff_list.append(gps_diff)
 
