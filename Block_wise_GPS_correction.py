@@ -1522,9 +1522,9 @@ class Patch:
 	def get_pairwise_transformation_info(self,neighbor):
 		overlap1,overlap2 = neighbor.get_overlap_rectangles(self)
 		
-		# if overlap1[2]-overlap1[0]<PATCH_SIZE[1]/5 and overlap1[3]-overlap1[1]<PATCH_SIZE[0]/5:
+		if overlap1[2]-overlap1[0]<PATCH_SIZE[1]/5 and overlap1[3]-overlap1[1]<PATCH_SIZE[0]/5:
 			
-		# 	return None
+			return None
 
 		kp1,desc1 = choose_SIFT_key_points(neighbor,overlap1[0],overlap1[1],overlap1[2],overlap1[3])
 		kp2,desc2 = choose_SIFT_key_points(self,overlap2[0],overlap2[1],overlap2[2],overlap2[3])
@@ -1957,14 +1957,14 @@ class Super_Patch:
 
 	def find_best_super_patch_for_merging(self,super_patches):
 		best_sp = None
-		best_score = sys.maxsize
+		best_score = 0
 		best_params = None
 
 		for sp in super_patches:
 			if self.has_overlap(sp):
 				score,params = self.calculate_merge_score(sp)
 
-				if score<best_score:
+				if score>best_score:
 					best_score = score
 					best_sp = sp
 					best_params = params
