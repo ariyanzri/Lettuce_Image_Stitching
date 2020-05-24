@@ -1223,7 +1223,7 @@ def super_patch_pool_merging_method(patches):
 				continue
 
 			super_patches.remove(sp2)
-			print(params.H)
+
 			diff = sp1.get_total_gps_diff_from_params(sp2,params)
 			sp2.correct_based_on_best_diff(diff)
 
@@ -1534,7 +1534,7 @@ class Patch:
 		# matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1)
 
 		if matches is None or len(matches) == 0:
-
+			print('match is none or len matches is 0.')
 			return None
 
 		num_matches = len(matches)
@@ -1546,7 +1546,7 @@ class Patch:
 		# print(percentage_inliers)
 
 		if H is None:
-			
+			print('H is none.')
 			return None
 
 		percentage_inliers = round(percentage_inliers*100,2)
@@ -1925,7 +1925,7 @@ class Super_Patch:
 
 		for p1 in self.patches:
 			for p2 in sp.patches:
-				if p1.has_overlap(p2) or p2.has_overlap(p1):
+				if p1.has_overlap(p2) and p2.has_overlap(p1):
 					tr_parameter = p1.get_pairwise_transformation_info(p2)
 					if tr_parameter is None:
 						list_parameters['{0}{1}'.format(p1.name,p2.name)] = tr_parameter
