@@ -1183,6 +1183,61 @@ def calculate_remaining_contour_matches_error(matches,T):
 
 	return average_distance
 
+def get_gps_diff_from_H(p1,p2,H):
+	c1 = [0,0,1]
+	
+	c1 = H.dot(c1).astype(int)
+
+	diff_x = -c1[0]
+	diff_y = -c1[1]
+
+	gps_scale_x = (PATCH_SIZE_GPS[0])/(PATCH_SIZE[1])
+	gps_scale_y = -(PATCH_SIZE_GPS[1])/(PATCH_SIZE[0])
+
+	diff_x = diff_x*gps_scale_x
+	diff_y = diff_y*gps_scale_y
+
+	new_UL = (round(p2.gps.UL_coord[0]-diff_x,7),round(p2.gps.UL_coord[1]-diff_y,7))
+
+	diff_UL = (p1.gps.UL_coord[0]-new_UL[0],p1.gps.UL_coord[1]-new_UL[1])
+
+	return diff_UL
+
+
+def super_patch_pool_merging_method(patches):
+	super_patches = []
+	for p in patches:
+		super_patches.append(Super_Patch([p]))
+
+	while len(super_patches)>1:
+		new_supper_patches = []
+
+		while len(super_patches)>0:
+
+			sp1 = super_patches.pop()
+
+			sp2,params = sp1.find_best_super_patch_for_merging(super_patches)
+
+			if sp2 is None:
+				new_supper_patches.append(sp1)
+				continue
+
+			super_patches.remove(sp2)
+
+			diff = sp1.get_total_gps_diff_from_params(sp2,params)
+			sp2.correct_based_on_best_diff(diff)
+
+			new_sp = Super_Patch(sp1.patches+sp2.patches)
+			new_supper_patches.append(new_sp)
+
+		super_patches = new_supper_patches.copy()
+
+	return super_patches[0].patches
+
+
+
+
+
 class GPS_Coordinate:
 	
 	def __init__(self,UL_coord,UR_coord,LL_coord,LR_coord,Center):
@@ -1761,7 +1816,6 @@ class Patch:
 		self.delete_img()
 		p2.delete_img()
 		
-
 	def correct_based_on_contours_and_lettuce_heads(self,list_lettuce_heads):
 		self.load_img()
 
@@ -1839,7 +1893,6 @@ class Patch:
 		self.delete_img()
 		return best_error
 
-
 	def move_GPS_based_on_lettuce(self,T):
 		diff_x = -T[0,2]*GPS_TO_IMAGE_RATIO[0]
 		diff_y = T[1,2]*GPS_TO_IMAGE_RATIO[1]
@@ -1867,21 +1920,93 @@ class Super_Patch:
 		return False
 
 	def calculate_merge_score(self,sp):
-		pass
+		if len(sp.patches) == 1:
+			total_number_inliers = 0
+			list_parameters = []
+
+			for p1 in self.patches:
+				for p2 in sp.patches:
+					if p1.has_overlap(p2) or p2.has_overlap(p1):
+						tr_parameter = p1.get_pairwise_transformation_info(p2)
+						number_inliers = tr_parameter.percentage_inliers * tr_parameter.num_matches
+						total_number_inliers += number_inliers
+						list_parameters.append((p1,p2,tr_parameter))
+
+			return total_number_inliers,list_parameters
+		else:
+			# least deviation in gps movements
+			total_number_inliers = 0
+			list_parameters = {}
+
+			for p1 in self.patches:
+				for p2 in sp.patches:
+					if p1.has_overlap(p2) or p2.has_overlap(p1):
+						tr_parameter = p1.get_pairwise_transformation_info(p2)
+						number_inliers = tr_parameter.percentage_inliers * tr_parameter.num_matches
+						total_number_inliers += number_inliers
+						list_parameters['{0}{1}'.format(p1.name,p2.name)] = tr_parameter
+
+			return total_number_inliers,list_parameters
+
 
 	def find_best_super_patch_for_merging(self,super_patches):
 		best_sp = None
 		best_score = sys.maxsize
+		best_params = None
 
 		for sp in super_patches:
 			if self.has_overlap(sp):
-				score = self.calculate_merge_score(sp)
+				score,params = self.calculate_merge_score(sp)
 
 				if score<best_score:
 					best_score = score
 					best_sp = sp
+					best_params = params
 
-		return best_sp
+		return best_sp,best_params
+
+
+	def get_total_gps_diff_from_params(self,best_sp,params):
+		gps_diff_list = []
+
+		for p1 in self.patches:
+			for p2 in best_sp.patches:
+
+				gps_diff = get_gps_diff_from_H(p2,p1,params['{0}{1}'.format(p1.name,p2.name)].H)
+				gps_diff_list.append(gps_diff)
+
+		best_score = sys.maxsize
+		best_diff = None
+
+		for gps_diff in gps_diff_list:
+			average_absolute_diff_sumed = 0
+
+			for rem_gps_diff in gps_diff_list:
+				average_absolute_diff_sumed+=abs(rem_gps_diff[0]-gps_diff[0])+abs(rem_gps_diff[1]-gps_diff[1])
+
+			average_absolute_diff_sumed/=(2*len(gps_diff_list))
+
+			if average_absolute_diff_sumed<best_score:
+				best_score = average_absolute_diff_sumed
+				best_diff = gps_diff
+
+		return best_diff
+
+	def correct_based_on_best_diff(self,diff):
+		diff_x = diff[0]
+		diff_y = diff[1]
+
+		for p in self.patches:
+
+			new_UL = (p.gps.UL_coord[0]-diff_x,p.gps.UL_coord[1]-diff_y)
+			new_UR = (p.gps.UR_coord[0]-diff_x,p.gps.UR_coord[1]-diff_y)
+			new_LL = (p.gps.LL_coord[0]-diff_x,p.gps.LL_coord[1]-diff_y)
+			new_LR = (p.gps.LR_coord[0]-diff_x,p.gps.LR_coord[1]-diff_y)
+			new_center = (p.gps.Center[0]-diff_x,p.gps.Center[1]-diff_y)
+
+			new_coords = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+
+			p.gps = new_coords
 
 
 class Row:
@@ -1901,6 +2026,7 @@ class Row:
 
 			previous_patch = patch
 				
+
 class Group:
 	def __init__(self,gid,rows):
 		self.group_id = gid
@@ -2555,10 +2681,12 @@ def main(scan_date):
 		# p1.get_lettuce_contours_centers(lettuce_coords)
 		# p1.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
 
-		r = Row(field.groups[0].rows[0])
-		draw_together(r.patches)
-		r.correct_row_by_matching_lettuce_contours()
-		draw_together(r.patches)
+		# r = Row(field.groups[0].rows[0])
+
+		draw_together(field.groups[0].rows[0])
+		new_patches = super_patch_pool_merging_method(field.groups[0].rows[0])
+		# r.correct_row_by_matching_lettuce_contours()
+		draw_together(new_patches)
 
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
