@@ -25,7 +25,7 @@ PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
 # NUMBER_OF_ROWS_IN_GROUPS = 10
-NUMBER_OF_ROWS_IN_GROUPS = 5
+NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -2224,15 +2224,21 @@ class Group:
 		# string_res = self.correct_row_by_row()
 		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
 
-		for p in self.patches:
-			err = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
-			print('Group ID {0}: patch {1} corrected with {2} error.'.format(self.group_id,p.name,err))
-			sys.stdout.flush()
+		# for p in self.patches:
+		# 	err = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
+		# 	print('Group ID {0}: patch {1} corrected with {2} error.'.format(self.group_id,p.name,err))
+		# 	sys.stdout.flush()
 		
-		string_res = get_corrected_string(self.patches)
+		self.load_all_patches_SIFT_points()
+
+		corrected_patches = super_patch_pool_merging_method(self.patches)
+
+		string_res = get_corrected_string(corrected_patches)
 		
 		print('Group {0} was corrected internally. '.format(self.group_id))
 		sys.stdout.flush()
+
+		self.delete_all_patches_SIFT_points()
 
 		return string_res
 
@@ -2344,7 +2350,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups[5:6]
+		return groups[5:7]
 
 	def get_rows(self):
 		global coordinates_file
@@ -2696,10 +2702,11 @@ def main(scan_date):
 		# r = Row(field.groups[0].rows[0])
 
 		# draw_together(field.groups[0].patches)
-		# field.draw_and_save_field()
-		field.groups[0].load_all_patches_SIFT_points()
-		new_patches = super_patch_pool_merging_method(field.groups[0].patches)
 		field.draw_and_save_field()
+		# field.correct_field()
+		# field.groups[0].load_all_patches_SIFT_points()
+		# new_patches = super_patch_pool_merging_method(field.groups[0].patches)
+		# field.draw_and_save_field()
 		# r.correct_row_by_matching_lettuce_contours()
 		# draw_together(new_patches)
 
