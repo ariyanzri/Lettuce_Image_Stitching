@@ -1979,7 +1979,7 @@ class Super_Patch:
 			for p2 in best_sp.patches:
 				if not p1.has_overlap(p2) or not p2.has_overlap(p1):
 					continue
-					
+
 				param_current = params['{0}{1}'.format(p1.name,p2.name)]
 				if param_current is None:
 					continue
@@ -2695,9 +2695,9 @@ def main(scan_date):
 
 		# r = Row(field.groups[0].rows[0])
 
-		draw_together(field.groups[0].rows[0])
+		draw_together(field.groups[0].patches)
 		field.groups[0].load_all_patches_SIFT_points()
-		new_patches = super_patch_pool_merging_method(field.groups[0].rows[0])
+		new_patches = super_patch_pool_merging_method(field.groups[0].patches)
 		# r.correct_row_by_matching_lettuce_contours()
 		draw_together(new_patches)
 
