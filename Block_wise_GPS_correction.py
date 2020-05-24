@@ -1529,9 +1529,9 @@ class Patch:
 		kp1,desc1 = choose_SIFT_key_points(neighbor,overlap1[0],overlap1[1],overlap1[2],overlap1[3])
 		kp2,desc2 = choose_SIFT_key_points(self,overlap2[0],overlap2[1],overlap2[2],overlap2[3])
 
-		# matches = get_good_matches(desc2,desc1)
-		# matches = get_top_n_good_matches(desc2,desc1,kp2,kp1)
-		matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1)
+		matches = get_good_matches(desc2,desc1)
+		matches = get_top_n_good_matches(desc2,desc1,kp2,kp1)
+		# matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1)
 
 		if matches is None or len(matches) == 0:
 			print('match is none or len matches is 0.')
