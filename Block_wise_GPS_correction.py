@@ -1920,36 +1920,38 @@ class Super_Patch:
 		return False
 
 	def calculate_merge_score(self,sp):
-		if len(sp.patches) == 1:
-			total_number_inliers = 0
-			list_parameters = []
+		total_number_inliers = 0
+		list_parameters = {}
 
-			for p1 in self.patches:
-				for p2 in sp.patches:
-					if p1.has_overlap(p2) or p2.has_overlap(p1):
-						tr_parameter = p1.get_pairwise_transformation_info(p2)
-						if tr_parameter is None:
-							continue
-							
-						number_inliers = tr_parameter.percentage_inliers * tr_parameter.num_matches
-						total_number_inliers += number_inliers
-						list_parameters.append((p1,p2,tr_parameter))
+		for p1 in self.patches:
+			for p2 in sp.patches:
+				if p1.has_overlap(p2) or p2.has_overlap(p1):
+					tr_parameter = p1.get_pairwise_transformation_info(p2)
+					if tr_parameter is None:
+						continue
+						
+					number_inliers = tr_parameter.percentage_inliers * tr_parameter.num_matches
+					total_number_inliers += number_inliers
+					list_parameters['{0}{1}'.format(p1.name,p2.name)] = tr_parameter
 
-			return total_number_inliers,list_parameters
-		else:
-			# least deviation in gps movements
-			total_number_inliers = 0
-			list_parameters = {}
+		return total_number_inliers,list_parameters
 
-			for p1 in self.patches:
-				for p2 in sp.patches:
-					if p1.has_overlap(p2) or p2.has_overlap(p1):
-						tr_parameter = p1.get_pairwise_transformation_info(p2)
-						number_inliers = tr_parameter.percentage_inliers * tr_parameter.num_matches
-						total_number_inliers += number_inliers
-						list_parameters['{0}{1}'.format(p1.name,p2.name)] = tr_parameter
+		# if len(sp.patches) == 1:
 
-			return total_number_inliers,list_parameters
+		# else:
+			# # least deviation in gps movements
+			# total_number_inliers = 0
+			# list_parameters = {}
+
+			# for p1 in self.patches:
+			# 	for p2 in sp.patches:
+			# 		if p1.has_overlap(p2) or p2.has_overlap(p1):
+			# 			tr_parameter = p1.get_pairwise_transformation_info(p2)
+			# 			number_inliers = tr_parameter.percentage_inliers * tr_parameter.num_matches
+			# 			total_number_inliers += number_inliers
+			# 			list_parameters['{0}{1}'.format(p1.name,p2.name)] = tr_parameter
+
+			# return total_number_inliers,list_parameters
 
 
 	def find_best_super_patch_for_merging(self,super_patches):
