@@ -1928,6 +1928,7 @@ class Super_Patch:
 				if p1.has_overlap(p2) or p2.has_overlap(p1):
 					tr_parameter = p1.get_pairwise_transformation_info(p2)
 					if tr_parameter is None:
+						list_parameters['{0}{1}'.format(p1.name,p2.name)] = tr_parameter
 						continue
 						
 					number_inliers = tr_parameter.percentage_inliers * tr_parameter.num_matches
@@ -1976,8 +1977,11 @@ class Super_Patch:
 
 		for p1 in self.patches:
 			for p2 in best_sp.patches:
-
-				gps_diff = get_gps_diff_from_H(p2,p1,params['{0}{1}'.format(p1.name,p2.name)].H)
+				param_current = params['{0}{1}'.format(p1.name,p2.name)]
+				if param_current is None:
+					continue
+					
+				gps_diff = get_gps_diff_from_H(p2,p1,param_current.H)
 				gps_diff_list.append(gps_diff)
 
 		best_score = sys.maxsize
