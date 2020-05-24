@@ -1886,7 +1886,7 @@ class Super_Patch:
 
 class Row:
 	def __init__(self,patches):
-		sorted_patches = sorted(patches, key=lambda x: x.gps.Center[0])
+		sorted_patches = sorted(patches, key=lambda x: x.gps.Center[0],reverse=True)
 		self.patches = sorted_patches
 
 	def correct_row_by_matching_lettuce_contours(self):
