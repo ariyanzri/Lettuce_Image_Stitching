@@ -2693,6 +2693,7 @@ def main(scan_date):
 		# r = Row(field.groups[0].rows[0])
 
 		draw_together(field.groups[0].rows[0])
+		field.groups[0].load_all_patches_SIFT_points()
 		new_patches = super_patch_pool_merging_method(field.groups[0].rows[0])
 		# r.correct_row_by_matching_lettuce_contours()
 		draw_together(new_patches)
