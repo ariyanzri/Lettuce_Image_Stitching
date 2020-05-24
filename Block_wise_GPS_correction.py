@@ -1522,9 +1522,9 @@ class Patch:
 	def get_pairwise_transformation_info(self,neighbor):
 		overlap1,overlap2 = neighbor.get_overlap_rectangles(self)
 		
-		if overlap1[2]-overlap1[0]<PATCH_SIZE[1]/5 and overlap1[3]-overlap1[1]<PATCH_SIZE[0]/5:
+		# if overlap1[2]-overlap1[0]<PATCH_SIZE[1]/5 and overlap1[3]-overlap1[1]<PATCH_SIZE[0]/5:
 			
-			return None
+		# 	return None
 
 		kp1,desc1 = choose_SIFT_key_points(neighbor,overlap1[0],overlap1[1],overlap1[2],overlap1[3])
 		kp2,desc2 = choose_SIFT_key_points(self,overlap2[0],overlap2[1],overlap2[2],overlap2[3])
@@ -1553,9 +1553,9 @@ class Patch:
 
 		dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
 
-		if dissimilarity == -1:
+		# if dissimilarity == -1:
 			
-			return None
+		# 	return None
 
 		return Neighbor_Parameters(overlap2,overlap1,H,num_matches,percentage_inliers,dissimilarity)
 
