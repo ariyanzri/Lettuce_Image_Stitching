@@ -1928,6 +1928,9 @@ class Super_Patch:
 				for p2 in sp.patches:
 					if p1.has_overlap(p2) or p2.has_overlap(p1):
 						tr_parameter = p1.get_pairwise_transformation_info(p2)
+						if tr_parameter is None:
+							continue
+							
 						number_inliers = tr_parameter.percentage_inliers * tr_parameter.num_matches
 						total_number_inliers += number_inliers
 						list_parameters.append((p1,p2,tr_parameter))
