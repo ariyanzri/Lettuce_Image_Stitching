@@ -2344,7 +2344,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups[5:7]
+		return groups[5:6]
 
 	def get_rows(self):
 		global coordinates_file
@@ -2695,11 +2695,13 @@ def main(scan_date):
 
 		# r = Row(field.groups[0].rows[0])
 
-		draw_together(field.groups[0].patches)
+		# draw_together(field.groups[0].patches)
+		field.draw_and_save_field()
 		field.groups[0].load_all_patches_SIFT_points()
 		new_patches = super_patch_pool_merging_method(field.groups[0].patches)
+		field.draw_and_save_field()
 		# r.correct_row_by_matching_lettuce_contours()
-		draw_together(new_patches)
+		# draw_together(new_patches)
 
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
