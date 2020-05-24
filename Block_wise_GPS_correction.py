@@ -25,7 +25,7 @@ PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
 # NUMBER_OF_ROWS_IN_GROUPS = 10
-NUMBER_OF_ROWS_IN_GROUPS = 4
+NUMBER_OF_ROWS_IN_GROUPS = 5
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -1522,19 +1522,19 @@ class Patch:
 	def get_pairwise_transformation_info(self,neighbor):
 		overlap1,overlap2 = neighbor.get_overlap_rectangles(self)
 		
-		# if overlap1[2]-overlap1[0]<PATCH_SIZE[1]/5 and overlap1[3]-overlap1[1]<PATCH_SIZE[0]/5:
+		if overlap1[2]-overlap1[0]<PATCH_SIZE[1]/5 and overlap1[3]-overlap1[1]<PATCH_SIZE[0]/5:
 			
-		# 	return None
+			return None
 
 		kp1,desc1 = choose_SIFT_key_points(neighbor,overlap1[0],overlap1[1],overlap1[2],overlap1[3])
 		kp2,desc2 = choose_SIFT_key_points(self,overlap2[0],overlap2[1],overlap2[2],overlap2[3])
 
-		matches = get_good_matches(desc2,desc1)
+		# matches = get_good_matches(desc2,desc1)
 		matches = get_top_n_good_matches(desc2,desc1,kp2,kp1)
 		# matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1)
 
 		if matches is None or len(matches) == 0:
-			print('match is none or len matches is 0.')
+			# print('match is none or len matches is 0.')
 			return None
 
 		num_matches = len(matches)
@@ -1546,7 +1546,7 @@ class Patch:
 		# print(percentage_inliers)
 
 		if H is None:
-			print('H is none.')
+			# print('H is none.')
 			return None
 
 		percentage_inliers = round(percentage_inliers*100,2)
@@ -2408,7 +2408,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist[5:10])
+			rows.append(newlist[5:15])
 
 		print('Rows calculated and created completely.')
 
@@ -2696,7 +2696,7 @@ def main(scan_date):
 		# r = Row(field.groups[0].rows[0])
 
 		# draw_together(field.groups[0].patches)
-		# field.draw_and_save_field()
+		field.draw_and_save_field()
 		field.groups[0].load_all_patches_SIFT_points()
 		new_patches = super_patch_pool_merging_method(field.groups[0].patches)
 		field.draw_and_save_field()
