@@ -1522,9 +1522,9 @@ class Patch:
 	def get_pairwise_transformation_info(self,neighbor):
 		overlap1,overlap2 = neighbor.get_overlap_rectangles(self)
 		
-		if overlap1[2]-overlap1[0]<PATCH_SIZE[1]/5 and overlap1[3]-overlap1[1]<PATCH_SIZE[0]/5:
+		# if overlap1[2]-overlap1[0]<PATCH_SIZE[1]/5 and overlap1[3]-overlap1[1]<PATCH_SIZE[0]/5:
 			
-			return None
+		# 	return None
 
 		kp1,desc1 = choose_SIFT_key_points(neighbor,overlap1[0],overlap1[1],overlap1[2],overlap1[3])
 		kp2,desc2 = choose_SIFT_key_points(self,overlap2[0],overlap2[1],overlap2[2],overlap2[3])
@@ -2696,7 +2696,7 @@ def main(scan_date):
 		# r = Row(field.groups[0].rows[0])
 
 		# draw_together(field.groups[0].patches)
-		field.draw_and_save_field()
+		# field.draw_and_save_field()
 		field.groups[0].load_all_patches_SIFT_points()
 		new_patches = super_patch_pool_merging_method(field.groups[0].patches)
 		field.draw_and_save_field()
