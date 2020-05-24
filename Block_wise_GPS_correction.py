@@ -1977,7 +1977,7 @@ class Super_Patch:
 
 		for p1 in self.patches:
 			for p2 in best_sp.patches:
-				param_current = params['{0}{1}'.format(p1.name,p2.name)]
+				param_current = params['{0}{1}'.format(p2.name,p1.name)]
 				if param_current is None:
 					continue
 
