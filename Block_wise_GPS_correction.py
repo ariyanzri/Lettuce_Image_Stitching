@@ -1204,10 +1204,12 @@ def get_gps_diff_from_H(p1,p2,H):
 	return diff_UL
 
 
-def super_patch_pool_merging_method(patches):
+def super_patch_pool_merging_method(patches,gid):
 	super_patches = []
 	for p in patches:
 		super_patches.append(Super_Patch([p]))
+
+	i = 1
 
 	while len(super_patches)>1:
 		new_supper_patches = []
@@ -1229,6 +1231,9 @@ def super_patch_pool_merging_method(patches):
 
 			new_sp = Super_Patch(sp1.patches+sp2.patches)
 			new_supper_patches.append(new_sp)
+
+		print('Group {0}: Super Patches with group size {1} merged together.'.format(gid,i))
+		i+=1
 
 		super_patches = new_supper_patches.copy()
 
@@ -2231,7 +2236,7 @@ class Group:
 		
 		self.load_all_patches_SIFT_points()
 
-		corrected_patches = super_patch_pool_merging_method(self.patches)
+		corrected_patches = super_patch_pool_merging_method(self.patches,self.group_id)
 
 		string_res = get_corrected_string(corrected_patches)
 		
