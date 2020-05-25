@@ -24,8 +24,8 @@ from collections import OrderedDict,Counter
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-# NUMBER_OF_ROWS_IN_GROUPS = 10
-NUMBER_OF_ROWS_IN_GROUPS = 4
+NUMBER_OF_ROWS_IN_GROUPS = 10
+# NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -1233,7 +1233,9 @@ def super_patch_pool_merging_method(patches,gid):
 			new_supper_patches.append(new_sp)
 
 		print('Group {0}: Super Patches with group size {1} merged together.'.format(gid,i))
-		i+=1
+		sys.stdout.flush()
+
+		i*=2
 
 		super_patches = new_supper_patches.copy()
 
@@ -2355,7 +2357,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups[5:7]
+		return groups
 
 	def get_rows(self):
 		global coordinates_file
@@ -2419,7 +2421,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist[5:15])
+			rows.append(newlist)
 
 		print('Rows calculated and created completely.')
 
@@ -2708,10 +2710,10 @@ def main(scan_date):
 
 		# draw_together(field.groups[0].patches)
 		# field.draw_and_save_field()
-		field.correct_field()
+		# field.correct_field()
 		# field.groups[0].load_all_patches_SIFT_points()
 		# new_patches = super_patch_pool_merging_method(field.groups[0].patches)
-		field.draw_and_save_field()
+		# field.draw_and_save_field()
 		# r.correct_row_by_matching_lettuce_contours()
 		# draw_together(new_patches)
 
@@ -2719,10 +2721,10 @@ def main(scan_date):
 
 		# field.draw_and_save_field()
 		# field.groups[0].correct_internally()
-		# field.correct_field()
+		field.correct_field()
 		# field.groups[0].correct_internally()
 		# field.draw_and_save_field()
-		# field.save_new_coordinate()
+		field.save_new_coordinate()
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
