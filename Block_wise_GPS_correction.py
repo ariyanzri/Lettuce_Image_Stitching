@@ -2697,7 +2697,7 @@ def main(scan_date):
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
-		os.system("taskset -p -c 6-40 %d" % os.getpid())
+		os.system("taskset -p -c 3-11,15-45 %d" % os.getpid())
 		
 		field = Field()
 
@@ -2890,7 +2890,7 @@ def main(scan_date):
 
 
 
-server_core = {'coge':20,'laplace.cs.arizona.edu':30,'ariyan':4}
+server_core = {'coge':20,'laplace.cs.arizona.edu':15,'ariyan':4}
 
 server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
