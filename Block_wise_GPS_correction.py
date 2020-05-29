@@ -1219,12 +1219,14 @@ def super_patch_pool_merging_method(patches,gid):
 
 			sp1 = super_patches.pop()
 
-			sp2,params = sp1.find_best_super_patch_for_merging(super_patches)
+			sp2,params,scr = sp1.find_best_super_patch_for_merging(super_patches)
 
 			if sp2 is None:
 				new_supper_patches.append(sp1)
 				continue
 
+			print('Group {0}: Merge accepted using score {1}.'.format(gid,scr))
+			
 			super_patches.remove(sp2)
 
 			diff = sp1.get_total_gps_diff_from_params(sp2,params)
@@ -1993,7 +1995,7 @@ class Super_Patch:
 					best_sp = sp
 					best_params = params
 
-		return best_sp,best_params
+		return best_sp,best_params,best_score
 
 
 	def get_total_gps_diff_from_params(self,best_sp,params):
