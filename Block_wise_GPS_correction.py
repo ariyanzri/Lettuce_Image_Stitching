@@ -69,6 +69,14 @@ def load_preprocess_image(address):
 	img = img.astype('uint8')
 	img_g = convert_to_gray(img)
 
+	cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
+	cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
+	cv2.resizeWindow('fig1', 500,500)
+	cv2.resizeWindow('fig2', 500,500)
+	cv2.imshow('fig1',img)
+	cv2.imshow('fig2',img_g)
+	cv2.waitKey(0)
+
 	return img, img_g
 
 def choose_SIFT_key_points(patch,x1,y1,x2,y2):
@@ -1578,8 +1586,8 @@ class Patch:
 
 		H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2)
 
-		if percentage_inliers<0.10 or num_matches<100:
-			return None
+		# if percentage_inliers<0.10 or num_matches<100:
+		# 	return None
 
 		# H,percentage_inliers = find_translation(matches,kp2,kp1)
 		
@@ -1592,8 +1600,8 @@ class Patch:
 
 		percentage_inliers = round(percentage_inliers*100,2)
 
-		# dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
-		dissimilarity = - percentage_inliers*num_matches
+		dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
+		# dissimilarity = - percentage_inliers*num_matches
 
 		# if dissimilarity == -1:
 			
