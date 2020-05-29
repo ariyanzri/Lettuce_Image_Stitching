@@ -10,6 +10,7 @@ import pickle
 import os
 import threading
 import socket
+import statistics
 
 from sklearn.linear_model import RANSACRegressor
 from sklearn.datasets import make_regression
@@ -24,8 +25,8 @@ from collections import OrderedDict,Counter
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-NUMBER_OF_ROWS_IN_GROUPS = 10
-# NUMBER_OF_ROWS_IN_GROUPS = 4
+# NUMBER_OF_ROWS_IN_GROUPS = 10
+NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -1926,40 +1927,56 @@ class Super_Patch:
 
 		return False
 
-	def calculate_merge_score(self,sp):
-		total_number_inliers = 0
-		list_parameters = {}
+	def number_of_patch_overlaps(self,sp):
+		n = 0
 
 		for p1 in self.patches:
 			for p2 in sp.patches:
-				if p1.has_overlap(p2) and p2.has_overlap(p1):
-					tr_parameter = p1.get_pairwise_transformation_info(p2)
-					if tr_parameter is None:
+				if p1.has_overlap(p2) or p2.has_overlap(p1):
+					n+=1
+
+		return n
+
+	def calculate_merge_score(self,sp):
+		
+		number_overlaped_patches = self.number_of_patch_overlaps(sp)
+
+		if number_overlaped_patches == 1:
+			total_number_inliers = 0
+			list_parameters = {}
+
+			for p1 in self.patches:
+				for p2 in sp.patches:
+					if p1.has_overlap(p2) and p2.has_overlap(p1):
+						tr_parameter = p1.get_pairwise_transformation_info(p2)
+						if tr_parameter is None:
+							list_parameters['{0}{1}'.format(p1.name,p2.name)] = tr_parameter
+							continue
+							
+						number_inliers = tr_parameter.percentage_inliers * tr_parameter.num_matches
+						total_number_inliers += number_inliers
 						list_parameters['{0}{1}'.format(p1.name,p2.name)] = tr_parameter
-						continue
-						
-					number_inliers = tr_parameter.percentage_inliers * tr_parameter.num_matches
-					total_number_inliers += number_inliers
-					list_parameters['{0}{1}'.format(p1.name,p2.name)] = tr_parameter
 
-		return total_number_inliers,list_parameters
+			return total_number_inliers,list_parameters
+		else:
+			
+			list_diff_x = []
+			list_diff_y = []
+			list_parameters = {}
 
-		# if len(sp.patches) == 1:
+			for p1 in self.patches:
+				for p2 in sp.patches:
+					if p1.has_overlap(p2) or p2.has_overlap(p1):
+						tr_parameter = p1.get_pairwise_transformation_info(p2)
+						gps_diff = get_gps_diff_from_H(p2,p1,tr_parameter.H)
+						list_diff_x.append(gps_diff[0])
+						list_diff_y.append(gps_diff[1])
 
-		# else:
-			# # least deviation in gps movements
-			# total_number_inliers = 0
-			# list_parameters = {}
+						list_parameters['{0}{1}'.format(p1.name,p2.name)] = tr_parameter
 
-			# for p1 in self.patches:
-			# 	for p2 in sp.patches:
-			# 		if p1.has_overlap(p2) or p2.has_overlap(p1):
-			# 			tr_parameter = p1.get_pairwise_transformation_info(p2)
-			# 			number_inliers = tr_parameter.percentage_inliers * tr_parameter.num_matches
-			# 			total_number_inliers += number_inliers
-			# 			list_parameters['{0}{1}'.format(p1.name,p2.name)] = tr_parameter
+			avg_stdev = (statistics.stdev(list_diff_x)+statistics.stdev(list_diff_y))/2
 
-			# return total_number_inliers,list_parameters
+			return -avg_stdev,list_parameters
 
 
 	def find_best_super_patch_for_merging(self,super_patches):
@@ -2357,7 +2374,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups
+		return groups[12:13]
 
 	def get_rows(self):
 		global coordinates_file
@@ -2421,7 +2438,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist)
+			rows.append(newlist[5:15])
 
 		print('Rows calculated and created completely.')
 
@@ -2719,12 +2736,12 @@ def main(scan_date):
 
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
-		# field.draw_and_save_field()
+		field.draw_and_save_field()
 		# field.groups[0].correct_internally()
 		field.correct_field()
 		# field.groups[0].correct_internally()
-		# field.draw_and_save_field()
-		field.save_new_coordinate()
+		field.draw_and_save_field()
+		# field.save_new_coordinate()
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
@@ -2750,16 +2767,68 @@ def main(scan_date):
 				break
 				
 		
-		# p1.load_SIFT_points()
-		# p2.load_SIFT_points()
-		# p1.load_img()
-		# p2.load_img()
-		# overlap_1,overlap_2 = p1.get_overlap_rectangles(p2)
+		p1.load_SIFT_points()
+		p2.load_SIFT_points()
+		p1.load_img()
+		p2.load_img()
+		overlap_1,overlap_2 = p1.get_overlap_rectangles(p2)
 
 		# kp1,desc1 = choose_SIFT_key_points(p1,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
 		# kp2,desc2 = choose_SIFT_key_points(p2,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
-		# kp1,desc1 = detect_SIFT_key_points(p1.rgb_img,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
-		# kp2,desc2 = detect_SIFT_key_points(p2.rgb_img,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
+		kp1,desc1 = detect_SIFT_key_points(p1.rgb_img,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
+		kp2,desc2 = detect_SIFT_key_points(p2.rgb_img,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
+
+		matches = get_good_matches(desc1,desc2)
+		sorted_matches = sorted(matches, key=lambda x: x[0].distance)
+
+		img_top_lowerror = None
+		img_top_higherror = None
+		img_nottop_lowerror = None
+		img_nottop_high_error = None
+
+		mtch_top_lowerror = []
+		mtch_top_higherror = []
+		mtch_nottop_lowerror = []
+		mtch_nottop_high_error = []
+
+		for i,m in enumerate(sorted_matches):
+			pt1 = kp1[m[0].queryIdx].pt
+			pt2 = kp2[m[0].trainIdx].pt
+			sg_tr = np.array([[1,0,PATCH_SIZE[0]-abs(pt1[1]-pt2[1])],[0,1,PATCH_SIZE[1]-abs(pt1[0]-pt2[0])],[0,0,1]])
+			diff = get_gps_diff_from_H(p2,p1,sg_tr)
+			print(diff)
+			print(GPS_ERROR_X)
+			print(GPS_ERROR_Y)
+
+			if i<PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION*len(sorted_matches):
+				if abs(diff[0])<=GPS_ERROR_X and abs(diff[1])<=GPS_ERROR_Y:
+					mtch_top_lowerror.append(m)
+				else:
+					mtch_top_higherror.append(m)
+			else:
+				if abs(diff[0])<=GPS_ERROR_X and abs(diff[1])<=GPS_ERROR_Y:
+					mtch_nottop_lowerror.append(m)
+				else:
+					mtch_nottop_high_error.append(m)
+
+		img_top_lowerror = cv2.drawMatches(p1.rgb_img,kp1,p2.rgb_img,kp2,[m[0] for m in mtch_top_lowerror],img_top_lowerror,matchColor=(0,255,0))
+		img_top_higherror = cv2.drawMatches(p1.rgb_img,kp1,p2.rgb_img,kp2,[m[0] for m in mtch_top_higherror],img_top_higherror,matchColor=(0,255,0))
+		img_nottop_lowerror = cv2.drawMatches(p1.rgb_img,kp1,p2.rgb_img,kp2,[m[0] for m in mtch_nottop_lowerror],img_nottop_lowerror,matchColor=(0,255,0))
+		img_nottop_high_error = cv2.drawMatches(p1.rgb_img,kp1,p2.rgb_img,kp2,[m[0] for m in mtch_nottop_high_error],img_nottop_high_error,matchColor=(0,255,0))
+
+		cv2.namedWindow('img_top_lowerror',cv2.WINDOW_NORMAL)
+		cv2.namedWindow('img_top_higherror',cv2.WINDOW_NORMAL)
+		cv2.namedWindow('img_nottop_lowerror',cv2.WINDOW_NORMAL)
+		cv2.namedWindow('img_nottop_high_error',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('img_top_lowerror', 500,500)
+		cv2.resizeWindow('img_top_higherror', 500,500)
+		cv2.resizeWindow('img_nottop_lowerror', 500,500)
+		cv2.resizeWindow('img_nottop_high_error', 500,500)
+		cv2.imshow('img_top_lowerror',img_top_lowerror)
+		cv2.imshow('img_top_higherror',img_top_higherror)
+		cv2.imshow('img_nottop_lowerror',img_nottop_lowerror)
+		cv2.imshow('img_nottop_high_error',img_nottop_high_error)
+		cv2.waitKey(0)
 
 		# get_top_percentage_of_matches_no_KNN(p1,p2,desc1,desc2,kp1,kp2)
 
@@ -2804,12 +2873,12 @@ def main(scan_date):
 		# cv2.imshow('img2',p2.rgb_img)
 		# cv2.waitKey(0)
 
-		draw_together([p1,p2])
+		# draw_together([p1,p2])
 
 		# p2.gps = p2.correct_based_on_neighbors([p1])
-		p2.correct_based_on_matched_contour_centers(p1)
+		# p2.correct_based_on_matched_contour_centers(p1)
 
-		draw_together([p1,p2])
+		# draw_together([p1,p2])
 
 		# p1.load_SIFT_points()
 		# p2.load_SIFT_points()
