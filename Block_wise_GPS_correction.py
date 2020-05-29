@@ -1226,7 +1226,7 @@ def super_patch_pool_merging_method(patches,gid):
 				continue
 
 			print('Group {0}: Merge accepted using score {1}.'.format(gid,scr))
-			
+
 			super_patches.remove(sp2)
 
 			diff = sp1.get_total_gps_diff_from_params(sp2,params)
@@ -1942,7 +1942,8 @@ class Super_Patch:
 	def calculate_merge_score(self,sp):
 		
 		number_overlaped_patches = self.number_of_patch_overlaps(sp)
-
+		print(number_overlaped_patches)
+		
 		if number_overlaped_patches == 1:
 			total_number_inliers = 0
 			list_parameters = {}
