@@ -529,7 +529,7 @@ def get_good_matches_based_on_GPS_error(desc1,desc2,kp1,kp2):
 
 	return matches
 
-def get_top_n_good_matches(desc1,desc2,kp1,kp2):
+def get_top_percentage_matches(desc1,desc2,kp1,kp2):
 	bf = cv2.BFMatcher()
 	matches = bf.knnMatch(desc1,desc2, k=2)
 
@@ -549,6 +549,32 @@ def get_top_n_good_matches(desc1,desc2,kp1,kp2):
 	# 	good += sorted_matches
 
 	number_of_good_matches = int(math.floor(len(sorted_matches)*PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION))
+	good = sorted_matches[0:number_of_good_matches]
+
+	matches = np.asarray(good)
+
+	return matches
+
+def get_top_n_matches(desc1,desc2,kp1,kp2,n):
+	bf = cv2.BFMatcher()
+	matches = bf.knnMatch(desc1,desc2, k=2)
+
+	good = []
+	for m in matches:
+		
+		if 	m[0].distance < PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
+			good.append(m)
+
+	sorted_matches = sorted(good, key=lambda x: x[0].distance)
+
+	good = []
+
+	# if len(sorted_matches)>NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION:
+	# 	good += sorted_matches[0:NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION]
+	# else:
+	# 	good += sorted_matches
+
+	number_of_good_matches = min(n,len(sorted_matches))
 	good = sorted_matches[0:number_of_good_matches]
 
 	matches = np.asarray(good)
@@ -1539,8 +1565,9 @@ class Patch:
 		kp1,desc1 = choose_SIFT_key_points(neighbor,overlap1[0],overlap1[1],overlap1[2],overlap1[3])
 		kp2,desc2 = choose_SIFT_key_points(self,overlap2[0],overlap2[1],overlap2[2],overlap2[3])
 
-		matches = get_good_matches(desc2,desc1)
-		# matches = get_top_n_good_matches(desc2,desc1,kp2,kp1)
+		# matches = get_good_matches(desc2,desc1)
+		# matches = get_top_percentage_matches(desc2,desc1,kp2,kp1)
+		matches = get_top_n_matches(desc2,desc1,kp2,kp1,30)
 		# matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1)
 
 		if matches is None or len(matches) == 0:
@@ -2228,7 +2255,7 @@ class Group:
 				# kp = patch.SIFT_kp_locations
 				# desc = patch.SIFT_kp_desc
 
-				# matches = get_top_n_good_matches(desc_merged,desc,kp_merged,kp)
+				# matches = get_top_percentage_matches(desc_merged,desc,kp_merged,kp)
 
 				# H, perc_in = find_homography(matches,kp_merged,kp,None,None)
 
@@ -2351,7 +2378,7 @@ class Group:
 		# 			prev_kp.append(kp2)
 		# 			prev_desc.append(desc2)
 					
-		# 			matches.append(get_top_n_good_matches(desc2,desc1,kp2,kp1))
+		# 			matches.append(get_top_percentage_matches(desc2,desc1,kp2,kp1))
 
 		# H = calculate_homography_for_super_patches(prev_kp,kp,matches)
 
