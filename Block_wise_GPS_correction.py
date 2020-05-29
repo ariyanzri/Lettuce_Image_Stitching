@@ -60,18 +60,20 @@ def convert_to_gray(img):
 	# coefficients = [-1,1,2] 
 	# m = np.array(coefficients).reshape((1,3))
 	# img_g = cv2.transform(img, m)
+		
+	img_g = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 	
-	green_channel = img[:,:,1].copy()
-	red_channel = img[:,:,2].copy()
-	blue_channel = img[:,:,0].copy()
+	# green_channel = img[:,:,1].copy()
+	# red_channel = img[:,:,2].copy()
+	# blue_channel = img[:,:,0].copy()
 
-	img = green_channel-0.61*blue_channel-0.39*red_channel
+	# img = green_channel-0.61*blue_channel-0.39*red_channel
 
-	min_p = np.amin(img)
-	max_p = np.amax(img)
-	rng = (max_p-min_p)
+	# min_p = np.amin(img)
+	# max_p = np.amax(img)
+	# rng = (max_p-min_p)
 	
-	img_g = cv2.normalize(img, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
+	# img_g = cv2.normalize(img, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
 
 	return img_g
 
