@@ -1577,6 +1577,10 @@ class Patch:
 		num_matches = len(matches)
 
 		H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2)
+
+		if percentage_inliers<0.20 or num_matches<200:
+			return None
+
 		# H,percentage_inliers = find_translation(matches,kp2,kp1)
 		
 		# print(H)
@@ -1588,8 +1592,8 @@ class Patch:
 
 		percentage_inliers = round(percentage_inliers*100,2)
 
-		dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
-		# dissimilarity = - percentage_inliers
+		# dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
+		dissimilarity = - percentage_inliers*num_matches
 
 		# if dissimilarity == -1:
 			
