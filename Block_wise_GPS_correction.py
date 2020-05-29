@@ -57,11 +57,11 @@ def remove_shadow(image):
 
 def convert_to_gray(img):
 	
-	coefficients = [-1,1,2] 
-	m = np.array(coefficients).reshape((1,3))
-	img_g = cv2.transform(img, m)
+	# coefficients = [-1,1,2] 
+	# m = np.array(coefficients).reshape((1,3))
+	# img_g = cv2.transform(img, m)
 		
-	# img_g = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+	img_g = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
 	# green_channel = img[:,:,1].copy()
 	# red_channel = img[:,:,2].copy()
