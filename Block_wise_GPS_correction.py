@@ -1588,7 +1588,8 @@ class Patch:
 
 		percentage_inliers = round(percentage_inliers*100,2)
 
-		dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
+		# dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
+		dissimilarity = - percentage_inliers*len(num_matches)
 
 		# if dissimilarity == -1:
 			
@@ -2285,21 +2286,21 @@ class Group:
 		global lettuce_coords,no_of_cores_to_use
 
 		print('Group {0} with {1} rows and {2} patches internally correction started.'.format(self.group_id,len(self.rows),len(self.patches)))
-		# self.load_all_patches_SIFT_points()
+		self.load_all_patches_SIFT_points()
 
-		# self.pre_calculate_internal_neighbors_and_transformation_parameters()
+		self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
-		# G = Graph(len(self.patches),[p.name for p in self.patches])
-		# G.initialize_edge_weights(self.patches)
+		G = Graph(len(self.patches),[p.name for p in self.patches])
+		G.initialize_edge_weights(self.patches)
 
-		# try:
-		# 	parents = G.generate_MST_prim(self.rows[0][0].name)
-		# 	string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
-		# except Exception as e:
-		# 	print(e)
-		# 	string_res = get_corrected_string(self.patches)
+		try:
+			parents = G.generate_MST_prim(self.rows[0][0].name)
+			string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
+		except Exception as e:
+			print(e)
+			string_res = get_corrected_string(self.patches)
 
-		# self.delete_all_patches_SIFT_points()
+		self.delete_all_patches_SIFT_points()
 
 		# string_res = self.correct_row_by_row()
 		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
@@ -2309,16 +2310,16 @@ class Group:
 		# 	print('Group ID {0}: patch {1} corrected with {2} error.'.format(self.group_id,p.name,err))
 		# 	sys.stdout.flush()
 		
-		self.load_all_patches_SIFT_points()
+		# self.load_all_patches_SIFT_points()
 
-		corrected_patches = super_patch_pool_merging_method(self.patches,self.group_id)
+		# corrected_patches = super_patch_pool_merging_method(self.patches,self.group_id)
 
-		string_res = get_corrected_string(corrected_patches)
-		
+		# string_res = get_corrected_string(corrected_patches)
+		# self.delete_all_patches_SIFT_points()
+
+
 		print('Group {0} was corrected internally. '.format(self.group_id))
 		sys.stdout.flush()
-
-		self.delete_all_patches_SIFT_points()
 
 		return string_res
 
@@ -2792,7 +2793,7 @@ def main(scan_date):
 
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
-		field.draw_and_save_field()
+		# field.draw_and_save_field()
 		# field.groups[0].correct_internally()
 		field.correct_field()
 		# field.groups[0].correct_internally()
