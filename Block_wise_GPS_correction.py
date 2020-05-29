@@ -1589,7 +1589,7 @@ class Patch:
 		percentage_inliers = round(percentage_inliers*100,2)
 
 		# dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
-		dissimilarity = - percentage_inliers*num_matches
+		dissimilarity = - percentage_inliers
 
 		# if dissimilarity == -1:
 			
