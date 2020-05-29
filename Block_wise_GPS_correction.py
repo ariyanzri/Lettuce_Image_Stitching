@@ -27,7 +27,7 @@ PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
 # NUMBER_OF_ROWS_IN_GROUPS = 10
 NUMBER_OF_ROWS_IN_GROUPS = 5
-PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.25
+PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
 MINIMUM_NUMBER_OF_MATCHES = 100
@@ -1599,7 +1599,8 @@ class Patch:
 		num_matches = len(matches)
 
 		H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2)
-
+		print(percentage_inliers,num_matches)
+		
 		# if percentage_inliers<0.10 or num_matches<100:
 		# 	return None
 
@@ -1614,8 +1615,8 @@ class Patch:
 
 		percentage_inliers = round(percentage_inliers*100,2)
 
-		# dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
-		dissimilarity = - percentage_inliers*num_matches
+		dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
+		# dissimilarity = - percentage_inliers*num_matches
 
 		# if dissimilarity == -1:
 			
