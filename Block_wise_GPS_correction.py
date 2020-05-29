@@ -2752,7 +2752,9 @@ def test_function():
 	images = os.listdir(patch_folder)
 	img,img_g = load_preprocess_image('{0}/{1}'.format(patch_folder,images[0]))
 
-	
+	kp,desc = detect_SIFT_key_points(img_g,0,0,img_g.shape[1],img_g.shape[0])
+
+	img=cv.drawKeypoints(img_g,kp,img)
 
 	cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
 	cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
