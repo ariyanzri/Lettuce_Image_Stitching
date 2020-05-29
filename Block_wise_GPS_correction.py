@@ -2816,9 +2816,10 @@ def main(scan_date):
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
 		os.system("taskset -p -c 3-11,15-45 %d" % os.getpid())
-		test_function()
+		# test_function()
 
-		# field = Field()
+		field = Field()
+		field.create_patches_SIFT_files()
 
 		# lettuce_coords = read_lettuce_heads_coordinates()
 		# p1 = field.groups[0].patches[3]
