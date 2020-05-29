@@ -1998,7 +1998,7 @@ class Super_Patch:
 			if self.has_overlap(sp):
 				score,params = self.calculate_merge_score(sp)
 				
-				if 0 > score >= -5e-7:
+				if 0 > score:
 					if best_score < 0:
 						
 						if score < best_score:
