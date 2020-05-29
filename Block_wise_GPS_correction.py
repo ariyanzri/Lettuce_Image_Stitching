@@ -1942,7 +1942,7 @@ class Super_Patch:
 	def calculate_merge_score(self,sp):
 		
 		number_overlaped_patches = self.number_of_patch_overlaps(sp)
-		print(number_overlaped_patches)
+		# print(number_overlaped_patches)
 		
 		if number_overlaped_patches == 1:
 			total_number_inliers = 0
