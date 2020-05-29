@@ -1981,6 +1981,9 @@ class Super_Patch:
 
 						list_parameters['{0}{1}'.format(p1.name,p2.name)] = tr_parameter
 
+			if len(list_diff_x)<2:
+				return -sys.maxsize,list_parameters
+
 			avg_stdev = (statistics.stdev(list_diff_x)+statistics.stdev(list_diff_y))/2
 
 			return -avg_stdev,list_parameters
@@ -1994,13 +1997,30 @@ class Super_Patch:
 		for sp in super_patches:
 			if self.has_overlap(sp):
 				score,params = self.calculate_merge_score(sp)
-				if score<=0:
-					print(score)
-					
-				if score>best_score:
-					best_score = score
-					best_sp = sp
-					best_params = params
+				
+				if 0 >= score >= -1e-7:
+					if best_score <= 0:
+						
+						if score < best_score:
+							best_score = score
+							best_sp = sp
+							best_params = params
+
+					else:
+						best_score = score
+						best_sp = sp
+						best_params = params
+						
+				elif score>0:
+
+					if 0 >= best_score:
+						continue
+					else:
+
+						if score>best_score:
+							best_score = score
+							best_sp = sp
+							best_params = params
 
 		return best_sp,best_params,best_score
 
