@@ -62,7 +62,7 @@ def convert_to_gray(img):
 	# img_g = cv2.transform(img, m)
 		
 	img_g = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-	
+
 	# green_channel = img[:,:,1].copy()
 	# red_channel = img[:,:,2].copy()
 	# blue_channel = img[:,:,0].copy()
@@ -83,13 +83,13 @@ def load_preprocess_image(address):
 	img = img.astype('uint8')
 	img_g = convert_to_gray(img)
 
-	cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
-	cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
-	cv2.resizeWindow('fig1', 500,500)
-	cv2.resizeWindow('fig2', 500,500)
-	cv2.imshow('fig1',img)
-	cv2.imshow('fig2',img_g)
-	cv2.waitKey(0)
+	# cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
+	# cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
+	# cv2.resizeWindow('fig1', 500,500)
+	# cv2.resizeWindow('fig2', 500,500)
+	# cv2.imshow('fig1',img)
+	# cv2.imshow('fig2',img_g)
+	# cv2.waitKey(0)
 
 	return img, img_g
 
@@ -2746,6 +2746,19 @@ class Field:
 		print('Coordinates saved.')
 		sys.stdout.flush()
 
+def test_function():
+	global patch_folder
+
+	patches = read_all_data()
+
+	cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
+	cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
+	cv2.resizeWindow('fig1', 500,500)
+	cv2.resizeWindow('fig2', 500,500)
+	cv2.imshow('fig1',patches[0].rgb_img)
+	cv2.imshow('fig2',patches[1].gray_img)
+	cv2.waitKey(0)
+
 def main(scan_date):
 	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path,lettuce_heads_coordinates_file,lettuce_coords
 
@@ -2798,8 +2811,9 @@ def main(scan_date):
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
 		os.system("taskset -p -c 3-11,15-45 %d" % os.getpid())
-		
-		field = Field()
+		test_function()
+
+		# field = Field()
 
 		# lettuce_coords = read_lettuce_heads_coordinates()
 		# p1 = field.groups[0].patches[3]
@@ -2821,9 +2835,9 @@ def main(scan_date):
 
 		# field.draw_and_save_field()
 		# field.groups[0].correct_internally()
-		field.correct_field()
+		# field.correct_field()
 		# field.groups[0].correct_internally()
-		field.draw_and_save_field()
+		# field.draw_and_save_field()
 		# field.save_new_coordinate()
 
 	elif server == 'ariyan':
