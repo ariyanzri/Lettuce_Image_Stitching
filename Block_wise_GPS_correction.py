@@ -2754,7 +2754,7 @@ def test_function():
 
 	kp,desc = detect_SIFT_key_points(img_g,0,0,img_g.shape[1],img_g.shape[0])
 
-	img=cv2.drawKeypoints(img_g,kp,img)
+	img_g=cv2.drawKeypoints(img_g,kp,img)
 
 	cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
 	cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
