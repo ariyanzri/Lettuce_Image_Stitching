@@ -2749,14 +2749,17 @@ class Field:
 def test_function():
 	global patch_folder
 
-	patches = read_all_data()
+	images = os.listdir(patch_folder)
+	img,img_g = load_preprocess_image('{0}/{1}'.format(patch_folder,images[0]))
+
+	
 
 	cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
 	cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
 	cv2.resizeWindow('fig1', 500,500)
 	cv2.resizeWindow('fig2', 500,500)
-	cv2.imshow('fig1',patches[0].rgb_img)
-	cv2.imshow('fig2',patches[1].gray_img)
+	cv2.imshow('fig1',img)
+	cv2.imshow('fig2',img_g)
 	cv2.waitKey(0)
 
 def main(scan_date):
