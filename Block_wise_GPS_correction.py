@@ -26,7 +26,7 @@ PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
 # NUMBER_OF_ROWS_IN_GROUPS = 10
-NUMBER_OF_ROWS_IN_GROUPS = 4
+NUMBER_OF_ROWS_IN_GROUPS = 5
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -1566,8 +1566,8 @@ class Patch:
 		kp2,desc2 = choose_SIFT_key_points(self,overlap2[0],overlap2[1],overlap2[2],overlap2[3])
 
 		# matches = get_good_matches(desc2,desc1)
-		# matches = get_top_percentage_matches(desc2,desc1,kp2,kp1)
-		matches = get_top_n_matches(desc2,desc1,kp2,kp1,30)
+		matches = get_top_percentage_matches(desc2,desc1,kp2,kp1)
+		# matches = get_top_n_matches(desc2,desc1,kp2,kp1,50)
 		# matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1)
 
 		if matches is None or len(matches) == 0:
@@ -2494,7 +2494,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist[5:15])
+			rows.append(newlist[5:20])
 
 		print('Rows calculated and created completely.')
 
@@ -2792,7 +2792,7 @@ def main(scan_date):
 
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
-		# field.draw_and_save_field()
+		field.draw_and_save_field()
 		# field.groups[0].correct_internally()
 		field.correct_field()
 		# field.groups[0].correct_internally()
