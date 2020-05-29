@@ -1943,7 +1943,7 @@ class Super_Patch:
 		
 		number_overlaped_patches = self.number_of_patch_overlaps(sp)
 		# print(number_overlaped_patches)
-		
+
 		if number_overlaped_patches == 1:
 			total_number_inliers = 0
 			list_parameters = {}
@@ -1971,6 +1971,10 @@ class Super_Patch:
 				for p2 in sp.patches:
 					if p1.has_overlap(p2) or p2.has_overlap(p1):
 						tr_parameter = p1.get_pairwise_transformation_info(p2)
+						if tr_parameter is None:
+							list_parameters['{0}{1}'.format(p1.name,p2.name)] = tr_parameter
+							continue
+
 						gps_diff = get_gps_diff_from_H(p2,p1,tr_parameter.H)
 						list_diff_x.append(gps_diff[0])
 						list_diff_y.append(gps_diff[1])
@@ -1990,7 +1994,9 @@ class Super_Patch:
 		for sp in super_patches:
 			if self.has_overlap(sp):
 				score,params = self.calculate_merge_score(sp)
-
+				if score<=0:
+					print(score)
+					
 				if score>best_score:
 					best_score = score
 					best_sp = sp
