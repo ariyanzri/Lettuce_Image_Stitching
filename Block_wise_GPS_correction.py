@@ -2013,7 +2013,7 @@ class Super_Patch:
 
 				elif score>0:
 
-					if 0 > best_score:
+					if 0 > best_score >= -5e-7:
 						continue
 					else:
 
