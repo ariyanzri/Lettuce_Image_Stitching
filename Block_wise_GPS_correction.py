@@ -1418,10 +1418,15 @@ class Graph():
 					param = params[0]
 					H = param.H
 
-					patch.gps = get_new_GPS_Coords(patch,parent_patch,H)
-					gps_diff = get_gps_diff_from_H(patch,parent_patch,param.H)
+					new_gps = get_new_GPS_Coords(patch,parent_patch,H)
+
+					gps_diff = (patch.gps.UL_coord[0]-new_gps.UL_coord[0],patch.gps.UL_coord[1]-new_gps.UL_coord[1])
 					print(gps_diff)
+					
+					patch.gps = new_gps
+
 					logger(patch,gps_diff,param,self.gid,step)
+					
 					step+=1
 
 		string_corrected = get_corrected_string(patches)
