@@ -11,6 +11,7 @@ import os
 import threading
 import socket
 import statistics
+import datetime
 
 from sklearn.linear_model import RANSACRegressor
 from sklearn.datasets import make_regression
@@ -26,7 +27,7 @@ PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
 # NUMBER_OF_ROWS_IN_GROUPS = 10
-NUMBER_OF_ROWS_IN_GROUPS = 5
+NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -1320,6 +1321,10 @@ class GPS_Coordinate:
 
 		return False
 
+	def to_csv(self):
+		return '{0};{1};{2};{3};{4};{5};{6};{7};{8};{9}'.format(self.UL_coord[0],self.UL_coord[1],self.UR_coord[0],self.UR_coord[1],\
+			self.LL_coord[0],self.LL_coord[1],self.LR_coord[0],self.LR_coord[1],self.Center[0],self.Center[1])
+
 class Graph():
 
 	def __init__(self,no_vertex,vertex_names):
@@ -1408,6 +1413,7 @@ class Graph():
 					H = H[0]
 
 					patch.gps = get_new_GPS_Coords(patch,parent_patch,H)
+					logger(patch,parent_patch,n[1])
 
 		string_corrected = get_corrected_string(patches)
 		return string_corrected
@@ -1599,8 +1605,7 @@ class Patch:
 		num_matches = len(matches)
 
 		H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2)
-		print(percentage_inliers,num_matches)
-		
+
 		# if percentage_inliers<0.10 or num_matches<100:
 		# 	return None
 
@@ -1621,6 +1626,8 @@ class Patch:
 		# if dissimilarity == -1:
 			
 		# 	return None
+		
+		print(percentage_inliers,num_matches,dissimilarity,(overlap1[2]-overlap1[0])*(overlap1[3]-overlap1[1]))
 
 		return Neighbor_Parameters(overlap2,overlap1,H,num_matches,percentage_inliers,dissimilarity)
 
@@ -2175,7 +2182,7 @@ class Group:
 		print('SIFT for all patches in group {0} deleted.'.format(self.group_id))
 		sys.stdout.flush()
 
-	def pre_calculate_internal_neighbors_and_transformation_parameters(self):
+	def pre_calculate_internal_neighbors_and_transformation_parameters(self,print_flg=False):
 		remove_neighbors = []
 
 		for p in self.patches:
@@ -2192,7 +2199,9 @@ class Group:
 					
 					p.neighbors.append((n,neighbor_param))
 
-			print('GROPU ID: {0} - Calculated Transformation and error values for {1} neighbors of {2}'.format(self.group_id,len(p.neighbors),p.name))
+			if print_flg:
+				print('GROPU ID: {0} - Calculated Transformation and error values for {1} neighbors of {2}'.format(self.group_id,len(p.neighbors),p.name))
+
 			sys.stdout.flush()
 
 		for a,b in remove_neighbors:
@@ -2522,7 +2531,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist[5:20])
+			rows.append(newlist[5:10])
 
 		print('Rows calculated and created completely.')
 
@@ -2747,6 +2756,18 @@ class Field:
 		print('Coordinates saved.')
 		sys.stdout.flush()
 
+def logger(corrected_patch,parent_patch,param,gid):
+	global correction_log_file
+
+	with open(correction_log_file,"a+") as f:
+		gps_diff = get_gps_diff_from_H(corrected_patch,parent_patch,param.H)
+
+		string_log = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}'.format(gid,corrected_patch.name,corrected_patch.gps.to_csv(),parent_patch.name,parent_patch.gps.to_csv(),\
+			param.H[0,2],param.H[1,2],param.num_matches,param.percentage_inliers,param.dissimilarity,gps_diff[0],gps_diff[1])
+
+		f.write(string_log)
+
+
 def test_function():
 	global patch_folder
 
@@ -2766,7 +2787,7 @@ def test_function():
 	cv2.waitKey(0)
 
 def main(scan_date):
-	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path,lettuce_heads_coordinates_file,lettuce_coords
+	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path,lettuce_heads_coordinates_file,lettuce_coords,method,correction_log_file
 
 	if server == 'coge':
 		patch_folder = '/storage/ariyanzarei/{0}-rgb/bin2tif_out'.format(scan_date)
@@ -2777,6 +2798,8 @@ def main(scan_date):
 		plot_npy_file = '/storage/ariyanzarei/{0}-rgb/plt.npy'.format(scan_date)
 		row_save_path = '/storage/ariyanzarei/{0}-rgb/rows'.format(scan_date)
 		field_image_path = 'field.bmp'
+		correction_log_file = ''
+
 		# lettuce_heads_coordinates_file = '/storage/ariyanzarei/{0}-rgb/{0}_coordinates.csv'.format(scan_date)
 
 	elif server == 'laplace.cs.arizona.edu':
@@ -2788,6 +2811,7 @@ def main(scan_date):
 		plot_npy_file = '/data/plant/full_scans/{0}-rgb/plt.npy'.format(scan_date)
 		field_image_path = 'field.bmp'
 		lettuce_heads_coordinates_file = 'season10_lettuce_latlon.csv'
+		correction_log_file = '/data/plant/full_scans/{0}-rgb/logs/log_{1}_at_{2}.csv'.format(scan_date,method,datetime.datetime.now().strftime("%d/%m/%y %H:%M"))
 
 	elif server == 'ariyan':
 		patch_folder = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures'
@@ -2798,6 +2822,7 @@ def main(scan_date):
 		plot_npy_file = '/home/ariyan/Desktop/plt.npy'
 		field_image_path = '/home/ariyan/Desktop/field.bmp'
 		lettuce_heads_coordinates_file = '/home/ariyan/Desktop/season10_lettuce_latlon.csv'
+		correction_log_file = ''
 
 
 	if server == 'coge':
@@ -3068,8 +3093,16 @@ server_core = {'coge':20,'laplace.cs.arizona.edu':45,'ariyan':4}
 server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
 
+if sys.argv >= 3:
+	method = sys.argv[2]
+else:
+	method = 'NAN'
+
 start_time = datetime.datetime.now()
+
 # main('2020-02-18')
 main('2020-01-08')
+
 end_time = datetime.datetime.now()
+
 report_time(start_time,end_time)
