@@ -1400,6 +1400,8 @@ class Graph():
 			if p == -1:
 				queue_traverse = [v]
 				break
+		
+		step = 0
 
 		while len(queue_traverse) > 0:
 			u = queue_traverse.pop()
@@ -1417,7 +1419,9 @@ class Graph():
 					H = param.H
 
 					patch.gps = get_new_GPS_Coords(patch,parent_patch,H)
-					logger(patch,parent_patch,param,self.gid)
+					gps_diff = get_gps_diff_from_H(patch,parent_patch,param.H)
+					logger(patch,gps_diff,param,self.gid,step)
+					step+=1
 
 		string_corrected = get_corrected_string(patches)
 		return string_corrected
@@ -2760,13 +2764,13 @@ class Field:
 		print('Coordinates saved.')
 		sys.stdout.flush()
 
-def logger(corrected_patch,parent_patch,param,gid):
+def logger(corrected_patch,gps_diff,param,gid,step_id):
 	global correction_log_file
 
 	with open(correction_log_file,"a+") as f:
-		gps_diff = get_gps_diff_from_H(corrected_patch,parent_patch,param.H)
+		
 
-		string_log = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12}'.format(gid,corrected_patch.name,corrected_patch.gps.to_csv(),parent_patch.name,parent_patch.gps.to_csv(),\
+		string_log = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}'.format(gid,step_id,corrected_patch.name,corrected_patch.gps.to_csv(),\
 			param.H[0,2],param.H[1,2],param.num_matches,param.percentage_inliers,param.dissimilarity,gps_diff[0],gps_diff[1],\
 			(param.overlap_on_patch[2]-param.overlap_on_patch[0])*(param.overlap_on_patch[3]-param.overlap_on_patch[1]))
 
