@@ -1410,11 +1410,14 @@ class Graph():
 
 					patch = dict_patches[self.vertex_index_to_name_dict[v]]
 					parent_patch = dict_patches[self.vertex_index_to_name_dict[p]]
-					H = [n[1].H for n in parent_patch.neighbors if n[0] == patch]
-					H = H[0]
+					# H = [n[1].H for n in parent_patch.neighbors if n[0] == patch]
+					# H = H[0]
+					params = [n[1] for n in parent_patch.neighbors if n[0] == patch]
+					param = params[0]
+					H = param.H
 
 					patch.gps = get_new_GPS_Coords(patch,parent_patch,H)
-					logger(patch,parent_patch,n[1],self.gid)
+					logger(patch,parent_patch,param,self.gid)
 
 		string_corrected = get_corrected_string(patches)
 		return string_corrected
