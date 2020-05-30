@@ -26,8 +26,8 @@ from collections import OrderedDict,Counter
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-# NUMBER_OF_ROWS_IN_GROUPS = 10
-NUMBER_OF_ROWS_IN_GROUPS = 4
+NUMBER_OF_ROWS_IN_GROUPS = 10
+# NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -2481,7 +2481,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups[12:13]
+		return groups
 
 	def get_rows(self):
 		global coordinates_file
@@ -2545,7 +2545,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist[5:10])
+			rows.append(newlist)
 
 		print('Rows calculated and created completely.')
 
@@ -2845,13 +2845,13 @@ def main(scan_date):
 		
 		field = Field()
 		# field.save_plot()
-		# field.create_patches_SIFT_files()
+		field.create_patches_SIFT_files()
 
 		# field.groups[14].correct_internally()
 		# field.draw_and_save_field()
-		field.correct_field()
+		# field.correct_field()
 		# field.draw_and_save_field()
-		field.save_new_coordinate()
+		# field.save_new_coordinate()
 
 
 	elif server == 'laplace.cs.arizona.edu':
@@ -3103,7 +3103,7 @@ def main(scan_date):
 
 
 
-server_core = {'coge':20,'laplace.cs.arizona.edu':20,'ariyan':4}
+server_core = {'coge':63,'laplace.cs.arizona.edu':20,'ariyan':4}
 
 server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
