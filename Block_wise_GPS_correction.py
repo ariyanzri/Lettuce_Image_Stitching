@@ -2816,7 +2816,7 @@ def main(scan_date):
 		plot_npy_file = '/data/plant/full_scans/{0}-rgb/plt.npy'.format(scan_date)
 		field_image_path = 'field.bmp'
 		lettuce_heads_coordinates_file = 'season10_lettuce_latlon.csv'
-		correction_log_file = '/data/plant/full_scans/{0}-rgb/logs/log_{1}_at_{2}.csv'.format(scan_date,method,datetime.datetime.now().strftime("%d/%m/%y %H:%M"))
+		correction_log_file = '/data/plant/full_scans/{0}-rgb/logs/log_{1}_at_{2}.csv'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
 
 	elif server == 'ariyan':
 		patch_folder = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures'
