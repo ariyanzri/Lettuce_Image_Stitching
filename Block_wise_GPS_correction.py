@@ -1420,6 +1420,7 @@ class Graph():
 
 					patch.gps = get_new_GPS_Coords(patch,parent_patch,H)
 					gps_diff = get_gps_diff_from_H(patch,parent_patch,param.H)
+					print(gps_diff)
 					logger(patch,gps_diff,param,self.gid,step)
 					step+=1
 
@@ -2190,7 +2191,7 @@ class Group:
 		print('SIFT for all patches in group {0} deleted.'.format(self.group_id))
 		sys.stdout.flush()
 
-	def pre_calculate_internal_neighbors_and_transformation_parameters(self,print_flg=False):
+	def pre_calculate_internal_neighbors_and_transformation_parameters(self,print_flg=True):
 		remove_neighbors = []
 
 		for p in self.patches:
