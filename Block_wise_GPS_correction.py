@@ -1327,7 +1327,7 @@ class GPS_Coordinate:
 
 class Graph():
 
-	def __init__(self,no_vertex,vertex_names):
+	def __init__(self,no_vertex,vertex_names,gid=-1):
 		self.vertecis_number = no_vertex
 		self.vertex_index_to_name_dict = {}
 		self.vertex_name_to_index_dict = {}
@@ -1336,6 +1336,7 @@ class Graph():
 			self.vertex_name_to_index_dict[v] = i
 
 		self.edges = [[-1 for column in range(no_vertex)] for row in range(no_vertex)]
+		self.gid = gid
 
 	def initialize_edge_weights(self,patches):
 		
@@ -1413,7 +1414,7 @@ class Graph():
 					H = H[0]
 
 					patch.gps = get_new_GPS_Coords(patch,parent_patch,H)
-					logger(patch,parent_patch,n[1])
+					logger(patch,parent_patch,n[1],self.gid)
 
 		string_corrected = get_corrected_string(patches)
 		return string_corrected
@@ -1627,7 +1628,7 @@ class Patch:
 			
 		# 	return None
 		
-		print(percentage_inliers,num_matches,dissimilarity,(overlap1[2]-overlap1[0])*(overlap1[3]-overlap1[1]))
+		# print(percentage_inliers,num_matches,dissimilarity,(overlap1[2]-overlap1[0])*(overlap1[3]-overlap1[1]))
 
 		return Neighbor_Parameters(overlap2,overlap1,H,num_matches,percentage_inliers,dissimilarity)
 
@@ -2326,7 +2327,7 @@ class Group:
 
 		self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
-		G = Graph(len(self.patches),[p.name for p in self.patches])
+		G = Graph(len(self.patches),[p.name for p in self.patches],self.group_id)
 		G.initialize_edge_weights(self.patches)
 
 		try:
@@ -2762,8 +2763,9 @@ def logger(corrected_patch,parent_patch,param,gid):
 	with open(correction_log_file,"a+") as f:
 		gps_diff = get_gps_diff_from_H(corrected_patch,parent_patch,param.H)
 
-		string_log = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}'.format(gid,corrected_patch.name,corrected_patch.gps.to_csv(),parent_patch.name,parent_patch.gps.to_csv(),\
-			param.H[0,2],param.H[1,2],param.num_matches,param.percentage_inliers,param.dissimilarity,gps_diff[0],gps_diff[1])
+		string_log = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12}'.format(gid,corrected_patch.name,corrected_patch.gps.to_csv(),parent_patch.name,parent_patch.gps.to_csv(),\
+			param.H[0,2],param.H[1,2],param.num_matches,param.percentage_inliers,param.dissimilarity,gps_diff[0],gps_diff[1],\
+			(param.overlap_on_patch[2]-param.overlap_on_patch[0])*(param.overlap_on_patch[3]-param.overlap_on_patch[1]))
 
 		f.write(string_log)
 
