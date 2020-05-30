@@ -3093,7 +3093,7 @@ server_core = {'coge':20,'laplace.cs.arizona.edu':20,'ariyan':4}
 server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
 
-if sys.argv >= 3:
+if len(sys.argv) >= 3:
 	method = sys.argv[2]
 else:
 	method = 'NAN'
