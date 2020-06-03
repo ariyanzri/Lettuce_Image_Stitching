@@ -301,6 +301,10 @@ def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2):
 
 	H, masked = cv2.estimateAffinePartial2D(dst, src, maxIters = 1000, confidence = 0.99, refineIters = 5)
 
+	print('--------------------')
+	print(H)
+	print('--------------------')
+	
 	if H is None or H.shape != (2,3):
 		return None,0
 
@@ -1624,9 +1628,7 @@ class Patch:
 		# 	return None
 
 		# H,percentage_inliers = find_translation(matches,kp2,kp1)
-		print('--------------------')
-		print(H)
-		print('--------------------')
+
 		# print(percentage_inliers)
 
 		if H is None:
