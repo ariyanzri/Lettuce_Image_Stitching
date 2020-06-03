@@ -301,16 +301,12 @@ def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2):
 
 	H, masked = cv2.estimateAffinePartial2D(dst, src, maxIters = 1000, confidence = 0.99, refineIters = 5)
 
-	print('--------------------')
-	print(math.degrees(math.acos(H[0,0])),math.degrees(math.asin(H[1,0])))
-	print('--------------------')
-
 	if H is None or H.shape != (2,3):
 		return None,0
 
 	H = np.append(H,np.array([[0,0,1]]),axis=0)
 	H[0:2,0:2] = np.array([[1,0],[0,1]])
-	return H,np.sum(masked)/len(masked)
+	return H,np.sum(masked)/len(masked),(math.degrees(math.acos(H[0,0])),math.degrees(math.asin(H[1,0])))
 
 def get_dissimilarity_on_overlaps(p1,p2,H):
 
@@ -1022,7 +1018,7 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 
 		matches = get_good_matches(desc_merged,desc)
 
-		H, perc_in = find_homography(matches,kp_merged,kp,None,None)
+		H, perc_in,degrees = find_homography(matches,kp_merged,kp,None,None)
 
 		if H is None:
 			# if patch.previously_checked:
@@ -1437,7 +1433,7 @@ class Graph():
 		return string_corrected
 
 class Neighbor_Parameters:
-	def __init__(self,o_p,o_n,h,nm,pi,d):
+	def __init__(self,o_p,o_n,h,nm,pi,d,dg):
 
 		self.overlap_on_patch = o_p
 		self.overlap_on_neighbor = o_n
@@ -1445,6 +1441,7 @@ class Neighbor_Parameters:
 		self.num_matches = nm
 		self.percentage_inliers = pi
 		self.dissimilarity = d
+		self.degrees = dg
 
 
 class Patch:
@@ -1622,7 +1619,7 @@ class Patch:
 
 		num_matches = len(matches)
 
-		H,percentage_inliers = find_homography(matches,kp2,kp1,overlap1,overlap2)
+		H,percentage_inliers,degrees = find_homography(matches,kp2,kp1,overlap1,overlap2)
 
 		# if percentage_inliers<0.10 or num_matches<100:
 		# 	return None
@@ -1646,7 +1643,7 @@ class Patch:
 		
 		# print(percentage_inliers,num_matches,dissimilarity,(overlap1[2]-overlap1[0])*(overlap1[3]-overlap1[1]))
 
-		return Neighbor_Parameters(overlap2,overlap1,H,num_matches,percentage_inliers,dissimilarity)
+		return Neighbor_Parameters(overlap2,overlap1,H,num_matches,percentage_inliers,dissimilarity,degrees)
 
 	def get_fft_region(self,x1,y1,x2,y2):
 		
@@ -2311,7 +2308,7 @@ class Group:
 
 				# matches = get_top_percentage_matches(desc_merged,desc,kp_merged,kp)
 
-				# H, perc_in = find_homography(matches,kp_merged,kp,None,None)
+				# H, perc_in,degrees = find_homography(matches,kp_merged,kp,None,None)
 
 				# if H is not None:
 
@@ -2779,9 +2776,9 @@ def logger(corrected_patch,gps_diff,param,gid,step_id):
 	with open(correction_log_file,"a+") as f:
 		
 
-		string_log = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11}'.format(gid,step_id,corrected_patch.name,corrected_patch.gps.to_csv(),\
+		string_log = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12}'.format(gid,step_id,corrected_patch.name,corrected_patch.gps.to_csv(),\
 			param.H[0,2],param.H[1,2],param.num_matches,param.percentage_inliers,param.dissimilarity,gps_diff[0],gps_diff[1],\
-			(param.overlap_on_patch[2]-param.overlap_on_patch[0])*(param.overlap_on_patch[3]-param.overlap_on_patch[1]))
+			(param.overlap_on_patch[2]-param.overlap_on_patch[0])*(param.overlap_on_patch[3]-param.overlap_on_patch[1]),param.degrees)
 
 		f.write(string_log)
 
@@ -2816,7 +2813,7 @@ def main(scan_date):
 		plot_npy_file = '/storage/ariyanzarei/{0}-rgb/plt.npy'.format(scan_date)
 		row_save_path = '/storage/ariyanzarei/{0}-rgb/rows'.format(scan_date)
 		field_image_path = 'field.bmp'
-		correction_log_file = ''
+		correction_log_file = '/storage/ariyanzarei/{0}-rgb/logs/log_{1}_at_{2}.csv'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
 
 		# lettuce_heads_coordinates_file = '/storage/ariyanzarei/{0}-rgb/{0}_coordinates.csv'.format(scan_date)
 
@@ -3106,15 +3103,12 @@ def main(scan_date):
 
 
 
-server_core = {'coge':63,'laplace.cs.arizona.edu':20,'ariyan':4}
+server_core = {'coge':10,'laplace.cs.arizona.edu':20,'ariyan':4}
 
 server = socket.gethostname()
 no_of_cores_to_use = server_core[server]
 
-if len(sys.argv) >= 3:
-	method = sys.argv[2]
-else:
-	method = 'NAN'
+method = 'MST'
 
 start_time = datetime.datetime.now()
 
