@@ -300,13 +300,14 @@ def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2):
 		return None,0
 
 	H, masked = cv2.estimateAffinePartial2D(dst, src, maxIters = 1000, confidence = 0.99, refineIters = 5)
+	deg = (math.degrees(math.acos(H[0,0])),math.degrees(math.asin(H[1,0])))
 
 	if H is None or H.shape != (2,3):
 		return None,0
 
 	H = np.append(H,np.array([[0,0,1]]),axis=0)
 	H[0:2,0:2] = np.array([[1,0],[0,1]])
-	return H,np.sum(masked)/len(masked),(math.degrees(math.acos(H[0,0])),math.degrees(math.asin(H[1,0])))
+	return H,np.sum(masked)/len(masked),deg
 
 def get_dissimilarity_on_overlaps(p1,p2,H):
 
@@ -1421,7 +1422,7 @@ class Graph():
 					new_gps = get_new_GPS_Coords(patch,parent_patch,H)
 
 					gps_diff = (patch.gps.UL_coord[0]-new_gps.UL_coord[0],patch.gps.UL_coord[1]-new_gps.UL_coord[1])
-					print(gps_diff)
+					# print(gps_diff)
 					
 					patch.gps = new_gps
 
