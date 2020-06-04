@@ -26,8 +26,8 @@ from collections import OrderedDict,Counter
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-# NUMBER_OF_ROWS_IN_GROUPS = 10
-NUMBER_OF_ROWS_IN_GROUPS = 4
+NUMBER_OF_ROWS_IN_GROUPS = 10
+# NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -298,7 +298,7 @@ def find_scale_and_theta(H):
 	theta = math.degrees(math.acos(H[0,0]/s))
 
 	print(s,theta)
-	
+
 	return s,theta
 	
 
@@ -2494,7 +2494,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups[2:3]
+		return groups
 
 	def get_rows(self):
 		global coordinates_file
@@ -2558,7 +2558,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist[3:5])
+			rows.append(newlist)
 
 		print('Rows calculated and created completely.')
 
@@ -2789,9 +2789,9 @@ def logger(corrected_patch,gps_diff,param,gid,step_id):
 	with open(correction_log_file,"a+") as f:
 		
 
-		string_log = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12}'.format(gid,step_id,corrected_patch.name,corrected_patch.gps.to_csv(),\
+		string_log = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13}'.format(gid,step_id,corrected_patch.name,corrected_patch.gps.to_csv(),\
 			param.H[0,2],param.H[1,2],param.num_matches,param.percentage_inliers,param.dissimilarity,gps_diff[0],gps_diff[1],\
-			(param.overlap_on_patch[2]-param.overlap_on_patch[0])*(param.overlap_on_patch[3]-param.overlap_on_patch[1]),param.degrees)
+			(param.overlap_on_patch[2]-param.overlap_on_patch[0])*(param.overlap_on_patch[3]-param.overlap_on_patch[1]),param.degrees,param.scale)
 
 		f.write(string_log)
 
@@ -2864,7 +2864,7 @@ def main(scan_date):
 		# field.draw_and_save_field()
 		field.correct_field()
 		# field.draw_and_save_field()
-		# field.save_new_coordinate()
+		field.save_new_coordinate()
 
 
 	elif server == 'laplace.cs.arizona.edu':
