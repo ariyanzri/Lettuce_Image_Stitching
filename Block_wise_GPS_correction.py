@@ -707,11 +707,11 @@ def get_lids():
 	return lids
 
 def get_name_of_patches_with_lids(lids):
-	global lid_file
+	global CORRECTED_coordinates_file
 
 	patches_names_with_lid = []
 
-	with open(lid_file) as f:
+	with open(CORRECTED_coordinates_file) as f:
 		lines = f.read()
 		lines = lines.replace('"','')
 
