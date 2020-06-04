@@ -852,7 +852,14 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 
 	x,y,r = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
 	
-	if x >= 0 and x < shp[1] and y >= 0 and y < shp[0] and r >= 400 and r <= 500 or True:
+
+	# if r >= 400 and r <= 500:
+	# 	return x,y,r,l,pname,coord
+	# else:
+	# 	print(x,y,r)
+	# 	return -1,-1,-1,-1,-1,-1
+
+	if x >= 0 and x < shp[1] and y >= 0 and y < shp[0] and r >= 400 and r <= 500:
 		return x,y,r,l,pname,coord
 	else:
 		print(x,y,r)
@@ -877,8 +884,6 @@ def calculate_error_of_correction():
 	results = processes.map(get_lid_in_patch_helper,args_list)
 	processes.close()
 
-	print(len(results))
-
 	for x,y,r,l,pn,crd in results:
 		if r!=-1:
 			old_lid = lids[l]
@@ -889,8 +894,8 @@ def calculate_error_of_correction():
 			distances.append(math.sqrt((old_lid[0]-point[0])**2+(old_lid[1]-point[1])**2))
 			
 			
-			patch.load_img()
-			patch.visualize_with_single_GPS_point(point,(x+10,y+10),r)
+			# patch.load_img()
+			# patch.visualize_with_single_GPS_point(point,(x+10,y+10),r)
 
 	print(distances)
 	return statistics.mean(distances),statistics.stdev(distances)
