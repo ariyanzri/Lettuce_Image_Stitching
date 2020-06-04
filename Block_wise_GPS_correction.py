@@ -2044,23 +2044,26 @@ class Patch:
 
 		image, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 		
+		final_contours = []
+
 		for cnt in contours:
 			area = cv2.contourArea(cnt)
-			print(area)
+			if area>=LETTUCE_AREA_THRESHOLD:
+				final_contours.append(cnt)
 
 
 		# contours_new = []
 		# for cnt in contours:
 		# 	contours_new.append(cnt+(overlap[0],overlap[1]))
 
-		cv2.drawContours(self.rgb_img, contours, -1, (0,255,0),10)
+		cv2.drawContours(self.rgb_img, final_contours, -1, (0,255,0),10)
 
 		cv2.namedWindow('gr',cv2.WINDOW_NORMAL)
 		cv2.resizeWindow('gr', 500,500)
 		cv2.imshow('gr',self.rgb_img)
 		cv2.waitKey(0)
 
-		return contours
+		return final_contours
 
 	def get_lettuce_contours_centers(self,list_lettuce_heads=None):
 		
