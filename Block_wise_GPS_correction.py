@@ -2055,6 +2055,11 @@ class Patch:
 
 		cv2.drawContours(self.rgb_img, contours, -1, (0,255,0),10)
 
+		cv2.namedWindow('gr',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('gr', 500,500)
+		cv2.imshow('gr',self.rgb_img)
+		cv2.waitKey(0)
+
 		return contours
 
 	def get_lettuce_contours_centers(self,list_lettuce_heads=None):
