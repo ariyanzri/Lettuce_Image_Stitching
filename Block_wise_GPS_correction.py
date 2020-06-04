@@ -858,8 +858,7 @@ def get_lid_in_patch(img_name,ransac_iter=100,ransac_min_num_fit=10):
 		return -1,-1,-1
 
 def calculate_error_of_correction():
-	RMSE = 0
-	count = 0
+	distances = []
 
 	lids = get_lids()
 	lid_patch_names = get_name_of_patches_with_lids(lids)
@@ -869,14 +868,13 @@ def calculate_error_of_correction():
 
 		if x!=-1 and y!=-1 and r!=-1:
 			old_lid = lids[l]
-			RMSE+=(old_lid[0]-x)**2+(old_lid[1]-y)**2
-			count+=1
-
+			distances.append((old_lid[0]-x)**2+(old_lid[1]-y)**2)
+			
 			# patch = Patch(p,coord)
 			# patch.load_img()
 			# patch.visualize_with_single_GPS_point(old_lid,(x,y),r)
 
-	return math.sqrt(RMSE/count)
+	return statistics.mean(distances),statistics.stdev(distances)
 
 # --------------- new method in which we consider all patches -------------------
 
