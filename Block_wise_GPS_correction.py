@@ -806,7 +806,7 @@ def get_unique_lists(xs,ys):
 
 	return xs[ind],ys[ind]
 
-def get_lid_in_patch(img_name,l,ransac_iter=100,ransac_min_num_fit=10):
+def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=10):
 	global patch_folder
 	img = cv2.imread('{0}/{1}'.format(patch_folder,img_name))
 	
@@ -840,7 +840,7 @@ def get_lid_in_patch(img_name,l,ransac_iter=100,ransac_min_num_fit=10):
 	new_contours = np.array(new_contours)
 
 	if np.shape(new_contours)[0]<ransac_min_num_fit:
-		return -1,-1,-1,-1
+		return -1,-1,-1,-1,-1,-1
 
 	xs = np.array(new_contours[:,0])
 	ys = np.array(new_contours[:,1])
@@ -848,15 +848,15 @@ def get_lid_in_patch(img_name,l,ransac_iter=100,ransac_min_num_fit=10):
 	xs,ys = get_unique_lists(xs,ys)
 
 	if np.shape(xs)[0]<ransac_min_num_fit:
-		return -1,-1,-1,-1
+		return -1,-1,-1,-1,-1,-1
 
 	x,y,r = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
 	
 	if x >= 0 and x < shp[1] and y >= 0 and y < shp[0] and r >= 400 and r <= 500:
-		return x,y,r,l
+		return x,y,r,l,pname,coord
 	else:
 		print(x,y,r)
-		return -1,-1,-1,-1
+		return -1,-1,-1,-1,-1,-1
 
 def get_lid_in_patch_helper(args):
 	return get_lid_in_patch(*args)
@@ -870,7 +870,7 @@ def calculate_error_of_correction():
 	args_list = []
 
 	for l_marker,p_name,coord in lid_patch_names:
-		args_list.append((p_name,l_marker))
+		args_list.append((p_name,l_marker,p_name,coord))
 
 	processes = MyPool(no_of_cores_to_use)
 
@@ -879,14 +879,16 @@ def calculate_error_of_correction():
 
 	print(len(results))
 
-	for x,y,r,l in results:
+	for x,y,r,l,pn,crd in results:
 		if r!=-1:
 			old_lid = lids[l]
 
-			point = convert_image_to_GPS_coordinate((x,y))
+			patch = Patch(pn,crd)
+
+			point = patch.convert_image_to_GPS_coordinate((x,y))
 			distances.append(math.sqrt((old_lid[0]-x)**2+(old_lid[1]-y)**2))
 			
-			patch = Patch(p,coord)
+			
 			patch.load_img()
 			patch.visualize_with_single_GPS_point(point,(x+10,y+10),r)
 
