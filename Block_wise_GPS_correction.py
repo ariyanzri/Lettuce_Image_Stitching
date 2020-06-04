@@ -3271,13 +3271,13 @@ def main(scan_date):
 
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
 
-		field.draw_and_save_field()
-		# field.groups[0].correct_internally()
-		# field.correct_field()
-		# field.groups[0].correct_internally()
 		# field.draw_and_save_field()
+		# field.groups[0].correct_internally()
+		field.correct_field()
+		# field.groups[0].correct_internally()
+		field.draw_and_save_field()
 		# field.save_new_coordinate()
-		# print(calculate_error_of_correction())
+		print(calculate_error_of_correction())
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
