@@ -1567,7 +1567,7 @@ def hybrid_method_UAV_lettuce_matching_step(patches,gid):
 
 		err = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
 
-		if err == sys.maxsize:
+		if err >=500:
 			not_corrected.append(p)
 		else:
 			print('Group ID {0}: patch {1} corrected with {2} error.'.format(gid,p.name,err))
@@ -1808,7 +1808,7 @@ class Patch:
 	def load_SIFT_points(self):
 		global SIFT_folder
 
-		if len(SIFT_kp_locations) == 0:
+		if len(self.SIFT_kp_locations) == 0:
 			(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_folder,self.name.replace('.tif','')), "rb"))
 			self.SIFT_kp_locations = kp_tmp.copy()
 			self.SIFT_kp_desc = desc_tmp.copy()
