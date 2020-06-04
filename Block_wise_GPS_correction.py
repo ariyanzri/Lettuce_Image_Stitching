@@ -289,6 +289,17 @@ def find_translation(matches,kp1,kp2):
 
 	return np.array([[1,0,t_x],[0,1,t_y],[0,0,1]]),0
 
+def find_scale_and_theta(H):
+
+	a = H[0,0]
+	b = H[1,0]
+
+	s = math.sqrt(a**2+b**2)
+	theta = math.degrees(math.acos(H[0,0]/s))
+
+	print(s,theta)
+	
+	return s,theta
 	
 
 def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2):	
@@ -300,14 +311,14 @@ def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2):
 		return None,0
 
 	H, masked = cv2.estimateAffinePartial2D(dst, src, maxIters = 1000, confidence = 0.99, refineIters = 5)
-	deg = (math.degrees(math.acos(H[0,0])),math.degrees(math.asin(H[1,0])))
+	scale,theta = find_scale_and_theta(H)
 
 	if H is None or H.shape != (2,3):
 		return None,0
 
 	H = np.append(H,np.array([[0,0,1]]),axis=0)
 	H[0:2,0:2] = np.array([[1,0],[0,1]])
-	return H,np.sum(masked)/len(masked),deg
+	return H,np.sum(masked)/len(masked),scale,theta
 
 def get_dissimilarity_on_overlaps(p1,p2,H):
 
@@ -1019,7 +1030,7 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 
 		matches = get_good_matches(desc_merged,desc)
 
-		H, perc_in,degrees = find_homography(matches,kp_merged,kp,None,None)
+		H, perc_in,scale,theta = find_homography(matches,kp_merged,kp,None,None)
 
 		if H is None:
 			# if patch.previously_checked:
@@ -1434,7 +1445,7 @@ class Graph():
 		return string_corrected
 
 class Neighbor_Parameters:
-	def __init__(self,o_p,o_n,h,nm,pi,d,dg):
+	def __init__(self,o_p,o_n,h,nm,pi,d,scale,theta):
 
 		self.overlap_on_patch = o_p
 		self.overlap_on_neighbor = o_n
@@ -1442,7 +1453,8 @@ class Neighbor_Parameters:
 		self.num_matches = nm
 		self.percentage_inliers = pi
 		self.dissimilarity = d
-		self.degrees = dg
+		self.degrees = theta
+		self.scale = scale
 
 
 class Patch:
@@ -1620,7 +1632,7 @@ class Patch:
 
 		num_matches = len(matches)
 
-		H,percentage_inliers,degrees = find_homography(matches,kp2,kp1,overlap1,overlap2)
+		H,percentage_inliers,scale,theta = find_homography(matches,kp2,kp1,overlap1,overlap2)
 
 		# if percentage_inliers<0.10 or num_matches<100:
 		# 	return None
@@ -1644,7 +1656,7 @@ class Patch:
 		
 		# print(percentage_inliers,num_matches,dissimilarity,(overlap1[2]-overlap1[0])*(overlap1[3]-overlap1[1]))
 
-		return Neighbor_Parameters(overlap2,overlap1,H,num_matches,percentage_inliers,dissimilarity,degrees)
+		return Neighbor_Parameters(overlap2,overlap1,H,num_matches,percentage_inliers,dissimilarity,scale,theta)
 
 	def get_fft_region(self,x1,y1,x2,y2):
 		
@@ -2309,7 +2321,7 @@ class Group:
 
 				# matches = get_top_percentage_matches(desc_merged,desc,kp_merged,kp)
 
-				# H, perc_in,degrees = find_homography(matches,kp_merged,kp,None,None)
+				# H, perc_in,scale,theta = find_homography(matches,kp_merged,kp,None,None)
 
 				# if H is not None:
 
