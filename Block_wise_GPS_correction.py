@@ -297,8 +297,6 @@ def find_scale_and_theta(H):
 	s = math.sqrt(a**2+b**2)
 	theta = math.degrees(math.acos(H[0,0]/s))
 
-	print(s,theta)
-
 	return s,theta
 	
 
