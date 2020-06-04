@@ -874,6 +874,7 @@ def calculate_error_of_correction():
 			# patch.load_img()
 			# patch.visualize_with_single_GPS_point(old_lid,(x,y),r)
 
+	print(distances)
 	return statistics.mean(distances),statistics.stdev(distances)
 
 # --------------- new method in which we consider all patches -------------------
