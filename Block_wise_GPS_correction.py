@@ -852,7 +852,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 
 	x,y,r = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
 	
-	if x >= 0 and x < shp[1] and y >= 0 and y < shp[0] and r >= 400 and r <= 500:
+	if x >= 0 and x < shp[1] and y >= 0 and y < shp[0] and r >= 400 and r <= 500 or True:
 		return x,y,r,l,pname,coord
 	else:
 		print(x,y,r)
