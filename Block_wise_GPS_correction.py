@@ -3170,11 +3170,11 @@ def logger(corrected_patch,gps_diff,param,gid,step_id):
 		
 
 		if param.H is not None:
-			string_log = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13}'.format(gid,step_id,corrected_patch.name,corrected_patch.gps.to_csv(),\
+			string_log = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13}\n'.format(gid,step_id,corrected_patch.name,corrected_patch.gps.to_csv(),\
 			param.H[0,2],param.H[1,2],param.num_matches,param.percentage_inliers,param.dissimilarity,gps_diff[0],gps_diff[1],\
 			(param.overlap_on_patch[2]-param.overlap_on_patch[0])*(param.overlap_on_patch[3]-param.overlap_on_patch[1]),param.degrees,param.scale)
 		else:
-			string_log = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13}'.format(gid,step_id,corrected_patch.name,corrected_patch.gps.to_csv(),\
+			string_log = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13}\n'.format(gid,step_id,corrected_patch.name,corrected_patch.gps.to_csv(),\
 			None,None,param.num_matches,param.percentage_inliers,param.dissimilarity,gps_diff[0],gps_diff[1],\
 			None,param.degrees,param.scale)
 
