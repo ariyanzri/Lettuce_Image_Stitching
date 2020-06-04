@@ -886,7 +886,7 @@ def calculate_error_of_correction():
 			patch = Patch(pn,crd)
 
 			point = patch.convert_image_to_GPS_coordinate((x,y))
-			distances.append(math.sqrt((old_lid[0]-x)**2+(old_lid[1]-y)**2))
+			distances.append(math.sqrt((old_lid[0]-point[0])**2+(old_lid[1]-point[1])**2))
 			
 			
 			patch.load_img()
