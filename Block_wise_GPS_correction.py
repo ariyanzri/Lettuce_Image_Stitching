@@ -1996,9 +1996,9 @@ class Patch:
 		dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
 		# dissimilarity = - percentage_inliers*num_matches
 
-		# if dissimilarity == -1:
+		if dissimilarity == -1:
 			
-		# 	return None
+			return None
 		
 		# print(percentage_inliers,num_matches,dissimilarity,(overlap1[2]-overlap1[0])*(overlap1[3]-overlap1[1]))
 
