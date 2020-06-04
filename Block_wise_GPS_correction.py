@@ -1821,8 +1821,8 @@ class Patch:
 		cv2.circle(output,point_img,r,(255,0,0),thickness=15)
 
 
-		ratio_x = (point[0] - self.GPS_coords.UL_coord[0])/(self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])
-		ratio_y = (self.GPS_coords.UL_coord[1] - point[1])/(self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])
+		ratio_x = (point[0] - self.gps.UL_coord[0])/(self.gps.UR_coord[0]-self.gps.UL_coord[0])
+		ratio_y = (self.gps.UL_coord[1] - point[1])/(self.gps.UL_coord[1]-self.gps.LL_coord[1])
 
 		shp = np.shape(output)
 		cv2.circle(output,(int(ratio_x*shp[1]),int(ratio_y*shp[0])),20,(0,0,255),thickness=-1)
