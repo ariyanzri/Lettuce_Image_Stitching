@@ -26,8 +26,8 @@ from collections import OrderedDict,Counter
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-# NUMBER_OF_ROWS_IN_GROUPS = 10
-NUMBER_OF_ROWS_IN_GROUPS = 4
+NUMBER_OF_ROWS_IN_GROUPS = 10
+# NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -707,12 +707,17 @@ def get_lids():
 
 	return lids
 
-def get_name_of_patches_with_lids(lids):
-	global CORRECTED_coordinates_file
+def get_name_of_patches_with_lids(lids,use_not_corrected=False):
+	global CORRECTED_coordinates_file,coordinates_file
 
 	patches_names_with_lid = []
 
-	with open(CORRECTED_coordinates_file) as f:
+	if use_not_corrected:
+		address_of_coodinates = coordinates_file
+	else:
+		address_of_coodinates = CORRECTED_coordinates_file
+
+	with open(address_of_coodinates) as f:
 		lines = f.read()
 		lines = lines.replace('"','')
 
@@ -867,11 +872,11 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 def get_lid_in_patch_helper(args):
 	return get_lid_in_patch(*args)
 
-def calculate_error_of_correction():
+def calculate_error_of_correction(use_not_corrected=False):
 	distances = []
 
 	lids = get_lids()
-	lid_patch_names = get_name_of_patches_with_lids(lids)
+	lid_patch_names = get_name_of_patches_with_lids(lids,use_not_corrected)
 
 	args_list = []
 
@@ -2869,7 +2874,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups[4:6]
+		return groups
 
 	def get_rows(self):
 		global coordinates_file
@@ -2933,7 +2938,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist[5:20])
+			rows.append(newlist)
 
 		print('Rows calculated and created completely.')
 
@@ -3275,13 +3280,13 @@ def main(scan_date):
 		# draw_together(new_patches)
 
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
-
+		print(calculate_error_of_correction(True))
 		# field.draw_and_save_field()
 		# field.groups[0].correct_internally()
 		field.correct_field()
 		# field.groups[0].correct_internally()
-		field.draw_and_save_field()
-		# field.save_new_coordinate()
+		# field.draw_and_save_field()
+		field.save_new_coordinate()
 		print(calculate_error_of_correction())
 
 	elif server == 'ariyan':
