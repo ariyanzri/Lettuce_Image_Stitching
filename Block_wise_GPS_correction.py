@@ -2651,7 +2651,7 @@ class Group:
 
 		# corrected_patches = super_patch_pool_merging_method(self.patches,self.group_id)
 
-		# string_res = get_corrected_string(corrected_patches)
+		string_res = get_corrected_string(self.patches)
 		# self.delete_all_patches_SIFT_points()
 
 
@@ -3152,7 +3152,7 @@ def main(scan_date):
 		field = Field()
 		# field.create_patches_SIFT_files()
 
-		lettuce_coords = read_lettuce_heads_coordinates()
+		# lettuce_coords = read_lettuce_heads_coordinates()
 		# p1 = field.groups[0].patches[3]
 		# p1.get_lettuce_contours_centers(lettuce_coords)
 		# p1.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
@@ -3161,7 +3161,7 @@ def main(scan_date):
 
 		# draw_together(field.groups[0].patches)
 		# field.draw_and_save_field()
-		field.correct_field()
+		# field.correct_field()
 		# field.groups[0].load_all_patches_SIFT_points()
 		# new_patches = super_patch_pool_merging_method(field.groups[0].patches)
 		# field.draw_and_save_field()
@@ -3172,10 +3172,11 @@ def main(scan_date):
 
 		# field.draw_and_save_field()
 		# field.groups[0].correct_internally()
-		# field.correct_field()
+		field.correct_field()
 		# field.groups[0].correct_internally()
 		# field.draw_and_save_field()
 		field.save_new_coordinate()
+		
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
