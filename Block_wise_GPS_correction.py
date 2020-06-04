@@ -865,7 +865,8 @@ def calculate_error_of_correction():
 
 	lids = get_lids()
 	lid_patch_names = get_name_of_patches_with_lids(lids)
-
+	print(len(lid_patch_names))
+	
 	args_list = []
 
 	for l_marker,p_name,coord in lid_patch_names:
