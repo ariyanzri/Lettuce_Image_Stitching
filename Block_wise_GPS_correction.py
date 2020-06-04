@@ -3143,7 +3143,7 @@ def main(scan_date):
 		field = Field()
 		# field.create_patches_SIFT_files()
 
-		# lettuce_coords = read_lettuce_heads_coordinates()
+		lettuce_coords = read_lettuce_heads_coordinates()
 		# p1 = field.groups[0].patches[3]
 		# p1.get_lettuce_contours_centers(lettuce_coords)
 		# p1.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
