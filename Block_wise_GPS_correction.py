@@ -2057,12 +2057,12 @@ class Patch:
 		# for cnt in contours:
 		# 	contours_new.append(cnt+(overlap[0],overlap[1]))
 
-		cv2.drawContours(self.rgb_img, final_contours, -1, (0,255,0),10)
+		# cv2.drawContours(self.rgb_img, final_contours, -1, (0,255,0),10)
 
-		cv2.namedWindow('gr',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('gr', 500,500)
-		cv2.imshow('gr',self.rgb_img)
-		cv2.waitKey(0)
+		# cv2.namedWindow('gr',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('gr', 500,500)
+		# cv2.imshow('gr',self.rgb_img)
+		# cv2.waitKey(0)
 
 		return final_contours
 
