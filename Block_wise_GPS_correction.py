@@ -56,6 +56,13 @@ def remove_shadow(image):
 	
 	return rgb_img
 
+def adjust_gamma(image, gamma=1.0):
+
+	invGamma = 1.0 / gamma
+	table = np.array([((i / 255.0) ** invGamma) * 255 for i in np.arange(0, 256)]).astype("uint8")
+	
+	return cv2.LUT(image, table)
+
 def convert_to_gray(img):
 	
 	# coefficients = [-1,1,2] 
@@ -674,6 +681,202 @@ def get_result_dict_from_strings(s):
 		
 
 	return res_dict
+
+# lid methods
+
+def get_lids():
+	global lid_file
+
+	lids = {}
+
+	with open(lid_file) as f:
+		lines = f.read()
+
+		for l in lines.split('\n'):
+			if l == '':
+				break
+
+			features = l.split(',')
+
+			marker = features[0]
+			lat = features[1]
+			lon = features[2]
+
+			lids[marker] = (float(lon),float(lat))
+
+	return lids
+
+def get_name_of_patches_with_lids(lids):
+	global lid_file
+
+	patches_names_with_lid = []
+
+	with open(lid_file) as f:
+		lines = f.read()
+		lines = lines.replace('"','')
+
+		for l in lines.split('\n'):
+			if l == '':
+				break
+			if l == 'Filename,Upper left,Lower left,Upper right,Lower right,Center' or l == 'name,upperleft,lowerleft,uperright,lowerright,center':
+				continue
+
+			features = l.split(',')
+
+			filename = features[0]
+			upper_left = (float(features[1]),float(features[2]))
+			lower_left = (float(features[3]),float(features[4]))
+			upper_right = (float(features[5]),float(features[6]))
+			lower_right = (float(features[7]),float(features[8]))
+			center = (float(features[9]),float(features[10]))
+
+			coord = Patch_GPS_coordinate(upper_left,upper_right,lower_left,lower_right,center)
+			
+			for l in lids:
+				if coord.is_coord_inside(lids[l]):
+					patches_names_with_lid.append((l,filename,coord))
+
+	return patches_names_with_lid
+
+def fit_circle(xs,ys):
+
+	us = xs - np.mean(xs)
+	vs = ys - np.mean(ys)
+
+	A1 = np.sum(us**2)
+	B1 = np.sum(us*vs)
+	C1 = 0.5*(np.sum(us**3)+np.sum(us*(vs**2)))
+	A2 = B1
+	B2 = np.sum(vs**2)
+	C2 = 0.5*(np.sum(vs**3)+np.sum(vs*(us**2)))
+
+	v = (A1*C2 - A2*C1)/(A1*B2 - A2*B1)
+	u = (C1-B1*v)/A1
+
+	r = int(math.sqrt(u**2+v**2+(A1+B2)/np.shape(xs)[0]))
+
+	x = int(u+np.mean(xs))
+	y = int(v+np.mean(ys))
+
+	return x,y,r
+
+def circle_error(x,y,r,xs,ys):
+	err = 0
+
+	for i in range(0,np.shape(xs)[0]):
+		d = math.sqrt((x-xs[i])**2+(y-ys[i])**2)
+		if d>2*r:
+			err+=0
+		elif d<r/2:
+			err+=0
+		else:
+			err += abs(d - r)
+
+	return err
+
+def ransac(xs,ys,iterations,number_of_points):
+	best_x = -1
+	best_y = -1
+	best_r = -1
+	min_error = None
+
+	for i in range(0,iterations):
+		
+		indexes = random.sample(range(0,np.shape(xs)[0]),number_of_points)
+	
+		xs_r = xs[indexes]
+		ys_r = ys[indexes]
+
+		x,y,r = fit_circle(xs_r,ys_r)
+		err = circle_error(x,y,r,xs,ys)
+
+		if min_error == None or min_error>err:
+			min_error = err
+			best_x = x
+			best_y = y
+			best_r = r
+
+	return best_x,best_y,best_r
+
+def get_unique_lists(xs,ys):
+	tmp, ind1 = np.unique(xs,return_index=True)
+	tmp, ind2 = np.unique(ys,return_index=True)
+
+	ind = np.intersect1d(ind1,ind2)
+
+	return xs[ind],ys[ind]
+
+def get_lid_in_patch(img_name,ransac_iter=100,ransac_min_num_fit=10):
+	global patch_folder
+	img = cv2.imread('{0}/{1}'.format(patch_folder,img_name))
+	
+	img[:,:,1:3] = 0
+
+	img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+	
+	img = adjust_gamma(img,2.5)
+	
+	max_intensity = np.amax(img)
+	
+	t = max_intensity-2
+	
+	(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
+	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (200, 200))
+	img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
+
+	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (50, 50))
+	img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+
+	shp = np.shape(img)
+
+	img, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+	
+	new_contours = []
+
+	for c in contours:
+		for p in c:
+			new_contours.append([p[0][0],p[0][1]])
+	
+	new_contours = np.array(new_contours)
+
+	if np.shape(new_contours)[0]<ransac_min_num_fit:
+		return -1,-1,-1
+
+	xs = np.array(new_contours[:,0])
+	ys = np.array(new_contours[:,1])
+
+	xs,ys = get_unique_lists(xs,ys)
+
+	if np.shape(xs)[0]<ransac_min_num_fit:
+		return -1,-1,-1
+
+	x,y,r = ransac(xs,ys,100,10)
+	
+	if x >= 0 and x < shp[1] and y >= 0 and y < shp[0] and r >= 400 and r <= 500:
+		return x,y,r
+	else:
+		return -1,-1,-1
+
+def calculate_error_of_correction():
+	RMSE = 0
+	count = 0
+
+	lids = get_lids()
+	lid_patch_names = get_name_of_patches_with_lids(lids)
+
+	for l,p,coord in lid_patch_names:
+		x,y,r = get_lid_in_patch(p)
+
+		if x!=-1 and y!=-1 and r!=-1:
+			old_lid = lids[l]
+			RMSE+=(old_lid[0]-x)**2+(old_lid[1]-y)**2
+			count+=1
+
+			patch = Patch(p,coord)
+			patch.load_img()
+			patch.visualize_with_single_GPS_point(old_lid,(x,y),r)
+
+	return math.sqrt(RMSE/count)
 
 # --------------- new method in which we consider all patches -------------------
 
@@ -1608,6 +1811,26 @@ class Patch:
 
 		return (p1_x1,p1_y1,p1_x2,p1_y2),(p2_x1,p2_y1,p2_x2,p2_y2)
 
+
+	def visualize_with_single_GPS_point(self,point,point_img,r):
+		if self.rgb_img is None:
+			return
+
+		output = self.rgb_img.copy()
+		cv2.circle(output,point_img,20,(0,255,0),thickness=-1)
+		cv2.circle(output,point_img,r,(255,0,0),thickness=15)
+
+
+		ratio_x = (point[0] - self.GPS_coords.UL_coord[0])/(self.GPS_coords.UR_coord[0]-self.GPS_coords.UL_coord[0])
+		ratio_y = (self.GPS_coords.UL_coord[1] - point[1])/(self.GPS_coords.UL_coord[1]-self.GPS_coords.LL_coord[1])
+
+		shp = np.shape(output)
+		cv2.circle(output,(int(ratio_x*shp[1]),int(ratio_y*shp[0])),20,(0,0,255),thickness=-1)
+
+		cv2.namedWindow('GPS',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('GPS', 500,500)
+		cv2.imshow('GPS',output)
+		cv2.waitKey(0)
 
 	def get_pairwise_transformation_info(self,neighbor):
 		overlap1,overlap2 = neighbor.get_overlap_rectangles(self)
@@ -2868,9 +3091,12 @@ def main(scan_date):
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
 		os.system("taskset -p -c 0-35 %d" % os.getpid())
+		
+		print(calculate_error_of_correction())
+
 		# test_function()
 
-		field = Field()
+		# field = Field()
 		# field.create_patches_SIFT_files()
 
 		# lettuce_coords = read_lettuce_heads_coordinates()
@@ -2893,9 +3119,9 @@ def main(scan_date):
 
 		# field.draw_and_save_field()
 		# field.groups[0].correct_internally()
-		field.correct_field()
+		# field.correct_field()
 		# field.groups[0].correct_internally()
-		field.draw_and_save_field()
+		# field.draw_and_save_field()
 		# field.save_new_coordinate()
 
 	elif server == 'ariyan':
