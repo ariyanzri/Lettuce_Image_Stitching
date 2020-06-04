@@ -3280,7 +3280,7 @@ def main(scan_date):
 		# draw_together(new_patches)
 
 		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
-		print(calculate_error_of_correction(True))
+		# print(calculate_error_of_correction(True))
 		# field.draw_and_save_field()
 		# field.groups[0].correct_internally()
 		field.correct_field()
