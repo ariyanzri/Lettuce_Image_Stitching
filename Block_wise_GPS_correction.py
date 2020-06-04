@@ -850,7 +850,7 @@ def get_lid_in_patch(img_name,l,ransac_iter=100,ransac_min_num_fit=10):
 	if np.shape(xs)[0]<ransac_min_num_fit:
 		return -1,-1,-1,-1
 
-	x,y,r = ransac(xs,ys,100,10)
+	x,y,r = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
 	
 	if x >= 0 and x < shp[1] and y >= 0 and y < shp[0] and r >= 400 and r <= 500:
 		return x,y,r,l
@@ -876,6 +876,8 @@ def calculate_error_of_correction():
 	results = processes.map(get_lid_in_patch_helper,args_list)
 	processes.close()
 
+	print(len(results))
+	
 	for x,y,r,l in results:
 		if r!=-1:
 			old_lid = lids[l]
