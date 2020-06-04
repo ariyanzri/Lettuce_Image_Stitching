@@ -895,7 +895,6 @@ def calculate_error_of_correction():
 			# patch.load_img()
 			# patch.visualize_with_single_GPS_point(point,(x+10,y+10),r)
 
-	print(distances)
 	return statistics.mean(distances),statistics.stdev(distances)
 
 # --------------- new method in which we consider all patches -------------------
@@ -3137,11 +3136,11 @@ def main(scan_date):
 		print('RUNNING ON -- {0} --'.format(server))
 		os.system("taskset -p -c 0-35 %d" % os.getpid())
 		
-		print(calculate_error_of_correction())
+		# print(calculate_error_of_correction())
 
 		# test_function()
 
-		# field = Field()
+		field = Field()
 		# field.create_patches_SIFT_files()
 
 		# lettuce_coords = read_lettuce_heads_coordinates()
@@ -3153,7 +3152,7 @@ def main(scan_date):
 
 		# draw_together(field.groups[0].patches)
 		# field.draw_and_save_field()
-		# field.correct_field()
+		field.correct_field()
 		# field.groups[0].load_all_patches_SIFT_points()
 		# new_patches = super_patch_pool_merging_method(field.groups[0].patches)
 		# field.draw_and_save_field()
