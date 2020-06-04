@@ -806,7 +806,7 @@ def get_unique_lists(xs,ys):
 
 	return xs[ind],ys[ind]
 
-def get_lid_in_patch(img_name,ransac_iter=100,ransac_min_num_fit=10):
+def get_lid_in_patch(img_name,l,ransac_iter=100,ransac_min_num_fit=10):
 	global patch_folder
 	img = cv2.imread('{0}/{1}'.format(patch_folder,img_name))
 	
@@ -840,7 +840,7 @@ def get_lid_in_patch(img_name,ransac_iter=100,ransac_min_num_fit=10):
 	new_contours = np.array(new_contours)
 
 	if np.shape(new_contours)[0]<ransac_min_num_fit:
-		return -1,-1,-1
+		return -1,-1,-1,-1
 
 	xs = np.array(new_contours[:,0])
 	ys = np.array(new_contours[:,1])
@@ -848,14 +848,17 @@ def get_lid_in_patch(img_name,ransac_iter=100,ransac_min_num_fit=10):
 	xs,ys = get_unique_lists(xs,ys)
 
 	if np.shape(xs)[0]<ransac_min_num_fit:
-		return -1,-1,-1
+		return -1,-1,-1,-1
 
 	x,y,r = ransac(xs,ys,100,10)
 	
 	if x >= 0 and x < shp[1] and y >= 0 and y < shp[0] and r >= 400 and r <= 500:
-		return x,y,r
+		return x,y,r,l
 	else:
-		return -1,-1,-1
+		return -1,-1,-1,-1
+
+def get_lid_in_patch_helper(args):
+	return get_lid_in_patch(*args)
 
 def calculate_error_of_correction():
 	distances = []
@@ -866,14 +869,14 @@ def calculate_error_of_correction():
 	args_list = []
 
 	for l_marker,p_name,coord in lid_patch_names:
-		args_list.append(p_name)
+		args_list.append((p_name,l_marker))
 
 	processes = MyPool(no_of_cores_to_use)
 
-	results = processes.map(get_lid_in_patch,args_list)
+	results = processes.map(get_lid_in_patch_helper,args_list)
 	processes.close()
 
-	for x,y,r in results:
+	for x,y,r,l in results:
 		if x!=-1 and y!=-1 and r!=-1:
 			old_lid = lids[l]
 			distances.append(math.sqrt((old_lid[0]-x)**2+(old_lid[1]-y)**2))
