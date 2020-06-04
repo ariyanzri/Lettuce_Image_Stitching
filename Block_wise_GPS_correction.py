@@ -865,8 +865,7 @@ def calculate_error_of_correction():
 
 	lids = get_lids()
 	lid_patch_names = get_name_of_patches_with_lids(lids)
-	print(len(lid_patch_names))
-	
+
 	args_list = []
 
 	for l_marker,p_name,coord in lid_patch_names:
@@ -878,7 +877,7 @@ def calculate_error_of_correction():
 	processes.close()
 
 	for x,y,r,l in results:
-		if x!=-1 and y!=-1 and r!=-1:
+		if r!=-1:
 			old_lid = lids[l]
 			distances.append(math.sqrt((old_lid[0]-x)**2+(old_lid[1]-y)**2))
 			
