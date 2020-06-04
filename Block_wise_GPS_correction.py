@@ -882,11 +882,13 @@ def calculate_error_of_correction():
 	for x,y,r,l in results:
 		if r!=-1:
 			old_lid = lids[l]
+
+			point = convert_image_to_GPS_coordinate((x,y))
 			distances.append(math.sqrt((old_lid[0]-x)**2+(old_lid[1]-y)**2))
 			
-			# patch = Patch(p,coord)
-			# patch.load_img()
-			# patch.visualize_with_single_GPS_point(old_lid,(x,y),r)
+			patch = Patch(p,coord)
+			patch.load_img()
+			patch.visualize_with_single_GPS_point(point,(x+10,y+10),r)
 
 	print(distances)
 	return statistics.mean(distances),statistics.stdev(distances)
@@ -1735,6 +1737,12 @@ class Patch:
 		self.gray_img = None
 
 		gc.collect()
+
+	def convert_image_to_GPS_coordinate(self,point):
+		x_ratio = point[1]/PATCH_SIZE[1]
+		y_ratio = point[0]/PATCH_SIZE[0]
+
+		return (self.gps.UL_coord[0]+x_ratio,self.gps.UL_coord[1]-y_ratio)
 
 	def get_hog_region(self,x1,y1,x2,y2):
 		
