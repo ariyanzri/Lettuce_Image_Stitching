@@ -872,9 +872,9 @@ def calculate_error_of_correction():
 			RMSE+=(old_lid[0]-x)**2+(old_lid[1]-y)**2
 			count+=1
 
-			patch = Patch(p,coord)
-			patch.load_img()
-			patch.visualize_with_single_GPS_point(old_lid,(x,y),r)
+			# patch = Patch(p,coord)
+			# patch.load_img()
+			# patch.visualize_with_single_GPS_point(old_lid,(x,y),r)
 
 	return math.sqrt(RMSE/count)
 
