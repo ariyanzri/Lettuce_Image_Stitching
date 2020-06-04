@@ -730,7 +730,7 @@ def get_name_of_patches_with_lids(lids):
 			lower_right = (float(features[7]),float(features[8]))
 			center = (float(features[9]),float(features[10]))
 
-			coord = Patch_GPS_coordinate(upper_left,upper_right,lower_left,lower_right,center)
+			coord = GPS_Coordinate(upper_left,upper_right,lower_left,lower_right,center)
 			
 			for l in lids:
 				if coord.is_coord_inside(lids[l]):
