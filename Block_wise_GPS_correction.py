@@ -868,7 +868,7 @@ def calculate_error_of_correction():
 
 		if x!=-1 and y!=-1 and r!=-1:
 			old_lid = lids[l]
-			distances.append((old_lid[0]-x)**2+(old_lid[1]-y)**2)
+			distances.append(math.sqrt((old_lid[0]-x)**2+(old_lid[1]-y)**2))
 			
 			# patch = Patch(p,coord)
 			# patch.load_img()
@@ -2009,11 +2009,16 @@ class Patch:
 
 		image, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 		
+		for cnt in contours:
+			area = cv2.contourArea(cnt)
+			print(area)
+
+
 		# contours_new = []
 		# for cnt in contours:
 		# 	contours_new.append(cnt+(overlap[0],overlap[1]))
 
-		# cv2.drawContours(self.rgb_img, contours, -1, (0,255,0),10)
+		cv2.drawContours(self.rgb_img, contours, -1, (0,255,0),10)
 
 		return contours
 
@@ -2568,29 +2573,35 @@ class Group:
 		global lettuce_coords,no_of_cores_to_use
 
 		print('Group {0} with {1} rows and {2} patches internally correction started.'.format(self.group_id,len(self.rows),len(self.patches)))
-		self.load_all_patches_SIFT_points()
+		
+		# MST method
 
-		self.pre_calculate_internal_neighbors_and_transformation_parameters()
+		# self.load_all_patches_SIFT_points()
 
-		G = Graph(len(self.patches),[p.name for p in self.patches],self.group_id)
-		G.initialize_edge_weights(self.patches)
+		# self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
-		try:
-			parents = G.generate_MST_prim(self.rows[0][0].name)
-			string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
-		except Exception as e:
-			print(e)
-			string_res = get_corrected_string(self.patches)
+		# G = Graph(len(self.patches),[p.name for p in self.patches],self.group_id)
+		# G.initialize_edge_weights(self.patches)
 
-		self.delete_all_patches_SIFT_points()
+		# try:
+		# 	parents = G.generate_MST_prim(self.rows[0][0].name)
+		# 	string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
+		# except Exception as e:
+		# 	print(e)
+		# 	string_res = get_corrected_string(self.patches)
+
+		# self.delete_all_patches_SIFT_points()
+
 
 		# string_res = self.correct_row_by_row()
 		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
 
-		# for p in self.patches:
-		# 	err = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
-		# 	print('Group ID {0}: patch {1} corrected with {2} error.'.format(self.group_id,p.name,err))
-		# 	sys.stdout.flush()
+		# lettuce head matching
+
+		for p in self.patches:
+			err = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
+			print('Group ID {0}: patch {1} corrected with {2} error.'.format(self.group_id,p.name,err))
+			sys.stdout.flush()
 		
 		# self.load_all_patches_SIFT_points()
 
