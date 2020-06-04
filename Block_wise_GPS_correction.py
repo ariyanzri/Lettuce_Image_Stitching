@@ -733,7 +733,7 @@ def get_name_of_patches_with_lids(lids):
 			coord = GPS_Coordinate(upper_left,upper_right,lower_left,lower_right,center)
 			
 			for l in lids:
-				if coord.is_coord_inside(lids[l]):
+				if coord.is_coord_inside(lids[l]) or coord.is_point_near(lids[l],PATCH_SIZE_GPS[1]):
 					patches_names_with_lid.append((l,filename,coord))
 
 	return patches_names_with_lid
@@ -1506,7 +1506,8 @@ def super_patch_pool_merging_method(patches,gid):
 	return super_patches[0].patches
 
 
-
+def GPS_distance(point1,point2):
+	return math.sqrt((point2[0]-point1[0])**2+(point2[1]-point1[1])**2)
 
 
 class GPS_Coordinate:
@@ -1520,6 +1521,13 @@ class GPS_Coordinate:
 
 	def is_coord_inside(self, coord):
 		if coord[0]>=self.UL_coord[0] and coord[0]<=self.UR_coord[0] and coord[1]<=self.UL_coord[1] and coord[1]>=self.LL_coord[1]:
+			return True
+		else:
+			return False
+
+	def is_point_near(self,point,threshold):
+		if GPS_distance(self.UL_coord,point)<threshold or GPS_distance(self.UL_coord,point)<threshold or \
+		GPS_distance(self.UL_coord,point)<threshold or	GPS_distance(self.UL_coord,point)<threshold:
 			return True
 		else:
 			return False
@@ -2725,7 +2733,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups
+		return groups[1:2]
 
 	def get_rows(self):
 		global coordinates_file
