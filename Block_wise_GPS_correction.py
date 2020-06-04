@@ -855,6 +855,7 @@ def get_lid_in_patch(img_name,l,ransac_iter=100,ransac_min_num_fit=10):
 	if x >= 0 and x < shp[1] and y >= 0 and y < shp[0] and r >= 400 and r <= 500:
 		return x,y,r,l
 	else:
+		print(x,y,r)
 		return -1,-1,-1,-1
 
 def get_lid_in_patch_helper(args):
@@ -877,7 +878,7 @@ def calculate_error_of_correction():
 	processes.close()
 
 	print(len(results))
-	
+
 	for x,y,r,l in results:
 		if r!=-1:
 			old_lid = lids[l]
