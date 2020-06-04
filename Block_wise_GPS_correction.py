@@ -1531,6 +1531,96 @@ def GPS_distance(point1,point2):
 	return math.sqrt((point2[0]-point1[0])**2+(point2[1]-point1[1])**2)
 
 
+def get_best_neighbor_hybrid_method(p1,corrected):
+
+	corrected_neighbors = [p for p in corrected if (p.has_overlap(p1) or p1.has_overlap(p))]
+
+	best_score = sys.maxsize
+	best_params = None
+	best_p = None
+
+	p1.load_SIFT_points()
+
+	for p_tmp in corrected_neighbors:
+		p_tmp.load_SIFT_points()
+
+		params = p_tmp.get_pairwise_transformation_info(p1)
+		
+		if params is not None and params.dissimilarity < best_score:
+			best_score = params.dissimilarity
+			best_params = params
+			best_p = p_tmp
+
+	return best_p,best_params
+
+
+def hybrid_method_UAV_lettuce_matching_step(patches,gid):
+	global lettuce_coords
+
+	not_corrected = []
+	corrected = []
+	step = 0
+
+	for p in patches:
+		
+		old_gps = p.gps
+
+		err = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
+
+		if err == sys.maxsize:
+			not_corrected.append(p)
+		else:
+			print('Group ID {0}: patch {1} corrected with {2} error.'.format(gid,p.name,err))
+			sys.stdout.flush()
+			corrected.append(p)
+
+			gps_diff = (old_gps.UL_coord[0]-p.gps.UL_coord[0],old_gps.UL_coord[1]-p.gps.UL_coord[1])
+			params = Neighbor_Parameters(None,None,None,None,None,None,None,None)
+			logger(p,gps_diff,params,gid,step)
+			step+=1
+
+	return corrected,not_corrected,step
+
+def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step):
+	
+	print('Group ID {0}: ---- Entering SIFT Correction Phase ----'.format(gid))
+	sys.stdout.flush()
+
+	step = starting_step
+
+	while len(not_corrected)>0:
+		
+		p1 = not_corrected.pop()
+		
+		p2,params = get_best_neighbor_hybrid_method(p1,corrected)
+
+		if p2 is None:
+			print('Group ID {0}: ERROR- patch {1} has no good corrected neighbor and will be pushed back.'.format(gid,p1.name))
+			sys.stdout.flush()
+			not_corrected.insert(0,p1)
+			continue
+
+		H = params.H
+
+		new_gps = get_new_GPS_Coords(p1,p2,H)
+
+		gps_diff = (p1.gps.UL_coord[0]-new_gps.UL_coord[0],p1.gps.UL_coord[1]-new_gps.UL_coord[1])
+		
+		p1.gps = new_gps
+
+		corrected.append(p1)
+
+		logger(p1,gps_diff,params,gid,step)
+
+		step+=1
+
+		print('Group ID {0}: patch {1} corrected with {2} dissimilarity.'.format(gid,p1.name,params.dissimilarity))
+		sys.stdout.flush()
+
+	return corrected
+
+
+
 class GPS_Coordinate:
 	
 	def __init__(self,UL_coord,UR_coord,LL_coord,LR_coord,Center):
@@ -1718,9 +1808,10 @@ class Patch:
 	def load_SIFT_points(self):
 		global SIFT_folder
 
-		(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_folder,self.name.replace('.tif','')), "rb"))
-		self.SIFT_kp_locations = kp_tmp.copy()
-		self.SIFT_kp_desc = desc_tmp.copy()
+		if len(SIFT_kp_locations) == 0:
+			(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_folder,self.name.replace('.tif','')), "rb"))
+			self.SIFT_kp_locations = kp_tmp.copy()
+			self.SIFT_kp_desc = desc_tmp.copy()
 
 	def delete_SIFT_points(self):
 		self.SIFT_kp_locations = None
@@ -2640,18 +2731,28 @@ class Group:
 		# string_res = self.correct_row_by_row()
 		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
 
-		# lettuce head matching
+		# lettuce head matching (UAV)
 
 		for p in self.patches:
 			err = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
 			print('Group ID {0}: patch {1} corrected with {2} error.'.format(self.group_id,p.name,err))
 			sys.stdout.flush()
 		
+		string_res = get_corrected_string(self.patches)
+
+		# Hybrid method: Lettuce head matching (UAV) and SIFT on remaining
+
+		# corrected,not_corrected,step = hybrid_method_UAV_lettuce_matching_step(self.patches,self.group_id)
+			
+		# final_patches = hybrid_method_sift_correction_step(corrected,not_corrected,self.group_id,step)
+
+		# string_res = get_corrected_string(final_patches)
+
 		# self.load_all_patches_SIFT_points()
 
 		# corrected_patches = super_patch_pool_merging_method(self.patches,self.group_id)
 
-		string_res = get_corrected_string(self.patches)
+		# string_res = get_corrected_string(self.patches)
 		# self.delete_all_patches_SIFT_points()
 
 
@@ -3112,7 +3213,7 @@ def main(scan_date):
 		CORRECTED_coordinates_file = '/data/plant/full_scans/metadata/{0}_coordinates_CORRECTED.csv'.format(scan_date)
 		plot_npy_file = '/data/plant/full_scans/{0}-rgb/plt.npy'.format(scan_date)
 		field_image_path = 'field.bmp'
-		lettuce_heads_coordinates_file = 'season10_lettuce_latlon.csv'
+		lettuce_heads_coordinates_file = 'season10_ind_lettuce_2020-05-27.csv'
 		correction_log_file = '/data/plant/full_scans/{0}-rgb/logs/log_{1}_at_{2}.csv'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
 
 	elif server == 'ariyan':
@@ -3176,7 +3277,7 @@ def main(scan_date):
 		# field.groups[0].correct_internally()
 		# field.draw_and_save_field()
 		field.save_new_coordinate()
-		
+		print(calculate_error_of_correction())
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
