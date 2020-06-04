@@ -863,9 +863,17 @@ def calculate_error_of_correction():
 	lids = get_lids()
 	lid_patch_names = get_name_of_patches_with_lids(lids)
 
-	for l,p,coord in lid_patch_names:
-		x,y,r = get_lid_in_patch(p)
+	args_list = []
 
+	for l_marker,p_name,coord in lid_patch_names:
+		args_list.append(p_name)
+
+	processes = MyPool(no_of_cores_to_use)
+
+	results = processes.map(get_lid_in_patch,args_list)
+	processes.close()
+
+	for x,y,r in results:
 		if x!=-1 and y!=-1 and r!=-1:
 			old_lid = lids[l]
 			distances.append(math.sqrt((old_lid[0]-x)**2+(old_lid[1]-y)**2))
