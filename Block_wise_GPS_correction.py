@@ -2768,7 +2768,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups[1:2]
+		return groups
 
 	def get_rows(self):
 		global coordinates_file
@@ -3175,7 +3175,7 @@ def main(scan_date):
 		# field.correct_field()
 		# field.groups[0].correct_internally()
 		# field.draw_and_save_field()
-		# field.save_new_coordinate()
+		field.save_new_coordinate()
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
