@@ -3513,7 +3513,10 @@ def main(scan_date):
 		# HPC
 		print('RUNNING ON -- {0} --'.format(server))
 		field = Field()
-		field.create_patches_SIFT_files()
+		# field.create_patches_SIFT_files()
+		field.draw_and_save_field()
+		# field.correct_field()
+		# field.draw_and_save_field()
 
 
 		
@@ -3528,7 +3531,7 @@ server_core = {'coge':10,'laplace.cs.arizona.edu':10,'ariyan':4}
 
 server = socket.gethostname()
 if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
-	no_of_cores_to_use = 15
+	no_of_cores_to_use = 5
 else:
 	no_of_cores_to_use = server_core[server]
 
