@@ -3237,6 +3237,18 @@ def main(scan_date):
 		lettuce_heads_coordinates_file = '/home/ariyan/Desktop/season10_lettuce_latlon.csv'
 		correction_log_file = ''
 
+	else:
+		# HPC
+		patch_folder = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/bin2tif_out'.format(scan_date)
+		SIFT_folder = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/SIFT'.format(scan_date)
+		lid_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/lids.txt'.format(scan_date)
+		coordinates_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/{1}_coordinates.csv'.format(scan_date,scan_date)
+		CORRECTED_coordinates_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/{1}_coordinates_CORRECTED.csv'.format(scan_date,scan_date)
+		plot_npy_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/plt.npy'.format(scan_date)
+		field_image_path = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/field.bmp'.format(scan_date)
+		lettuce_heads_coordinates_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/season10_ind_lettuce_2020-05-27.csv'.format(scan_date)
+		correction_log_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/logs/log_{1}_at_{2}.csv'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
+
 
 	if server == 'coge':
 		print('RUNNING ON -- {0} --'.format(server))
@@ -3498,8 +3510,10 @@ def main(scan_date):
 		# cv2.waitKey(0)
 
 	else:
+		# HPC
 		print('RUNNING ON -- {0} --'.format(server))
-
+		field = Field()
+		field.create_patches_SIFT_files()
 
 
 		
@@ -3510,11 +3524,11 @@ def main(scan_date):
 
 
 
-server_core = {'coge':10,'laplace.cs.arizona.edu':15,'ariyan':4}
+server_core = {'coge':10,'laplace.cs.arizona.edu':10,'ariyan':4}
 
 server = socket.gethostname()
 if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
-	no_of_cores_to_use = 25
+	no_of_cores_to_use = 15
 else:
 	no_of_cores_to_use = server_core[server]
 
@@ -3524,7 +3538,8 @@ method = 'Hybrid'
 start_time = datetime.datetime.now()
 
 # main('2020-02-18')
-main('2020-01-08')
+# main('2020-01-08')
+main('2020-05-18')
 
 end_time = datetime.datetime.now()
 
