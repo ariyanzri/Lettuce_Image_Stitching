@@ -1972,6 +1972,9 @@ class Patch:
 		kp1,desc1 = choose_SIFT_key_points(neighbor,overlap1[0],overlap1[1],overlap1[2],overlap1[3])
 		kp2,desc2 = choose_SIFT_key_points(self,overlap2[0],overlap2[1],overlap2[2],overlap2[3])
 
+		if desc1 is None or len(desc1) == 0 or desc2 is None or len(desc2) == 0:
+			return None
+
 		# matches = get_good_matches(desc2,desc1)
 		matches = get_top_percentage_matches(desc2,desc1,kp2,kp1)
 		# matches = get_top_n_matches(desc2,desc1,kp2,kp1,50)
