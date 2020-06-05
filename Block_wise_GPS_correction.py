@@ -13,9 +13,9 @@ import socket
 import statistics
 import datetime
 
-from sklearn.linear_model import RANSACRegressor
-from sklearn.datasets import make_regression
-from sklearn.base import BaseEstimator
+# from sklearn.linear_model import RANSACRegressor
+# from sklearn.datasets import make_regression
+# from sklearn.base import BaseEstimator
 # from skimage.feature import hog
 
 from Customized_myltiprocessing import MyPool
@@ -3499,10 +3499,10 @@ def main(scan_date):
 
 	else:
 		print('RUNNING ON -- {0} --'.format(server))
+
+
+
 		
-		
-
-		
 
 
 
@@ -3510,7 +3510,7 @@ def main(scan_date):
 
 
 
-server_core = {'coge':10,'laplace.cs.arizona.edu':20,'ariyan':4}
+server_core = {'coge':10,'laplace.cs.arizona.edu':15,'ariyan':4}
 
 server = socket.gethostname()
 if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
