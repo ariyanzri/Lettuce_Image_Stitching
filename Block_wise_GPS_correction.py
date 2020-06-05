@@ -574,9 +574,11 @@ def get_top_percentage_matches(desc1,desc2,kp1,kp2):
 	bf = cv2.BFMatcher()
 	matches = bf.knnMatch(desc1,desc2, k=2)
 
+	if matches is None or len(matches) == 0:
+		return None
+
 	good = []
 	for m in matches:
-		
 		if 	m[0].distance < PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
 			good.append(m)
 
