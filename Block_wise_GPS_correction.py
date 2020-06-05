@@ -579,7 +579,8 @@ def get_top_percentage_matches(desc1,desc2,kp1,kp2):
 
 	good = []
 	for m in matches:
-		if 	m[0].distance < PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
+
+		if len(m) < 2 or m[0].distance < PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
 			good.append(m)
 
 	sorted_matches = sorted(good, key=lambda x: x[0].distance)
