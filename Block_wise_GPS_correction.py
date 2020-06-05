@@ -3222,8 +3222,7 @@ def main(scan_date):
 		row_save_path = '/storage/ariyanzarei/{0}-rgb/rows'.format(scan_date)
 		field_image_path = 'field.bmp'
 		correction_log_file = '/storage/ariyanzarei/{0}-rgb/logs/log_{1}_at_{2}.csv'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
-
-		# lettuce_heads_coordinates_file = '/storage/ariyanzarei/{0}-rgb/{0}_coordinates.csv'.format(scan_date)
+		lettuce_heads_coordinates_file = 'season10_ind_lettuce_2020-05-27.csv'.format(scan_date)
 
 	elif server == 'laplace.cs.arizona.edu':
 		patch_folder = '/data/plant/full_scans/{0}-rgb/bin2tif_out'.format(scan_date)
@@ -3265,7 +3264,7 @@ def main(scan_date):
 		
 		field = Field()
 		lettuce_coords = read_lettuce_heads_coordinates()
-		
+
 		# field.save_plot()
 		# field.create_patches_SIFT_files()
 
