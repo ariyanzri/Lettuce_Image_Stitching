@@ -2726,21 +2726,21 @@ class Group:
 		
 		# MST method
 
-		self.load_all_patches_SIFT_points()
+		# self.load_all_patches_SIFT_points()
 
-		self.pre_calculate_internal_neighbors_and_transformation_parameters()
+		# self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
-		G = Graph(len(self.patches),[p.name for p in self.patches],self.group_id)
-		G.initialize_edge_weights(self.patches)
+		# G = Graph(len(self.patches),[p.name for p in self.patches],self.group_id)
+		# G.initialize_edge_weights(self.patches)
 
-		try:
-			parents = G.generate_MST_prim(self.rows[0][0].name)
-			string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
-		except Exception as e:
-			print(e)
-			string_res = get_corrected_string(self.patches)
+		# try:
+		# 	parents = G.generate_MST_prim(self.rows[0][0].name)
+		# 	string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
+		# except Exception as e:
+		# 	print(e)
+		# 	string_res = get_corrected_string(self.patches)
 
-		self.delete_all_patches_SIFT_points()
+		# self.delete_all_patches_SIFT_points()
 
 
 		# string_res = self.correct_row_by_row()
@@ -2757,11 +2757,11 @@ class Group:
 
 		# Hybrid method: Lettuce head matching (UAV) and SIFT on remaining
 
-		# corrected,not_corrected,step = hybrid_method_UAV_lettuce_matching_step(self.patches,self.group_id)
+		corrected,not_corrected,step = hybrid_method_UAV_lettuce_matching_step(self.patches,self.group_id)
 			
-		# final_patches = hybrid_method_sift_correction_step(corrected,not_corrected,self.group_id,step)
+		final_patches = hybrid_method_sift_correction_step(corrected,not_corrected,self.group_id,step)
 
-		# string_res = get_corrected_string(final_patches)
+		string_res = get_corrected_string(final_patches)
 
 		# self.load_all_patches_SIFT_points()
 
@@ -3264,6 +3264,8 @@ def main(scan_date):
 		print('RUNNING ON -- {0} --'.format(server))
 		
 		field = Field()
+		lettuce_coords = read_lettuce_heads_coordinates()
+		
 		# field.save_plot()
 		# field.create_patches_SIFT_files()
 
@@ -3272,7 +3274,7 @@ def main(scan_date):
 		field.correct_field()
 		# field.draw_and_save_field()
 		field.save_new_coordinate()
-
+		print(calculate_error_of_correction())
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
@@ -3546,13 +3548,13 @@ else:
 	no_of_cores_to_use = server_core[server]
 
 
-method = 'MST'
+method = 'Hybrid'
 
 start_time = datetime.datetime.now()
 
 # main('2020-02-18')
-# main('2020-01-08')
-main('2020-05-18')
+main('2020-01-08')
+# main('2020-05-18')
 
 end_time = datetime.datetime.now()
 
