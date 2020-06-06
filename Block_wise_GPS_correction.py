@@ -902,6 +902,10 @@ def calculate_error_of_correction(use_not_corrected=False):
 			patch = Patch(pn,crd)
 
 			point = patch.convert_image_to_GPS_coordinate((x,y))
+			print('--------')
+			print(old_lid)
+			print(point)
+			print('--------')
 			distances.append(math.sqrt((old_lid[0]-point[0])**2+(old_lid[1]-point[1])**2))
 			
 			
@@ -3262,17 +3266,17 @@ def main(scan_date):
 	if server == 'coge':
 		print('RUNNING ON -- {0} --'.format(server))
 		
-		field = Field()
-		lettuce_coords = read_lettuce_heads_coordinates()
+		# field = Field()
+		# lettuce_coords = read_lettuce_heads_coordinates()
 
 		# field.save_plot()
 		# field.create_patches_SIFT_files()
 
 		# field.groups[14].correct_internally()
 		# field.draw_and_save_field()
-		field.correct_field()
+		# field.correct_field()
 		# field.draw_and_save_field()
-		field.save_new_coordinate()
+		# field.save_new_coordinate()
 		print(calculate_error_of_correction())
 
 	elif server == 'laplace.cs.arizona.edu':
