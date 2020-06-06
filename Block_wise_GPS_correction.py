@@ -916,14 +916,26 @@ def calculate_error_of_correction(use_not_corrected=False):
 			point = patch.convert_image_to_GPS_coordinate((x,y))
 			
 			# distances.append(math.sqrt((old_lid[0]-point[0])**2+(old_lid[1]-point[1])**2))
-			distances.append(GPS_distance(old_lid,point))
+			d = GPS_distance(old_lid,point)
+			distances.append(d)
+
+			patch.load_img()
+			output = patch.rgb_img
+
+			ratio_x = (point[0] - patch.gps.UL_coord[0])/(patch.gps.UR_coord[0]-patch.gps.UL_coord[0])
+			ratio_y = (patch.gps.UL_coord[1] - point[1])/(patch.gps.UL_coord[1]-patch.gps.LL_coord[1])
+
+			cv2.circle(output,(int(ratio_x*PATCH_SIZE[1]),int(ratio_y*PATCH_SIZE[0])),20,(0,0,255),thickness=-1)
 			
-			
-			# patch.load_img()
+			ratio_x = (old_lid[0] - patch.gps.UL_coord[0])/(patch.gps.UR_coord[0]-patch.gps.UL_coord[0])
+			ratio_y = (patch.gps.UL_coord[1] - old_lid[1])/(patch.gps.UL_coord[1]-patch.gps.LL_coord[1])
+
+			cv2.circle(output,(int(ratio_x*PATCH_SIZE[1]),int(ratio_y*PATCH_SIZE[0])),20,(0,255,0),thickness=-1)
+
+			cv2.imwrite('{0}-{1}.jpg'.format(patch.name,d),output)
+
 			# patch.visualize_with_single_GPS_point(point,(x+10,y+10),r)
 
-	print(distances)
-	
 	return statistics.mean(distances),statistics.stdev(distances)
 
 # --------------- new method in which we consider all patches -------------------
@@ -3135,8 +3147,8 @@ class Field:
 			if p.gps.UR_coord[0]>=right:
 				right=p.gps.UR_coord[0]
 
-
-		super_patch_size = (int(math.ceil((up-down)/GPS_TO_IMAGE_RATIO[1]))+100,int(math.ceil((right-left)/GPS_TO_IMAGE_RATIO[0]))+100,3)
+		reduction_factor = 1
+		super_patch_size = (int(math.ceil((up-down)/GPS_TO_IMAGE_RATIO[1])*reduction_factor)+100,int(math.ceil((right-left)/GPS_TO_IMAGE_RATIO[0])*reduction_factor)+100,3)
 		UL = (left,up)
 
 		result = np.zeros(super_patch_size)
@@ -3147,8 +3159,8 @@ class Field:
 			x_diff = p.gps.UL_coord[0] - UL[0]
 			y_diff = UL[1] - p.gps.UL_coord[1]
 			
-			st_x = int(x_diff/GPS_TO_IMAGE_RATIO[0])
-			st_y = int(y_diff/GPS_TO_IMAGE_RATIO[1])
+			st_x = int(reduction_factor*x_diff/GPS_TO_IMAGE_RATIO[0])
+			st_y = int(reduction_factor*y_diff/GPS_TO_IMAGE_RATIO[1])
 			
 			result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img
 			
