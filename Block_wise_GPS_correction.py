@@ -879,6 +879,18 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 def get_lid_in_patch_helper(args):
 	return get_lid_in_patch(*args)
 
+def GPS_distance(c1,c2):
+	phi1 = c1[1]
+	lambda1 = c1[0]
+	phi2 = c2[1]
+	lambda2 = c2[0]
+	R = 6371000
+
+	a = math.sin((phi2-phi1)/2)**2+math.cos(phi1)*math.cos(phi2)*(math.sin((lambda2-lambda1)/2)**2)
+	c = 2*math.atan2(math.sqrt(a),math.sqrt(1-a))
+
+	return R*c
+
 def calculate_error_of_correction(use_not_corrected=False):
 	distances = []
 
@@ -906,7 +918,8 @@ def calculate_error_of_correction(use_not_corrected=False):
 			print(old_lid)
 			print(point)
 			print('--------')
-			distances.append(math.sqrt((old_lid[0]-point[0])**2+(old_lid[1]-point[1])**2))
+			# distances.append(math.sqrt((old_lid[0]-point[0])**2+(old_lid[1]-point[1])**2))
+			distances.append(GPS_distance(old_lid,point))
 			
 			
 			# patch.load_img()
@@ -3403,127 +3416,7 @@ def main(scan_date):
 		cv2.imshow('img_nottop_high_error',img_nottop_high_error)
 		cv2.waitKey(0)
 
-		# get_top_percentage_of_matches_no_KNN(p1,p2,desc1,desc2,kp1,kp2)
-
-
-		# contours1 = p1.get_lettuce_contours(overlap=overlap_1)
-		# contours2 = p2.get_lettuce_contours(overlap=overlap_2)
-
-		# pairs = []
-
-		# for i,cnt1 in enumerate(contours1):
-		# 	for j,cnt2 in enumerate(contours2):
-		# 		scr = cv2.matchShapes(cnt1,cnt2,1,0.0)
-				
-		# 		pairs.append((i,j,scr))
 		
-		# sorted_pairs = sorted(pairs, key = lambda x:x[2])
-		# used_i = []
-		# used_j = []
-
-		# for p in sorted_pairs:
-		# 	if p[0] in used_i or p[1] in used_j:
-		# 		continue
-
-		# 	r = random.randint(0,256)
-		# 	g = random.randint(0,256)
-		# 	b = random.randint(0,256)
-
-		# 	cv2.drawContours(p1.rgb_img, contours1, p[0], (b,g,r),10)
-		# 	cv2.drawContours(p2.rgb_img, contours2, p[1], (b,g,r),10)
-
-		# 	used_i.append(p[0])
-		# 	used_j.append(p[1])
-
-
-
-
-		# cv2.namedWindow('img1',cv2.WINDOW_NORMAL)
-		# cv2.namedWindow('img2',cv2.WINDOW_NORMAL)
-		# cv2.resizeWindow('img1', 500,500)
-		# cv2.resizeWindow('img2', 500,500)
-		# cv2.imshow('img1',p1.rgb_img)
-		# cv2.imshow('img2',p2.rgb_img)
-		# cv2.waitKey(0)
-
-		# draw_together([p1,p2])
-
-		# p2.gps = p2.correct_based_on_neighbors([p1])
-		# p2.correct_based_on_matched_contour_centers(p1)
-
-		# draw_together([p1,p2])
-
-		# p1.load_SIFT_points()
-		# p2.load_SIFT_points()
-		# p1.load_img()
-		# p2.load_img()
-		# tx = 0
-		# ty = 0
-
-		# while True:
-		# 	p1.load_img()
-		# 	p2.load_img()
-
-		# 	p2.gps = add_to_gps_coord(p2.gps,tx,ty)
-		# 	overlap_1,overlap_2 = p1.get_overlap_rectangles(p2)
-
-		# 	img1 = p1.rgb_img.copy()
-		# 	img2 = p2.rgb_img.copy()
-			
-		# 	# fd1 = p1.get_hog_region(overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
-		# 	# fd2 = p2.get_hog_region(overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
-
-		# 	fft1 = p1.get_fft_region(overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
-		# 	fft2 = p2.get_fft_region(overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
-
-		# 	print(np.sqrt(np.sum((fft1-fft2)**2)/(fft1.shape[0]*fft1.shape[1]*fft1.shape[2])))
-
-		# 	cv2.rectangle(img1,(overlap_1[0],overlap_1[1]),(overlap_1[2],overlap_1[3]),(0,0,255),20)
-		# 	cv2.rectangle(img2,(overlap_2[0],overlap_2[1]),(overlap_2[2],overlap_2[3]),(0,0,255),20)
-
-		# 	cv2.namedWindow('p1',cv2.WINDOW_NORMAL)
-		# 	cv2.namedWindow('p2',cv2.WINDOW_NORMAL)
-		# 	cv2.namedWindow('fft1',cv2.WINDOW_NORMAL)
-		# 	cv2.namedWindow('fft2',cv2.WINDOW_NORMAL)
-		# 	cv2.resizeWindow('p1', 500,500)
-		# 	cv2.resizeWindow('p2', 500,500)
-		# 	cv2.resizeWindow('fft1', 500,500)
-		# 	cv2.resizeWindow('fft2', 500,500)
-		# 	cv2.imshow('p1',img1)
-		# 	cv2.imshow('p2',img2)
-		# 	cv2.imshow('fft1',fft1)
-		# 	cv2.imshow('fft2',fft2)
-		# 	key_pressed = cv2.waitKey(0)
-
-			
-		# 	if key_pressed == ord('a'):
-		# 		tx = -0.0000001
-		# 		ty = 0
-		# 	elif key_pressed == ord('d'):
-		# 		tx = +0.0000001
-		# 		ty = 0
-		# 	elif key_pressed == ord('w'):
-		# 		tx = 0
-		# 		ty = 0.0000001
-		# 	elif key_pressed == ord('s'):
-		# 		tx = 0
-		# 		ty = -0.0000001
-
-
-		
-
-		# p1.load_img()
-		# p2.load_img()
-
-		# cv2.namedWindow('p1',cv2.WINDOW_NORMAL)
-		# cv2.namedWindow('p2',cv2.WINDOW_NORMAL)
-		# cv2.resizeWindow('p1', 500,500)
-		# cv2.resizeWindow('p2', 500,500)
-
-		# cv2.imshow('p1',p1.rgb_img)
-		# cv2.imshow('p2',p2.rgb_img)
-		# cv2.waitKey(0)
-
 	else:
 		# HPC
 		print('RUNNING ON -- {0} --'.format(server))
