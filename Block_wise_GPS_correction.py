@@ -914,10 +914,7 @@ def calculate_error_of_correction(use_not_corrected=False):
 			patch = Patch(pn,crd)
 
 			point = patch.convert_image_to_GPS_coordinate((x,y))
-			print('--------')
-			print(old_lid)
-			print(point)
-			print('--------')
+			
 			# distances.append(math.sqrt((old_lid[0]-point[0])**2+(old_lid[1]-point[1])**2))
 			distances.append(GPS_distance(old_lid,point))
 			
@@ -925,6 +922,8 @@ def calculate_error_of_correction(use_not_corrected=False):
 			# patch.load_img()
 			# patch.visualize_with_single_GPS_point(point,(x+10,y+10),r)
 
+	print(distances)
+	
 	return statistics.mean(distances),statistics.stdev(distances)
 
 # --------------- new method in which we consider all patches -------------------
