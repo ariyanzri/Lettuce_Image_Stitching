@@ -890,7 +890,7 @@ def GPS_distance(c1,c2):
 	lambda1 = math.radians(c1[0])
 	phi2 = math.radians(c2[1])
 	lambda2 = math.radians(c2[0])
-	R = 637100000
+	R = 6371
 
 	a = math.sin((phi2-phi1)/2)**2+math.cos(phi1)*math.cos(phi2)*(math.sin((lambda2-lambda1)/2)**2)
 	c = 2*math.atan2(math.sqrt(a),math.sqrt(1-a))
@@ -922,8 +922,9 @@ def calculate_error_of_correction(use_not_corrected=False):
 			point = patch.convert_image_to_GPS_coordinate((x,y))
 			
 			distances.append(math.sqrt((old_lid[0]-point[0])**2+(old_lid[1]-point[1])**2))
+			
 			# d = GPS_distance(old_lid,point)
-			distances.append(d)
+			# distances.append(d)
 
 			# patch.load_img()
 			# output = patch.rgb_img
@@ -3485,8 +3486,8 @@ method = 'MST'
 start_time = datetime.datetime.now()
 
 # main('2020-02-18')
-# main('2020-01-08')
-main('2020-05-18')
+main('2020-01-08')
+# main('2020-05-18')
 
 end_time = datetime.datetime.now()
 
