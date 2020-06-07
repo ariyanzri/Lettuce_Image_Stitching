@@ -3453,9 +3453,9 @@ def main(scan_date):
 		print('RUNNING ON -- {0} --'.format(server))
 		field = Field()
 		# field.create_patches_SIFT_files()
-		field.draw_and_save_field()
-		# field.correct_field()
 		# field.draw_and_save_field()
+		field.correct_field()
+		field.draw_and_save_field()
 
 
 		
