@@ -921,10 +921,10 @@ def calculate_error_of_correction(use_not_corrected=False):
 
 			point = patch.convert_image_to_GPS_coordinate((x,y))
 			
-			distances.append(math.sqrt((old_lid[0]-point[0])**2+(old_lid[1]-point[1])**2))
+			# distances.append(math.sqrt((old_lid[0]-point[0])**2+(old_lid[1]-point[1])**2))
 			
-			# d = GPS_distance(old_lid,point)
-			# distances.append(d)
+			d = GPS_distance(old_lid,point)
+			distances.append(d)
 
 			# patch.load_img()
 			# output = patch.rgb_img
