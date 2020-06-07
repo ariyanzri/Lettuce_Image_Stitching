@@ -3472,8 +3472,8 @@ else:
 	no_of_cores_to_use = server_core[server]
 
 
-# method = 'MST'
-method = 'Hybrid'
+method = 'MST'
+# method = 'Hybrid'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
@@ -3482,8 +3482,8 @@ method = 'Hybrid'
 start_time = datetime.datetime.now()
 
 # main('2020-02-18')
-main('2020-01-08')
-# main('2020-05-18')
+# main('2020-01-08')
+main('2020-05-18')
 
 end_time = datetime.datetime.now()
 
