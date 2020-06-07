@@ -36,6 +36,7 @@ RANSAC_MAX_ITER = 1000
 RANSAC_ERROR_THRESHOLD = 5
 PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
 LETTUCE_AREA_THRESHOLD = 5000
+REDUCTION_FACTOR = 0.05
 
 GPS_ERROR_Y = 0.0000005
 GPS_ERROR_X = 0.000001
@@ -885,10 +886,10 @@ def get_lid_in_patch_helper(args):
 	return get_lid_in_patch(*args)
 
 def GPS_distance(c1,c2):
-	phi1 = c1[1]
-	lambda1 = c1[0]
-	phi2 = c2[1]
-	lambda2 = c2[0]
+	phi1 = math.radians(c1[1])
+	lambda1 = math.radians(c1[0])
+	phi2 = math.radians(c2[1])
+	lambda2 = math.radians(c2[0])
 	R = 637100000
 
 	a = math.sin((phi2-phi1)/2)**2+math.cos(phi1)*math.cos(phi2)*(math.sin((lambda2-lambda1)/2)**2)
@@ -2753,55 +2754,60 @@ class Group:
 
 	def correct_internally(self):
 
-		global lettuce_coords,no_of_cores_to_use
+		global lettuce_coords,no_of_cores_to_use,method
 
 		print('Group {0} with {1} rows and {2} patches internally correction started.'.format(self.group_id,len(self.rows),len(self.patches)))
 		
-		# MST method
+		if method == 'MST':
 
-		# self.load_all_patches_SIFT_points()
+			self.load_all_patches_SIFT_points()
 
-		# self.pre_calculate_internal_neighbors_and_transformation_parameters()
+			self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
-		# G = Graph(len(self.patches),[p.name for p in self.patches],self.group_id)
-		# G.initialize_edge_weights(self.patches)
+			G = Graph(len(self.patches),[p.name for p in self.patches],self.group_id)
+			G.initialize_edge_weights(self.patches)
 
-		# try:
-		# 	parents = G.generate_MST_prim(self.rows[0][0].name)
-		# 	string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
-		# except Exception as e:
-		# 	print(e)
-		# 	string_res = get_corrected_string(self.patches)
+			try:
+				parents = G.generate_MST_prim(self.rows[0][0].name)
+				string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
+			except Exception as e:
+				print(e)
+				string_res = get_corrected_string(self.patches)
 
-		# self.delete_all_patches_SIFT_points()
+			self.delete_all_patches_SIFT_points()
 
-
-		# string_res = self.correct_row_by_row()
-		# string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
-
-		# lettuce head matching (UAV)
-
-		# for p in self.patches:
-		# 	err = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
-		# 	print('Group ID {0}: patch {1} corrected with {2} error.'.format(self.group_id,p.name,err))
-		# 	sys.stdout.flush()
-		
-		# string_res = get_corrected_string(self.patches)
-
-		# Hybrid method: Lettuce head matching (UAV) and SIFT on remaining
-
-		corrected,not_corrected,step = hybrid_method_UAV_lettuce_matching_step(self.patches,self.group_id)
+		elif method == 'Hybrid':
 			
-		final_patches = hybrid_method_sift_correction_step(corrected,not_corrected,self.group_id,step)
+			corrected,not_corrected,step = hybrid_method_UAV_lettuce_matching_step(self.patches,self.group_id)
+			
+			final_patches = hybrid_method_sift_correction_step(corrected,not_corrected,self.group_id,step)
 
-		string_res = get_corrected_string(final_patches)
+			string_res = get_corrected_string(final_patches)
 
-		# self.load_all_patches_SIFT_points()
+		elif method == 'Merge':
+			
+			self.load_all_patches_SIFT_points()
 
-		# corrected_patches = super_patch_pool_merging_method(self.patches,self.group_id)
+			corrected_patches = super_patch_pool_merging_method(self.patches,self.group_id)
 
-		# string_res = get_corrected_string(self.patches)
-		# self.delete_all_patches_SIFT_points()
+			string_res = get_corrected_string(self.patches)
+			self.delete_all_patches_SIFT_points()
+
+		elif method == 'AllNeighbor':
+			
+			string_res = correct_patch_group_all_corrected_neighbors(self.group_id,self.patches)
+
+		elif method == 'Rowbyrow':
+			
+			string_res = self.correct_row_by_row()
+
+		elif method == 'UAVmatching':
+			for p in self.patches:
+				err = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
+				print('Group ID {0}: patch {1} corrected with {2} error.'.format(self.group_id,p.name,err))
+				sys.stdout.flush()
+			
+			string_res = get_corrected_string(self.patches)
 
 
 		print('Group {0} was corrected internally. '.format(self.group_id))
@@ -3152,8 +3158,7 @@ class Field:
 			if p.gps.UR_coord[0]>=right:
 				right=p.gps.UR_coord[0]
 
-		reduction_factor = 0.05
-		super_patch_size = (int(math.ceil((up-down)*reduction_factor/GPS_TO_IMAGE_RATIO[1]))+100,int(math.ceil((right-left)*reduction_factor/GPS_TO_IMAGE_RATIO[0]))+100,3)
+		super_patch_size = (int(math.ceil((up-down)*REDUCTION_FACTOR/GPS_TO_IMAGE_RATIO[1]))+100,int(math.ceil((right-left)*REDUCTION_FACTOR/GPS_TO_IMAGE_RATIO[0]))+100,3)
 		UL = (left,up)
 
 		result = np.zeros(super_patch_size)
@@ -3164,10 +3169,10 @@ class Field:
 			x_diff = p.gps.UL_coord[0] - UL[0]
 			y_diff = UL[1] - p.gps.UL_coord[1]
 			
-			st_x = int(reduction_factor*x_diff/GPS_TO_IMAGE_RATIO[0])
-			st_y = int(reduction_factor*y_diff/GPS_TO_IMAGE_RATIO[1])
+			st_x = int(REDUCTION_FACTOR*x_diff/GPS_TO_IMAGE_RATIO[0])
+			st_y = int(REDUCTION_FACTOR*y_diff/GPS_TO_IMAGE_RATIO[1])
 			
-			new_size = (int(PATCH_SIZE[0]*reduction_factor),int(PATCH_SIZE[1]*reduction_factor))
+			new_size = (int(PATCH_SIZE[0]*REDUCTION_FACTOR),int(PATCH_SIZE[1]*REDUCTION_FACTOR))
 
 			tmpimg = cv2.resize(p.rgb_img,(new_size[1],new_size[0]))
 
@@ -3445,9 +3450,9 @@ def main(scan_date):
 		print('RUNNING ON -- {0} --'.format(server))
 		field = Field()
 		# field.create_patches_SIFT_files()
-		# field.draw_and_save_field()
-		field.correct_field()
 		field.draw_and_save_field()
+		# field.correct_field()
+		# field.draw_and_save_field()
 
 
 		
@@ -3467,7 +3472,12 @@ else:
 	no_of_cores_to_use = server_core[server]
 
 
+# method = 'MST'
 method = 'Hybrid'
+# method = 'Merge'
+# method = 'AllNeighbor'
+# method = 'Rowbyrow'
+# method = 'UAVmatching'
 
 start_time = datetime.datetime.now()
 
