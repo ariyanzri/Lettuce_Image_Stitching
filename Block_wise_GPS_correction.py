@@ -868,7 +868,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 	
 	print(x,y)
 	cv2.circle(rgb_img,(x,y),20,(0,255,0),thickness=-1)
-	cv2.imwrite('tmp.jpg',rgb_img)
+	cv2.imwrite('tmp-{0}-{1}.jpg'.format(x,y),rgb_img)
 
 	if r >= 400 and r <= 500:
 		return x,y,r,l,pname,coord
