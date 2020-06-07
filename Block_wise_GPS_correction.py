@@ -3135,7 +3135,7 @@ class Field:
 		print('Field fully corrected.')
 		sys.stdout.flush()
 
-	def draw_and_save_field(self):
+	def draw_and_save_field(self,is_old=False):
 		global patch_folder, field_image_path
 
 		all_patches = []
@@ -3185,7 +3185,12 @@ class Field:
 			p.delete_img()
 
 		# result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
-		cv2.imwrite(field_image_path,result)
+		
+		if is_old:
+			cv2.imwrite(field_image_path+'/old_field.bmp',result)
+		else:
+			cv2.imwrite(field_image_path+'/field.bmp',result)
+
 		print('Field successfully printed.')
 		sys.stdout.flush()
 
@@ -3266,7 +3271,7 @@ def main(scan_date):
 		CORRECTED_coordinates_file = '/storage/ariyanzarei/{0}-rgb/{0}_coordinates_CORRECTED.csv'.format(scan_date)
 		plot_npy_file = '/storage/ariyanzarei/{0}-rgb/plt.npy'.format(scan_date)
 		row_save_path = '/storage/ariyanzarei/{0}-rgb/rows'.format(scan_date)
-		field_image_path = 'field.bmp'
+		field_image_path = '.'
 		correction_log_file = '/storage/ariyanzarei/{0}-rgb/logs/log_{1}_at_{2}.csv'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
 		lettuce_heads_coordinates_file = 'season10_ind_lettuce_2020-05-27.csv'.format(scan_date)
 
@@ -3277,7 +3282,7 @@ def main(scan_date):
 		coordinates_file = '/data/plant/full_scans/metadata/{0}_coordinates.csv'.format(scan_date)
 		CORRECTED_coordinates_file = '/data/plant/full_scans/metadata/{0}_coordinates_CORRECTED.csv'.format(scan_date)
 		plot_npy_file = '/data/plant/full_scans/{0}-rgb/plt.npy'.format(scan_date)
-		field_image_path = 'field.bmp'
+		field_image_path = '.'
 		lettuce_heads_coordinates_file = 'season10_ind_lettuce_2020-05-27.csv'
 		correction_log_file = '/data/plant/full_scans/{0}-rgb/logs/log_{1}_at_{2}.csv'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
 
@@ -3288,7 +3293,7 @@ def main(scan_date):
 		coordinates_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt'
 		CORRECTED_coordinates_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt'
 		plot_npy_file = '/home/ariyan/Desktop/plt.npy'
-		field_image_path = '/home/ariyan/Desktop/field.bmp'
+		field_image_path = '/home/ariyan/Desktop'
 		lettuce_heads_coordinates_file = '/home/ariyan/Desktop/season10_lettuce_latlon.csv'
 		correction_log_file = ''
 
@@ -3300,7 +3305,7 @@ def main(scan_date):
 		coordinates_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/{1}_coordinates.csv'.format(scan_date,scan_date)
 		CORRECTED_coordinates_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/{1}_coordinates_CORRECTED.csv'.format(scan_date,scan_date)
 		plot_npy_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/plt.npy'.format(scan_date)
-		field_image_path = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/field.bmp'.format(scan_date)
+		field_image_path = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb'.format(scan_date)
 		lettuce_heads_coordinates_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/season10_ind_lettuce_2020-05-27.csv'.format(scan_date)
 		correction_log_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/logs/log_{1}_at_{2}.csv'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
 
@@ -3455,10 +3460,10 @@ def main(scan_date):
 		# HPC
 		print('RUNNING ON -- {0} --'.format(server))
 		field = Field()
-		# field.create_patches_SIFT_files()
-		field.draw_and_save_field()
-		field.correct_field()
-		field.draw_and_save_field()
+		field.create_patches_SIFT_files()
+		field.draw_and_save_field(is_old=True)
+		# field.correct_field()
+		# field.draw_and_save_field(is_old=False)
 
 
 		
@@ -3489,7 +3494,8 @@ start_time = datetime.datetime.now()
 
 # main('2020-02-18')
 # main('2020-01-08')
-main('2020-05-18')
+# main('2020-05-18')
+main('2020-05-19')
 
 end_time = datetime.datetime.now()
 
