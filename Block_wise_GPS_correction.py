@@ -924,20 +924,20 @@ def calculate_error_of_correction(use_not_corrected=False):
 			d = GPS_distance(old_lid,point)
 			distances.append(d)
 
-			patch.load_img()
-			output = patch.rgb_img
+			# patch.load_img()
+			# output = patch.rgb_img
 
-			ratio_x = (point[0] - patch.gps.UL_coord[0])/(patch.gps.UR_coord[0]-patch.gps.UL_coord[0])
-			ratio_y = (patch.gps.UL_coord[1] - point[1])/(patch.gps.UL_coord[1]-patch.gps.LL_coord[1])
+			# ratio_x = (point[0] - patch.gps.UL_coord[0])/(patch.gps.UR_coord[0]-patch.gps.UL_coord[0])
+			# ratio_y = (patch.gps.UL_coord[1] - point[1])/(patch.gps.UL_coord[1]-patch.gps.LL_coord[1])
 
-			cv2.circle(output,(int(ratio_x*PATCH_SIZE[1]),int(ratio_y*PATCH_SIZE[0])),20,(0,0,255),thickness=-1)
+			# cv2.circle(output,(int(ratio_x*PATCH_SIZE[1]),int(ratio_y*PATCH_SIZE[0])),20,(0,0,255),thickness=-1)
 			
-			ratio_x = (old_lid[0] - patch.gps.UL_coord[0])/(patch.gps.UR_coord[0]-patch.gps.UL_coord[0])
-			ratio_y = (patch.gps.UL_coord[1] - old_lid[1])/(patch.gps.UL_coord[1]-patch.gps.LL_coord[1])
+			# ratio_x = (old_lid[0] - patch.gps.UL_coord[0])/(patch.gps.UR_coord[0]-patch.gps.UL_coord[0])
+			# ratio_y = (patch.gps.UL_coord[1] - old_lid[1])/(patch.gps.UL_coord[1]-patch.gps.LL_coord[1])
 
-			cv2.circle(output,(int(ratio_x*PATCH_SIZE[1]),int(ratio_y*PATCH_SIZE[0])),20,(0,255,0),thickness=-1)
+			# cv2.circle(output,(int(ratio_x*PATCH_SIZE[1]),int(ratio_y*PATCH_SIZE[0])),20,(0,255,0),thickness=-1)
 
-			cv2.imwrite('{0}-{1}.jpg'.format(patch.name,d),output)
+			# cv2.imwrite('{0}-{1}.jpg'.format(patch.name,d),output)
 
 			# patch.visualize_with_single_GPS_point(point,(x+10,y+10),r)
 
@@ -3306,7 +3306,7 @@ def main(scan_date):
 		# field.correct_field()
 		# field.draw_and_save_field()
 		# field.save_new_coordinate()
-		print(calculate_error_of_correction())
+		print(calculate_error_of_correction(True))
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
