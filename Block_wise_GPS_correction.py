@@ -2926,7 +2926,7 @@ class Field:
 
 		return groups
 
-	def get_rows(self,discard_right=True):
+	def get_rows(self,discard_right=False):
 		global coordinates_file
 
 		center_of_rows = []
@@ -3310,7 +3310,7 @@ def main(scan_date):
 		
 		err = calculate_error_of_correction(True)
 		print("({:.10f},{:.10f})".format(err[0],err[1]))
-		
+
 		field = Field()
 		lettuce_coords = read_lettuce_heads_coordinates()
 
@@ -3456,7 +3456,7 @@ def main(scan_date):
 		print('RUNNING ON -- {0} --'.format(server))
 		field = Field()
 		# field.create_patches_SIFT_files()
-		# field.draw_and_save_field()
+		field.draw_and_save_field()
 		field.correct_field()
 		field.draw_and_save_field()
 
@@ -3478,8 +3478,8 @@ else:
 	no_of_cores_to_use = server_core[server]
 
 
-# method = 'MST'
-method = 'Hybrid'
+method = 'MST'
+# method = 'Hybrid'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
@@ -3488,8 +3488,8 @@ method = 'Hybrid'
 start_time = datetime.datetime.now()
 
 # main('2020-02-18')
-main('2020-01-08')
-# main('2020-05-18')
+# main('2020-01-08')
+main('2020-05-18')
 
 end_time = datetime.datetime.now()
 
