@@ -941,7 +941,7 @@ def calculate_error_of_correction(use_not_corrected=False):
 
 			# patch.visualize_with_single_GPS_point(point,(x+10,y+10),r)
 
-	return round(statistics.mean(distances),6),round(statistics.stdev(distances),6)
+	return statistics.mean(distances),statistics.stdev(distances)
 
 # --------------- new method in which we consider all patches -------------------
 
@@ -3152,8 +3152,8 @@ class Field:
 			if p.gps.UR_coord[0]>=right:
 				right=p.gps.UR_coord[0]
 
-		reduction_factor = 1
-		super_patch_size = (int(math.ceil((up-down)/GPS_TO_IMAGE_RATIO[1])*reduction_factor)+100,int(math.ceil((right-left)/GPS_TO_IMAGE_RATIO[0])*reduction_factor)+100,3)
+		reduction_factor = 0.1
+		super_patch_size = (int(math.ceil((up-down)*reduction_factor/GPS_TO_IMAGE_RATIO[1]))+100,int(math.ceil((right-left)*reduction_factor/GPS_TO_IMAGE_RATIO[0]))+100,3)
 		UL = (left,up)
 
 		result = np.zeros(super_patch_size)
@@ -3167,7 +3167,11 @@ class Field:
 			st_x = int(reduction_factor*x_diff/GPS_TO_IMAGE_RATIO[0])
 			st_y = int(reduction_factor*y_diff/GPS_TO_IMAGE_RATIO[1])
 			
-			result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img
+			new_size = (int(PATCH_SIZE[0]*reduction_factor),int(PATCH_SIZE[1]*reduction_factor))
+
+			tmpimg = cv2.resize(p.rgb_img,(new_size[1],new_size[0]))
+
+			result[st_y:st_y+new_size[0],st_x:st_x+new_size[1],:] = tmpimg
 			
 			p.delete_img()
 
@@ -3306,8 +3310,8 @@ def main(scan_date):
 		# field.correct_field()
 		# field.draw_and_save_field()
 		# field.save_new_coordinate()
-		print(calculate_error_of_correction(True))
-		print(calculate_error_of_correction())
+		print("({:.10f},{:.10f})".format(calculate_error_of_correction(True)))
+		print("({:.10f},{:.10f})".format(calculate_error_of_correction()))
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
