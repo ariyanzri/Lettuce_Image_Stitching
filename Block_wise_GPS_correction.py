@@ -866,9 +866,9 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 
 	x,y,r = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
 	
-	print(x,y)
-	cv2.circle(rgb_img,(x,y),20,(0,255,0),thickness=-1)
-	cv2.imwrite('tmp-{0}-{1}.jpg'.format(x,y),rgb_img)
+	# print(x,y)
+	# cv2.circle(rgb_img,(x,y),20,(0,255,0),thickness=-1)
+	# cv2.imwrite('tmp-{0}-{1}.jpg'.format(x,y),rgb_img)
 
 	if r >= 400 and r <= 500:
 		return x,y,r,l,pname,coord
@@ -1880,8 +1880,8 @@ class Patch:
 		gc.collect()
 
 	def convert_image_to_GPS_coordinate(self,point):
-		x_ratio = point[0]/PATCH_SIZE[1]
-		y_ratio = point[1]/PATCH_SIZE[0]
+		x_ratio = point[0]*GPS_TO_IMAGE_RATIO[0]
+		y_ratio = point[1]*GPS_TO_IMAGE_RATIO[1]
 
 		return (self.gps.UL_coord[0]+x_ratio,self.gps.UL_coord[1]-y_ratio)
 
