@@ -3450,9 +3450,9 @@ def main(scan_date):
 		print('RUNNING ON -- {0} --'.format(server))
 		field = Field()
 		# field.create_patches_SIFT_files()
-		field.draw_and_save_field()
-		# field.correct_field()
 		# field.draw_and_save_field()
+		field.correct_field()
+		field.draw_and_save_field()
 
 
 		
@@ -3482,8 +3482,8 @@ method = 'MST'
 start_time = datetime.datetime.now()
 
 # main('2020-02-18')
-main('2020-01-08')
-# main('2020-05-18')
+# main('2020-01-08')
+main('2020-05-18')
 
 end_time = datetime.datetime.now()
 
