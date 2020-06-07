@@ -822,7 +822,8 @@ def get_unique_lists(xs,ys):
 def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=10):
 	global patch_folder
 	img = cv2.imread('{0}/{1}'.format(patch_folder,img_name))
-	
+	rgb_img = img.copy()
+
 	img[:,:,1:3] = 0
 
 	img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -865,6 +866,9 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 
 	x,y,r = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
 	
+	print(x,y)
+	cv2.circle(rgb_img,(x,y),20,(0,255,0),thickness=-1)
+	cv2.imwrite('tmp.jpg',rgb_img)
 
 	if r >= 400 and r <= 500:
 		return x,y,r,l,pname,coord
