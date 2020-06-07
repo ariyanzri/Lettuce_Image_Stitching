@@ -2925,7 +2925,7 @@ class Field:
 
 		return groups
 
-	def get_rows(self):
+	def get_rows(self,discard_right=True):
 		global coordinates_file
 
 		center_of_rows = []
@@ -2945,6 +2945,9 @@ class Field:
 				features = l.split(',')
 
 				filename = features[0]
+				if discard_right and '_right' in filename:
+					continue:
+
 				upper_left = (float(features[1]),float(features[2]))
 				lower_left = (float(features[3]),float(features[4]))
 				upper_right = (float(features[5]),float(features[6]))
@@ -3450,9 +3453,9 @@ def main(scan_date):
 		print('RUNNING ON -- {0} --'.format(server))
 		field = Field()
 		# field.create_patches_SIFT_files()
-		# field.draw_and_save_field()
-		field.correct_field()
 		field.draw_and_save_field()
+		# field.correct_field()
+		# field.draw_and_save_field()
 
 
 		
