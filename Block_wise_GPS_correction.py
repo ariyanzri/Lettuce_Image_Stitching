@@ -2946,7 +2946,7 @@ class Field:
 
 				filename = features[0]
 				if discard_right and '_right' in filename:
-					continue:
+					continue
 
 				upper_left = (float(features[1]),float(features[2]))
 				lower_left = (float(features[3]),float(features[4]))
