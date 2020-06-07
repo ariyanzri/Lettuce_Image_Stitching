@@ -921,10 +921,10 @@ def calculate_error_of_correction(use_not_corrected=False):
 
 			point = patch.convert_image_to_GPS_coordinate((x,y))
 			
-			# distances.append(math.sqrt((old_lid[0]-point[0])**2+(old_lid[1]-point[1])**2))
+			distances.append(math.sqrt((old_lid[0]-point[0])**2+(old_lid[1]-point[1])**2))
 			
-			d = GPS_distance(old_lid,point)
-			distances.append(d)
+			# d = GPS_distance(old_lid,point)
+			# distances.append(d)
 
 			# patch.load_img()
 			# output = patch.rgb_img
@@ -3226,11 +3226,11 @@ def logger(corrected_patch,gps_diff,param,gid,step_id):
 		
 
 		if param.H is not None:
-			string_log = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13}'.format(gid,step_id,corrected_patch.name,corrected_patch.gps.to_csv(),\
+			string_log = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13}\n'.format(gid,step_id,corrected_patch.name,corrected_patch.gps.to_csv(),\
 			param.H[0,2],param.H[1,2],param.num_matches,param.percentage_inliers,param.dissimilarity,gps_diff[0],gps_diff[1],\
 			(param.overlap_on_patch[2]-param.overlap_on_patch[0])*(param.overlap_on_patch[3]-param.overlap_on_patch[1]),param.degrees,param.scale)
 		else:
-			string_log = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13}'.format(gid,step_id,corrected_patch.name,corrected_patch.gps.to_csv(),\
+			string_log = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13}\n'.format(gid,step_id,corrected_patch.name,corrected_patch.gps.to_csv(),\
 			None,None,param.num_matches,param.percentage_inliers,param.dissimilarity,gps_diff[0],gps_diff[1],\
 			None,param.degrees,param.scale)
 
@@ -3308,19 +3308,21 @@ def main(scan_date):
 	if server == 'coge':
 		print('RUNNING ON -- {0} --'.format(server))
 		
-		# field = Field()
-		# lettuce_coords = read_lettuce_heads_coordinates()
+		err = calculate_error_of_correction(True)
+		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		
+		field = Field()
+		lettuce_coords = read_lettuce_heads_coordinates()
 
 		# field.save_plot()
 		# field.create_patches_SIFT_files()
 
 		# field.groups[14].correct_internally()
 		# field.draw_and_save_field()
-		# field.correct_field()
+		field.correct_field()
 		# field.draw_and_save_field()
-		# field.save_new_coordinate()
-		err = calculate_error_of_correction(True)
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		field.save_new_coordinate()
+		
 		err = calculate_error_of_correction()
 		print("({:.10f},{:.10f})".format(err[0],err[1]))
 
@@ -3467,7 +3469,7 @@ def main(scan_date):
 
 
 
-server_core = {'coge':20,'laplace.cs.arizona.edu':10,'ariyan':4}
+server_core = {'coge':10,'laplace.cs.arizona.edu':10,'ariyan':4}
 
 server = socket.gethostname()
 if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
@@ -3476,8 +3478,8 @@ else:
 	no_of_cores_to_use = server_core[server]
 
 
-method = 'MST'
-# method = 'Hybrid'
+# method = 'MST'
+method = 'Hybrid'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
