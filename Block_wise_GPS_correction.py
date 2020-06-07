@@ -921,8 +921,8 @@ def calculate_error_of_correction(use_not_corrected=False):
 
 			point = patch.convert_image_to_GPS_coordinate((x,y))
 			
-			# distances.append(math.sqrt((old_lid[0]-point[0])**2+(old_lid[1]-point[1])**2))
-			d = GPS_distance(old_lid,point)
+			distances.append(math.sqrt((old_lid[0]-point[0])**2+(old_lid[1]-point[1])**2))
+			# d = GPS_distance(old_lid,point)
 			distances.append(d)
 
 			# patch.load_img()
@@ -3482,8 +3482,8 @@ method = 'MST'
 start_time = datetime.datetime.now()
 
 # main('2020-02-18')
-# main('2020-01-08')
-main('2020-05-18')
+main('2020-01-08')
+# main('2020-05-18')
 
 end_time = datetime.datetime.now()
 
