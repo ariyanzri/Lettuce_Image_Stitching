@@ -889,7 +889,7 @@ def GPS_distance(c1,c2):
 	lambda1 = c1[0]
 	phi2 = c2[1]
 	lambda2 = c2[0]
-	R = 6371000
+	R = 637100000
 
 	a = math.sin((phi2-phi1)/2)**2+math.cos(phi1)*math.cos(phi2)*(math.sin((lambda2-lambda1)/2)**2)
 	c = 2*math.atan2(math.sqrt(a),math.sqrt(1-a))
@@ -941,7 +941,7 @@ def calculate_error_of_correction(use_not_corrected=False):
 
 			# patch.visualize_with_single_GPS_point(point,(x+10,y+10),r)
 
-	return statistics.mean(distances),statistics.stdev(distances)
+	return round(statistics.mean(distances),6),round(statistics.stdev(distances),6)
 
 # --------------- new method in which we consider all patches -------------------
 
@@ -3307,6 +3307,7 @@ def main(scan_date):
 		# field.draw_and_save_field()
 		# field.save_new_coordinate()
 		print(calculate_error_of_correction(True))
+		print(calculate_error_of_correction())
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
