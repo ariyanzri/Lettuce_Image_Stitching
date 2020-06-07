@@ -26,8 +26,8 @@ from collections import OrderedDict,Counter
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-NUMBER_OF_ROWS_IN_GROUPS = 10
-# NUMBER_OF_ROWS_IN_GROUPS = 4
+# NUMBER_OF_ROWS_IN_GROUPS = 10
+NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -2917,7 +2917,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups
+		return groups[4:6]
 
 	def get_rows(self):
 		global coordinates_file
@@ -2981,7 +2981,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist)
+			rows.append(newlist[6:10])
 
 		print('Rows calculated and created completely.')
 
@@ -3152,7 +3152,7 @@ class Field:
 			if p.gps.UR_coord[0]>=right:
 				right=p.gps.UR_coord[0]
 
-		reduction_factor = 0.1
+		reduction_factor = 0.05
 		super_patch_size = (int(math.ceil((up-down)*reduction_factor/GPS_TO_IMAGE_RATIO[1]))+100,int(math.ceil((right-left)*reduction_factor/GPS_TO_IMAGE_RATIO[0]))+100,3)
 		UL = (left,up)
 
@@ -3175,7 +3175,7 @@ class Field:
 			
 			p.delete_img()
 
-		result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
+		# result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
 		cv2.imwrite(field_image_path,result)
 		print('Field successfully printed.')
 		sys.stdout.flush()
@@ -3324,7 +3324,7 @@ def main(scan_date):
 		field = Field()
 		# field.create_patches_SIFT_files()
 
-		lettuce_coords = read_lettuce_heads_coordinates()
+		# lettuce_coords = read_lettuce_heads_coordinates()
 		# p1 = field.groups[0].patches[3]
 		# p1.get_lettuce_contours_centers(lettuce_coords)
 		# p1.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
@@ -3332,7 +3332,7 @@ def main(scan_date):
 		# r = Row(field.groups[0].rows[0])
 
 		# draw_together(field.groups[0].patches)
-		# field.draw_and_save_field()
+		field.draw_and_save_field()
 		# field.correct_field()
 		# field.groups[0].load_all_patches_SIFT_points()
 		# new_patches = super_patch_pool_merging_method(field.groups[0].patches)
@@ -3344,11 +3344,11 @@ def main(scan_date):
 		# print(calculate_error_of_correction(True))
 		# field.draw_and_save_field()
 		# field.groups[0].correct_internally()
-		field.correct_field()
+		# field.correct_field()
 		# field.groups[0].correct_internally()
 		# field.draw_and_save_field()
-		field.save_new_coordinate()
-		print(calculate_error_of_correction())
+		# field.save_new_coordinate()
+		# print(calculate_error_of_correction())
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
