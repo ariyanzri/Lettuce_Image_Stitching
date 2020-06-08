@@ -43,6 +43,8 @@ GPS_ERROR_X = 0.000001
 
 FFT_PARALLEL_CORES_TO_USE = 20
 
+DISCARD_RIGHT_FLAG = True
+
 def remove_shadow(image):
 
 	hsvImg = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
@@ -942,6 +944,8 @@ def calculate_error_of_correction(use_not_corrected=False):
 			# cv2.imwrite('{0}-{1}.jpg'.format(patch.name,d),output)
 
 			# patch.visualize_with_single_GPS_point(point,(x+10,y+10),r)
+
+	print(distances)
 
 	return statistics.mean(distances),statistics.stdev(distances)
 
@@ -3017,7 +3021,7 @@ class Field:
 
 		return groups
 
-	def get_rows(self,discard_right=False):
+	def get_rows(self,discard_right=DISCARD_RIGHT_FLAG):
 		global coordinates_file
 
 		center_of_rows = []
@@ -3577,19 +3581,19 @@ else:
 
 
 # method = 'MST'
-# method = 'Hybrid'
+method = 'Hybrid'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
 # method = 'UAVmatching'
-method = 'Old_method'
+# method = 'Old_method'
 
 start_time = datetime.datetime.now()
 
-# main('2020-02-18')
+main('2020-02-18')
 # main('2020-01-08')
 
-main('2020-05-18')
+# main('2020-05-18')
 # main('2020-05-19')
 
 end_time = datetime.datetime.now()
