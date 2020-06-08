@@ -3530,8 +3530,8 @@ def main(scan_date):
 		# HPC
 		print('RUNNING ON -- {0} --'.format(server))
 		field = Field()
-		field.create_patches_SIFT_files()
-		field.draw_and_save_field(is_old=True)
+		# field.create_patches_SIFT_files()
+		# field.draw_and_save_field(is_old=True)
 		field.correct_field()
 		field.draw_and_save_field(is_old=False)
 
@@ -3548,7 +3548,7 @@ server_core = {'coge':10,'laplace.cs.arizona.edu':10,'ariyan':4}
 
 server = socket.gethostname()
 if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
-	no_of_cores_to_use = 16
+	no_of_cores_to_use = 5
 else:
 	no_of_cores_to_use = server_core[server]
 
@@ -3565,8 +3565,8 @@ start_time = datetime.datetime.now()
 
 # main('2020-02-18')
 # main('2020-01-08')
-# main('2020-05-18')
-main('2020-05-19')
+main('2020-05-18')
+# main('2020-05-19')
 
 end_time = datetime.datetime.now()
 
