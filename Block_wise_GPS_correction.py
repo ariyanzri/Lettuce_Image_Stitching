@@ -1562,11 +1562,17 @@ def super_patch_pool_merging_method(patches,gid):
 				new_supper_patches.append(sp1)
 				continue
 
+			
+			diff = sp1.get_total_gps_diff_from_params(sp2,params)
+			
+			if diff is None:
+				new_supper_patches.append(sp1)
+				continue				
+
 			print('Group {0}: Merge accepted using score {1}.'.format(gid,scr))
 
 			super_patches.remove(sp2)
 
-			diff = sp1.get_total_gps_diff_from_params(sp2,params)
 			sp2.correct_based_on_best_diff(diff)
 
 			new_sp = Super_Patch(sp1.patches+sp2.patches)
