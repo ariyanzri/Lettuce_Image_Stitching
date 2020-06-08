@@ -3478,7 +3478,7 @@ server_core = {'coge':10,'laplace.cs.arizona.edu':10,'ariyan':4}
 
 server = socket.gethostname()
 if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
-	no_of_cores_to_use = 5
+	no_of_cores_to_use = 16
 else:
 	no_of_cores_to_use = server_core[server]
 
