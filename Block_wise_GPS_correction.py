@@ -3585,8 +3585,8 @@ else:
 
 
 # method = 'MST'
-method = 'Hybrid'
-# method = 'Merge'
+# method = 'Hybrid'
+method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
 # method = 'UAVmatching'
@@ -3594,10 +3594,10 @@ method = 'Hybrid'
 
 start_time = datetime.datetime.now()
 
-main('2020-02-18')
+# main('2020-02-18')
 # main('2020-01-08')
 
-# main('2020-05-18')
+main('2020-05-18')
 # main('2020-05-19')
 
 end_time = datetime.datetime.now()
