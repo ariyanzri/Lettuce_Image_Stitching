@@ -1666,6 +1666,59 @@ def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step
 
 	return corrected
 
+def old_method_simple_for_test(corrected,not_corrected,gid,starting_step):
+	
+	no_change_counter = 0
+
+	print('Group ID {0}: ---- Entering SIFT Correction Phase ----'.format(gid))
+	sys.stdout.flush()
+
+	step = starting_step
+	
+	prev_len = len(not_corrected)
+
+	while len(not_corrected)>0 and no_change_counter<len(not_corrected):
+		
+		current_len = len(not_corrected)
+
+		if current_len == prev_len:
+			no_change_counter+=1
+		else:
+			no_change_counter=0
+
+		p1 = not_corrected.pop()
+		
+		p2,params = get_best_neighbor_hybrid_method(p1,corrected)
+
+		if p2 is None:
+			print('Group ID {0}: ERROR- patch {1} has no good corrected neighbor and will be pushed back.'.format(gid,p1.name))
+			sys.stdout.flush()
+			not_corrected.insert(0,p1)
+
+			prev_len = len(not_corrected)
+
+			continue
+
+		H = params.H
+
+		new_gps = get_new_GPS_Coords(p1,p2,H)
+
+		gps_diff = (p1.gps.UL_coord[0]-new_gps.UL_coord[0],p1.gps.UL_coord[1]-new_gps.UL_coord[1])
+		
+		p1.gps = new_gps
+
+		corrected.append(p1)
+
+		logger(p1,gps_diff,params,gid,step)
+
+		step+=1
+
+		print('Group ID {0}: patch {1} corrected with {2} dissimilarity.'.format(gid,p1.name,params.dissimilarity))
+		sys.stdout.flush()
+
+		prev_len = len(not_corrected)
+
+	return corrected
 
 
 class GPS_Coordinate:
@@ -2810,6 +2863,23 @@ class Group:
 			
 			string_res = get_corrected_string(self.patches)
 
+		elif method == 'Old_method':
+
+			max_patch = None
+			max_n = 0
+
+			for p in self.patches:
+				neighbors = [n for n in self.patches if n.has_overlap(p) or p.has_overlap(n)]
+				if len(neighbors)>max_n:
+					max_n = len(neighbors)
+					max_patch = p
+
+			corrected = [p]
+			not_corrected = [p for p in self.patches if p != max_patch]
+			step = 0
+			final_patches = old_method_simple_for_test(corrected,not_corrected,self.group_id,step)
+
+			string_res = get_corrected_string(final_patches)
 
 		print('Group {0} was corrected internally. '.format(self.group_id))
 		sys.stdout.flush()
@@ -3483,12 +3553,13 @@ else:
 	no_of_cores_to_use = server_core[server]
 
 
-method = 'MST'
+# method = 'MST'
 # method = 'Hybrid'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
 # method = 'UAVmatching'
+method = 'Old_method'
 
 start_time = datetime.datetime.now()
 
