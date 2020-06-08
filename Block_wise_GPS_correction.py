@@ -717,7 +717,7 @@ def get_lids():
 
 	return lids
 
-def get_name_of_patches_with_lids(lids,use_not_corrected=False):
+def get_name_of_patches_with_lids(lids,use_not_corrected=False,discard_right=DISCARD_RIGHT_FLAG):
 	global CORRECTED_coordinates_file,coordinates_file
 
 	patches_names_with_lid = []
@@ -740,6 +740,10 @@ def get_name_of_patches_with_lids(lids,use_not_corrected=False):
 			features = l.split(',')
 
 			filename = features[0]
+
+			if discard_right and '_right' in filename:
+				continue
+
 			upper_left = (float(features[1]),float(features[2]))
 			lower_left = (float(features[3]),float(features[4]))
 			upper_right = (float(features[5]),float(features[6]))
