@@ -1592,7 +1592,7 @@ def get_best_neighbor_old_method(p1,corrected):
 
 		params = p_tmp.get_pairwise_transformation_info(p1)
 		
-		if (best_params is None and params is not None) or (params is not None and params.num_matches*params.percentage_inliers > best_params.num_matches*best_params.percentage_inliers and  params.dissimilarity < best_params.dissimilarity):
+		if (best_params is None and params is not None) or (params is not None and params.percentage_inliers > best_params.percentage_inliers and  params.dissimilarity < best_params.dissimilarity):
 			best_params = params
 			best_p = p_tmp
 
