@@ -3597,8 +3597,8 @@ start_time = datetime.datetime.now()
 # main('2020-02-18')
 # main('2020-01-08')
 
-main('2020-05-18')
-# main('2020-05-19')
+# main('2020-05-18')
+main('2020-05-19')
 
 end_time = datetime.datetime.now()
 
