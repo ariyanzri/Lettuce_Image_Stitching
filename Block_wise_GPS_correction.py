@@ -1578,6 +1578,27 @@ def GPS_distance(point1,point2):
 	return math.sqrt((point2[0]-point1[0])**2+(point2[1]-point1[1])**2)
 
 
+def get_best_neighbor_old_method(p1,corrected):
+
+	corrected_neighbors = [p for p in corrected if (p.has_overlap(p1) or p1.has_overlap(p))]
+
+	best_params = None
+	best_p = None
+
+	p1.load_SIFT_points()
+
+	for p_tmp in corrected_neighbors:
+		p_tmp.load_SIFT_points()
+
+		params = p_tmp.get_pairwise_transformation_info(p1)
+		
+		if params is not None and params.num_matches*params.percentage_inliers > best_params.num_matches*best_params.percentage_inliers and  params.dissimilarity < best_params.dissimilarity:
+			best_params = params
+			best_p = p_tmp
+
+	return best_p,best_params
+
+
 def get_best_neighbor_hybrid_method(p1,corrected):
 
 	corrected_neighbors = [p for p in corrected if (p.has_overlap(p1) or p1.has_overlap(p))]
@@ -1677,7 +1698,7 @@ def old_method_simple_for_test(corrected,not_corrected,gid,starting_step):
 	
 	prev_len = len(not_corrected)
 
-	while len(not_corrected)>0 and no_change_counter<len(not_corrected):
+	while len(not_corrected)>0 and no_change_counter<=len(not_corrected)+2:
 		
 		current_len = len(not_corrected)
 
@@ -1688,7 +1709,7 @@ def old_method_simple_for_test(corrected,not_corrected,gid,starting_step):
 
 		p1 = not_corrected.pop()
 		
-		p2,params = get_best_neighbor_hybrid_method(p1,corrected)
+		p2,params = get_best_neighbor_old_method(p1,corrected)
 
 		if p2 is None:
 			print('Group ID {0}: ERROR- patch {1} has no good corrected neighbor and will be pushed back.'.format(gid,p1.name))
