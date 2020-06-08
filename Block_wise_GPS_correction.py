@@ -1718,7 +1718,7 @@ def old_method_simple_for_test(corrected,not_corrected,gid,starting_step):
 
 		prev_len = len(not_corrected)
 
-	return corrected
+	return corrected+not_corrected
 
 
 class GPS_Coordinate:
