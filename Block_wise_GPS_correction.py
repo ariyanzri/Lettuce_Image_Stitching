@@ -3152,7 +3152,9 @@ class Field:
 
 					for patch in group.patches:
 						
-						patch.gps = result_dict[patch.name]
+						if patch.name in result_dict:
+
+							patch.gps = result_dict[patch.name]
 
 		# manager = multiprocessing.Manager()
 		# return_dict = manager.dict()
