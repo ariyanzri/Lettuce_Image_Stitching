@@ -3462,8 +3462,8 @@ def main(scan_date):
 		field = Field()
 		field.create_patches_SIFT_files()
 		field.draw_and_save_field(is_old=True)
-		# field.correct_field()
-		# field.draw_and_save_field(is_old=False)
+		field.correct_field()
+		field.draw_and_save_field(is_old=False)
 
 
 		
