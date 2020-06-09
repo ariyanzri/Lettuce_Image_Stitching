@@ -1639,22 +1639,27 @@ def get_best_neighbor_hybrid_method(p1,corrected):
 
 	corrected_neighbors = [p for p in corrected if (p.has_overlap(p1) or p1.has_overlap(p))]
 
-	best_score = sys.maxsize
-	best_params = None
+	best_score = 0
 	best_p = None
 
-	p1.load_SIFT_points()
+	# p1.load_SIFT_points()
 
 	for p_tmp in corrected_neighbors:
-		p_tmp.load_SIFT_points()
+		# p_tmp.load_SIFT_points()
 
-		params = p_tmp.get_pairwise_transformation_info(p1)
+		# params = p_tmp.get_pairwise_transformation_info(p1)
 		
-		if params is not None and params.dissimilarity < best_score:
-			best_score = params.dissimilarity
-			best_params = params
+		overlap1,overlap2 = p1.get_overlap_rectangles(p_tmp)
+		overlap_area = (overlap1[2]-overlap1[0])*(overlap1[3]-overlap1[1]) 
+
+		if overlap_area  > best_score:
+			best_score = overlap_area
 			best_p = p_tmp
 
+	best_p.load_SIFT_points()
+	p1.load_SIFT_points()
+	best_params = best_p.get_pairwise_transformation_info(p1)
+	
 	return best_p,best_params
 
 
@@ -1671,7 +1676,7 @@ def hybrid_method_UAV_lettuce_matching_step(patches,gid):
 
 		total_matched,total_contours = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
 
-		if total_matched <CONTOUR_MATCHING_MIN_MATCH:
+		if total_matched <CONTOUR_MATCHING_MIN_MATCH or total_matched/total_contours <=0.5:
 			not_corrected.append(p)
 		else:
 			print('Group ID {0}: patch {1} corrected with {2} number of matches ({3}).'.format(gid,p.name,total_matched,total_matched/total_contours))
@@ -1763,7 +1768,7 @@ def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step
 			number_of_iterations_without_change+=1
 			continue
 
-		if num_matches<40:
+		if params.num_matches<40:
 			print('Group ID {0}: ERROR- patch {1} NUM Matches < 40. will be pushed back.'.format(gid,p1.name))
 			sys.stdout.flush()
 			can_be_corrected_patches.insert(0,p1)
