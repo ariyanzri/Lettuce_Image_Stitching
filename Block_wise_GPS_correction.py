@@ -973,7 +973,7 @@ def find_all_neighbors(patches,patch):
 
 	return neighbors
 
-def draw_together(patches):
+def draw_together(patches,return_flag=False):
 	
 	up = patches[0].gps.UL_coord[1]
 	down = patches[0].gps.LL_coord[1]
@@ -1015,8 +1015,11 @@ def draw_together(patches):
 	result = np.array(result).astype('uint8')
 	result = cv2.resize(result,(int(result.shape[1]/5),int(result.shape[0]/5)))
 
-	cv2.imshow('fig',result)
-	cv2.waitKey(0)
+	if return_flag == False:
+		cv2.imshow('fig',result)
+		cv2.waitKey(0)
+	else:
+		return result,GPS_Coordinate((left,up),(righ,up),(left,down),(right,down),((right+left)/2,(up+down)/2))
 
 def merge_all_neighbors(corrected_neighbors,patch):
 	total_kp = []
@@ -2827,8 +2830,8 @@ class Group:
 				if j == 0:
 					continue
 
-				draw_together(r[:j+1])
-				
+				# draw_together(r[:j+1])
+
 				prev_p = r[j-1]
 				params = prev_p.get_pairwise_transformation_info(p)
 
@@ -2836,8 +2839,23 @@ class Group:
 
 				p.gps = new_gps
 
-				draw_together(r[:j+1])
- 
+				# draw_together(r[:j+1])
+
+			if i == 0:
+				continue
+
+			current_row,current_row_gps = draw_together(r,True)
+			prev_row,prev_row_gps = draw_together(self.rows[i-1],True)
+
+			curr_kp,curr_desc = detect_SIFT_key_points(current_row,0.8*current_row.shape[1],0,current_row.shape[1],current_row.shape[0])
+			prev_kp,prev_desc = detect_SIFT_key_points(prev_row,0.8*prev_row.shape[1],0,prev_row.shape[1],prev_row.shape[0])
+
+			matches = get_top_percentage_matches(prev_desc,curr_desc,prev_kp,curr_kp)
+ 			
+			H,per_in,scale,theta = find_homography(matches,prev_kp,curr_kp,None,None)
+
+			cv2.imshow('fig1',current_row)
+			cv2.imshow('fig2',prev_row)
 		# self.load_all_patches_SIFT_points()
 
 		# for i,r in enumerate(self.rows):
