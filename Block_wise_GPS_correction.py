@@ -1745,14 +1745,14 @@ def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step
 		p1 = can_be_corrected_patches.pop()
 		p2,params = get_best_neighbor_hybrid_method(p1,corrected)
 
-		H = params.H
-
 		if p2 is None:
 			print('Group ID {0}: ERROR- patch {1} NONE Neighbor. will be pushed back.'.format(gid,p1.name))
 			sys.stdout.flush()
 			can_be_corrected_patches.insert(0,p1)
 			number_of_iterations_without_change+=1
 			continue
+
+		H = params.H
 
 		if H is None:
 			print('Group ID {0}: ERROR- patch {1} H is NONE. will be pushed back.'.format(gid,p1.name))
