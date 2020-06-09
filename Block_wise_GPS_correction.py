@@ -37,6 +37,7 @@ RANSAC_ERROR_THRESHOLD = 5
 PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
 LETTUCE_AREA_THRESHOLD = 5000
 REDUCTION_FACTOR = 0.05
+OVERLAP_DISCARD_RATIO = 0.05
 
 GPS_ERROR_Y = 0.0000005
 GPS_ERROR_X = 0.000001
@@ -2095,7 +2096,7 @@ class Patch:
 	def get_pairwise_transformation_info(self,neighbor):
 		overlap1,overlap2 = neighbor.get_overlap_rectangles(self)
 		
-		if overlap1[2]-overlap1[0]<PATCH_SIZE[1]/5 and overlap1[3]-overlap1[1]<PATCH_SIZE[0]/5:
+		if overlap1[2]-overlap1[0]<PATCH_SIZE[1]*OVERLAP_DISCARD_RATIO and overlap1[3]-overlap1[1]<PATCH_SIZE[0]*OVERLAP_DISCARD_RATIO:
 			
 			return None
 
