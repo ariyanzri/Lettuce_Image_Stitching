@@ -3599,7 +3599,6 @@ if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
 else:
 	no_of_cores_to_use = server_core[server]
 
-
 method = 'MST'
 # method = 'Hybrid'
 # method = 'Merge'
@@ -3608,13 +3607,19 @@ method = 'MST'
 # method = 'UAVmatching'
 # method = 'Old_method'
 
+
+
+# scan_date = '2020-02-18'
+scan_date = '2020-01-08'
+
+# scan_date = '2020-05-18'
+# scan_date = '2020-05-19'
+
+print('Starting process on {0} for scan date {1} using method {2}.'.format(server,scan_date,method))
+
 start_time = datetime.datetime.now()
 
-# main('2020-02-18')
-main('2020-01-08')
-
-# main('2020-05-18')
-# main('2020-05-19')
+main(scan_date)
 
 end_time = datetime.datetime.now()
 
