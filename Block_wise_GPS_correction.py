@@ -1731,7 +1731,7 @@ def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step
 
 	for p in corrected:
 		for p_n in not_corrected:
-			if p_n.has_overlap(p) and p.has_overlap(p_n):
+			if p_n.has_overlap(p) and p.has_overlap(p_n) and p_n not in can_be_corrected_patches:
 				can_be_corrected_patches.append(p_n)
 
 	number_of_iterations_without_change = 0
