@@ -2844,18 +2844,26 @@ class Group:
 			if i == 0:
 				continue
 
-			current_row,current_row_gps = draw_together(r,True)
-			prev_row,prev_row_gps = draw_together(self.rows[i-1],True)
+			for j,p in enumerate(r):
+				prev_p = self.rows[i-1][j]
 
-			curr_kp,curr_desc = detect_SIFT_key_points(current_row,int(0.8*current_row.shape[1]),0,current_row.shape[1],current_row.shape[0])
-			prev_kp,prev_desc = detect_SIFT_key_points(prev_row,int(0.8*prev_row.shape[1]),0,prev_row.shape[1],prev_row.shape[0])
+				params = prev_p.get_pairwise_transformation_info(p)
 
-			matches = get_top_percentage_matches(prev_desc,curr_desc,prev_kp,curr_kp)
+				print(params.H)
+				
+			# current_row,current_row_gps = draw_together(r,True)
+			# prev_row,prev_row_gps = draw_together(self.rows[i-1],True)
+
+			# curr_kp,curr_desc = detect_SIFT_key_points(current_row,int(0.8*current_row.shape[1]),0,current_row.shape[1],current_row.shape[0])
+			# prev_kp,prev_desc = detect_SIFT_key_points(prev_row,int(0.8*prev_row.shape[1]),0,prev_row.shape[1],prev_row.shape[0])
+
+			# matches = get_top_percentage_matches(prev_desc,curr_desc,prev_kp,curr_kp)
  			
-			H,per_in,scale,theta = find_homography(matches,prev_kp,curr_kp,None,None)
+			# H,per_in,scale,theta = find_homography(matches,prev_kp,curr_kp,None,None)
 
-			cv2.imshow('fig1',current_row)
-			cv2.imshow('fig2',prev_row)
+			# cv2.imshow('fig1',current_row)
+			# cv2.imshow('fig2',prev_row)
+
 		# self.load_all_patches_SIFT_points()
 
 		# for i,r in enumerate(self.rows):
