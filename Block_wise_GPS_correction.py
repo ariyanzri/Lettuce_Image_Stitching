@@ -2322,7 +2322,8 @@ class Patch:
 			area = cv2.contourArea(cnt)
 			areas.append(area)
 
-		threshold = np.percentile(np.array(area),40)
+		threshold = np.percentile(np.array(area),60)
+		
 		print(areas)
 		print(threshold)
 
