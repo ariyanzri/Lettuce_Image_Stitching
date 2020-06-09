@@ -1769,7 +1769,7 @@ def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step
 			number_of_iterations_without_change+=1
 			continue
 
-		if params.num_matches<40:
+		if params.num_matches<40 and number_of_iterations_without_change<len(can_be_corrected_patches):
 			print('Group ID {0}: ERROR- patch {1} NUM Matches < 40. will be pushed back.'.format(gid,p1.name))
 			sys.stdout.flush()
 			can_be_corrected_patches.insert(0,p1)
@@ -1801,6 +1801,11 @@ def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step
 		sys.stdout.flush()
 
 		number_of_iterations_without_change = 0
+
+	print('Group ID {0} - Remaining not corrected patches in this Group:'.format(gid))
+
+	for p in can_be_corrected_patches:
+		print('\t {0}'.format(p.name))
 
 	return corrected
 
