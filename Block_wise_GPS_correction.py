@@ -1674,7 +1674,7 @@ def hybrid_method_UAV_lettuce_matching_step(patches,gid):
 		if total_matched <CONTOUR_MATCHING_MIN_MATCH:
 			not_corrected.append(p)
 		else:
-			print('Group ID {0}: patch {1} corrected with {2} number of matches.'.format(gid,p.name,err))
+			print('Group ID {0}: patch {1} corrected with {2} number of matches.'.format(gid,p.name,total_matched))
 			sys.stdout.flush()
 			corrected.append(p)
 
