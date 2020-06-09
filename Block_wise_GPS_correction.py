@@ -2319,6 +2319,7 @@ class Patch:
 
 		for cnt in contours:
 			area = cv2.contourArea(cnt)
+			print(area)
 			if area>=LETTUCE_AREA_THRESHOLD:
 				final_contours.append(cnt)
 
