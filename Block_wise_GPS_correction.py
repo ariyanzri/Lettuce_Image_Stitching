@@ -1790,7 +1790,6 @@ def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step
 				continue
 
 			if p.has_overlap(p1) or p1.has_overlap(p):
-				print(p.name)
 				can_be_corrected_patches.append(p)
 
 		logger(p1,gps_diff,params,gid,step)
