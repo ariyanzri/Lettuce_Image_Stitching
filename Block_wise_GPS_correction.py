@@ -2326,8 +2326,8 @@ class Patch:
 		print(areas)
 		print(threshold)
 
-		for cnt in contours:
-			if area>threshold:
+		for i,cnt in enumerate(contours):
+			if areas[i]>threshold:
 				final_contours.append(cnt)
 
 
