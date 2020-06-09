@@ -38,7 +38,7 @@ PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
 LETTUCE_AREA_THRESHOLD = 5000
 REDUCTION_FACTOR = 0.05
 OVERLAP_DISCARD_RATIO = 0.05
-CONTOUR_MATCHING_ERR_TOLERANCE = 600
+CONTOUR_MATCHING_MIN_MATCH = 3
 INSIDE_RADIOUS_LETTUCE_MATCHING_THRESHOLD = 200
 
 GPS_ERROR_Y = 0.0000005
@@ -1669,12 +1669,12 @@ def hybrid_method_UAV_lettuce_matching_step(patches,gid):
 		
 		old_gps = p.gps
 
-		err = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
+		total_matched = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
 
-		if err >=CONTOUR_MATCHING_ERR_TOLERANCE:
+		if total_matched <CONTOUR_MATCHING_MIN_MATCH:
 			not_corrected.append(p)
 		else:
-			print('Group ID {0}: patch {1} corrected with {2} error.'.format(gid,p.name,err))
+			print('Group ID {0}: patch {1} corrected with {2} number of matches.'.format(gid,p.name,err))
 			sys.stdout.flush()
 			corrected.append(p)
 
