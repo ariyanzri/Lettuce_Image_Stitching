@@ -2317,10 +2317,15 @@ class Patch:
 		
 		final_contours = []
 
+		areas = []
 		for cnt in contours:
 			area = cv2.contourArea(cnt)
-			print(area)
-			if area>=LETTUCE_AREA_THRESHOLD:
+			areas.append(area)
+
+		threshold = np.quantile(np.array(areas),0.25)
+
+		for cnt in contours:
+			if area>=threshold:
 				final_contours.append(cnt)
 
 
