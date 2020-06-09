@@ -39,6 +39,7 @@ LETTUCE_AREA_THRESHOLD = 5000
 REDUCTION_FACTOR = 0.05
 OVERLAP_DISCARD_RATIO = 0.05
 CONTOUR_MATCHING_ERR_TOLERANCE = 600
+INSIDE_RADIOUS_LETTUCE_MATCHING_THRESHOLD = 200
 
 GPS_ERROR_Y = 0.0000005
 GPS_ERROR_X = 0.000001
@@ -2506,14 +2507,12 @@ class Patch:
 		for l in inside_lettuce_heads:
 			cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
 			
-		cv2.circle(imgg, (1000, 1500), 200, (0, 255, 255 ), -1)
-
 		cv2.imshow('reg',imgg)
 		cv2.waitKey(0)
 
 
 		best_T = None
-		best_error = sys.maxsize
+		best_matched = 0
 
 		for c in contour_centers:
 			for l in inside_lettuce_heads:
@@ -2525,13 +2524,14 @@ class Patch:
 
 				# mean_error = calculate_average_min_distance_lettuce_heads(contour_centers,inside_lettuce_heads,T)
 
-				count_matched_lettuce_heads_to_UAV(contour_centers,inside_lettuce_heads,T,1000)
+				matched_count = count_matched_lettuce_heads_to_UAV(contour_centers,inside_lettuce_heads,T,INSIDE_RADIOUS_LETTUCE_MATCHING_THRESHOLD)
 
-				if mean_error<best_error:
-					best_error = mean_error
+				if matched_count>best_matched:
+					best_matched = matched_count
 					best_T = T
 		
-
+		print(best_T)
+		
 		if best_T is not None:
 			self.move_GPS_based_on_lettuce(best_T)
 
