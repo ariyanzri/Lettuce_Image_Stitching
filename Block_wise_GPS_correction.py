@@ -1664,6 +1664,27 @@ def hybrid_method_UAV_lettuce_matching_step(patches,gid):
 
 	return corrected,not_corrected,step
 
+def get_best_pop(not_corrected,corrected):
+
+	best_count = 0
+	best_n = None
+
+	for n in not_corrected:
+		neibhor_count = 0
+
+		for p in corrected:
+			if n.has_overlap(p) or p.has_overlap(n):
+				neibhor_count+=1
+
+		if best_count<neibhor_count:
+			best_count = neibhor_count
+			best_n = n
+
+	return best_n
+
+
+
+
 def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step):
 	
 	print('Group ID {0}: ---- Entering SIFT Correction Phase ----'.format(gid))
@@ -1673,7 +1694,12 @@ def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step
 
 	while len(not_corrected)>0:
 		
-		p1 = not_corrected.pop()
+		# p1 = not_corrected.pop()
+		p1 = get_best_pop(not_corrected,corrected)
+		if p1 is None:
+			break
+
+		not_corrected.remove(p1)
 		
 		p2,params = get_best_neighbor_hybrid_method(p1,corrected)
 
@@ -3599,8 +3625,8 @@ if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
 else:
 	no_of_cores_to_use = server_core[server]
 
-method = 'MST'
-# method = 'Hybrid'
+# method = 'MST'
+method = 'Hybrid'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
@@ -3609,8 +3635,8 @@ method = 'MST'
 
 
 
-# scan_date = '2020-02-18'
-scan_date = '2020-01-08'
+scan_date = '2020-02-18'
+# scan_date = '2020-01-08'
 
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
