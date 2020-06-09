@@ -3501,7 +3501,8 @@ def main(scan_date):
 		
 		field = Field()
 
-
+		field.correct_field()
+		
 		# err = calculate_error_of_correction(True)
 		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
