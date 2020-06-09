@@ -2881,6 +2881,7 @@ class Group:
 			corrected_patches = super_patch_pool_merging_method(self.patches,self.group_id)
 
 			string_res = get_corrected_string(self.patches)
+			
 			self.delete_all_patches_SIFT_points()
 
 		elif method == 'AllNeighbor':
@@ -3590,7 +3591,7 @@ def main(scan_date):
 
 
 
-server_core = {'coge':10,'laplace.cs.arizona.edu':7,'ariyan':4}
+server_core = {'coge':10,'laplace.cs.arizona.edu':5,'ariyan':4}
 
 server = socket.gethostname()
 if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
