@@ -2835,7 +2835,7 @@ class Group:
 				p.gps = new_gps
 
 				draw_together(r[:j+1])
-
+ 
 		# self.load_all_patches_SIFT_points()
 
 		# for i,r in enumerate(self.rows):
