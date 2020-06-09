@@ -2847,8 +2847,8 @@ class Group:
 			current_row,current_row_gps = draw_together(r,True)
 			prev_row,prev_row_gps = draw_together(self.rows[i-1],True)
 
-			curr_kp,curr_desc = detect_SIFT_key_points(current_row,0.8*current_row.shape[1],0,current_row.shape[1],current_row.shape[0])
-			prev_kp,prev_desc = detect_SIFT_key_points(prev_row,0.8*prev_row.shape[1],0,prev_row.shape[1],prev_row.shape[0])
+			curr_kp,curr_desc = detect_SIFT_key_points(current_row,int(0.8*current_row.shape[1]),0,current_row.shape[1],current_row.shape[0])
+			prev_kp,prev_desc = detect_SIFT_key_points(prev_row,int(0.8*prev_row.shape[1]),0,prev_row.shape[1],prev_row.shape[0])
 
 			matches = get_top_percentage_matches(prev_desc,curr_desc,prev_kp,curr_kp)
  			
