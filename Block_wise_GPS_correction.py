@@ -1492,7 +1492,7 @@ def count_matched_lettuce_heads_to_UAV(contour_centers,inside_lettuce_heads,T,in
 	matched_count = 0
 
 	for c in contour_centers:
-		new_center = (c[0]+T[0],c[1]+T[1])
+		new_center = (c[0]+T[0,2],c[1]+T[1,2])
 
 		for l in inside_lettuce_heads:
 			distance = math.sqrt((new_center[0]-l[0])**2+(new_center[1]-l[1])**2)
@@ -2531,7 +2531,7 @@ class Patch:
 					best_T = T
 		
 		print(best_T)
-		
+
 		if best_T is not None:
 			self.move_GPS_based_on_lettuce(best_T)
 
