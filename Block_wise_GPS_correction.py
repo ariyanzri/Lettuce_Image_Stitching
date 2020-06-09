@@ -2849,8 +2849,23 @@ class Group:
 
 				params = prev_p.get_pairwise_transformation_info(p)
 
-				print(params.H)
-				
+				gps_diff = get_gps_diff_from_H(p,prev_p,params.H)
+
+				break
+
+			draw_together(r+self.rows[i-1])
+
+			for p in enumerate(r):
+				new_UR = (p.gps.UR_coord[0]-gps_diff[0],p.gps.UR_coord[1]-gps_diff[1])
+				new_LL = (p.gps.LL_coord[0]-gps_diff[0],p.gps.LL_coord[1]-gps_diff[1])
+				new_LR = (p.gps.LR_coord[0]-gps_diff[0],p.gps.LR_coord[1]-gps_diff[1])
+				new_center = (p.gps.Center[0]-gps_diff[0],p.gps.Center[1]-gps_diff[1])
+
+				new_coords = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+				p.gps = new_coords
+
+			draw_together(r+self.rows[i-1])
+			
 			# current_row,current_row_gps = draw_together(r,True)
 			# prev_row,prev_row_gps = draw_together(self.rows[i-1],True)
 
