@@ -3442,7 +3442,8 @@ def main(scan_date):
 		print('RUNNING ON -- {0} --'.format(server))
 		os.system("taskset -p -c 0-37 %d" % os.getpid())
 		
-		# print(calculate_error_of_correction())
+		err = calculate_error_of_correction(True)
+		print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 		# test_function()
 
@@ -3450,6 +3451,13 @@ def main(scan_date):
 		# field.create_patches_SIFT_files()
 
 		# lettuce_coords = read_lettuce_heads_coordinates()
+		
+		field.correct_field()
+		field.save_new_coordinate()
+
+		err = calculate_error_of_correction()
+		print("({:.10f},{:.10f})".format(err[0],err[1]))
+
 		# p1 = field.groups[0].patches[3]
 		# p1.get_lettuce_contours_centers(lettuce_coords)
 		# p1.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
@@ -3457,8 +3465,8 @@ def main(scan_date):
 		# r = Row(field.groups[0].rows[0])
 
 		# draw_together(field.groups[0].patches)
-		field.draw_and_save_field()
-		# field.correct_field()
+		# field.draw_and_save_field()
+		
 		# field.groups[0].load_all_patches_SIFT_points()
 		# new_patches = super_patch_pool_merging_method(field.groups[0].patches)
 		# field.draw_and_save_field()
@@ -3472,7 +3480,7 @@ def main(scan_date):
 		# field.correct_field()
 		# field.groups[0].correct_internally()
 		# field.draw_and_save_field()
-		# field.save_new_coordinate()
+		
 		# print(calculate_error_of_correction())
 
 	elif server == 'ariyan':
@@ -3590,9 +3598,9 @@ else:
 	no_of_cores_to_use = server_core[server]
 
 
-# method = 'MST'
+method = 'MST'
 # method = 'Hybrid'
-method = 'Merge'
+# method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
 # method = 'UAVmatching'
@@ -3601,9 +3609,9 @@ method = 'Merge'
 start_time = datetime.datetime.now()
 
 # main('2020-02-18')
-# main('2020-01-08')
+main('2020-01-08')
 
-main('2020-05-18')
+# main('2020-05-18')
 # main('2020-05-19')
 
 end_time = datetime.datetime.now()
