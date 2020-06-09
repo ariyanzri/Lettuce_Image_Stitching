@@ -2530,8 +2530,6 @@ class Patch:
 					best_matched = matched_count
 					best_T = T
 		
-		print(best_T)
-
 		if best_T is not None:
 			self.move_GPS_based_on_lettuce(best_T)
 
@@ -2539,6 +2537,7 @@ class Patch:
 
 		for c in contour_centers:
 			cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
+			imgg = cv2.putText(imgg, '{0},{1}'.format(c[0],c[1]), (c[0],c[1]+20), cv2.FONT_HERSHEY_SIMPLEX,1, (0,255,0), 2, cv2.LINE_AA) 
 
 		inside_lettuce_heads = []
 
@@ -2557,7 +2556,7 @@ class Patch:
 
 
 		self.delete_img()
-		return best_error
+		return best_matched
 
 	def move_GPS_based_on_lettuce(self,T):
 		diff_x = -T[0,2]*GPS_TO_IMAGE_RATIO[0]
