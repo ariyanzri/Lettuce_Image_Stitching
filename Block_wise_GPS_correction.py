@@ -2856,6 +2856,7 @@ class Group:
 			draw_together(r+self.rows[i-1])
 
 			for p in r:
+				new_UL = (p.gps.UL_coord[0]-gps_diff[0],p.gps.UL_coord[1]-gps_diff[1])
 				new_UR = (p.gps.UR_coord[0]-gps_diff[0],p.gps.UR_coord[1]-gps_diff[1])
 				new_LL = (p.gps.LL_coord[0]-gps_diff[0],p.gps.LL_coord[1]-gps_diff[1])
 				new_LR = (p.gps.LR_coord[0]-gps_diff[0],p.gps.LR_coord[1]-gps_diff[1])
