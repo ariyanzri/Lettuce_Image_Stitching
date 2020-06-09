@@ -2830,7 +2830,7 @@ class Group:
 				prev_p = r[j-1]
 				params = prev_p.get_pairwise_transformation_info(p)
 
-				new_gps = get_new_GPS_Coords(p,prev_p,H)
+				new_gps = get_new_GPS_Coords(p,prev_p,params.H)
 
 				p.gps = new_gps
 
@@ -3502,7 +3502,7 @@ def main(scan_date):
 		field = Field()
 
 		field.correct_field()
-		
+
 		# err = calculate_error_of_correction(True)
 		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
