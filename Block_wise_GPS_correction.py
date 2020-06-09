@@ -38,6 +38,7 @@ PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
 LETTUCE_AREA_THRESHOLD = 5000
 REDUCTION_FACTOR = 0.05
 OVERLAP_DISCARD_RATIO = 0.05
+CONTOUR_MATCHING_ERR_TOLERANCE = 600
 
 GPS_ERROR_Y = 0.0000005
 GPS_ERROR_X = 0.000001
@@ -1650,7 +1651,7 @@ def hybrid_method_UAV_lettuce_matching_step(patches,gid):
 
 		err = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
 
-		if err >=500:
+		if err >=CONTOUR_MATCHING_ERR_TOLERANCE:
 			not_corrected.append(p)
 		else:
 			print('Group ID {0}: patch {1} corrected with {2} error.'.format(gid,p.name,err))
@@ -1665,22 +1666,31 @@ def hybrid_method_UAV_lettuce_matching_step(patches,gid):
 	return corrected,not_corrected,step
 
 def get_best_pop(not_corrected,corrected):
-
-	best_count = 0
-	best_n = None
-
+	
 	for n in not_corrected:
-		neibhor_count = 0
-
+		
 		for p in corrected:
+			
 			if n.has_overlap(p) or p.has_overlap(n):
-				neibhor_count+=1
+				
+				return n
+	return None
 
-		if best_count<neibhor_count:
-			best_count = neibhor_count
-			best_n = n
+	# best_count = 0
+	# best_n = None
 
-	return best_n
+	# for n in not_corrected:
+	# 	neibhor_count = 0
+
+	# 	for p in corrected:
+	# 		if n.has_overlap(p) or p.has_overlap(n):
+	# 			neibhor_count+=1
+
+	# 	if best_count<neibhor_count:
+	# 		best_count = neibhor_count
+	# 		best_n = n
+
+	# return best_n
 
 
 
@@ -1706,7 +1716,8 @@ def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step
 		if p2 is None:
 			print('Group ID {0}: ERROR- patch {1} has no good corrected neighbor and will be pushed back.'.format(gid,p1.name))
 			sys.stdout.flush()
-			not_corrected.insert(0,p1)
+			# not_corrected.insert(0,p1)
+			not_corrected.append(p1)
 			continue
 
 		H = params.H
