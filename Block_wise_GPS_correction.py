@@ -2532,7 +2532,8 @@ class Patch:
 				# mean_error = calculate_average_min_distance_lettuce_heads(contour_centers,inside_lettuce_heads,T)
 
 				matched_count = count_matched_lettuce_heads_to_UAV(contour_centers,inside_lettuce_heads,T,INSIDE_RADIOUS_LETTUCE_MATCHING_THRESHOLD)
-
+				print(matched_count)
+				
 				if matched_count>best_matched:
 					best_matched = matched_count
 					best_T = T
