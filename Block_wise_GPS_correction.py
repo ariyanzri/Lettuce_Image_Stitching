@@ -2827,6 +2827,8 @@ class Group:
 				if j == 0:
 					continue
 
+				draw_together(r[:j+1])
+				
 				prev_p = r[j-1]
 				params = prev_p.get_pairwise_transformation_info(p)
 
