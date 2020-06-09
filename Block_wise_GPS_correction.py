@@ -2823,6 +2823,7 @@ class Group:
 	def correct_row_by_row(self):
 
 		for i,r in enumerate(self.rows):
+			
 			for j,p in enumerate(r):
 
 				p.load_SIFT_points()
@@ -2859,7 +2860,7 @@ class Group:
 					best_gps_diff = gps_diff
 
 
-			draw_together(r+self.rows[i-1])
+			# draw_together(r+self.rows[i-1])
 
 			for p in r:
 				new_UL = (p.gps.UL_coord[0]-gps_diff[0],p.gps.UL_coord[1]-gps_diff[1])
@@ -2871,7 +2872,10 @@ class Group:
 				new_coords = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
 				p.gps = new_coords
 
-			draw_together(r+self.rows[i-1])
+			for prev_p in self.rows[i-1]:
+				prev_p.delete_SIFT_points()
+
+			# draw_together(r+self.rows[i-1])
 
 			# current_row,current_row_gps = draw_together(r,True)
 			# prev_row,prev_row_gps = draw_together(self.rows[i-1],True)
@@ -3697,9 +3701,9 @@ def main(scan_date):
 		field = Field()
 		# field.create_patches_SIFT_files()
 		# field.draw_and_save_field(is_old=True)
-		# field.correct_field()
-		# field.draw_and_save_field(is_old=False)
-		field.print_field_in_text()
+		field.correct_field()
+		field.draw_and_save_field(is_old=False)
+		# field.print_field_in_text()
 
 
 		
