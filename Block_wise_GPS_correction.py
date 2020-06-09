@@ -2346,7 +2346,9 @@ class Patch:
 			cX = int(M["m10"] / M["m00"])
 			cY = int(M["m01"] / M["m00"])
 
-			
+			if cX<=INSIDE_RADIOUS_LETTUCE_MATCHING_THRESHOLD or cY<=INSIDE_RADIOUS_LETTUCE_MATCHING_THRESHOLD or \
+			abs(PATCH_SIZE[1]-cX)<INSIDE_RADIOUS_LETTUCE_MATCHING_THRESHOLD or abs(PATCH_SIZE[0]-cY)<INSIDE_RADIOUS_LETTUCE_MATCHING_THRESHOLD:
+				continue
 
 			if areas[i]>threshold:
 				final_contours.append(cnt)
