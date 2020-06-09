@@ -1498,7 +1498,7 @@ def count_matched_lettuce_heads_to_UAV(contour_centers,inside_lettuce_heads,T,in
 			distance = math.sqrt((new_center[0]-l[0])**2+(new_center[1]-l[1])**2)
 			if distance<=inside_radious:
 				matched_count+=1
-			break
+				break
 
 	return matched_count
 
@@ -2532,7 +2532,6 @@ class Patch:
 				# mean_error = calculate_average_min_distance_lettuce_heads(contour_centers,inside_lettuce_heads,T)
 
 				matched_count = count_matched_lettuce_heads_to_UAV(contour_centers,inside_lettuce_heads,T,INSIDE_RADIOUS_LETTUCE_MATCHING_THRESHOLD)
-				print(matched_count)
 				
 				if matched_count>best_matched:
 					best_matched = matched_count
