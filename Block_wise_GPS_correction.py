@@ -1019,7 +1019,7 @@ def draw_together(patches,return_flag=False):
 		cv2.imshow('fig',result)
 		cv2.waitKey(0)
 	else:
-		return result,GPS_Coordinate((left,up),(righ,up),(left,down),(right,down),((right+left)/2,(up+down)/2))
+		return result,GPS_Coordinate((left,up),(right,up),(left,down),(right,down),((right+left)/2,(up+down)/2))
 
 def merge_all_neighbors(corrected_neighbors,patch):
 	total_kp = []
