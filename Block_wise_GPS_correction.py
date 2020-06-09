@@ -2172,8 +2172,8 @@ class Patch:
 
 		percentage_inliers = round(percentage_inliers*100,2)
 
-		# dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
-		dissimilarity = - percentage_inliers*num_matches
+		dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
+		# dissimilarity = - percentage_inliers*num_matches
 
 		if dissimilarity == -1:
 			
@@ -3729,11 +3729,11 @@ if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
 else:
 	no_of_cores_to_use = server_core[server]
 
-# method = 'MST'
+method = 'MST'
 # method = 'Hybrid'
 # method = 'Merge'
 # method = 'AllNeighbor'
-method = 'Rowbyrow'
+# method = 'Rowbyrow'
 # method = 'UAVmatching'
 # method = 'Old_method'
 
