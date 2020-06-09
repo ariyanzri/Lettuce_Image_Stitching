@@ -2844,6 +2844,9 @@ class Group:
 			if i == 0:
 				continue
 
+			best_params = None 
+			best_gps_diff = None
+
 			for j,p in enumerate(r):
 				prev_p = self.rows[i-1][j]
 
@@ -2851,7 +2854,10 @@ class Group:
 
 				gps_diff = get_gps_diff_from_H(p,prev_p,params.H)
 
-				break
+				if (best_params is None) or best_params.dissimilarity>params.dissimilarity:
+					best_params = params
+					best_gps_diff = gps_diff
+					
 
 			draw_together(r+self.rows[i-1])
 
