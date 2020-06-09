@@ -2840,6 +2840,9 @@ class Group:
 
 				p.gps = new_gps
 
+				print('GROPU ID: {0} - Patch {1} from row {2} corrected'.format(self.group_id,j,i))
+				sys.stdout.flush()
+
 				# draw_together(r[:j+1])
 
 			if i == 0:
@@ -2874,6 +2877,10 @@ class Group:
 
 			for prev_p in self.rows[i-1]:
 				prev_p.delete_SIFT_points()
+
+			print('GROPU ID: {0} - Row {1} corrected based on previous row.'.format(self.group_id,i))
+			sys.stdout.flush()
+				
 
 			# draw_together(r+self.rows[i-1])
 
