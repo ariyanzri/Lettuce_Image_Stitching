@@ -26,8 +26,8 @@ from collections import OrderedDict,Counter
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-NUMBER_OF_ROWS_IN_GROUPS = 10
-# NUMBER_OF_ROWS_IN_GROUPS = 4
+# NUMBER_OF_ROWS_IN_GROUPS = 10
+NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -3045,7 +3045,7 @@ class Group:
 		elif method == 'UAVmatching':
 			for p in self.patches:
 				err = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
-				print('Group ID {0}: patch {1} corrected with {2} error.'.format(self.group_id,p.name,err))
+				print('Group ID {0}: patch {1} corrected with {2} number of final matches.'.format(self.group_id,p.name,err))
 				sys.stdout.flush()
 			
 			string_res = get_corrected_string(self.patches)
@@ -3181,7 +3181,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups[8:9]
+		return groups[8:10]
 
 	def get_rows(self,discard_right=DISCARD_RIGHT_FLAG):
 		global coordinates_file
@@ -3248,7 +3248,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist)
+			rows.append(newlist[5:14])
 
 		print('Rows calculated and created completely.')
 
@@ -3581,8 +3581,8 @@ def main(scan_date):
 	if server == 'coge':
 		print('RUNNING ON -- {0} --'.format(server))
 		
-		err = calculate_error_of_correction(True)
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction(True)
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 		field = Field()
 		lettuce_coords = read_lettuce_heads_coordinates()
@@ -3591,13 +3591,13 @@ def main(scan_date):
 		# field.create_patches_SIFT_files()
 
 		# field.groups[14].correct_internally()
-		# field.draw_and_save_field()
+		field.draw_and_save_field()
 		field.correct_field()
-		# field.draw_and_save_field()
-		field.save_new_coordinate()
+		field.draw_and_save_field()
+		# field.save_new_coordinate()
 		
-		err = calculate_error_of_correction()
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction()
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
