@@ -2323,7 +2323,9 @@ class Patch:
 			areas.append(area)
 
 		threshold = np.percentile(np.array(area),25)
-
+		print(areas)
+		print(threshold)
+		
 		for cnt in contours:
 			if area>=threshold:
 				final_contours.append(cnt)
@@ -2510,6 +2512,7 @@ class Patch:
 				if mean_error<best_error:
 					best_error = mean_error
 					best_T = T
+		print(best_T)
 
 		if best_T is not None:
 			self.move_GPS_based_on_lettuce(best_T)
