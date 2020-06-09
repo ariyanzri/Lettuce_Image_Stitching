@@ -38,7 +38,7 @@ PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
 LETTUCE_AREA_THRESHOLD = 5000
 REDUCTION_FACTOR = 0.05
 OVERLAP_DISCARD_RATIO = 0.05
-CONTOUR_MATCHING_MIN_MATCH = 3
+CONTOUR_MATCHING_MIN_MATCH = 2
 INSIDE_RADIOUS_LETTUCE_MATCHING_THRESHOLD = 200
 
 GPS_ERROR_Y = 0.0000005
@@ -1669,12 +1669,12 @@ def hybrid_method_UAV_lettuce_matching_step(patches,gid):
 		
 		old_gps = p.gps
 
-		total_matched = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
+		total_matched,total_contours = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
 
 		if total_matched <CONTOUR_MATCHING_MIN_MATCH:
 			not_corrected.append(p)
 		else:
-			print('Group ID {0}: patch {1} corrected with {2} number of matches.'.format(gid,p.name,total_matched))
+			print('Group ID {0}: patch {1} corrected with {2} number of matches ({3}).'.format(gid,p.name,total_matched,total_matched/total_contours))
 			sys.stdout.flush()
 			corrected.append(p)
 
@@ -1722,25 +1722,53 @@ def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step
 
 	step = starting_step
 
-	while len(not_corrected)>0:
-		
-		# p1 = not_corrected.pop()
-		p1 = get_best_pop(not_corrected,corrected)
-		if p1 is None:
+	can_be_corrected_patches = []
+
+	for p in corrected:
+		for p_n in not_corrected:
+			if p_n.has_overlap(p) and p.has_overlap(p_n):
+				can_be_corrected_patches.append(p_n)
+
+	number_of_iterations_without_change = 0
+
+	while len(can_be_corrected_patches)>0:
+
+		if number_of_iterations_without_change>len(can_be_corrected_patches)+1:
+			print('Group ID {0}: Infinit loop detected.'.format(gid))
 			break
 
-		not_corrected.remove(p1)
-		
+		p1 = can_be_corrected_patches.pop()
 		p2,params = get_best_neighbor_hybrid_method(p1,corrected)
 
+		H = params.H
+
 		if p2 is None:
-			print('Group ID {0}: ERROR- patch {1} has no good corrected neighbor and will be pushed back.'.format(gid,p1.name))
+			print('Group ID {0}: ERROR- patch {1} NONE Neighbor. will be pushed back.'.format(gid,p1.name))
 			sys.stdout.flush()
-			# not_corrected.insert(0,p1)
-			not_corrected.append(p1)
+			can_be_corrected_patches.insert(0,p1)
+			number_of_iterations_without_change+=1
 			continue
 
-		H = params.H
+		if H is None:
+			print('Group ID {0}: ERROR- patch {1} H is NONE. will be pushed back.'.format(gid,p1.name))
+			sys.stdout.flush()
+			can_be_corrected_patches.insert(0,p1)
+			number_of_iterations_without_change+=1
+			continue
+
+		if params.percentage_inliers<0.1:
+			print('Group ID {0}: ERROR- patch {1} Percentage Inliers < 10 Percente. will be pushed back.'.format(gid,p1.name))
+			sys.stdout.flush()
+			can_be_corrected_patches.insert(0,p1)
+			number_of_iterations_without_change+=1
+			continue
+
+		if num_matches<40:
+			print('Group ID {0}: ERROR- patch {1} NUM Matches < 40. will be pushed back.'.format(gid,p1.name))
+			sys.stdout.flush()
+			can_be_corrected_patches.insert(0,p1)
+			number_of_iterations_without_change+=1
+			continue
 
 		new_gps = get_new_GPS_Coords(p1,p2,H)
 
@@ -1750,12 +1778,16 @@ def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step
 
 		corrected.append(p1)
 
+		can_be_corrected_patches+=[p for p in not_corrected if ((p.has_overlap(p1) or p1.has_overlap(p)) and (p not in can_be_corrected_patches and p not in corrected))]
+
 		logger(p1,gps_diff,params,gid,step)
 
 		step+=1
 
 		print('Group ID {0}: patch {1} corrected with {2} dissimilarity.'.format(gid,p1.name,params.dissimilarity))
 		sys.stdout.flush()
+
+		number_of_iterations_without_change = 0
 
 	return corrected
 
@@ -2563,7 +2595,7 @@ class Patch:
 
 
 		self.delete_img()
-		return best_matched
+		return best_matched,len(contour_centers)
 
 	def move_GPS_based_on_lettuce(self,T):
 		diff_x = -T[0,2]*GPS_TO_IMAGE_RATIO[0]
