@@ -1487,6 +1487,22 @@ def read_lettuce_heads_coordinates():
 
 	return lettuce_coords
 
+def count_matched_lettuce_heads_to_UAV(contour_centers,inside_lettuce_heads,T,inside_radious):
+	matched_count = 0
+
+	for c in contour_centers:
+		new_center = (c[0]+T[0],c[1]+T[1])
+
+		for l in inside_lettuce_heads:
+			distance = math.sqrt((new_center[0]-l[0])**2+(new_center[1]-l[1])**2)
+			if distance<=inside_radious:
+				matched_count+=1
+			break
+
+	return matched_count
+
+
+
 def calculate_average_min_distance_lettuce_heads(contour_centers,inside_lettuce_heads,T):
 	
 	average_distance = 0
@@ -2322,10 +2338,7 @@ class Patch:
 			area = cv2.contourArea(cnt)
 			areas.append(area)
 
-		threshold = np.percentile(np.array(areas),25)
-		
-		print(areas)
-		print(threshold)
+		threshold = np.percentile(np.array(areas),20)
 
 		for i,cnt in enumerate(contours):
 			
@@ -2493,6 +2506,7 @@ class Patch:
 		for l in inside_lettuce_heads:
 			cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
 			
+		cv2.circle(imgg, (100, 1500), 100, (0, 255, 255 ), -1)
 
 		cv2.imshow('reg',imgg)
 		cv2.waitKey(0)
@@ -2506,15 +2520,17 @@ class Patch:
 
 				T = get_translation_from_single_matches(c[0],c[1],l[0],l[1])
 
-				if abs(T[0,2])>=GPS_ERROR_X/GPS_TO_IMAGE_RATIO[0] or abs(T[1,2])>=GPS_ERROR_Y/GPS_TO_IMAGE_RATIO[1]:
-					continue
+				# if abs(T[0,2])>=GPS_ERROR_X/GPS_TO_IMAGE_RATIO[0] or abs(T[1,2])>=GPS_ERROR_Y/GPS_TO_IMAGE_RATIO[1]:
+				# 	continue
 
-				mean_error = calculate_average_min_distance_lettuce_heads(contour_centers,inside_lettuce_heads,T)
+				# mean_error = calculate_average_min_distance_lettuce_heads(contour_centers,inside_lettuce_heads,T)
+
+				count_matched_lettuce_heads_to_UAV(contour_centers,inside_lettuce_heads,T,1000)
 
 				if mean_error<best_error:
 					best_error = mean_error
 					best_T = T
-		print(best_T)
+		
 
 		if best_T is not None:
 			self.move_GPS_based_on_lettuce(best_T)
