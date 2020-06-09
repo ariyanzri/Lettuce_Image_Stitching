@@ -2528,7 +2528,7 @@ class Patch:
 		cv2.imshow('reg',imgg)
 		cv2.waitKey(0)
 
-		
+
 		self.delete_img()
 		return best_error
 
@@ -3148,7 +3148,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups
+		return groups[8:9]
 
 	def get_rows(self,discard_right=DISCARD_RIGHT_FLAG):
 		global coordinates_file
@@ -3571,6 +3571,8 @@ def main(scan_date):
 		# os.system("taskset -p -c 0-37 %d" % os.getpid())
 		os.system("taskset -p -c 38-47 %d" % os.getpid())
 		
+		lettuce_coords = read_lettuce_heads_coordinates()
+
 		field = Field()
 
 		field.correct_field()
