@@ -1659,7 +1659,7 @@ def get_best_neighbor_hybrid_method(p1,corrected):
 	best_p.load_SIFT_points()
 	p1.load_SIFT_points()
 	best_params = best_p.get_pairwise_transformation_info(p1)
-	
+
 	return best_p,best_params
 
 
@@ -1775,6 +1775,8 @@ def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step
 			number_of_iterations_without_change+=1
 			continue
 
+
+
 		new_gps = get_new_GPS_Coords(p1,p2,H)
 
 		gps_diff = (p1.gps.UL_coord[0]-new_gps.UL_coord[0],p1.gps.UL_coord[1]-new_gps.UL_coord[1])
@@ -1783,7 +1785,7 @@ def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step
 
 		corrected.append(p1)
 
-		can_be_corrected_patches+=[p for p in not_corrected if ((p.has_overlap(p1) or p1.has_overlap(p)) and (p not in can_be_corrected_patches and p not in corrected))]
+		can_be_corrected_patches+=[p for p in not_corrected if ((p.has_overlap(p1) or p1.has_overlap(p)) and p != p1 and (p not in can_be_corrected_patches and p not in corrected))]
 
 		logger(p1,gps_diff,params,gid,step)
 
