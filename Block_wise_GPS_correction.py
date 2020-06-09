@@ -1650,6 +1650,9 @@ def get_best_neighbor_hybrid_method(p1,corrected):
 
 		params = p_tmp.get_pairwise_transformation_info(p1)
 		
+		if params is None:
+			continue
+
 		# overlap1,overlap2 = p1.get_overlap_rectangles(p_tmp)
 		# overlap_area = (overlap1[2]-overlap1[0])*(overlap1[3]-overlap1[1]) 
 
