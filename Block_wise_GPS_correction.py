@@ -1785,7 +1785,13 @@ def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step
 
 		corrected.append(p1)
 
-		can_be_corrected_patches+=[p for p in not_corrected if ((p.has_overlap(p1) or p1.has_overlap(p)) and p != p1 and (p not in can_be_corrected_patches and p not in corrected))]
+		for p in not_corrected:
+			if p in corrected or p in can_be_corrected_patches:
+				continue
+
+			if p.has_overlap(p1) or p1.has_overlap(p):
+				print(p.name)
+				can_be_corrected_patches.append(p)
 
 		logger(p1,gps_diff,params,gid,step)
 
