@@ -2506,7 +2506,7 @@ class Patch:
 		for l in inside_lettuce_heads:
 			cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
 			
-		cv2.circle(imgg, (1000, 1500), 500, (0, 255, 255 ), -1)
+		cv2.circle(imgg, (1000, 1500), 300, (0, 255, 255 ), -1)
 
 		cv2.imshow('reg',imgg)
 		cv2.waitKey(0)
