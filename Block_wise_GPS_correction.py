@@ -2342,7 +2342,12 @@ class Patch:
 		threshold = np.percentile(np.array(areas),20)
 
 		for i,cnt in enumerate(contours):
+			M = cv2.moments(cnt)
+			cX = int(M["m10"] / M["m00"])
+			cY = int(M["m01"] / M["m00"])
+
 			
+
 			if areas[i]>threshold:
 				final_contours.append(cnt)
 
@@ -2537,7 +2542,7 @@ class Patch:
 
 		for c in contour_centers:
 			cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
-			imgg = cv2.putText(imgg, '{0},{1}'.format(c[0],c[1]), (c[0]+50,c[1]), cv2.FONT_HERSHEY_SIMPLEX,4, (0,255,0), 2, cv2.LINE_AA) 
+			imgg = cv2.putText(imgg, '{0},{1}'.format(c[0],c[1]), (c[0]+50,c[1]), cv2.FONT_HERSHEY_SIMPLEX,4, (0,255,0), 4, cv2.LINE_AA) 
 
 		inside_lettuce_heads = []
 
