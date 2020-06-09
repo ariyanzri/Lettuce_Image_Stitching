@@ -26,8 +26,8 @@ from collections import OrderedDict,Counter
 PATCH_SIZE = (3296, 2472)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-NUMBER_OF_ROWS_IN_GROUPS = 10
-# NUMBER_OF_ROWS_IN_GROUPS = 4
+# NUMBER_OF_ROWS_IN_GROUPS = 10
+NUMBER_OF_ROWS_IN_GROUPS = 4
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
@@ -2819,29 +2819,46 @@ class Group:
 
 	def correct_row_by_row(self):
 
+		for i,r in enumerate(self.rows):
+			for j,p in enumerate(r):
+
+				p.load_SIFT_points()
+
+				if j == 0:
+					continue
+
+				prev_p = r[j-1]
+				params = prev_p.get_pairwise_transformation_info(p)
+
+				new_gps = get_new_GPS_Coords(p,prev_p,H)
+
+				p.gps = new_gps
+
+				draw_together(r[:j+1])
+
 		# self.load_all_patches_SIFT_points()
 
-		for i,r in enumerate(self.rows):
+		# for i,r in enumerate(self.rows):
 
-			for j,patch in enumerate(r):
-				# print(i,j)
-				if i == 0 and j == 0:
-					patch.Corrected = True
-					continue
-				elif i == 0 and j>0:
-					left_side_neighbor = r[j-1]
-					down_side_neighbors = []
-					neighbors = down_side_neighbors+[left_side_neighbor]
-				elif i>0 and j==0:
-					left_side_neighbor = None
-					down_side_neighbors = find_all_neighbors(self.rows[i-1],patch)
-					neighbors = down_side_neighbors
-				elif i>0 and j>0:
-					left_side_neighbor = r[j-1]
-					down_side_neighbors = find_all_neighbors(self.rows[i-1],patch)
-					neighbors = down_side_neighbors
+		# 	for j,patch in enumerate(r):
+		# 		# print(i,j)
+		# 		if i == 0 and j == 0:
+		# 			patch.Corrected = True
+		# 			continue
+		# 		elif i == 0 and j>0:
+		# 			left_side_neighbor = r[j-1]
+		# 			down_side_neighbors = []
+		# 			neighbors = down_side_neighbors+[left_side_neighbor]
+		# 		elif i>0 and j==0:
+		# 			left_side_neighbor = None
+		# 			down_side_neighbors = find_all_neighbors(self.rows[i-1],patch)
+		# 			neighbors = down_side_neighbors
+		# 		elif i>0 and j>0:
+		# 			left_side_neighbor = r[j-1]
+		# 			down_side_neighbors = find_all_neighbors(self.rows[i-1],patch)
+		# 			neighbors = down_side_neighbors
 
-				patch.gps = patch.correct_based_on_neighbors(neighbors)
+		# 		patch.gps = patch.correct_based_on_neighbors(neighbors)
 
 				# patch.load_img()
 				# main = cv2.resize(patch.rgb_img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
@@ -2872,8 +2889,8 @@ class Group:
 
 				# draw_together(neighbors+[patch])
 			
-			print('Group ID {0}: row {1} corrected.'.format(self.group_id,i+1))
-			sys.stdout.flush()
+			# print('Group ID {0}: row {1} corrected.'.format(self.group_id,i+1))
+			# sys.stdout.flush()
 
 		# self.delete_all_patches_SIFT_points()
 
@@ -3068,7 +3085,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups
+		return groups[4:5]
 
 	def get_rows(self,discard_right=DISCARD_RIGHT_FLAG):
 		global coordinates_file
@@ -3135,7 +3152,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist)
+			rows.append(newlist[6:10])
 
 		print('Rows calculated and created completely.')
 
@@ -3479,23 +3496,27 @@ def main(scan_date):
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
-		os.system("taskset -p -c 0-37 %d" % os.getpid())
+		# os.system("taskset -p -c 0-37 %d" % os.getpid())
+		os.system("taskset -p -c 38-47 %d" % os.getpid())
 		
-		err = calculate_error_of_correction(True)
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		field = Field()
+
+
+		# err = calculate_error_of_correction(True)
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 		# test_function()
 
-		field = Field()
+		# field = Field()
 		# field.create_patches_SIFT_files()
 
 		# lettuce_coords = read_lettuce_heads_coordinates()
 		
-		field.correct_field()
-		field.save_new_coordinate()
+		# field.correct_field()
+		# field.save_new_coordinate()
 
-		err = calculate_error_of_correction()
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction()
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 		# p1 = field.groups[0].patches[3]
 		# p1.get_lettuce_contours_centers(lettuce_coords)
