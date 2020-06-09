@@ -2857,7 +2857,7 @@ class Group:
 				if (best_params is None) or best_params.dissimilarity>params.dissimilarity:
 					best_params = params
 					best_gps_diff = gps_diff
-					
+
 
 			draw_together(r+self.rows[i-1])
 
@@ -3437,6 +3437,15 @@ class Field:
 		print('Coordinates saved.')
 		sys.stdout.flush()
 
+	def print_field_in_text(self):
+
+		for group in self.groups:
+			print('---- GROUP {0} ----'.format(group.group_id))
+
+			for i,row in enumerate(group.rows):
+				print('\t**** ROW {0} with {1} patches.'.format(i,len(row)))
+
+
 def logger(corrected_patch,gps_diff,param,gid,step_id):
 	global correction_log_file
 
@@ -3688,8 +3697,9 @@ def main(scan_date):
 		field = Field()
 		# field.create_patches_SIFT_files()
 		# field.draw_and_save_field(is_old=True)
-		field.correct_field()
-		field.draw_and_save_field(is_old=False)
+		# field.correct_field()
+		# field.draw_and_save_field(is_old=False)
+		field.print_field_in_text()
 
 
 		
