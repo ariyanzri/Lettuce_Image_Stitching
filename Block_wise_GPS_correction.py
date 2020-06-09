@@ -1639,26 +1639,24 @@ def get_best_neighbor_hybrid_method(p1,corrected):
 
 	corrected_neighbors = [p for p in corrected if (p.has_overlap(p1) or p1.has_overlap(p))]
 
-	best_score = 0
+	best_score = sys.maxsize
 	best_p = None
+	best_params = None
 
-	# p1.load_SIFT_points()
+	p1.load_SIFT_points()
 
 	for p_tmp in corrected_neighbors:
-		# p_tmp.load_SIFT_points()
+		p_tmp.load_SIFT_points()
 
-		# params = p_tmp.get_pairwise_transformation_info(p1)
+		params = p_tmp.get_pairwise_transformation_info(p1)
 		
-		overlap1,overlap2 = p1.get_overlap_rectangles(p_tmp)
-		overlap_area = (overlap1[2]-overlap1[0])*(overlap1[3]-overlap1[1]) 
+		# overlap1,overlap2 = p1.get_overlap_rectangles(p_tmp)
+		# overlap_area = (overlap1[2]-overlap1[0])*(overlap1[3]-overlap1[1]) 
 
-		if overlap_area  > best_score:
-			best_score = overlap_area
+		if params.dissimilarity  < best_score:
+			best_score = params.dissimilarity
 			best_p = p_tmp
-
-	best_p.load_SIFT_points()
-	p1.load_SIFT_points()
-	best_params = best_p.get_pairwise_transformation_info(p1)
+			best_params = params
 
 	return best_p,best_params
 
@@ -1745,7 +1743,7 @@ def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step
 		p1 = can_be_corrected_patches.pop()
 		p2,params = get_best_neighbor_hybrid_method(p1,corrected)
 
-		if p2 is None:
+		if p2 is None or params is None:
 			print('Group ID {0}: ERROR- patch {1} NONE Neighbor. will be pushed back.'.format(gid,p1.name))
 			sys.stdout.flush()
 			can_be_corrected_patches.insert(0,p1)
