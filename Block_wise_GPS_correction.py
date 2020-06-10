@@ -3870,8 +3870,6 @@ def main(scan_date):
 
 
 
-
-
 server_core = {'coge':10,'laplace.cs.arizona.edu':5,'ariyan':4}
 
 server = socket.gethostname()
