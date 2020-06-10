@@ -2397,6 +2397,9 @@ class Patch:
 			area = cv2.contourArea(cnt)
 			areas.append(area)
 
+		if len(areas) == 0:
+			return []
+
 		threshold = np.percentile(np.array(areas),20)
 
 		for i,cnt in enumerate(contours):
@@ -2553,6 +2556,9 @@ class Patch:
 		
 		contour_centers,contours = self.get_lettuce_contours_centers()
 		inside_lettuce_heads = []
+
+		if len(contour_centers) == 0:
+			return 0,0.1
 
 		for coord in list_lettuce_heads:
 			if self.gps.is_coord_inside(coord) or self.gps.is_coord_in_GPS_error_proximity(coord):
@@ -3844,20 +3850,20 @@ else:
 	no_of_cores_to_use = server_core[server]
 
 # method = 'MST'
-# method = 'Hybrid'
+method = 'Hybrid'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
 # method = 'UAVmatching'
-method = 'Old_method'
+# method = 'Old_method'
 
 
 
-# scan_date = '2020-02-18'
+scan_date = '2020-02-18'
 # scan_date = '2020-01-08'
 
 # scan_date = '2020-05-18'
-scan_date = '2020-05-19'
+# scan_date = '2020-05-19'
 
 print('Starting process on {0} for scan date {1} using method {2}.'.format(server,scan_date,method))
 
