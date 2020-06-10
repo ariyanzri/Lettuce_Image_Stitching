@@ -2555,21 +2555,21 @@ class Patch:
 
 		# ---------------- DRAW -----------------------
 
-		cv2.namedWindow('reg',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('reg', 500,500)
+		# cv2.namedWindow('reg',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('reg', 500,500)
 
-		imgg = self.rgb_img.copy()
+		# imgg = self.rgb_img.copy()
 
-		cv2.drawContours(imgg, contours, -1, (0,255,0),10)
+		# cv2.drawContours(imgg, contours, -1, (0,255,0),10)
 
-		for c in contour_centers:
-			cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
+		# for c in contour_centers:
+		# 	cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
 
-		for l in inside_lettuce_heads:
-			cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
+		# for l in inside_lettuce_heads:
+		# 	cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
 			
-		cv2.imshow('reg',imgg)
-		cv2.waitKey(0)
+		# cv2.imshow('reg',imgg)
+		# cv2.waitKey(0)
 
 		# ---------------- DRAW -----------------------
 
@@ -2597,28 +2597,28 @@ class Patch:
 
 		# ---------------- DRAW -----------------------
 
-		imgg = self.rgb_img.copy()
+		# imgg = self.rgb_img.copy()
 
-		cv2.drawContours(imgg, contours, -1, (0,255,0),10)
+		# cv2.drawContours(imgg, contours, -1, (0,255,0),10)
 
-		for c in contour_centers:
-			cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
-			# imgg = cv2.putText(imgg, '{0},{1}'.format(c[0],c[1]), (c[0]+50,c[1]), cv2.FONT_HERSHEY_SIMPLEX,4, (0,255,0), 4, cv2.LINE_AA) 
+		# for c in contour_centers:
+		# 	cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
+		# 	# imgg = cv2.putText(imgg, '{0},{1}'.format(c[0],c[1]), (c[0]+50,c[1]), cv2.FONT_HERSHEY_SIMPLEX,4, (0,255,0), 4, cv2.LINE_AA) 
 
-		inside_lettuce_heads = []
+		# inside_lettuce_heads = []
 
-		for coord in list_lettuce_heads:
-			if self.gps.is_coord_inside(coord):
+		# for coord in list_lettuce_heads:
+		# 	if self.gps.is_coord_inside(coord):
 
-				pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
-				pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
-				inside_lettuce_heads.append((pX,pY))
+		# 		pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
+		# 		pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
+		# 		inside_lettuce_heads.append((pX,pY))
 
-		for l in inside_lettuce_heads:
-			cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
+		# for l in inside_lettuce_heads:
+		# 	cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
 			
-		cv2.imshow('reg',imgg)
-		cv2.waitKey(0)
+		# cv2.imshow('reg',imgg)
+		# cv2.waitKey(0)
 
 		# ---------------- DRAW -----------------------
 
@@ -3360,16 +3360,23 @@ class Field:
 
 		result = []
 		color = 0
+		row_changer = [2,3]
+		row_color = [2,3]
 
 		for group in self.groups:
 			
-			if color == 0:
-				color = 1
+			if row_changer == [2,3]:
+				row_color = [0,1]
 			else:
-				color = 0
+				row_color = [2,3]
 
 			for row in group.rows:
 				
+				if color == row_color[0]:
+					color = row_color[1]
+				else:
+					color = row_color[0]
+
 				for p in row:
 					result.append([p.gps.Center[0],p.gps.Center[1],color])
 		
@@ -3806,7 +3813,8 @@ def main(scan_date):
 		print('RUNNING ON -- {0} --'.format(server))
 		field = Field()
 		# field.create_patches_SIFT_files()
-		field.draw_and_save_field(is_old=True)
+		# field.draw_and_save_field(is_old=True)
+		field.save_plot()
 		field.correct_field()
 		field.draw_and_save_field(is_old=False)
 		# field.print_field_in_text()
@@ -3833,16 +3841,16 @@ else:
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
-method = 'UAVmatching'
-# method = 'Old_method'
+# method = 'UAVmatching'
+method = 'Old_method'
 
 
 
-scan_date = '2020-02-18'
+# scan_date = '2020-02-18'
 # scan_date = '2020-01-08'
 
 # scan_date = '2020-05-18'
-# scan_date = '2020-05-19'
+scan_date = '2020-05-19'
 
 print('Starting process on {0} for scan date {1} using method {2}.'.format(server,scan_date,method))
 
