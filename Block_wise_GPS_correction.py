@@ -3729,7 +3729,7 @@ def main(scan_date):
 		lettuce_coords = read_lettuce_heads_coordinates()
 
 		field = Field()
-		field.draw_and_save_field(is_old=True)
+		# field.draw_and_save_field(is_old=True)
 
 		field.correct_field()
 
