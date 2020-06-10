@@ -3624,10 +3624,42 @@ class Field:
 
 
 
+def get_RMSE_error_function(p,n,gid):
+	overlap_1,overlap_2 = p.get_overlap_rectangles(n)
 
-def get_approximate_random_RMSE_overlap(field,sample_no_per_group):
+	overlap_1_img = p.rgb_img[overlap_1[1]:overlap_1[3],overlap_1[0]:overlap_1[2],:]
+	overlap_2_img = n.rgb_img[overlap_2[1]:overlap_2[3],overlap_2[0]:overlap_2[2],:]
+
+	shape_1 = np.shape(overlap_1_img)
+	shape_2 = np.shape(overlap_2_img)
+
+	if shape_1 != shape_2:
+
+		if shape_1[0]*shape_1[1] > shape_2[0]*shape_2[1]:
+			overlap_1_img = cv2.resize(overlap_1_img,(shape_2[1],shape_2[0]))
+			shape_1 = shape_2
+		else:
+			overlap_2_img = cv2.resize(overlap_2_img,(shape_1[1],shape_1[0]))
+			shape_2 = shape_1
+
+	if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
+		
+		continue
+
+	err = np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
+	err /= float(overlap_1_img.shape[0] * overlap_2_img.shape[1] * overlap_2_img.shape[1])
+
+	err = math.sqrt(err)
+
+	return gid,n.gps.Center[0],n.gps.Center[1],err
+
+
+def get_RMSE_error_function_helper(args):
+	return get_RMSE_error_function(*args)
+
+def get_approximate_random_RMSE_overlap(field,sample_no_per_group,core_to_use):
 	
-	results = []
+	args_list = []
 
 	for group in field.groups:
 
@@ -3641,37 +3673,13 @@ def get_approximate_random_RMSE_overlap(field,sample_no_per_group):
 				n.load_img()
 
 				if n.has_overlap(p) or p.has_overlap(n):
+					args_list.append((p,n,group.group_id))
 
-					overlap_1,overlap_2 = p.get_overlap_rectangles(n)
-
-					overlap_1_img = p.rgb_img[overlap_1[1]:overlap_1[3],overlap_1[0]:overlap_1[2],:]
-					overlap_2_img = n.rgb_img[overlap_2[1]:overlap_2[3],overlap_2[0]:overlap_2[2],:]
-
-					shape_1 = np.shape(overlap_1_img)
-					shape_2 = np.shape(overlap_2_img)
-
-					if shape_1 != shape_2:
-
-						if shape_1[0]*shape_1[1] > shape_2[0]*shape_2[1]:
-							overlap_1_img = cv2.resize(overlap_1_img,(shape_2[1],shape_2[0]))
-							shape_1 = shape_2
-						else:
-							overlap_2_img = cv2.resize(overlap_2_img,(shape_1[1],shape_1[0]))
-							shape_2 = shape_1
-
-					if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
-						
-						continue
-
-					err = np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
-					err /= float(overlap_1_img.shape[0] * overlap_2_img.shape[1] * overlap_2_img.shape[1])
-
-					err = math.sqrt(err)
-
-					results.append([group.group_id,n.gps.Center[0],n.gps.Center[1],err])
-
+	processes = MyPool(int(core_to_use))
+	results = processes.map(get_RMSE_error_function_helper,args_list)
+	processes.close()
+				
 	return np.array(results)
-
 
 		
 def logger(corrected_patch,gps_diff,param,gid,step_id):
@@ -3787,7 +3795,7 @@ def main(scan_date):
 		os.system("taskset -p -c 38-47 %d" % os.getpid())
 		
 		field = Field(True)
-		print(get_approximate_random_RMSE_overlap(field,2))
+		print(get_approximate_random_RMSE_overlap(field,2,6))
 
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
