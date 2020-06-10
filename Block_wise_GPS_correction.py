@@ -3968,8 +3968,8 @@ method = 'MST'
 
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
-scan_date = '2020-06-02'
-# scan_date = '2020-06-03'
+# scan_date = '2020-06-02'
+scan_date = '2020-06-03'
 
 print('Starting process on {0} for scan date {1} using method {2}.'.format(server,scan_date,method))
 
