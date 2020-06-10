@@ -3680,7 +3680,7 @@ def get_RMSE_error_function(p,n,gid):
 	p.delete_img()
 	n.delete_img()
 
-	return gid,n.gps.Center[0],n.gps.Center[1],err
+	return gid,n.gps.Center[0],n.gps.Center[1],dissimilarity
 
 
 def get_RMSE_error_function_helper(args):
