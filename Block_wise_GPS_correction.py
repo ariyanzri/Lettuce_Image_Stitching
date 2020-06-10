@@ -3821,12 +3821,12 @@ def main(scan_date):
 		os.system("taskset -p -c 38-47 %d" % os.getpid())
 		
 		field = Field(False)
-		res = get_approximate_random_RMSE_overlap(field,2,6)
+		res = get_approximate_random_RMSE_overlap(field,10,6)
 		np.save('RMSE_before.npy',res)
 		print(np.mean(res[:,3]))
 
 		field = Field(True)
-		res = get_approximate_random_RMSE_overlap(field,2,6)
+		res = get_approximate_random_RMSE_overlap(field,10,6)
 		np.save('RMSE_after.npy',res)
 		print(np.mean(res[:,3]))
 
