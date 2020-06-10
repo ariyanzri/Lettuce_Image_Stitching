@@ -2446,7 +2446,7 @@ class Patch:
 		# cv2.imshow('gr',img)
 		# cv2.waitKey(0)
 
-		return contour_centers
+		return contour_centers,contours
 
 	def correct_based_on_matched_contour_centers(self,p2):
 
@@ -2543,7 +2543,7 @@ class Patch:
 		# cv2.imshow('fig',self.rgb_img)
 		# cv2.waitKey(0)
 		
-		contour_centers = self.get_lettuce_contours_centers()
+		contour_centers,contours = self.get_lettuce_contours_centers()
 		inside_lettuce_heads = []
 
 		for coord in list_lettuce_heads:
@@ -2553,20 +2553,25 @@ class Patch:
 				pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
 				inside_lettuce_heads.append((pX,pY))
 
-		# cv2.namedWindow('reg',cv2.WINDOW_NORMAL)
-		# cv2.resizeWindow('reg', 500,500)
+		# ---------------- DRAW -----------------------
 
-		# imgg = self.rgb_img.copy()
+		cv2.namedWindow('reg',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('reg', 500,500)
 
-		# for c in contour_centers:
-		# 	cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
+		imgg = self.rgb_img.copy()
 
-		# for l in inside_lettuce_heads:
-		# 	cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
+		cv2.drawContours(imgg, contours, -1, (0,255,0),10)
+
+		for c in contour_centers:
+			cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
+
+		for l in inside_lettuce_heads:
+			cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
 			
-		# cv2.imshow('reg',imgg)
-		# cv2.waitKey(0)
+		cv2.imshow('reg',imgg)
+		cv2.waitKey(0)
 
+		# ---------------- DRAW -----------------------
 
 		best_T = None
 		best_matched = 0
@@ -2590,27 +2595,32 @@ class Patch:
 		if best_T is not None:
 			self.move_GPS_based_on_lettuce(best_T)
 
-		# imgg = self.rgb_img.copy()
+		# ---------------- DRAW -----------------------
 
-		# for c in contour_centers:
-		# 	cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
-		# 	imgg = cv2.putText(imgg, '{0},{1}'.format(c[0],c[1]), (c[0]+50,c[1]), cv2.FONT_HERSHEY_SIMPLEX,4, (0,255,0), 4, cv2.LINE_AA) 
+		imgg = self.rgb_img.copy()
 
-		# inside_lettuce_heads = []
+		cv2.drawContours(imgg, contours, -1, (0,255,0),10)
 
-		# for coord in list_lettuce_heads:
-		# 	if self.gps.is_coord_inside(coord):
+		for c in contour_centers:
+			cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
+			imgg = cv2.putText(imgg, '{0},{1}'.format(c[0],c[1]), (c[0]+50,c[1]), cv2.FONT_HERSHEY_SIMPLEX,4, (0,255,0), 4, cv2.LINE_AA) 
 
-		# 		pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
-		# 		pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
-		# 		inside_lettuce_heads.append((pX,pY))
+		inside_lettuce_heads = []
 
-		# for l in inside_lettuce_heads:
-		# 	cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
+		for coord in list_lettuce_heads:
+			if self.gps.is_coord_inside(coord):
+
+				pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
+				pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
+				inside_lettuce_heads.append((pX,pY))
+
+		for l in inside_lettuce_heads:
+			cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
 			
-		# cv2.imshow('reg',imgg)
-		# cv2.waitKey(0)
+		cv2.imshow('reg',imgg)
+		cv2.waitKey(0)
 
+		# ---------------- DRAW -----------------------
 
 		self.delete_img()
 		return best_matched,len(contour_centers)
@@ -3233,7 +3243,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups
+		return groups[7:8]
 
 	def get_rows(self,discard_right=DISCARD_RIGHT_FLAG):
 		global coordinates_file
@@ -3823,16 +3833,16 @@ else:
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
-# method = 'UAVmatching'
-method = 'Old_method'
+method = 'UAVmatching'
+# method = 'Old_method'
 
 
 
-# scan_date = '2020-02-18'
+scan_date = '2020-02-18'
 # scan_date = '2020-01-08'
 
 # scan_date = '2020-05-18'
-scan_date = '2020-05-19'
+# scan_date = '2020-05-19'
 
 print('Starting process on {0} for scan date {1} using method {2}.'.format(server,scan_date,method))
 
