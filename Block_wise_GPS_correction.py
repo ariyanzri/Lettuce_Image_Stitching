@@ -2945,6 +2945,9 @@ class Group:
 				prev_p = r[j-1]
 				params = prev_p.get_pairwise_transformation_info(p)
 
+				if params is None:
+					continue
+					
 				new_gps = get_new_GPS_Coords(p,prev_p,params.H)
 
 				p.gps = new_gps
@@ -3891,8 +3894,8 @@ method = 'Rowbyrow'
 # scan_date = '2020-02-18'
 # scan_date = '2020-01-08'
 
-# scan_date = '2020-05-18'
-scan_date = '2020-05-19'
+scan_date = '2020-05-18'
+# scan_date = '2020-05-19'
 
 print('Starting process on {0} for scan date {1} using method {2}.'.format(server,scan_date,method))
 
