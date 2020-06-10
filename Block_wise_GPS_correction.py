@@ -3625,6 +3625,9 @@ class Field:
 
 
 def get_RMSE_error_function(p,n,gid):
+	p.load_img()
+	n.load_img()
+
 	overlap_1,overlap_2 = p.get_overlap_rectangles(n)
 
 	overlap_1_img = p.rgb_img[overlap_1[1]:overlap_1[3],overlap_1[0]:overlap_1[2],:]
@@ -3651,6 +3654,9 @@ def get_RMSE_error_function(p,n,gid):
 
 	err = math.sqrt(err)
 
+	p.delete_img()
+	n.delete_img()
+	
 	return gid,n.gps.Center[0],n.gps.Center[1],err
 
 
@@ -3667,10 +3673,7 @@ def get_approximate_random_RMSE_overlap(field,sample_no_per_group,core_to_use):
 
 		for p in sample_patches:
 
-			p.load_img()
-
 			for n in group.patches:
-				n.load_img()
 
 				if n.has_overlap(p) or p.has_overlap(n):
 					args_list.append((p,n,group.group_id))
