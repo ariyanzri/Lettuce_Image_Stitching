@@ -3636,6 +3636,10 @@ def get_RMSE_error_function(p,n,gid):
 	shape_1 = np.shape(overlap_1_img)
 	shape_2 = np.shape(overlap_2_img)
 
+	if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
+		
+		return -1,-1,-1,-1
+		
 	if shape_1 != shape_2:
 
 		if shape_1[0]*shape_1[1] > shape_2[0]*shape_2[1]:
@@ -3797,10 +3801,10 @@ def main(scan_date):
 		# os.system("taskset -p -c 0-37 %d" % os.getpid())
 		os.system("taskset -p -c 38-47 %d" % os.getpid())
 		
-		field = Field(False)
-		res = get_approximate_random_RMSE_overlap(field,10,6)
-		np.save('RMSE_before.npy',res)
-		print(np.mean(res[:,3]))
+		# field = Field(False)
+		# res = get_approximate_random_RMSE_overlap(field,10,6)
+		# np.save('RMSE_before.npy',res)
+		# print(np.mean(res[:,3]))
 
 		field = Field(True)
 		res = get_approximate_random_RMSE_overlap(field,10,6)
