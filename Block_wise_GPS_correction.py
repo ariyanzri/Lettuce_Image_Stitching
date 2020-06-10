@@ -3625,7 +3625,7 @@ class Field:
 
 
 
-def get_approximate_random_RMSE_overlap(field,coorected_coord_file,old_coord_file,sample_no_per_group):
+def get_approximate_random_RMSE_overlap(field,sample_no_per_group):
 	
 	results = []
 
@@ -3782,9 +3782,12 @@ def main(scan_date):
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
-		os.system("taskset -p -c 0-37 %d" % os.getpid())
-		# os.system("taskset -p -c 38-47 %d" % os.getpid())
+		# os.system("taskset -p -c 0-37 %d" % os.getpid())
+		os.system("taskset -p -c 38-47 %d" % os.getpid())
 		
+		field = Field()
+		print(get_approximate_random_RMSE_overlap(field,2))
+
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
 		# field = Field()
@@ -3794,21 +3797,21 @@ def main(scan_date):
 
 		# field.draw_and_save_field(is_old=False)
 
-		err = calculate_error_of_correction(True)
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction(True)
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 		# test_function()
 
-		field = Field()
+		# field = Field()
 		# field.create_patches_SIFT_files()
 
-		lettuce_coords = read_lettuce_heads_coordinates()
+		# lettuce_coords = read_lettuce_heads_coordinates()
 		
-		field.correct_field()
-		field.save_new_coordinate()
+		# field.correct_field()
+		# field.save_new_coordinate()
 
-		err = calculate_error_of_correction()
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction()
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 		# p1 = field.groups[0].patches[3]
 		# p1.get_lettuce_contours_centers(lettuce_coords)
@@ -3927,9 +3930,9 @@ def main(scan_date):
 		# HPC
 		print('RUNNING ON -- {0} --'.format(server))
 		field = Field()
-		# field.create_patches_SIFT_files()
-		# field.draw_and_save_field(is_old=True)
-		# field.save_plot()
+		field.create_patches_SIFT_files()
+		field.draw_and_save_field(is_old=True)
+		field.save_plot()
 		field.correct_field()
 		field.draw_and_save_field(is_old=False)
 		# field.print_field_in_text()
@@ -3964,6 +3967,8 @@ scan_date = '2020-01-08'
 
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
+# scan_date = '2020-06-02'
+# scan_date = '2020-06-03'
 
 print('Starting process on {0} for scan date {1} using method {2}.'.format(server,scan_date,method))
 
