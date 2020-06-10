@@ -3786,7 +3786,7 @@ def main(scan_date):
 		# os.system("taskset -p -c 0-37 %d" % os.getpid())
 		os.system("taskset -p -c 38-47 %d" % os.getpid())
 		
-		field = Field()
+		field = Field(True)
 		print(get_approximate_random_RMSE_overlap(field,2))
 
 		# lettuce_coords = read_lettuce_heads_coordinates()
