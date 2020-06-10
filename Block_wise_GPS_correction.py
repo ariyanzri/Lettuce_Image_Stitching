@@ -2964,13 +2964,16 @@ class Group:
 			best_gps_diff = None
 
 			for j,p in enumerate(r):
+				if j>=len(self.rows[i-1]):
+					continue
+					
 				prev_p = self.rows[i-1][j]
 
 				params = prev_p.get_pairwise_transformation_info(p)
 
 				if params is None:
 					continue
-					
+
 				gps_diff = get_gps_diff_from_H(p,prev_p,params.H)
 
 				if (best_params is None) or best_params.dissimilarity>params.dissimilarity:
