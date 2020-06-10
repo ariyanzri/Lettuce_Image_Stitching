@@ -1229,8 +1229,8 @@ def jitter_and_calculate_dissimilarity(patch,neighbors,jx,jy):
 
 def jitter_image_to_find_least_dissimilarity(patch,neighbors):
 	
-	list_jitter_x = np.arange(-0.0000002, 0.0000002, 0.00000003)
-	list_jitter_y = np.arange(-0.0000001, 0.0000001, 0.00000003)
+	list_jitter_x = np.arange(-0.000001, 0.000001, 0.0000001)
+	list_jitter_y = np.arange(-0.0000005, 0.0000005, 0.0000003)
 
 	min_dissimilarity = sys.maxsize
 	min_gps = None
@@ -3066,6 +3066,37 @@ class Group:
 
 		return get_corrected_string(self.patches)
 
+	def row_by_row_jitter(self):
+
+		for i,r in enumerate(self.rows):
+
+			for j,patch in enumerate(r):
+				# print(i,j)
+				if i == 0 and j == 0:
+					patch.Corrected = True
+					continue
+				elif i == 0 and j>0:
+					left_side_neighbor = r[j-1]
+					down_side_neighbors = []
+					neighbors = down_side_neighbors+[left_side_neighbor]
+				elif i>0 and j==0:
+					left_side_neighbor = None
+					down_side_neighbors = find_all_neighbors(self.rows[i-1],patch)
+					neighbors = down_side_neighbors
+				elif i>0 and j>0:
+					left_side_neighbor = r[j-1]
+					down_side_neighbors = find_all_neighbors(self.rows[i-1],patch)
+					neighbors = down_side_neighbors
+
+				patch.gps = jitter_image_to_find_least_dissimilarity(patch,neighbors)
+				
+				print('Group {0} - Patch {1} fixed based on {2} neighbors.'.format(self.group_id,patch.name,len(neighbors)))
+				
+			print('Group ID {0}: row {1} corrected.'.format(self.group_id,i+1))
+			sys.stdout.flush()
+
+		return get_corrected_string(self.patches)
+
 	def correct_internally(self):
 
 		global lettuce_coords,no_of_cores_to_use,method
@@ -3827,7 +3858,7 @@ def main(scan_date):
 		field = Field()
 		# field.create_patches_SIFT_files()
 		# field.draw_and_save_field(is_old=True)
-		field.save_plot()
+		# field.save_plot()
 		field.correct_field()
 		field.draw_and_save_field(is_old=False)
 		# field.print_field_in_text()
@@ -3850,19 +3881,19 @@ else:
 	no_of_cores_to_use = server_core[server]
 
 # method = 'MST'
-method = 'Hybrid'
+# method = 'Hybrid'
 # method = 'Merge'
 # method = 'AllNeighbor'
-# method = 'Rowbyrow'
+method = 'Rowbyrow'
 # method = 'UAVmatching'
 # method = 'Old_method'
 
 
 
-scan_date = '2020-02-18'
+# scan_date = '2020-02-18'
 # scan_date = '2020-01-08'
 
-# scan_date = '2020-05-18'
+scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 
 print('Starting process on {0} for scan date {1} using method {2}.'.format(server,scan_date,method))
