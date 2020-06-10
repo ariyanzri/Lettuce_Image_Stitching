@@ -3671,7 +3671,7 @@ def get_RMSE_error_function(p,n,gid):
 
 	dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
 	
-	
+
 	# err = np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
 	# err /= float(overlap_1_img.shape[0] * overlap_2_img.shape[1] * overlap_2_img.shape[1])
 
@@ -3821,12 +3821,12 @@ def main(scan_date):
 		os.system("taskset -p -c 38-47 %d" % os.getpid())
 		
 		field = Field(False)
-		res = get_approximate_random_RMSE_overlap(field,10,6)
+		res = get_approximate_random_RMSE_overlap(field,2,6)
 		np.save('RMSE_before.npy',res)
 		print(np.mean(res[:,3]))
 
 		field = Field(True)
-		res = get_approximate_random_RMSE_overlap(field,10,6)
+		res = get_approximate_random_RMSE_overlap(field,2,6)
 		np.save('RMSE_after.npy',res)
 		print(np.mean(res[:,3]))
 
