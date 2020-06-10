@@ -3656,7 +3656,7 @@ def get_RMSE_error_function(p,n,gid):
 
 	p.delete_img()
 	n.delete_img()
-	
+
 	return gid,n.gps.Center[0],n.gps.Center[1],err
 
 
@@ -3798,7 +3798,12 @@ def main(scan_date):
 		os.system("taskset -p -c 38-47 %d" % os.getpid())
 		
 		field = Field(False)
-		print(get_approximate_random_RMSE_overlap(field,2,6))
+		res = get_approximate_random_RMSE_overlap(field,10,6)
+		np.save('RMSE_before.npy',res)
+
+		field = Field(True)
+		res = get_approximate_random_RMSE_overlap(field,10,6)
+		np.save('RMSE_after.npy',res)
 
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
