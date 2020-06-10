@@ -3072,7 +3072,7 @@ class Group:
 			
 			final_patches = hybrid_method_sift_correction_step(corrected,not_corrected,self.group_id,step)
 
-			string_res = get_corrected_string(final_patches)
+			string_res = get_corrected_string(self.patches)
 
 		elif method == 'Merge':
 			
@@ -3114,9 +3114,9 @@ class Group:
 			corrected = [p]
 			not_corrected = [p for p in self.patches if p != max_patch]
 			step = 0
-			final_patches = old_method_simple_for_test(corrected,not_corrected,self.group_id,step)
+			final_patches = hybrid_method_sift_correction_step(corrected,not_corrected,self.group_id,step)
 
-			string_res = get_corrected_string(final_patches)
+			string_res = get_corrected_string(self.patches)
 
 		print('Group {0} was corrected internally. '.format(self.group_id))
 		sys.stdout.flush()
@@ -3817,19 +3817,19 @@ else:
 	no_of_cores_to_use = server_core[server]
 
 # method = 'MST'
-method = 'Hybrid'
+# method = 'Hybrid'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
 # method = 'UAVmatching'
-# method = 'Old_method'
+method = 'Old_method'
 
 
 
-scan_date = '2020-02-18'
+# scan_date = '2020-02-18'
 # scan_date = '2020-01-08'
 
-# scan_date = '2020-05-18'
+scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 
 print('Starting process on {0} for scan date {1} using method {2}.'.format(server,scan_date,method))
