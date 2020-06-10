@@ -472,7 +472,15 @@ def visualize_plot():
 
 	c = []
 	for d in data:
-		c.append('red' if d[2] == 0 else 'green')
+		# c.append('red' if d[2] == 0 else 'green')
+		if d[2] == 0:
+			c.append('red')
+		elif d[2] == 1:
+			c.append('green')
+		elif d[2] == 2:
+			c.append('blue')
+		else:
+			c.append('yellow')
 
 	plt.scatter(data[:,0],data[:,1],color=c,alpha=0.5)
 
@@ -3360,12 +3368,11 @@ class Field:
 
 		result = []
 		color = 0
-		row_changer = [2,3]
 		row_color = [2,3]
 
 		for group in self.groups:
 			
-			if row_changer == [2,3]:
+			if row_color == [2,3]:
 				row_color = [0,1]
 			else:
 				row_color = [2,3]
@@ -3723,89 +3730,89 @@ def main(scan_date):
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
 
-		# visualize_plot()
+		visualize_plot()
 
-		patches = read_all_data()
-		p1 = patches[0]
+		# patches = read_all_data()
+		# p1 = patches[0]
 		
-		# lettuce_coords = read_lettuce_heads_coordinates()
-		# p1.get_lettuce_contours_centers(lettuce_coords)
+		# # lettuce_coords = read_lettuce_heads_coordinates()
+		# # p1.get_lettuce_contours_centers(lettuce_coords)
 		
-		# fft = p1.get_fft_region(0,0,PATCH_SIZE[1],PATCH_SIZE[0])
-		# # print(fft)
-		# p1.load_img()
+		# # fft = p1.get_fft_region(0,0,PATCH_SIZE[1],PATCH_SIZE[0])
+		# # # print(fft)
+		# # p1.load_img()
 
-		p2 = patches[1]
+		# p2 = patches[1]
 
-		for p in patches:
-			if p.has_overlap(p1) and p1.has_overlap(p) and p1 != p:
-				p2 = p
+		# for p in patches:
+		# 	if p.has_overlap(p1) and p1.has_overlap(p) and p1 != p:
+		# 		p2 = p
 
-				break
+		# 		break
 				
 		
-		p1.load_SIFT_points()
-		p2.load_SIFT_points()
-		p1.load_img()
-		p2.load_img()
-		overlap_1,overlap_2 = p1.get_overlap_rectangles(p2)
+		# p1.load_SIFT_points()
+		# p2.load_SIFT_points()
+		# p1.load_img()
+		# p2.load_img()
+		# overlap_1,overlap_2 = p1.get_overlap_rectangles(p2)
 
-		# kp1,desc1 = choose_SIFT_key_points(p1,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
-		# kp2,desc2 = choose_SIFT_key_points(p2,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
-		kp1,desc1 = detect_SIFT_key_points(p1.rgb_img,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
-		kp2,desc2 = detect_SIFT_key_points(p2.rgb_img,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
+		# # kp1,desc1 = choose_SIFT_key_points(p1,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
+		# # kp2,desc2 = choose_SIFT_key_points(p2,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
+		# kp1,desc1 = detect_SIFT_key_points(p1.rgb_img,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
+		# kp2,desc2 = detect_SIFT_key_points(p2.rgb_img,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
 
-		matches = get_good_matches(desc1,desc2)
-		sorted_matches = sorted(matches, key=lambda x: x[0].distance)
+		# matches = get_good_matches(desc1,desc2)
+		# sorted_matches = sorted(matches, key=lambda x: x[0].distance)
 
-		img_top_lowerror = None
-		img_top_higherror = None
-		img_nottop_lowerror = None
-		img_nottop_high_error = None
+		# img_top_lowerror = None
+		# img_top_higherror = None
+		# img_nottop_lowerror = None
+		# img_nottop_high_error = None
 
-		mtch_top_lowerror = []
-		mtch_top_higherror = []
-		mtch_nottop_lowerror = []
-		mtch_nottop_high_error = []
+		# mtch_top_lowerror = []
+		# mtch_top_higherror = []
+		# mtch_nottop_lowerror = []
+		# mtch_nottop_high_error = []
 
-		for i,m in enumerate(sorted_matches):
-			pt1 = kp1[m[0].queryIdx].pt
-			pt2 = kp2[m[0].trainIdx].pt
-			sg_tr = np.array([[1,0,PATCH_SIZE[0]-abs(pt1[1]-pt2[1])],[0,1,PATCH_SIZE[1]-abs(pt1[0]-pt2[0])],[0,0,1]])
-			diff = get_gps_diff_from_H(p2,p1,sg_tr)
-			print(diff)
-			print(GPS_ERROR_X)
-			print(GPS_ERROR_Y)
+		# for i,m in enumerate(sorted_matches):
+		# 	pt1 = kp1[m[0].queryIdx].pt
+		# 	pt2 = kp2[m[0].trainIdx].pt
+		# 	sg_tr = np.array([[1,0,PATCH_SIZE[0]-abs(pt1[1]-pt2[1])],[0,1,PATCH_SIZE[1]-abs(pt1[0]-pt2[0])],[0,0,1]])
+		# 	diff = get_gps_diff_from_H(p2,p1,sg_tr)
+		# 	print(diff)
+		# 	print(GPS_ERROR_X)
+		# 	print(GPS_ERROR_Y)
 
-			if i<PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION*len(sorted_matches):
-				if abs(diff[0])<=GPS_ERROR_X and abs(diff[1])<=GPS_ERROR_Y:
-					mtch_top_lowerror.append(m)
-				else:
-					mtch_top_higherror.append(m)
-			else:
-				if abs(diff[0])<=GPS_ERROR_X and abs(diff[1])<=GPS_ERROR_Y:
-					mtch_nottop_lowerror.append(m)
-				else:
-					mtch_nottop_high_error.append(m)
+		# 	if i<PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION*len(sorted_matches):
+		# 		if abs(diff[0])<=GPS_ERROR_X and abs(diff[1])<=GPS_ERROR_Y:
+		# 			mtch_top_lowerror.append(m)
+		# 		else:
+		# 			mtch_top_higherror.append(m)
+		# 	else:
+		# 		if abs(diff[0])<=GPS_ERROR_X and abs(diff[1])<=GPS_ERROR_Y:
+		# 			mtch_nottop_lowerror.append(m)
+		# 		else:
+		# 			mtch_nottop_high_error.append(m)
 
-		img_top_lowerror = cv2.drawMatches(p1.rgb_img,kp1,p2.rgb_img,kp2,[m[0] for m in mtch_top_lowerror],img_top_lowerror,matchColor=(0,255,0))
-		img_top_higherror = cv2.drawMatches(p1.rgb_img,kp1,p2.rgb_img,kp2,[m[0] for m in mtch_top_higherror],img_top_higherror,matchColor=(0,255,0))
-		img_nottop_lowerror = cv2.drawMatches(p1.rgb_img,kp1,p2.rgb_img,kp2,[m[0] for m in mtch_nottop_lowerror],img_nottop_lowerror,matchColor=(0,255,0))
-		img_nottop_high_error = cv2.drawMatches(p1.rgb_img,kp1,p2.rgb_img,kp2,[m[0] for m in mtch_nottop_high_error],img_nottop_high_error,matchColor=(0,255,0))
+		# img_top_lowerror = cv2.drawMatches(p1.rgb_img,kp1,p2.rgb_img,kp2,[m[0] for m in mtch_top_lowerror],img_top_lowerror,matchColor=(0,255,0))
+		# img_top_higherror = cv2.drawMatches(p1.rgb_img,kp1,p2.rgb_img,kp2,[m[0] for m in mtch_top_higherror],img_top_higherror,matchColor=(0,255,0))
+		# img_nottop_lowerror = cv2.drawMatches(p1.rgb_img,kp1,p2.rgb_img,kp2,[m[0] for m in mtch_nottop_lowerror],img_nottop_lowerror,matchColor=(0,255,0))
+		# img_nottop_high_error = cv2.drawMatches(p1.rgb_img,kp1,p2.rgb_img,kp2,[m[0] for m in mtch_nottop_high_error],img_nottop_high_error,matchColor=(0,255,0))
 
-		cv2.namedWindow('img_top_lowerror',cv2.WINDOW_NORMAL)
-		cv2.namedWindow('img_top_higherror',cv2.WINDOW_NORMAL)
-		cv2.namedWindow('img_nottop_lowerror',cv2.WINDOW_NORMAL)
-		cv2.namedWindow('img_nottop_high_error',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('img_top_lowerror', 500,500)
-		cv2.resizeWindow('img_top_higherror', 500,500)
-		cv2.resizeWindow('img_nottop_lowerror', 500,500)
-		cv2.resizeWindow('img_nottop_high_error', 500,500)
-		cv2.imshow('img_top_lowerror',img_top_lowerror)
-		cv2.imshow('img_top_higherror',img_top_higherror)
-		cv2.imshow('img_nottop_lowerror',img_nottop_lowerror)
-		cv2.imshow('img_nottop_high_error',img_nottop_high_error)
-		cv2.waitKey(0)
+		# cv2.namedWindow('img_top_lowerror',cv2.WINDOW_NORMAL)
+		# cv2.namedWindow('img_top_higherror',cv2.WINDOW_NORMAL)
+		# cv2.namedWindow('img_nottop_lowerror',cv2.WINDOW_NORMAL)
+		# cv2.namedWindow('img_nottop_high_error',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('img_top_lowerror', 500,500)
+		# cv2.resizeWindow('img_top_higherror', 500,500)
+		# cv2.resizeWindow('img_nottop_lowerror', 500,500)
+		# cv2.resizeWindow('img_nottop_high_error', 500,500)
+		# cv2.imshow('img_top_lowerror',img_top_lowerror)
+		# cv2.imshow('img_top_higherror',img_top_higherror)
+		# cv2.imshow('img_nottop_lowerror',img_nottop_lowerror)
+		# cv2.imshow('img_nottop_high_error',img_nottop_high_error)
+		# cv2.waitKey(0)
 
 		
 	else:
