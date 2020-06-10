@@ -2071,12 +2071,16 @@ class Patch:
 		gc.collect()
 
 
-	def load_img(self):
+	def load_img(self,ratio=1):
 		global patch_folder
 
 		img,img_g = load_preprocess_image('{0}/{1}'.format(patch_folder,self.name))
 		self.rgb_img = img
 		self.gray_img = img_g
+
+		if ratio != 1:
+			self.rgb_img = cv2.resize(self.rgb_img,(int(PATCH_SIZE[1]*ratio),int(PATCH_SIZE[0]*ratio)))
+			self.gray_img = cv2.resize(self.gray_img,(int(PATCH_SIZE[1]*ratio),int(PATCH_SIZE[0]*ratio)))
 
 	def delete_img(self):
 
@@ -3259,18 +3263,18 @@ class Group:
 		# sys.stdout.flush()
 
 class Field:
-	def __init__(self):
+	def __init__(self,use_corrected=False):
 		global coordinates_file
 
-		self.groups = self.initialize_field()
+		self.groups = self.initialize_field(use_corrected)
 		print([g.group_id for g in self.groups])
 		# for group in self.groups:
 		# 	group.load_all_patches_SIFT_points()
 		
-	def initialize_field(self):
+	def initialize_field(self,use_corrected):
 		global coordinates_file
 
-		rows = self.get_rows()
+		rows = self.get_rows(DISCARD_RIGHT_FLAG,use_corrected)
 
 		groups = []
 
@@ -3299,14 +3303,19 @@ class Field:
 
 		return groups
 
-	def get_rows(self,discard_right=DISCARD_RIGHT_FLAG):
-		global coordinates_file
+	def get_rows(self,discard_right=DISCARD_RIGHT_FLAG,use_corrected=False):
+		global coordinates_file, CORRECTED_coordinates_file
 
 		center_of_rows = []
 		patches = []
 		
+		if use_corrected:
+			file_to_use = CORRECTED_coordinates_file
+		else:
+			file_to_use = coordinates_file
 
-		with open(coordinates_file) as f:
+
+		with open(file_to_use) as f:
 			lines = f.read()
 			lines = lines.replace('"','')
 
@@ -3614,6 +3623,56 @@ class Field:
 				print('\t**** ROW {0} with {1} patches.'.format(i,len(row)))
 
 
+
+
+def get_approximate_random_RMSE_overlap(field,coorected_coord_file,old_coord_file,sample_no_per_group):
+	
+	results = []
+
+	for group in field.groups:
+
+		sample_patches = random.sample(group.patches,sample_no_per_group)
+
+		for p in sample_patches:
+
+			p.load_img()
+
+			for n in group.patches:
+
+				if n.has_overlap(p) or p.has_overlap(n):
+
+					overlap_1,overlap_2 = p.get_overlap_rectangles(n)
+
+					overlap_1_img = p.rgb_img[overlap_1[1]:overlap_1[3],overlap_1[0]:overlap_1[2],:]
+					overlap_2_img = n.rgb_img[overlap_2[1]:overlap_2[3],overlap_2[0]:overlap_2[2],:]
+
+					shape_1 = np.shape(overlap_1_img)
+					shape_2 = np.shape(overlap_2_img)
+
+					if shape_1 != shape_2:
+
+						if shape_1[0]*shape_1[1] > shape_2[0]*shape_2[1]:
+							overlap_1_img = cv2.resize(overlap_1_img,(shape_2[1],shape_2[0]))
+							shape_1 = shape_2
+						else:
+							overlap_2_img = cv2.resize(overlap_2_img,(shape_1[1],shape_1[0]))
+							shape_2 = shape_1
+
+					if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
+						
+						continue
+
+					err = np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
+					err /= float(overlap_1_img.shape[0] * overlap_2_img.shape[1] * overlap_2_img.shape[1])
+
+					err = math.sqrt(err)
+
+					results.append([group.group_id,n.gps.Center,err])
+
+	return np.array(results)
+
+
+		
 def logger(corrected_patch,gps_diff,param,gid,step_id):
 	global correction_log_file
 
@@ -3723,33 +3782,33 @@ def main(scan_date):
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
-		# os.system("taskset -p -c 0-37 %d" % os.getpid())
-		os.system("taskset -p -c 38-47 %d" % os.getpid())
+		os.system("taskset -p -c 0-37 %d" % os.getpid())
+		# os.system("taskset -p -c 38-47 %d" % os.getpid())
 		
-		lettuce_coords = read_lettuce_heads_coordinates()
+		# lettuce_coords = read_lettuce_heads_coordinates()
 
-		field = Field()
-		# field.draw_and_save_field(is_old=True)
+		# field = Field()
+		# # field.draw_and_save_field(is_old=True)
 
-		field.correct_field()
+		# field.correct_field()
 
-		field.draw_and_save_field(is_old=False)
+		# field.draw_and_save_field(is_old=False)
 
-		# err = calculate_error_of_correction(True)
-		# print("({:.10f},{:.10f})".format(err[0],err[1]))
+		err = calculate_error_of_correction(True)
+		print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 		# test_function()
 
-		# field = Field()
+		field = Field()
 		# field.create_patches_SIFT_files()
 
-		# lettuce_coords = read_lettuce_heads_coordinates()
+		lettuce_coords = read_lettuce_heads_coordinates()
 		
-		# field.correct_field()
-		# field.save_new_coordinate()
+		field.correct_field()
+		field.save_new_coordinate()
 
-		# err = calculate_error_of_correction()
-		# print("({:.10f},{:.10f})".format(err[0],err[1]))
+		err = calculate_error_of_correction()
+		print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 		# p1 = field.groups[0].patches[3]
 		# p1.get_lettuce_contours_centers(lettuce_coords)
@@ -3891,19 +3950,19 @@ else:
 	no_of_cores_to_use = server_core[server]
 
 # method = 'MST'
-# method = 'Hybrid'
+method = 'Hybrid'
 # method = 'Merge'
 # method = 'AllNeighbor'
-method = 'Rowbyrow'
+# method = 'Rowbyrow'
 # method = 'UAVmatching'
 # method = 'Old_method'
 
 
 
 # scan_date = '2020-02-18'
-# scan_date = '2020-01-08'
+scan_date = '2020-01-08'
 
-scan_date = '2020-05-18'
+# scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 
 print('Starting process on {0} for scan date {1} using method {2}.'.format(server,scan_date,method))
