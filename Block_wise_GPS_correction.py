@@ -3639,7 +3639,7 @@ def get_RMSE_error_function(p,n,gid):
 	if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
 		
 		return -1,-1,-1,-1
-		
+
 	if shape_1 != shape_2:
 
 		if shape_1[0]*shape_1[1] > shape_2[0]*shape_2[1]:
@@ -3653,10 +3653,29 @@ def get_RMSE_error_function(p,n,gid):
 		
 		return -1,-1,-1,-1
 
-	err = np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
-	err /= float(overlap_1_img.shape[0] * overlap_2_img.shape[1] * overlap_2_img.shape[1])
+	overlap_1_img = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2GRAY)
+	overlap_2_img = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2GRAY)
 
-	err = math.sqrt(err)
+	overlap_1_img = cv2.blur(overlap_1_img,(5,5))
+	overlap_2_img = cv2.blur(overlap_2_img,(5,5))
+
+	ret1,overlap_1_img = cv2.threshold(overlap_1_img,0,255,cv2.THRESH_OTSU)
+	ret1,overlap_2_img = cv2.threshold(overlap_2_img,0,255,cv2.THRESH_OTSU)
+
+	tmp_size = np.shape(overlap_1_img)
+	
+	overlap_1_img[overlap_1_img==255] = 1
+	overlap_2_img[overlap_2_img==255] = 1
+
+	xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
+
+	dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
+	
+	
+	# err = np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
+	# err /= float(overlap_1_img.shape[0] * overlap_2_img.shape[1] * overlap_2_img.shape[1])
+
+	# err = math.sqrt(err)
 
 	p.delete_img()
 	n.delete_img()
@@ -3801,10 +3820,10 @@ def main(scan_date):
 		# os.system("taskset -p -c 0-37 %d" % os.getpid())
 		os.system("taskset -p -c 38-47 %d" % os.getpid())
 		
-		# field = Field(False)
-		# res = get_approximate_random_RMSE_overlap(field,10,6)
-		# np.save('RMSE_before.npy',res)
-		# print(np.mean(res[:,3]))
+		field = Field(False)
+		res = get_approximate_random_RMSE_overlap(field,10,6)
+		np.save('RMSE_before.npy',res)
+		print(np.mean(res[:,3]))
 
 		field = Field(True)
 		res = get_approximate_random_RMSE_overlap(field,10,6)
