@@ -46,7 +46,7 @@ GPS_ERROR_X = 0.000001
 
 FFT_PARALLEL_CORES_TO_USE = 20
 
-DISCARD_RIGHT_FLAG = True
+DISCARD_RIGHT_FLAG = False
 
 def remove_shadow(image):
 
@@ -3074,6 +3074,8 @@ class Group:
 
 			string_res = get_corrected_string(self.patches)
 
+			self.delete_all_patches_SIFT_points()
+
 		elif method == 'Merge':
 			
 			self.load_all_patches_SIFT_points()
@@ -3794,7 +3796,7 @@ def main(scan_date):
 		print('RUNNING ON -- {0} --'.format(server))
 		field = Field()
 		# field.create_patches_SIFT_files()
-		# field.draw_and_save_field(is_old=True)
+		field.draw_and_save_field(is_old=True)
 		field.correct_field()
 		field.draw_and_save_field(is_old=False)
 		# field.print_field_in_text()
@@ -3829,8 +3831,8 @@ method = 'Old_method'
 # scan_date = '2020-02-18'
 # scan_date = '2020-01-08'
 
-# scan_date = '2020-05-18'
-scan_date = '2020-05-19'
+scan_date = '2020-05-18'
+# scan_date = '2020-05-19'
 
 print('Starting process on {0} for scan date {1} using method {2}.'.format(server,scan_date,method))
 
