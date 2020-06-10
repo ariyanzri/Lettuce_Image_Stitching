@@ -3638,7 +3638,8 @@ def get_approximate_random_RMSE_overlap(field,sample_no_per_group):
 			p.load_img()
 
 			for n in group.patches:
-
+				n.load_img()
+				
 				if n.has_overlap(p) or p.has_overlap(n):
 
 					overlap_1,overlap_2 = p.get_overlap_rectangles(n)
