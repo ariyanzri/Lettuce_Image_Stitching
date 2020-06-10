@@ -3668,7 +3668,7 @@ def get_approximate_random_RMSE_overlap(field,sample_no_per_group):
 
 					err = math.sqrt(err)
 
-					results.append([group.group_id,n.gps.Center,err])
+					results.append([group.group_id,n.gps.Center[0],n.gps.Center[1],err])
 
 	return np.array(results)
 
