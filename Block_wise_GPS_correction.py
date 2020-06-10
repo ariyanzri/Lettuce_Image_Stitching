@@ -3644,7 +3644,7 @@ def get_RMSE_error_function(p,n,gid):
 
 	if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
 		
-		continue
+		return -1,-1,-1,-1
 
 	err = np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
 	err /= float(overlap_1_img.shape[0] * overlap_2_img.shape[1] * overlap_2_img.shape[1])
