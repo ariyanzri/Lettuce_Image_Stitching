@@ -3800,10 +3800,12 @@ def main(scan_date):
 		field = Field(False)
 		res = get_approximate_random_RMSE_overlap(field,10,6)
 		np.save('RMSE_before.npy',res)
+		print(np.mean(res[:,3]))
 
 		field = Field(True)
 		res = get_approximate_random_RMSE_overlap(field,10,6)
 		np.save('RMSE_after.npy',res)
+		print(np.mean(res[:,3]))
 
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
