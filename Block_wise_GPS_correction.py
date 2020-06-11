@@ -3285,7 +3285,7 @@ class Field:
 		# 	group.load_all_patches_SIFT_points()
 		
 	def initialize_field(self,use_corrected):
-		global coordinates_file, discard_right_flag, number_of_rows_in_groups, groups_to_use
+		global coordinates_file, number_of_rows_in_groups, groups_to_use
 
 		rows = self.get_rows(use_corrected)
 
@@ -3318,7 +3318,7 @@ class Field:
 
 		def get_rows(self,use_corrected=False):
 		global coordinates_file, CORRECTED_coordinates_file, patches_to_use, discard_right_flag
-
+		
 		center_of_rows = []
 		patches = []
 		
