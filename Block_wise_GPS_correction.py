@@ -3801,23 +3801,38 @@ def main(scan_date):
 	if server == 'coge':
 		print('RUNNING ON -- {0} --'.format(server))
 		
-		err = calculate_error_of_correction(True)
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction(True)
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
-		field = Field()
-		lettuce_coords = read_lettuce_heads_coordinates()
+		# field = Field()
+		# lettuce_coords = read_lettuce_heads_coordinates()
 
 		# field.save_plot()
 		# field.create_patches_SIFT_files()
 
 		# field.groups[14].correct_internally()
 		# field.draw_and_save_field()
-		field.correct_field()
+		# field.correct_field()
 		# field.draw_and_save_field()
-		field.save_new_coordinate()
+		# field.save_new_coordinate()
 		
-		err = calculate_error_of_correction()
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction()
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
+
+		# ------------
+
+		field = Field(False)
+		res = get_approximate_random_RMSE_overlap(field,10,60)
+		np.save('RMSE_before.npy',res)
+		print(np.mean(res[:,3]))
+
+		field = Field(True)
+		res = get_approximate_random_RMSE_overlap(field,10,60)
+		np.save('RMSE_after.npy',res)
+		print(np.mean(res[:,3]))
+
+		# ------------
+
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
@@ -4003,8 +4018,8 @@ if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
 else:
 	no_of_cores_to_use = server_core[server]
 
-method = 'MST'
-# method = 'Hybrid'
+# method = 'MST'
+method = 'Hybrid'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
