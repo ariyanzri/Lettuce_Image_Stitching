@@ -3316,7 +3316,7 @@ class Field:
 
 		return groups[groups_to_use]
 
-		def get_rows(self,use_corrected=False):
+	def get_rows(self,use_corrected=False):
 		global coordinates_file, CORRECTED_coordinates_file, patches_to_use, discard_right_flag
 		
 		center_of_rows = []
