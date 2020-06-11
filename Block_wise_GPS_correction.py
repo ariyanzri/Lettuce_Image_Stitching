@@ -4034,13 +4034,13 @@ else:
 # -------------------------------------------------- Runtime Settings ---------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
 
-number_of_rows_in_groups = 10
-groups_to_use = slice(0,None)
-patches_to_use = slice(0,None)
+# number_of_rows_in_groups = 10
+# groups_to_use = slice(0,None)
+# patches_to_use = slice(0,None)
 
-# number_of_rows_in_groups = 4
-# groups_to_use = slice(5,7)
-# patches_to_use = slice(5,20)
+number_of_rows_in_groups = 4
+groups_to_use = slice(5,7)
+patches_to_use = slice(5,20)
 
 inside_radius_lettuce_matching_threshold = 200
 discard_right_flag = True
