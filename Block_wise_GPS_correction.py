@@ -3818,15 +3818,15 @@ def main(scan_date):
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
 		# os.system("taskset -p -c 0-37 %d" % os.getpid())
-		os.system("taskset -p -c 38-47 %d" % os.getpid())
+		# os.system("taskset -p -c 38-47 %d" % os.getpid())
 		
 		field = Field(False)
-		res = get_approximate_random_RMSE_overlap(field,10,6)
+		res = get_approximate_random_RMSE_overlap(field,10,40)
 		np.save('RMSE_before.npy',res)
 		print(np.mean(res[:,3]))
 
 		field = Field(True)
-		res = get_approximate_random_RMSE_overlap(field,10,6)
+		res = get_approximate_random_RMSE_overlap(field,10,40)
 		np.save('RMSE_after.npy',res)
 		print(np.mean(res[:,3]))
 
@@ -3994,8 +3994,8 @@ if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
 else:
 	no_of_cores_to_use = server_core[server]
 
-method = 'MST'
-# method = 'Hybrid'
+# method = 'MST'
+method = 'Hybrid'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
