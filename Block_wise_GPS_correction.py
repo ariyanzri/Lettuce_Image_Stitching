@@ -3821,20 +3821,20 @@ def main(scan_date):
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
-		# os.system("taskset -p -c 0-37 %d" % os.getpid())
-		# os.system("taskset -p -c 38-47 %d" % os.getpid())
+		os.system("taskset -p -c 0-39 %d" % os.getpid())
+		# os.system("taskset -p -c 40-47 %d" % os.getpid())
 		
 		# ------------
 
-		field = Field(False)
-		res = get_approximate_random_RMSE_overlap(field,10,40)
-		np.save('RMSE_before.npy',res)
-		print(np.mean(res[:,3]))
+		# field = Field(False)
+		# res = get_approximate_random_RMSE_overlap(field,10,40)
+		# np.save('RMSE_before.npy',res)
+		# print(np.mean(res[:,3]))
 
-		field = Field(True)
-		res = get_approximate_random_RMSE_overlap(field,10,40)
-		np.save('RMSE_after.npy',res)
-		print(np.mean(res[:,3]))
+		# field = Field(True)
+		# res = get_approximate_random_RMSE_overlap(field,10,40)
+		# np.save('RMSE_after.npy',res)
+		# print(np.mean(res[:,3]))
 
 		# ------------
 
@@ -3848,19 +3848,19 @@ def main(scan_date):
 		# field.draw_and_save_field(is_old=False)
 
 		# ------------
-		# err = calculate_error_of_correction(True)
-		# print("({:.10f},{:.10f})".format(err[0],err[1]))
+		err = calculate_error_of_correction(True)
+		print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 
-		# field = Field()
+		field = Field()
 
-		# lettuce_coords = read_lettuce_heads_coordinates()
+		lettuce_coords = read_lettuce_heads_coordinates()
 		
-		# field.correct_field()
-		# field.save_new_coordinate()
+		field.correct_field()
+		field.save_new_coordinate()
 
-		# err = calculate_error_of_correction()
-		# print("({:.10f},{:.10f})".format(err[0],err[1]))
+		err = calculate_error_of_correction()
+		print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 		# ------------
 
@@ -4003,12 +4003,12 @@ if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
 else:
 	no_of_cores_to_use = server_core[server]
 
-# method = 'MST'
+method = 'MST'
 # method = 'Hybrid'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
-method = 'UAVmatching'
+# method = 'UAVmatching'
 # method = 'Old_method'
 
 
