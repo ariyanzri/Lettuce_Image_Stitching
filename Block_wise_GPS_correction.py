@@ -22,32 +22,6 @@ from Customized_myltiprocessing import MyPool
 from heapq import heappush, heappop, heapify
 from collections import OrderedDict,Counter
 
-
-PATCH_SIZE = (3296, 2472)
-PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
-HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-NUMBER_OF_ROWS_IN_GROUPS = 10
-# NUMBER_OF_ROWS_IN_GROUPS = 4
-PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
-GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
-MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
-MINIMUM_NUMBER_OF_MATCHES = 100
-RANSAC_MAX_ITER = 1000
-RANSAC_ERROR_THRESHOLD = 5
-PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
-LETTUCE_AREA_THRESHOLD = 5000
-REDUCTION_FACTOR = 0.05
-OVERLAP_DISCARD_RATIO = 0.05
-CONTOUR_MATCHING_MIN_MATCH = 2
-INSIDE_RADIOUS_LETTUCE_MATCHING_THRESHOLD = 200
-
-GPS_ERROR_Y = 0.0000005
-GPS_ERROR_X = 0.000001
-
-FFT_PARALLEL_CORES_TO_USE = 20
-
-DISCARD_RIGHT_FLAG = True
-
 def remove_shadow(image):
 
 	hsvImg = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
@@ -3305,7 +3279,7 @@ class Field:
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
 		sys.stdout.flush()
 
-		return groups
+		return groups[GROUPS_TO_USE]
 
 	def get_rows(self,discard_right=DISCARD_RIGHT_FLAG,use_corrected=False):
 		global coordinates_file, CORRECTED_coordinates_file
@@ -3377,7 +3351,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist)
+			rows.append(newlist[PATCHES_TO_USE])
 
 		print('Rows calculated and created completely.')
 
@@ -3819,17 +3793,19 @@ def main(scan_date):
 		# err = calculate_error_of_correction()
 		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
+		field = Field()
+		
 		# ------------
 
-		field = Field(False)
-		res = get_approximate_random_RMSE_overlap(field,10,60)
-		np.save('RMSE_before.npy',res)
-		print(np.mean(res[:,3]))
+		# field = Field(False)
+		# res = get_approximate_random_RMSE_overlap(field,10,60)
+		# np.save('RMSE_before.npy',res)
+		# print(np.mean(res[:,3]))
 
-		field = Field(True)
-		res = get_approximate_random_RMSE_overlap(field,10,60)
-		np.save('RMSE_after.npy',res)
-		print(np.mean(res[:,3]))
+		# field = Field(True)
+		# res = get_approximate_random_RMSE_overlap(field,10,60)
+		# np.save('RMSE_after.npy',res)
+		# print(np.mean(res[:,3]))
 
 		# ------------
 
@@ -4018,6 +3994,45 @@ if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
 else:
 	no_of_cores_to_use = server_core[server]
 
+
+# -----------------------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------- Settings ------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------------------
+
+PATCH_SIZE = (3296, 2472)
+PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
+HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
+
+NUMBER_OF_ROWS_IN_GROUPS = 10
+GROUPS_TO_USE = slice(0,None)
+PATCHES_TO_USE = slice(0,None)
+
+# NUMBER_OF_ROWS_IN_GROUPS = 4
+# GROUPS_TO_USE = slice(5,7)
+# PATCHES_TO_USE = slice(5,20)
+
+
+PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
+GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
+MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
+MINIMUM_NUMBER_OF_MATCHES = 100
+RANSAC_MAX_ITER = 1000
+RANSAC_ERROR_THRESHOLD = 5
+PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
+LETTUCE_AREA_THRESHOLD = 5000
+REDUCTION_FACTOR = 0.05
+OVERLAP_DISCARD_RATIO = 0.05
+CONTOUR_MATCHING_MIN_MATCH = 2
+INSIDE_RADIOUS_LETTUCE_MATCHING_THRESHOLD = 200
+
+GPS_ERROR_Y = 0.0000005
+GPS_ERROR_X = 0.000001
+
+FFT_PARALLEL_CORES_TO_USE = 20
+
+DISCARD_RIGHT_FLAG = True
+
+
 # method = 'MST'
 method = 'Hybrid'
 # method = 'Merge'
@@ -4030,11 +4045,15 @@ method = 'Hybrid'
 
 scan_date = '2020-02-18'
 # scan_date = '2020-01-08'
-
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
 # scan_date = '2020-06-03'
+
+# -----------------------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------------------
+
 
 print('Starting process on {0} for scan date {1} using method {2}.'.format(server,scan_date,method))
 
