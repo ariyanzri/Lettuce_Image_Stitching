@@ -732,8 +732,8 @@ def get_lids():
 
 	return lids
 
-def get_name_of_patches_with_lids(lids,use_not_corrected=False,discard_right=discard_right_flag):
-	global CORRECTED_coordinates_file,coordinates_file
+def get_name_of_patches_with_lids(lids,use_not_corrected=False):
+	global CORRECTED_coordinates_file,coordinates_file,discard_right_flag
 
 	patches_names_with_lid = []
 
@@ -756,7 +756,7 @@ def get_name_of_patches_with_lids(lids,use_not_corrected=False,discard_right=dis
 
 			filename = features[0]
 
-			if discard_right and '_right' in filename:
+			if discard_right_flag and '_right' in filename:
 				continue
 
 			upper_left = (float(features[1]),float(features[2]))
@@ -3287,7 +3287,7 @@ class Field:
 	def initialize_field(self,use_corrected):
 		global coordinates_file, discard_right_flag, number_of_rows_in_groups, groups_to_use
 
-		rows = self.get_rows(discard_right_flag,use_corrected)
+		rows = self.get_rows(use_corrected)
 
 		groups = []
 
@@ -3316,8 +3316,8 @@ class Field:
 
 		return groups[groups_to_use]
 
-	def get_rows(self,discard_right=discard_right_flag,use_corrected=False):
-		global coordinates_file, CORRECTED_coordinates_file, patches_to_use
+		def get_rows(self,use_corrected=False):
+		global coordinates_file, CORRECTED_coordinates_file, patches_to_use, discard_right_flag
 
 		center_of_rows = []
 		patches = []
@@ -3341,7 +3341,7 @@ class Field:
 				features = l.split(',')
 
 				filename = features[0]
-				if discard_right and '_right' in filename:
+				if discard_right_flag and '_right' in filename:
 					continue
 
 				upper_left = (float(features[1]),float(features[2]))
