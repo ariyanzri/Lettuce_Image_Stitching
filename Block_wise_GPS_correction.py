@@ -22,6 +22,36 @@ from Customized_myltiprocessing import MyPool
 from heapq import heappush, heappop, heapify
 from collections import OrderedDict,Counter
 
+# -----------------------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------- Settings ------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------------------
+
+PATCH_SIZE = (3296, 2472)
+PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
+HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
+
+PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
+GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
+MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
+MINIMUM_NUMBER_OF_MATCHES = 100
+RANSAC_MAX_ITER = 1000
+RANSAC_ERROR_THRESHOLD = 5
+PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
+LETTUCE_AREA_THRESHOLD = 5000
+REDUCTION_FACTOR = 0.05
+OVERLAP_DISCARD_RATIO = 0.05
+CONTOUR_MATCHING_MIN_MATCH = 2
+
+GPS_ERROR_Y = 0.0000005
+GPS_ERROR_X = 0.000001
+
+FFT_PARALLEL_CORES_TO_USE = 20
+
+# -----------------------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------------------
+
+
 def remove_shadow(image):
 
 	hsvImg = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
@@ -702,7 +732,7 @@ def get_lids():
 
 	return lids
 
-def get_name_of_patches_with_lids(lids,use_not_corrected=False,discard_right=DISCARD_RIGHT_FLAG):
+def get_name_of_patches_with_lids(lids,use_not_corrected=False,discard_right=discard_right_flag):
 	global CORRECTED_coordinates_file,coordinates_file
 
 	patches_names_with_lid = []
@@ -2332,6 +2362,8 @@ class Patch:
 		return contours
 
 	def get_lettuce_contours(self,list_lettuce_heads=None,overlap=None):
+		global inside_radius_lettuce_matching_threshold
+
 		if self.rgb_img is None:
 			self.load_img()
 
@@ -2385,8 +2417,8 @@ class Patch:
 			cX = int(M["m10"] / M["m00"])
 			cY = int(M["m01"] / M["m00"])
 
-			if cX<=INSIDE_RADIOUS_LETTUCE_MATCHING_THRESHOLD or cY<=INSIDE_RADIOUS_LETTUCE_MATCHING_THRESHOLD or \
-			abs(PATCH_SIZE[1]-cX)<INSIDE_RADIOUS_LETTUCE_MATCHING_THRESHOLD or abs(PATCH_SIZE[0]-cY)<INSIDE_RADIOUS_LETTUCE_MATCHING_THRESHOLD:
+			if cX<=inside_radius_lettuce_matching_threshold or cY<=inside_radius_lettuce_matching_threshold or \
+			abs(PATCH_SIZE[1]-cX)<inside_radius_lettuce_matching_threshold or abs(PATCH_SIZE[0]-cY)<inside_radius_lettuce_matching_threshold:
 				continue
 
 			if areas[i]>threshold:
@@ -2524,6 +2556,8 @@ class Patch:
 		p2.delete_img()
 		
 	def correct_based_on_contours_and_lettuce_heads(self,list_lettuce_heads):
+		global inside_radius_lettuce_matching_threshold
+
 		self.load_img()
 
 		# cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
@@ -2578,7 +2612,7 @@ class Patch:
 
 				# mean_error = calculate_average_min_distance_lettuce_heads(contour_centers,inside_lettuce_heads,T)
 
-				matched_count = count_matched_lettuce_heads_to_UAV(contour_centers,inside_lettuce_heads,T,INSIDE_RADIOUS_LETTUCE_MATCHING_THRESHOLD)
+				matched_count = count_matched_lettuce_heads_to_UAV(contour_centers,inside_lettuce_heads,T,inside_radius_lettuce_matching_threshold)
 				
 				if matched_count>best_matched:
 					best_matched = matched_count
@@ -3173,13 +3207,14 @@ class Group:
 
 
 	def correct_self_based_on_previous_group(self,previous_group):
+		global number_of_rows_in_groups
 
 		diff_x = []
 		diff_y = []
 
 		for i,patch_self in enumerate(self.rows[0]):
 
-			patch_prev = previous_group.rows[NUMBER_OF_ROWS_IN_GROUPS-1][i]
+			patch_prev = previous_group.rows[number_of_rows_in_groups-1][i]
 
 			diff = (patch_self.gps.UL_coord[0] - patch_prev.gps.UL_coord[0],patch_self.gps.UL_coord[1] - patch_prev.gps.UL_coord[1])
 			
@@ -3250,14 +3285,14 @@ class Field:
 		# 	group.load_all_patches_SIFT_points()
 		
 	def initialize_field(self,use_corrected):
-		global coordinates_file
+		global coordinates_file, discard_right_flag, number_of_rows_in_groups, groups_to_use
 
-		rows = self.get_rows(DISCARD_RIGHT_FLAG,use_corrected)
+		rows = self.get_rows(discard_right_flag,use_corrected)
 
 		groups = []
 
 		start = 0
-		end = NUMBER_OF_ROWS_IN_GROUPS
+		end = number_of_rows_in_groups
 
 		while start<len(rows):
 			
@@ -3274,15 +3309,15 @@ class Field:
 			groups.append(group)
 
 			start = end-1
-			end = start + NUMBER_OF_ROWS_IN_GROUPS
+			end = start + number_of_rows_in_groups
 
-		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),NUMBER_OF_ROWS_IN_GROUPS))
+		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),number_of_rows_in_groups))
 		sys.stdout.flush()
 
-		return groups[GROUPS_TO_USE]
+		return groups[groups_to_use]
 
-	def get_rows(self,discard_right=DISCARD_RIGHT_FLAG,use_corrected=False):
-		global coordinates_file, CORRECTED_coordinates_file
+	def get_rows(self,discard_right=discard_right_flag,use_corrected=False):
+		global coordinates_file, CORRECTED_coordinates_file, patches_to_use
 
 		center_of_rows = []
 		patches = []
@@ -3351,7 +3386,7 @@ class Field:
 		for g in patches_groups_by_rows:
 			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
 			
-			rows.append(newlist[PATCHES_TO_USE])
+			rows.append(newlist[patches_to_use])
 
 		print('Rows calculated and created completely.')
 
@@ -3794,7 +3829,7 @@ def main(scan_date):
 		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 		field = Field()
-		
+
 		# ------------
 
 		# field = Field(False)
@@ -3996,42 +4031,19 @@ else:
 
 
 # -----------------------------------------------------------------------------------------------------------------------------------
-# ------------------------------------------------------- Settings ------------------------------------------------------------------
+# -------------------------------------------------- Runtime Settings ---------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
 
-PATCH_SIZE = (3296, 2472)
-PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
-HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
+number_of_rows_in_groups = 10
+groups_to_use = slice(0,None)
+patches_to_use = slice(0,None)
 
-NUMBER_OF_ROWS_IN_GROUPS = 10
-GROUPS_TO_USE = slice(0,None)
-PATCHES_TO_USE = slice(0,None)
+# number_of_rows_in_groups = 4
+# groups_to_use = slice(5,7)
+# patches_to_use = slice(5,20)
 
-# NUMBER_OF_ROWS_IN_GROUPS = 4
-# GROUPS_TO_USE = slice(5,7)
-# PATCHES_TO_USE = slice(5,20)
-
-
-PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
-GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
-MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
-MINIMUM_NUMBER_OF_MATCHES = 100
-RANSAC_MAX_ITER = 1000
-RANSAC_ERROR_THRESHOLD = 5
-PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
-LETTUCE_AREA_THRESHOLD = 5000
-REDUCTION_FACTOR = 0.05
-OVERLAP_DISCARD_RATIO = 0.05
-CONTOUR_MATCHING_MIN_MATCH = 2
-INSIDE_RADIOUS_LETTUCE_MATCHING_THRESHOLD = 200
-
-GPS_ERROR_Y = 0.0000005
-GPS_ERROR_X = 0.000001
-
-FFT_PARALLEL_CORES_TO_USE = 20
-
-DISCARD_RIGHT_FLAG = True
-
+inside_radius_lettuce_matching_threshold = 200
+discard_right_flag = True
 
 # method = 'MST'
 method = 'Hybrid'
@@ -4040,7 +4052,6 @@ method = 'Hybrid'
 # method = 'Rowbyrow'
 # method = 'UAVmatching'
 # method = 'Old_method'
-
 
 
 scan_date = '2020-02-18'
