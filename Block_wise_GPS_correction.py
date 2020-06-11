@@ -3853,7 +3853,7 @@ def main(scan_date):
 
 
 		field = Field()
-
+		field.create_patches_SIFT_files()
 		lettuce_coords = read_lettuce_heads_coordinates()
 		
 		field.correct_field()
