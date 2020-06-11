@@ -3696,7 +3696,7 @@ def get_approximate_random_RMSE_overlap(field,sample_no_per_group,core_to_use):
 
 	for group in field.groups:
 
-		sample_patches = random.sample(group.patches,sample_no_per_group)
+		sample_patches = random.sample(group.patches,min(sample_no_per_group,len(group.patches)))
 
 		for p in sample_patches:
 
