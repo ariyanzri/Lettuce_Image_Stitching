@@ -3824,15 +3824,19 @@ def main(scan_date):
 		# os.system("taskset -p -c 0-37 %d" % os.getpid())
 		# os.system("taskset -p -c 38-47 %d" % os.getpid())
 		
-		# field = Field(False)
-		# res = get_approximate_random_RMSE_overlap(field,10,40)
-		# np.save('RMSE_before.npy',res)
-		# print(np.mean(res[:,3]))
+		# ------------
+		
+		field = Field(False)
+		res = get_approximate_random_RMSE_overlap(field,10,40)
+		np.save('RMSE_before.npy',res)
+		print(np.mean(res[:,3]))
 
-		# field = Field(True)
-		# res = get_approximate_random_RMSE_overlap(field,10,40)
-		# np.save('RMSE_after.npy',res)
-		# print(np.mean(res[:,3]))
+		field = Field(True)
+		res = get_approximate_random_RMSE_overlap(field,10,40)
+		np.save('RMSE_after.npy',res)
+		print(np.mean(res[:,3]))
+
+		# ------------
 
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
@@ -3843,21 +3847,22 @@ def main(scan_date):
 
 		# field.draw_and_save_field(is_old=False)
 
-		err = calculate_error_of_correction(True)
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# ------------
+		# err = calculate_error_of_correction(True)
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
-		# test_function()
 
-		field = Field()
-		# field.create_patches_SIFT_files()
+		# field = Field()
 
-		lettuce_coords = read_lettuce_heads_coordinates()
+		# lettuce_coords = read_lettuce_heads_coordinates()
 		
-		field.correct_field()
-		field.save_new_coordinate()
+		# field.correct_field()
+		# field.save_new_coordinate()
 
-		err = calculate_error_of_correction()
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction()
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
+
+		# ------------
 
 		# p1 = field.groups[0].patches[3]
 		# p1.get_lettuce_contours_centers(lettuce_coords)
