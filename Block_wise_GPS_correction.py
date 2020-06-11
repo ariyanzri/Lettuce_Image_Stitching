@@ -3826,15 +3826,15 @@ def main(scan_date):
 		
 		# ------------
 
-		# field = Field(False)
-		# res = get_approximate_random_RMSE_overlap(field,10,40)
-		# np.save('RMSE_before.npy',res)
-		# print(np.mean(res[:,3]))
+		field = Field(False)
+		res = get_approximate_random_RMSE_overlap(field,10,40)
+		np.save('RMSE_before.npy',res)
+		print(np.mean(res[:,3]))
 
-		# field = Field(True)
-		# res = get_approximate_random_RMSE_overlap(field,10,40)
-		# np.save('RMSE_after.npy',res)
-		# print(np.mean(res[:,3]))
+		field = Field(True)
+		res = get_approximate_random_RMSE_overlap(field,10,40)
+		np.save('RMSE_after.npy',res)
+		print(np.mean(res[:,3]))
 
 		# ------------
 
@@ -3848,19 +3848,19 @@ def main(scan_date):
 		# field.draw_and_save_field(is_old=False)
 
 		# ------------
-		err = calculate_error_of_correction(True)
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction(True)
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 
-		field = Field()
+		# field = Field()
 
-		lettuce_coords = read_lettuce_heads_coordinates()
+		# lettuce_coords = read_lettuce_heads_coordinates()
 		
-		field.correct_field()
-		field.save_new_coordinate()
+		# field.correct_field()
+		# field.save_new_coordinate()
 
-		err = calculate_error_of_correction()
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction()
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 		# ------------
 
