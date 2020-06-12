@@ -512,7 +512,7 @@ def get_new_GPS_Coords(p1,p2,H):
 	diff_x = diff_x*gps_scale_x
 	diff_y = diff_y*gps_scale_y
 
-	new_UL = (round(p2.gps.UL_coord[0]-diff_x,7),round(p2.gps.UL_coord[1]-diff_y,7))
+	new_UL = (round(p2.gps.UL_coord[0]-diff_x,14),round(p2.gps.UL_coord[1]-diff_y,14))
 
 	diff_UL = (p1.gps.UL_coord[0]-new_UL[0],p1.gps.UL_coord[1]-new_UL[1])
 
@@ -540,7 +540,7 @@ def get_new_GPS_Coords_for_groups(p1,p2,H):
 	diff_x = diff_x*gps_scale_x
 	diff_y = diff_y*gps_scale_y
 
-	# moved_UL = (round(p2.gps.UL_coord[0]-diff_x,7),round(p2.gps.UL_coord[1]-diff_y,7))
+	# moved_UL = (round(p2.gps.UL_coord[0]-diff_x,14),round(p2.gps.UL_coord[1]-diff_y,14))
 
 	# diff_UL = (p1.gps.UL_coord[0]-moved_UL[0],p1.gps.UL_coord[1]-moved_UL[1])
 
@@ -674,13 +674,13 @@ def get_corrected_string(patches):
 	final_results = ''
 
 	for p in patches:
-		p.gps.UL_coord = (round(p.gps.UL_coord[0],7),round(p.gps.UL_coord[1],7))
-		p.gps.LL_coord = (round(p.gps.LL_coord[0],7),round(p.gps.LL_coord[1],7))
-		p.gps.UR_coord = (round(p.gps.UR_coord[0],7),round(p.gps.UR_coord[1],7))
-		p.gps.LR_coord = (round(p.gps.LR_coord[0],7),round(p.gps.LR_coord[1],7))
-		p.gps.Center = (round(p.gps.Center[0],7),round(p.gps.Center[1],7))
+		p.gps.UL_coord = (round(p.gps.UL_coord[0],14),round(p.gps.UL_coord[1],14))
+		p.gps.LL_coord = (round(p.gps.LL_coord[0],14),round(p.gps.LL_coord[1],14))
+		p.gps.UR_coord = (round(p.gps.UR_coord[0],14),round(p.gps.UR_coord[1],14))
+		p.gps.LR_coord = (round(p.gps.LR_coord[0],14),round(p.gps.LR_coord[1],14))
+		p.gps.Center = (round(p.gps.Center[0],14),round(p.gps.Center[1],14))
 
-		final_results += '{:s},{:.7f},{:.7f},{:.7f},{:.7f},{:.7f},{:.7f},{:.7f},{:.7f},{:.7f},{:.7f}\n'\
+		final_results += '{:s},{:.14f},{:.14f},{:.14f},{:.14f},{:.14f},{:.14f},{:.14f},{:.14f},{:.14f},{:.14f}\n'\
 		.format(p.name,p.gps.UL_coord[0],p.gps.UL_coord[1],p.gps.LL_coord[0],p.gps.LL_coord[1],p.gps.UR_coord[0],p.gps.UR_coord[1]\
 			,p.gps.LR_coord[0],p.gps.LR_coord[1],p.gps.Center[0],p.gps.Center[1])
 
@@ -1572,7 +1572,7 @@ def get_gps_diff_from_H(p1,p2,H):
 	diff_x = diff_x*gps_scale_x
 	diff_y = diff_y*gps_scale_y
 
-	new_UL = (round(p2.gps.UL_coord[0]-diff_x,7),round(p2.gps.UL_coord[1]-diff_y,7))
+	new_UL = (round(p2.gps.UL_coord[0]-diff_x,14),round(p2.gps.UL_coord[1]-diff_y,14))
 
 	diff_UL = (p1.gps.UL_coord[0]-new_UL[0],p1.gps.UL_coord[1]-new_UL[1])
 
@@ -3612,13 +3612,13 @@ class Field:
 		final_results = 'Filename,Upper left,Lower left,Upper right,Lower right,Center\n'
 
 		for p in all_patches:
-			p.gps.UL_coord = (round(p.gps.UL_coord[0],7),round(p.gps.UL_coord[1],7))
-			p.gps.LL_coord = (round(p.gps.LL_coord[0],7),round(p.gps.LL_coord[1],7))
-			p.gps.UR_coord = (round(p.gps.UR_coord[0],7),round(p.gps.UR_coord[1],7))
-			p.gps.LR_coord = (round(p.gps.LR_coord[0],7),round(p.gps.LR_coord[1],7))
-			p.gps.Center = (round(p.gps.Center[0],7),round(p.gps.Center[1],7))
+			p.gps.UL_coord = (round(p.gps.UL_coord[0],14),round(p.gps.UL_coord[1],14))
+			p.gps.LL_coord = (round(p.gps.LL_coord[0],14),round(p.gps.LL_coord[1],14))
+			p.gps.UR_coord = (round(p.gps.UR_coord[0],14),round(p.gps.UR_coord[1],14))
+			p.gps.LR_coord = (round(p.gps.LR_coord[0],14),round(p.gps.LR_coord[1],14))
+			p.gps.Center = (round(p.gps.Center[0],14),round(p.gps.Center[1],14))
 
-			final_results += '{:s},"{:.7f},{:.7f}","{:.7f},{:.7f}","{:.7f},{:.7f}","{:.7f},{:.7f}","{:.7f},{:.7f}"\n'\
+			final_results += '{:s},"{:.14f},{:.14f}","{:.14f},{:.14f}","{:.14f},{:.14f}","{:.14f},{:.14f}","{:.14f},{:.14f}"\n'\
 			.format(p.name,p.gps.UL_coord[0],p.gps.UL_coord[1],p.gps.LL_coord[0],p.gps.LL_coord[1],p.gps.UR_coord[0],p.gps.UR_coord[1]\
 				,p.gps.LR_coord[0],p.gps.LR_coord[1],p.gps.Center[0],p.gps.Center[1])
 
@@ -3949,9 +3949,9 @@ def main(scan_date):
 		# HPC
 		print('RUNNING ON -- {0} --'.format(server))
 		field = Field()
-		# field.create_patches_SIFT_files()
-		# field.draw_and_save_field(is_old=True)
-		# field.save_plot()
+		field.create_patches_SIFT_files()
+		field.draw_and_save_field(is_old=True)
+		field.save_plot()
 		field.correct_field()
 		field.draw_and_save_field(is_old=False)
 		# field.print_field_in_text()
@@ -3986,7 +3986,7 @@ patches_to_use = slice(0,None)
 
 
 inside_radius_lettuce_matching_threshold = 200
-discard_right_flag = True
+discard_right_flag = False
 
 method = 'MST'
 # method = 'Hybrid'
@@ -3997,12 +3997,19 @@ method = 'MST'
 # method = 'Old_method'
 
 
-scan_date = '2020-02-18'
+# scan_date = '2020-02-18'
 # scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
 # scan_date = '2020-06-03'
+scan_date = '2020-06-05_20m_05mEW_10mNS-rgb'
+# scan_date = '2020-06-05_35m_05mEW_10mNS-rgb'
+# scan_date = '2020-06-05_35m_05mEW_125mNS-rgb'
+# scan_date = '2020-06-05_35m_0875mEW_10mNS-rgb'
+# scan_date = '2020-06-05_35m_0875mEW_125mNS-rgb'
+# scan_date = '2020-06-05_hardware_north-rgb'
+# scan_date = '2020-06-05_hardware_south-rgb'
 
 # -----------------------------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
