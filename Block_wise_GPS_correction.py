@@ -29,7 +29,9 @@ from collections import OrderedDict,Counter
 # ------------------------------------------------------- Settings ------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
 
-PATCH_SIZE = (3296, 2472)
+# PATCH_SIZE = (3296, 2472)
+PATCH_SIZE = (330, 247)
+
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
 
@@ -101,7 +103,8 @@ def convert_to_gray(img):
 
 def load_preprocess_image(address):
 	img = cv2.imread(address)
-	
+	img = cv2.resize(img,PATCH_SIZE)
+
 	img = img.astype('uint8')
 	img_g = convert_to_gray(img)
 
@@ -3878,14 +3881,14 @@ def main(scan_date):
 		# err = calculate_error_of_correction(True)
 		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
-		# field = Field()
+		field = Field()
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
 		# field.save_plot()
-		# field.create_patches_SIFT_files()
+		field.create_patches_SIFT_files()
 
 		# field.groups[14].correct_internally()
-		# field.draw_and_save_field()
+		field.draw_and_save_field()
 		# field.correct_field()
 		# field.draw_and_save_field()
 		# field.save_new_coordinate()
@@ -3893,7 +3896,7 @@ def main(scan_date):
 		# err = calculate_error_of_correction()
 		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
-		field = Field()
+		# field = Field()
 
 		# ------------
 
@@ -4005,7 +4008,7 @@ def main(scan_date):
 
 
 
-server_core = {'coge':10,'laplace.cs.arizona.edu':6,'ariyan':4}
+server_core = {'coge':60,'laplace.cs.arizona.edu':6,'ariyan':4}
 
 server = socket.gethostname()
 if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
@@ -4040,7 +4043,7 @@ method = 'MST'
 
 
 # scan_date = '2020-02-18'
-# scan_date = '2020-01-08'
+scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
@@ -4049,7 +4052,7 @@ method = 'MST'
 # scan_date = '2020-06-05_35m_05mEW_10mNS'
 # scan_date = '2020-06-05_35m_05mEW_125mNS'
 # scan_date = '2020-06-05_35m_0875mEW_10mNS'
-scan_date = '2020-06-05_35m_0875mEW_125mNS'
+# scan_date = '2020-06-05_35m_0875mEW_125mNS'
 # scan_date = '2020-06-05_hardware_north'
 # scan_date = '2020-06-05_hardware_south'
 
