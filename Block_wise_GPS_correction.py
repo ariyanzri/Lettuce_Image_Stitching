@@ -1980,6 +1980,32 @@ class Graph():
 
 		return dict_patches
 
+	def get_all_connected_components(self):
+		components = []
+		status = [0]*self.vertecis_number
+
+		for v in range(self.vertecis_number):
+			if status[v] == 1:
+				continue
+
+			queue_traverse = [v]
+			component = []
+
+			while len(queue_traverse)>0:
+				u = queue_traverse.pop()
+				component.append(u)
+
+				status[u] = 1
+
+				for k in range(self.vertecis_number):
+					if self.edges[u][k] != -1:
+						queue_traverse = [k] + queue_traverse
+
+			components.append(component)
+
+		return components
+
+
 	def revise_GPS_from_generated_MST(self,patches,parents):
 		dict_patches = self.get_patches_dict(patches)
 
@@ -3121,6 +3147,15 @@ class Group:
 
 		return get_corrected_string(self.patches)
 
+	def connected_component_patches(self):
+		list_connected_patches = []
+
+		for p in self.patches:
+			if len(p.neighbors)>0:
+				list_connected_patches.append(p)
+
+		return list_connected_patches
+
 	def correct_internally(self):
 
 		global lettuce_coords,no_of_cores_to_use,method
@@ -3133,17 +3168,23 @@ class Group:
 
 			self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
-			G = Graph(len(self.patches),[p.name for p in self.patches],self.group_id)
-			G.initialize_edge_weights(self.patches)
+			connected_patches = self.connected_component_patches()
+
+			G = Graph(len(connected_patches),[p.name for p in connected_patches],self.group_id)
+			G.initialize_edge_weights(connected_patches)
 
 			try:
-				parents = G.generate_MST_prim(self.rows[0][0].name)
-				string_res = G.revise_GPS_from_generated_MST(self.patches,parents)
+				parents = G.generate_MST_prim(connected_patches[0].name)
+				string_res = G.revise_GPS_from_generated_MST(connected_patches,parents)
 			except Exception as e:
-				print(e)
+				print(e)	
 				string_res = get_corrected_string(self.patches)
 
 			self.delete_all_patches_SIFT_points()
+
+			print('Group {0} - Not corrected patches (Left over in disconnected Graph:'.format(self.group_id))
+			for lp in list(set(self.patches)-set(connected_patches)):
+				print('\t{0}'.format(lp.name))
 
 		elif method == 'Hybrid':
 			
@@ -4006,10 +4047,10 @@ method = 'MST'
 # scan_date = '2020-06-05_20m_05mEW_10mNS'
 # scan_date = '2020-06-05_35m_05mEW_10mNS'
 # scan_date = '2020-06-05_35m_05mEW_125mNS'
-# scan_date = '2020-06-05_35m_0875mEW_10mNS'
+scan_date = '2020-06-05_35m_0875mEW_10mNS'
 # scan_date = '2020-06-05_35m_0875mEW_125mNS'
 # scan_date = '2020-06-05_hardware_north'
-scan_date = '2020-06-05_hardware_south'
+# scan_date = '2020-06-05_hardware_south'
 
 # -----------------------------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
