@@ -22,8 +22,8 @@ from Customized_myltiprocessing import MyPool
 from heapq import heappush, heappop, heapify
 from collections import OrderedDict,Counter
 
-from PIL import Image
-from PIL.TiffTags import TAGS
+# from PIL import Image
+# from PIL.TiffTags import TAGS
 
 # -----------------------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------- Settings ------------------------------------------------------------------
