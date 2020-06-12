@@ -4007,8 +4007,8 @@ method = 'MST'
 # scan_date = '2020-06-05_35m_05mEW_10mNS'
 # scan_date = '2020-06-05_35m_05mEW_125mNS'
 # scan_date = '2020-06-05_35m_0875mEW_10mNS'
-scan_date = '2020-06-05_35m_0875mEW_125mNS'
-# scan_date = '2020-06-05_hardware_north'
+# scan_date = '2020-06-05_35m_0875mEW_125mNS'
+scan_date = '2020-06-05_hardware_north'
 # scan_date = '2020-06-05_hardware_south'
 
 # -----------------------------------------------------------------------------------------------------------------------------------
