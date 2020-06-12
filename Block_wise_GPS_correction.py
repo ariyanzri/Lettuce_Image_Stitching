@@ -3990,9 +3990,9 @@ def main(scan_date):
 		# HPC
 		print('RUNNING ON -- {0} --'.format(server))
 		field = Field()
-		field.create_patches_SIFT_files()
-		field.draw_and_save_field(is_old=True)
-		field.save_plot()
+		# field.create_patches_SIFT_files()
+		# field.draw_and_save_field(is_old=True)
+		# field.save_plot()
 		field.correct_field()
 		field.draw_and_save_field(is_old=False)
 		# field.print_field_in_text()
