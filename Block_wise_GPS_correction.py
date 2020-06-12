@@ -3183,8 +3183,9 @@ class Group:
 			self.delete_all_patches_SIFT_points()
 
 			print('Group {0} - Not corrected patches (Left over in disconnected Graph:'.format(self.group_id))
-			for lp in list(set(self.patches)-set(connected_patches)):
-				print('\t{0}'.format(lp.name))
+			for lp in self.patches:
+				if lp not in connected_patches:
+					print('\t{0}'.format(lp.name))
 
 		elif method == 'Hybrid':
 			
@@ -4047,8 +4048,8 @@ method = 'MST'
 # scan_date = '2020-06-05_20m_05mEW_10mNS'
 # scan_date = '2020-06-05_35m_05mEW_10mNS'
 # scan_date = '2020-06-05_35m_05mEW_125mNS'
-# scan_date = '2020-06-05_35m_0875mEW_10mNS'
-scan_date = '2020-06-05_35m_0875mEW_125mNS'
+scan_date = '2020-06-05_35m_0875mEW_10mNS'
+# scan_date = '2020-06-05_35m_0875mEW_125mNS'
 # scan_date = '2020-06-05_hardware_north'
 # scan_date = '2020-06-05_hardware_south'
 
