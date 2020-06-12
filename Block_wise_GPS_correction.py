@@ -22,6 +22,9 @@ from Customized_myltiprocessing import MyPool
 from heapq import heappush, heappop, heapify
 from collections import OrderedDict,Counter
 
+from PIL import Image
+from PIL.TiffTags import TAGS
+
 # -----------------------------------------------------------------------------------------------------------------------------------
 # ------------------------------------------------------- Settings ------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
@@ -3318,7 +3321,7 @@ class Field:
 
 	def get_rows(self,use_corrected=False):
 		global coordinates_file, CORRECTED_coordinates_file, patches_to_use, discard_right_flag
-		
+
 		center_of_rows = []
 		patches = []
 		
@@ -3627,6 +3630,16 @@ class Field:
 		print('Coordinates saved.')
 		sys.stdout.flush()
 
+	def save_new_coordinates_on_tiff(self):
+		global patch_folder
+
+		for group in self.groups:
+			for patch in self.patches:
+				img = Image.open('{0}/{1}'.format(patch_folder,patch.name))
+				img.tag[33922] = (0.0, 0.0, 0.0, patch.gps.UL_coord[0], patch.gps.UL_coord[1], 0.0)
+				img.save('{0}/{1}'.format(patch_folder,patches[0].name),tiffinfo=img.tag)
+				img.close()
+
 	def print_field_in_text(self):
 
 		for group in self.groups:
@@ -3742,20 +3755,30 @@ def logger(corrected_patch,gps_diff,param,gid,step_id):
 def test_function():
 	global patch_folder
 
-	images = os.listdir(patch_folder)
-	img,img_g = load_preprocess_image('{0}/{1}'.format(patch_folder,images[0]))
+	patches = read_all_data()
 
-	kp,desc = detect_SIFT_key_points(img_g,0,0,img_g.shape[1],img_g.shape[0])
+	draw_together([patches[0],patches[3]])
+	patches[0].gps =add_to_gps_coord(patches[0].gps,0.00000009,0)
+	# img = Image.open('{0}/{1}'.format(patch_folder,patches[0].name))
+	# print(img.tag[33922])
+	# print(patches[0].gps.UL_coord)
+	# img.tag[33922] = (0.0, 0.0, 0.0, patches[0].gps.UL_coord[0], patches[0].gps.UL_coord[1], 0.0)
+	# print(img.tag[33922])
+	# img.save('{0}/{1}'.format(patch_folder,patches[0].name),tiffinfo=img.tag)
+	# img.close()
 
-	img_g=cv2.drawKeypoints(img_g,kp,img_g)
+	draw_together([patches[0],patches[3]])
+	# kp,desc = detect_SIFT_key_points(img_g,0,0,img_g.shape[1],img_g.shape[0])
 
-	cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
-	cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
-	cv2.resizeWindow('fig1', 500,500)
-	cv2.resizeWindow('fig2', 500,500)
-	cv2.imshow('fig1',img)
-	cv2.imshow('fig2',img_g)
-	cv2.waitKey(0)
+	# img_g=cv2.drawKeypoints(img_g,kp,img_g)
+
+	# cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
+	# cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
+	# cv2.resizeWindow('fig1', 500,500)
+	# cv2.resizeWindow('fig2', 500,500)
+	# cv2.imshow('fig1',img)
+	# cv2.imshow('fig2',img2)
+	# cv2.waitKey(0)
 
 def main(scan_date):
 	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path,lettuce_heads_coordinates_file,lettuce_coords,method,correction_log_file
@@ -3847,20 +3870,20 @@ def main(scan_date):
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
-		os.system("taskset -p -c 0-39 %d" % os.getpid())
+		# os.system("taskset -p -c 0-39 %d" % os.getpid())
 		# os.system("taskset -p -c 40-47 %d" % os.getpid())
 		
 		# ------------
 
-		# field = Field(False)
-		# res = get_approximate_random_RMSE_overlap(field,10,40)
-		# np.save('RMSE_before.npy',res)
-		# print(np.mean(res[:,3]))
+		field = Field(False)
+		res = get_approximate_random_RMSE_overlap(field,10,40)
+		np.save('RMSE_before.npy',res)
+		print(np.mean(res[:,3]))
 
-		# field = Field(True)
-		# res = get_approximate_random_RMSE_overlap(field,10,40)
-		# np.save('RMSE_after.npy',res)
-		# print(np.mean(res[:,3]))
+		field = Field(True)
+		res = get_approximate_random_RMSE_overlap(field,10,40)
+		np.save('RMSE_after.npy',res)
+		print(np.mean(res[:,3]))
 
 		# ------------
 
@@ -3874,19 +3897,19 @@ def main(scan_date):
 		# field.draw_and_save_field(is_old=False)
 
 		# ------------
-		err = calculate_error_of_correction(True)
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction(True)
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 
-		field = Field()
-		field.create_patches_SIFT_files()
-		lettuce_coords = read_lettuce_heads_coordinates()
+		# field = Field()
+		# field.create_patches_SIFT_files()
+		# lettuce_coords = read_lettuce_heads_coordinates()
 		
-		field.correct_field()
-		field.save_new_coordinate()
+		# field.correct_field()
+		# field.save_new_coordinate()
 
-		err = calculate_error_of_correction()
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction()
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 		# ------------
 
@@ -3918,89 +3941,8 @@ def main(scan_date):
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
 
-		visualize_plot()
-
-		# patches = read_all_data()
-		# p1 = patches[0]
-		
-		# # lettuce_coords = read_lettuce_heads_coordinates()
-		# # p1.get_lettuce_contours_centers(lettuce_coords)
-		
-		# # fft = p1.get_fft_region(0,0,PATCH_SIZE[1],PATCH_SIZE[0])
-		# # # print(fft)
-		# # p1.load_img()
-
-		# p2 = patches[1]
-
-		# for p in patches:
-		# 	if p.has_overlap(p1) and p1.has_overlap(p) and p1 != p:
-		# 		p2 = p
-
-		# 		break
-				
-		
-		# p1.load_SIFT_points()
-		# p2.load_SIFT_points()
-		# p1.load_img()
-		# p2.load_img()
-		# overlap_1,overlap_2 = p1.get_overlap_rectangles(p2)
-
-		# # kp1,desc1 = choose_SIFT_key_points(p1,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
-		# # kp2,desc2 = choose_SIFT_key_points(p2,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
-		# kp1,desc1 = detect_SIFT_key_points(p1.rgb_img,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
-		# kp2,desc2 = detect_SIFT_key_points(p2.rgb_img,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
-
-		# matches = get_good_matches(desc1,desc2)
-		# sorted_matches = sorted(matches, key=lambda x: x[0].distance)
-
-		# img_top_lowerror = None
-		# img_top_higherror = None
-		# img_nottop_lowerror = None
-		# img_nottop_high_error = None
-
-		# mtch_top_lowerror = []
-		# mtch_top_higherror = []
-		# mtch_nottop_lowerror = []
-		# mtch_nottop_high_error = []
-
-		# for i,m in enumerate(sorted_matches):
-		# 	pt1 = kp1[m[0].queryIdx].pt
-		# 	pt2 = kp2[m[0].trainIdx].pt
-		# 	sg_tr = np.array([[1,0,PATCH_SIZE[0]-abs(pt1[1]-pt2[1])],[0,1,PATCH_SIZE[1]-abs(pt1[0]-pt2[0])],[0,0,1]])
-		# 	diff = get_gps_diff_from_H(p2,p1,sg_tr)
-		# 	print(diff)
-		# 	print(GPS_ERROR_X)
-		# 	print(GPS_ERROR_Y)
-
-		# 	if i<PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION*len(sorted_matches):
-		# 		if abs(diff[0])<=GPS_ERROR_X and abs(diff[1])<=GPS_ERROR_Y:
-		# 			mtch_top_lowerror.append(m)
-		# 		else:
-		# 			mtch_top_higherror.append(m)
-		# 	else:
-		# 		if abs(diff[0])<=GPS_ERROR_X and abs(diff[1])<=GPS_ERROR_Y:
-		# 			mtch_nottop_lowerror.append(m)
-		# 		else:
-		# 			mtch_nottop_high_error.append(m)
-
-		# img_top_lowerror = cv2.drawMatches(p1.rgb_img,kp1,p2.rgb_img,kp2,[m[0] for m in mtch_top_lowerror],img_top_lowerror,matchColor=(0,255,0))
-		# img_top_higherror = cv2.drawMatches(p1.rgb_img,kp1,p2.rgb_img,kp2,[m[0] for m in mtch_top_higherror],img_top_higherror,matchColor=(0,255,0))
-		# img_nottop_lowerror = cv2.drawMatches(p1.rgb_img,kp1,p2.rgb_img,kp2,[m[0] for m in mtch_nottop_lowerror],img_nottop_lowerror,matchColor=(0,255,0))
-		# img_nottop_high_error = cv2.drawMatches(p1.rgb_img,kp1,p2.rgb_img,kp2,[m[0] for m in mtch_nottop_high_error],img_nottop_high_error,matchColor=(0,255,0))
-
-		# cv2.namedWindow('img_top_lowerror',cv2.WINDOW_NORMAL)
-		# cv2.namedWindow('img_top_higherror',cv2.WINDOW_NORMAL)
-		# cv2.namedWindow('img_nottop_lowerror',cv2.WINDOW_NORMAL)
-		# cv2.namedWindow('img_nottop_high_error',cv2.WINDOW_NORMAL)
-		# cv2.resizeWindow('img_top_lowerror', 500,500)
-		# cv2.resizeWindow('img_top_higherror', 500,500)
-		# cv2.resizeWindow('img_nottop_lowerror', 500,500)
-		# cv2.resizeWindow('img_nottop_high_error', 500,500)
-		# cv2.imshow('img_top_lowerror',img_top_lowerror)
-		# cv2.imshow('img_top_higherror',img_top_higherror)
-		# cv2.imshow('img_nottop_lowerror',img_nottop_lowerror)
-		# cv2.imshow('img_nottop_high_error',img_nottop_high_error)
-		# cv2.waitKey(0)
+		# visualize_plot()
+		test_function()
 
 		
 	else:
@@ -4034,19 +3976,20 @@ else:
 # -------------------------------------------------- Runtime Settings ---------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
 
-# number_of_rows_in_groups = 10
-# groups_to_use = slice(0,None)
-# patches_to_use = slice(0,None)
+number_of_rows_in_groups = 10
+groups_to_use = slice(0,None)
+patches_to_use = slice(0,None)
 
-number_of_rows_in_groups = 4
-groups_to_use = slice(5,7)
-patches_to_use = slice(5,20)
+# number_of_rows_in_groups = 4
+# groups_to_use = slice(5,7)
+# patches_to_use = slice(5,20)
+
 
 inside_radius_lettuce_matching_threshold = 200
 discard_right_flag = True
 
-# method = 'MST'
-method = 'Hybrid'
+method = 'MST'
+# method = 'Hybrid'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
