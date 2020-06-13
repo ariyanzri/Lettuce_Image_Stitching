@@ -43,7 +43,7 @@ RANSAC_MAX_ITER = 1000
 RANSAC_ERROR_THRESHOLD = 5
 PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
 LETTUCE_AREA_THRESHOLD = 5000
-REDUCTION_FACTOR = 0.05
+REDUCTION_FACTOR = 0.1
 OVERLAP_DISCARD_RATIO = 0.05
 CONTOUR_MATCHING_MIN_MATCH = 2
 
@@ -3885,7 +3885,7 @@ def main(scan_date):
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
 		# field.save_plot()
-		field.create_patches_SIFT_files()
+		# field.create_patches_SIFT_files()
 
 		# field.groups[14].correct_internally()
 		field.draw_and_save_field()
