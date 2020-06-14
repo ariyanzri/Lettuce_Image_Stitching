@@ -2260,7 +2260,7 @@ class Patch:
 		cv2.waitKey(0)
 
 	def get_pairwise_transformation_info(self,neighbor):
-		overlap1,overlap2 = neighbor.get_overlap_rectangles(self)
+		overlap2,overlap1 = neighbor.get_overlap_rectangles(self)
 		
 		if overlap1[2]-overlap1[0]<PATCH_SIZE[1]*OVERLAP_DISCARD_RATIO and overlap1[3]-overlap1[1]<PATCH_SIZE[0]*OVERLAP_DISCARD_RATIO:
 			# print('overlap low.')
