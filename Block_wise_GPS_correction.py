@@ -104,7 +104,7 @@ def convert_to_gray(img):
 
 def load_preprocess_image(address):
 	img = cv2.imread(address)
-	img = cv2.resize(img,PATCH_SIZE)
+	img = cv2.resize(img,(PATCH_SIZE[1],PATCH_SIZE[0]))
 
 	img = img.astype('uint8')
 	img_g = convert_to_gray(img)
@@ -2260,7 +2260,7 @@ class Patch:
 		cv2.waitKey(0)
 
 	def get_pairwise_transformation_info(self,neighbor):
-		overlap2,overlap1 = neighbor.get_overlap_rectangles(self)
+		overlap1,overlap2 = neighbor.get_overlap_rectangles(self)
 		
 		if overlap1[2]-overlap1[0]<PATCH_SIZE[1]*OVERLAP_DISCARD_RATIO and overlap1[3]-overlap1[1]<PATCH_SIZE[0]*OVERLAP_DISCARD_RATIO:
 			# print('overlap low.')
