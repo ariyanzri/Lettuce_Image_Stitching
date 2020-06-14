@@ -30,12 +30,13 @@ from collections import OrderedDict,Counter
 # -----------------------------------------------------------------------------------------------------------------------------------
 
 # PATCH_SIZE = (3296, 2472)
-PATCH_SIZE = (330, 247)
+# PATCH_SIZE = (330, 247)
+PATCH_SIZE = (659, 494)
 
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
 
-PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
+PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.8
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
 MINIMUM_NUMBER_OF_MATCHES = 100
@@ -2262,14 +2263,14 @@ class Patch:
 		overlap1,overlap2 = neighbor.get_overlap_rectangles(self)
 		
 		if overlap1[2]-overlap1[0]<PATCH_SIZE[1]*OVERLAP_DISCARD_RATIO and overlap1[3]-overlap1[1]<PATCH_SIZE[0]*OVERLAP_DISCARD_RATIO:
-			print('overlap low.')
+			# print('overlap low.')
 			return None
 
 		kp1,desc1 = choose_SIFT_key_points(neighbor,overlap1[0],overlap1[1],overlap1[2],overlap1[3])
 		kp2,desc2 = choose_SIFT_key_points(self,overlap2[0],overlap2[1],overlap2[2],overlap2[3])
 
 		if desc1 is None or len(desc1) == 0 or desc2 is None or len(desc2) == 0:
-			print('bad desc')
+			# print('bad desc')
 			return None
 
 		# matches = get_good_matches(desc2,desc1)
@@ -2278,7 +2279,7 @@ class Patch:
 		# matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1)
 
 		if matches is None or len(matches) == 0:
-			print('match is none or len matches is 0.')
+			# print('match is none or len matches is 0.')
 			return None
 
 		num_matches = len(matches)
@@ -2293,7 +2294,7 @@ class Patch:
 		# print(percentage_inliers)
 
 		if H is None:
-			print('H is none.')
+			# print('H is none.')
 			return None
 
 		percentage_inliers = round(percentage_inliers*100,2)
@@ -2302,7 +2303,7 @@ class Patch:
 		# dissimilarity = - percentage_inliers*num_matches
 
 		if dissimilarity == -1:
-			print('dissimilarity -1.')
+			# print('dissimilarity -1.')
 			return None
 		
 		# print(percentage_inliers,num_matches,dissimilarity,(overlap1[2]-overlap1[0])*(overlap1[3]-overlap1[1]))
@@ -3897,7 +3898,7 @@ def main(scan_date):
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
 		# field.save_plot()
-		# field.create_patches_SIFT_files()
+		field.create_patches_SIFT_files()
 
 		# field.groups[14].correct_internally()
 		# field.draw_and_save_field(is_old=True)
@@ -4020,7 +4021,7 @@ def main(scan_date):
 
 
 
-server_core = {'coge':10,'laplace.cs.arizona.edu':6,'ariyan':4}
+server_core = {'coge':60,'laplace.cs.arizona.edu':6,'ariyan':4}
 
 server = socket.gethostname()
 if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
