@@ -2271,6 +2271,13 @@ class Patch:
 
 		if desc1 is None or len(desc1) == 0 or desc2 is None or len(desc2) == 0:
 			# print('bad desc')
+			print(kp1,desc1)
+			print(kp2,desc2)
+			self.load_img()
+			neighbor.load_img()
+
+			print(self.rgb_img.shape)
+			print(neighbor.rgb_img.shape)
 			return None
 
 		# matches = get_good_matches(desc2,desc1)
