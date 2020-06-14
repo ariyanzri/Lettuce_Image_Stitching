@@ -29,8 +29,8 @@ from collections import OrderedDict,Counter
 # ------------------------------------------------------- Settings ------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
 
-PATCH_SIZE = (3296, 2472)
-# PATCH_SIZE = (330, 247)
+# PATCH_SIZE = (3296, 2472)
+PATCH_SIZE = (330, 247)
 # PATCH_SIZE = (659, 494)
 
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
@@ -2271,7 +2271,7 @@ class Patch:
 
 		if desc1 is None or len(desc1) == 0 or desc2 is None or len(desc2) == 0:
 			# print('bad desc')
-			print(overlap1,overlap2)
+			# print(overlap1,overlap2)
 			return None
 
 		# matches = get_good_matches(desc2,desc1)
@@ -2926,7 +2926,7 @@ class Group:
 					
 					if neighbor_param is None:
 						remove_neighbors.append((n,p))
-						print('GROPU ID: {0} - REMOVED PATCH'.format(self.group_id))
+						# print('GROPU ID: {0} - REMOVED PATCH'.format(self.group_id))
 						continue
 					
 					p.neighbors.append((n,neighbor_param))
