@@ -3899,12 +3899,12 @@ def main(scan_date):
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
 		# field.save_plot()
-		field.create_patches_SIFT_files()
+		# field.create_patches_SIFT_files()
 
 		# field.groups[14].correct_internally()
 		# field.draw_and_save_field(is_old=True)
-		# field.correct_field()
-		# field.draw_and_save_field(is_old=False)
+		field.correct_field()
+		field.draw_and_save_field(is_old=False)
 		# field.save_new_coordinate()
 		
 		# err = calculate_error_of_correction()
