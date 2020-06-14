@@ -2923,6 +2923,7 @@ class Group:
 					
 					if neighbor_param is None:
 						remove_neighbors.append((n,p))
+						print('GROPU ID: {0} - REMOVED PATCH'.format(self.group_id))
 						continue
 					
 					p.neighbors.append((n,neighbor_param))
