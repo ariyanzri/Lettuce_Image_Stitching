@@ -2262,13 +2262,14 @@ class Patch:
 		overlap1,overlap2 = neighbor.get_overlap_rectangles(self)
 		
 		if overlap1[2]-overlap1[0]<PATCH_SIZE[1]*OVERLAP_DISCARD_RATIO and overlap1[3]-overlap1[1]<PATCH_SIZE[0]*OVERLAP_DISCARD_RATIO:
-			
+			print('overlap low.')
 			return None
 
 		kp1,desc1 = choose_SIFT_key_points(neighbor,overlap1[0],overlap1[1],overlap1[2],overlap1[3])
 		kp2,desc2 = choose_SIFT_key_points(self,overlap2[0],overlap2[1],overlap2[2],overlap2[3])
 
 		if desc1 is None or len(desc1) == 0 or desc2 is None or len(desc2) == 0:
+			print('bad desc')
 			return None
 
 		# matches = get_good_matches(desc2,desc1)
@@ -2277,7 +2278,7 @@ class Patch:
 		# matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1)
 
 		if matches is None or len(matches) == 0:
-			# print('match is none or len matches is 0.')
+			print('match is none or len matches is 0.')
 			return None
 
 		num_matches = len(matches)
@@ -2292,7 +2293,7 @@ class Patch:
 		# print(percentage_inliers)
 
 		if H is None:
-			# print('H is none.')
+			print('H is none.')
 			return None
 
 		percentage_inliers = round(percentage_inliers*100,2)
@@ -2301,7 +2302,7 @@ class Patch:
 		# dissimilarity = - percentage_inliers*num_matches
 
 		if dissimilarity == -1:
-			
+			print('dissimilarity -1.')
 			return None
 		
 		# print(percentage_inliers,num_matches,dissimilarity,(overlap1[2]-overlap1[0])*(overlap1[3]-overlap1[1]))
