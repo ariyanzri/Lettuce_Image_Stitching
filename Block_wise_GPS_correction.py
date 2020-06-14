@@ -416,6 +416,17 @@ def get_dissimilarity_on_overlaps(p1,p2,H):
 	shape_1 = np.shape(overlap_1_img)
 	shape_2 = np.shape(overlap_2_img)
 
+	if shape_1 != shape_2:
+
+		min_shape = (min(shape_1[0],shape_2[0]),min(shape_1[1],shape_2[1]))
+
+		overlap_1_img = cv2.resize(overlap_1_img,(min_shape[1],min_shape[0]))
+		shape_1 = min_shape
+
+		overlap_2_img = cv2.resize(overlap_2_img,(min_shape[1],min_shape[0]))
+		shape_2 = min_shape
+
+
 	if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
 		return -1
 
@@ -3888,7 +3899,7 @@ def main(scan_date):
 		# field.create_patches_SIFT_files()
 
 		# field.groups[14].correct_internally()
-		field.draw_and_save_field(is_old=True)
+		# field.draw_and_save_field(is_old=True)
 		field.correct_field()
 		field.draw_and_save_field(is_old=False)
 		# field.save_new_coordinate()
@@ -4008,7 +4019,7 @@ def main(scan_date):
 
 
 
-server_core = {'coge':60,'laplace.cs.arizona.edu':6,'ariyan':4}
+server_core = {'coge':10,'laplace.cs.arizona.edu':6,'ariyan':4}
 
 server = socket.gethostname()
 if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
