@@ -3898,7 +3898,7 @@ def main(scan_date):
 		# field.create_patches_SIFT_files()
 
 		# field.groups[14].correct_internally()
-		# field.draw_and_save_field(is_old=True)
+		field.draw_and_save_field(is_old=True)
 		field.correct_field()
 		field.draw_and_save_field(is_old=False)
 		# field.save_new_coordinate()
