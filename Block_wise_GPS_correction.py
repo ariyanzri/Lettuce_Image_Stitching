@@ -416,6 +416,9 @@ def get_dissimilarity_on_overlaps(p1,p2,H):
 	shape_1 = np.shape(overlap_1_img)
 	shape_2 = np.shape(overlap_2_img)
 
+	if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
+		return -1
+
 	if shape_1 != shape_2:
 
 		min_shape = (min(shape_1[0],shape_2[0]),min(shape_1[1],shape_2[1]))
@@ -2118,16 +2121,12 @@ class Patch:
 		gc.collect()
 
 
-	def load_img(self,ratio=1):
+	def load_img(self):
 		global patch_folder
 
 		img,img_g = load_preprocess_image('{0}/{1}'.format(patch_folder,self.name))
 		self.rgb_img = img
 		self.gray_img = img_g
-
-		if ratio != 1:
-			self.rgb_img = cv2.resize(self.rgb_img,(int(PATCH_SIZE[1]*ratio),int(PATCH_SIZE[0]*ratio)))
-			self.gray_img = cv2.resize(self.gray_img,(int(PATCH_SIZE[1]*ratio),int(PATCH_SIZE[0]*ratio)))
 
 	def delete_img(self):
 
@@ -3931,15 +3930,15 @@ def main(scan_date):
 		
 		# ------------
 
-		field = Field(False)
-		res = get_approximate_random_RMSE_overlap(field,10,40)
-		np.save('RMSE_before.npy',res)
-		print(np.mean(res[:,3]))
+		# field = Field(False)
+		# res = get_approximate_random_RMSE_overlap(field,10,40)
+		# np.save('RMSE_before.npy',res)
+		# print(np.mean(res[:,3]))
 
-		field = Field(True)
-		res = get_approximate_random_RMSE_overlap(field,10,40)
-		np.save('RMSE_after.npy',res)
-		print(np.mean(res[:,3]))
+		# field = Field(True)
+		# res = get_approximate_random_RMSE_overlap(field,10,40)
+		# np.save('RMSE_after.npy',res)
+		# print(np.mean(res[:,3]))
 
 		# ------------
 
