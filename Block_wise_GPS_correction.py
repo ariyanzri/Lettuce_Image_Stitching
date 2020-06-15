@@ -29,9 +29,9 @@ from collections import OrderedDict,Counter
 # ------------------------------------------------------- Settings ------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
 
-# PATCH_SIZE = (3296, 2472)
-# PATCH_SIZE = (330, 247)
-PATCH_SIZE = (659, 494)
+# PATCH_SIZE = (3296, 2472) # 1
+# PATCH_SIZE = (330, 247) # 0.1
+PATCH_SIZE = (659, 494) # 0.2 
 
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
@@ -3932,12 +3932,12 @@ def main(scan_date):
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
 		# field.save_plot()
-		# field.create_patches_SIFT_files()
+		field.create_patches_SIFT_files()
 
 		# field.groups[14].correct_internally()
 		field.draw_and_save_field(is_old=True)
-		# field.correct_field()
-		# field.draw_and_save_field(is_old=False)
+		field.correct_field()
+		field.draw_and_save_field(is_old=False)
 		# field.save_new_coordinate()
 		
 		# err = calculate_error_of_correction()
