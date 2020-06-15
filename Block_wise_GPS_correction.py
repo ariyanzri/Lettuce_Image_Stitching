@@ -30,8 +30,8 @@ from collections import OrderedDict,Counter
 # -----------------------------------------------------------------------------------------------------------------------------------
 
 # PATCH_SIZE = (3296, 2472)
-PATCH_SIZE = (330, 247)
-# PATCH_SIZE = (659, 494)
+# PATCH_SIZE = (330, 247)
+PATCH_SIZE = (659, 494)
 
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
@@ -1897,6 +1897,28 @@ def old_method_simple_for_test(corrected,not_corrected,gid,starting_step):
 	return corrected+not_corrected
 
 
+def ortho_generation_sub_function(p,UL):
+	p.load_img()
+			
+	x_diff = p.gps.UL_coord[0] - UL[0]
+	y_diff = UL[1] - p.gps.UL_coord[1]
+	
+	st_x = int(REDUCTION_FACTOR*x_diff/GPS_TO_IMAGE_RATIO[0])
+	st_y = int(REDUCTION_FACTOR*y_diff/GPS_TO_IMAGE_RATIO[1])
+	
+	new_size = (int(PATCH_SIZE[0]*REDUCTION_FACTOR),int(PATCH_SIZE[1]*REDUCTION_FACTOR))
+
+	tmpimg = cv2.resize(p.rgb_img,(new_size[1],new_size[0]))
+
+	p.delete_img()
+
+	return st_y,st_y+new_size[0],st_x,st_x+new_size[1],tmpimg
+
+
+def ortho_generation_sub_function_helper(args):
+	return ortho_generation_sub_function(*args)	
+
+
 class GPS_Coordinate:
 	
 	def __init__(self,UL_coord,UR_coord,LL_coord,LR_coord,Center):
@@ -3601,7 +3623,7 @@ class Field:
 		sys.stdout.flush()
 
 	def draw_and_save_field(self,is_old=False):
-		global patch_folder, field_image_path
+		global patch_folder, field_image_path, no_of_cores_to_use_max
 
 		all_patches = []
 
@@ -3632,22 +3654,33 @@ class Field:
 
 		result = np.zeros(super_patch_size)
 
+		# for p in all_patches:
+		# 	p.load_img()
+			
+		# 	x_diff = p.gps.UL_coord[0] - UL[0]
+		# 	y_diff = UL[1] - p.gps.UL_coord[1]
+			
+		# 	st_x = int(REDUCTION_FACTOR*x_diff/GPS_TO_IMAGE_RATIO[0])
+		# 	st_y = int(REDUCTION_FACTOR*y_diff/GPS_TO_IMAGE_RATIO[1])
+			
+		# 	new_size = (int(PATCH_SIZE[0]*REDUCTION_FACTOR),int(PATCH_SIZE[1]*REDUCTION_FACTOR))
+
+		# 	tmpimg = cv2.resize(p.rgb_img,(new_size[1],new_size[0]))
+
+		# 	result[st_y:st_y+new_size[0],st_x:st_x+new_size[1],:] = tmpimg
+			
+		# 	p.delete_img()
+
+		args = []
 		for p in all_patches:
-			p.load_img()
-			
-			x_diff = p.gps.UL_coord[0] - UL[0]
-			y_diff = UL[1] - p.gps.UL_coord[1]
-			
-			st_x = int(REDUCTION_FACTOR*x_diff/GPS_TO_IMAGE_RATIO[0])
-			st_y = int(REDUCTION_FACTOR*y_diff/GPS_TO_IMAGE_RATIO[1])
-			
-			new_size = (int(PATCH_SIZE[0]*REDUCTION_FACTOR),int(PATCH_SIZE[1]*REDUCTION_FACTOR))
+			args.append((p,UL))
 
-			tmpimg = cv2.resize(p.rgb_img,(new_size[1],new_size[0]))
+		processes = MyPool(no_of_cores_to_use_max)
+		results_parallel = processes.map(ortho_generation_sub_function_helper,args)
+		processes.close()
 
-			result[st_y:st_y+new_size[0],st_x:st_x+new_size[1],:] = tmpimg
-			
-			p.delete_img()
+		for st_y,st_y2,st_x,st_x2,tmpimg in results_parallel:
+			result[st_y:st_y2,st_x:st_x2,:] = tmpimg
 
 		# result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
 		
@@ -3902,9 +3935,9 @@ def main(scan_date):
 		# field.create_patches_SIFT_files()
 
 		# field.groups[14].correct_internally()
-		# field.draw_and_save_field(is_old=True)
-		field.correct_field()
-		field.draw_and_save_field(is_old=False)
+		field.draw_and_save_field(is_old=True)
+		# field.correct_field()
+		# field.draw_and_save_field(is_old=False)
 		# field.save_new_coordinate()
 		
 		# err = calculate_error_of_correction()
@@ -4023,12 +4056,15 @@ def main(scan_date):
 
 
 server_core = {'coge':25,'laplace.cs.arizona.edu':6,'ariyan':4}
+server_core_max = {'coge':60,'laplace.cs.arizona.edu':45,'ariyan':4}
 
 server = socket.gethostname()
 if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
 	no_of_cores_to_use = 5
+	no_of_cores_to_use_max = 15
 else:
 	no_of_cores_to_use = server_core[server]
+	no_of_cores_to_use_max = server_core_max[server]
 
 
 # -----------------------------------------------------------------------------------------------------------------------------------
