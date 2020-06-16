@@ -31,7 +31,8 @@ from collections import OrderedDict,Counter
 
 # PATCH_SIZE = (3296, 2472) # 1
 # PATCH_SIZE = (330, 247) # 0.1
-PATCH_SIZE = (659, 494) # 0.2 
+# PATCH_SIZE = (659, 494) # 0.2
+PATCH_SIZE = (1648, 1236) # 0.5 
 
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
@@ -1457,7 +1458,7 @@ def read_all_data():
 
 			features = l.split(',')
 
-			rgb,img = load_preprocess_image('{0}/{1}'.format(patch_folder,features[0]))
+			# rgb,img = load_preprocess_image('{0}/{1}'.format(patch_folder,features[0]))
 
 			upper_left = (float(features[1]),float(features[2]))
 			lower_left = (float(features[3]),float(features[4]))
@@ -3848,9 +3849,30 @@ def test_function():
 	global patch_folder
 
 	patches = read_all_data()
+	p1 = patches[0]
+	p2 = patches[3]
+	overlap_1,overlap_2 = p1.get_overlap_rectangles(p2)
+	
+	p1.load_SIFT_points()
+	p2.load_SIFT_points()
 
-	draw_together([patches[0],patches[3]])
-	patches[0].gps =add_to_gps_coord(patches[0].gps,0.00000009,0)
+	kp1,desc1 = choose_SIFT_key_points(p1,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
+	kp2,desc2 = choose_SIFT_key_points(p2,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
+
+	matches = get_top_percentage_matches(desc1,desc2,kp1,kp2)
+
+	p1.load_img()
+	p2.load_img()
+
+	img1 = p1.rgb_img
+	img2 = p2.rgb_img
+	img3 = cv2.hconcat([img1,img2])
+
+	# cv2.rectangle(img1,(overlap_1[0],overlap_1[1]),(overlap_1[2],overlap_1[3]),(0,0,255),20)
+	# cv2.rectangle(img2,(overlap_2[0],overlap_2[1]),(overlap_2[2],overlap_2[3]),(0,0,255),20)
+
+	# draw_together([patches[0],patches[3]])
+	# patches[0].gps =add_to_gps_coord(patches[0].gps,0.00000009,0)
 	# img = Image.open('{0}/{1}'.format(patch_folder,patches[0].name))
 	# print(img.tag[33922])
 	# print(patches[0].gps.UL_coord)
@@ -3859,16 +3881,35 @@ def test_function():
 	# img.save('{0}/{1}'.format(patch_folder,patches[0].name),tiffinfo=img.tag)
 	# img.close()
 
-	draw_together([patches[0],patches[3]])
+	# draw_together([patches[0],patches[3]])
 	# kp,desc = detect_SIFT_key_points(img_g,0,0,img_g.shape[1],img_g.shape[0])
 
 	# img_g=cv2.drawKeypoints(img_g,kp,img_g)
+
+	
+	cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
+	cv2.resizeWindow('fig3', 500,500)
+	cv2.imshow('fig3',img3)
+	cv2.waitKey(0)
+
+	for m in matches:
+		pp1 = kp1[m[0].queryIdx]
+		pp2 = kp2[m[0].trainIdx]
+
+		GPS_p1 = (p1.gps.UL_coord[0] - pp1[0]*GPS_TO_IMAGE_RATIO[0] , p1.gps.UL_coord[1] + pp1[1]*GPS_TO_IMAGE_RATIO[1])
+		GPS_p2 = (p2.gps.UL_coord[0] - pp2[0]*GPS_TO_IMAGE_RATIO[0] , p2.gps.UL_coord[1] + pp2[1]*GPS_TO_IMAGE_RATIO[1])
+
+		diff = (GPS_p2[0]-GPS_p1[0],GPS_p2[1]-GPS_p1[1])
+		print(diff)
+		cv2.line(img3,(int(pp1[0]),int(pp1[1])),(int(pp2[0]+PATCH_SIZE[1]),int(pp2[1])),(255,0,0),5)
+		cv2.imshow('fig3',img3)
+		cv2.waitKey(0)
 
 	# cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
 	# cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
 	# cv2.resizeWindow('fig1', 500,500)
 	# cv2.resizeWindow('fig2', 500,500)
-	# cv2.imshow('fig1',img)
+	# cv2.imshow('fig1',img1)
 	# cv2.imshow('fig2',img2)
 	# cv2.waitKey(0)
 
