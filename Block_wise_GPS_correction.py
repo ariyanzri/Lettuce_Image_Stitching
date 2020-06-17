@@ -604,7 +604,7 @@ def correct_groups_internally_helper(args):
 
 # 	result_dict[gid] = group.correct_internally()
 
-def get_good_matches_based_on_GPS_error(desc1,desc2,kp1,kp2):
+def get_good_matches_based_on_GPS_error(desc1,desc2,kp1,kp2,p1,p2):
 	bf = cv2.BFMatcher()
 	matches = bf.knnMatch(desc1,desc2, k=2)
 
@@ -2323,7 +2323,7 @@ class Patch:
 		# matches = get_good_matches(desc2,desc1)
 		# matches = get_top_percentage_matches(desc2,desc1,kp2,kp1)
 		# matches = get_top_n_matches(desc2,desc1,kp2,kp1,50)
-		matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1)
+		matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1,self,neighbor)
 
 		if matches is None or len(matches) == 0:
 			# print('match is none or len matches is 0.')
@@ -4026,10 +4026,10 @@ def main(scan_date):
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
 		# field.save_plot()
-		field.create_patches_SIFT_files()
+		# field.create_patches_SIFT_files()
 
 		# field.groups[14].correct_internally()
-		field.draw_and_save_field(is_old=True)
+		# field.draw_and_save_field(is_old=True)
 		field.correct_field()
 		field.draw_and_save_field(is_old=False)
 		# field.save_new_coordinate()
