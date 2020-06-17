@@ -29,10 +29,14 @@ from collections import OrderedDict,Counter
 # ------------------------------------------------------- Settings ------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
 
-# PATCH_SIZE = (3296, 2472) # 1
 # PATCH_SIZE = (330, 247) # 0.1
-# PATCH_SIZE = (659, 494) # 0.2
-PATCH_SIZE = (1648, 1236) # 0.5 
+PATCH_SIZE = (659, 494) # 0.2
+# PATCH_SIZE = (989, 742) # 0.3
+# PATCH_SIZE = (1318, 989) # 0.4
+# PATCH_SIZE = (1648, 1236) # 0.5 
+# PATCH_SIZE = (1978, 1483) # 0.6
+# PATCH_SIZE = (2637, 1978) # 0.8
+# PATCH_SIZE = (3296, 2472) # 1
 
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
@@ -587,25 +591,27 @@ def get_good_matches_based_on_GPS_error(desc1,desc2,kp1,kp2):
 	bf = cv2.BFMatcher()
 	matches = bf.knnMatch(desc1,desc2, k=2)
 
+	if matches is None or len(matches) == 0:
+		return None
+
+	if len(matches[0]) < 2:
+		return None
+
 	good = []
+
 	for m in matches:
-		p1 = kp1[m[0].queryIdx]
-		p2 = kp2[m[0].trainIdx]
+		
+		pp1 = kp1[m[0].queryIdx].pt
+		pp2 = kp2[m[0].trainIdx].pt
 
-		if 	abs(p1[0]-p2[0])<=GPS_ERROR_X/GPS_TO_IMAGE_RATIO[0] and abs(p1[1]-p2[1])<=GPS_ERROR_Y/GPS_TO_IMAGE_RATIO[1]:
+		GPS_p1 = (p1.gps.UL_coord[0] + pp1[0]*GPS_TO_IMAGE_RATIO[0] , p1.gps.UL_coord[1] - pp1[1]*GPS_TO_IMAGE_RATIO[1])
+		GPS_p2 = (p2.gps.UL_coord[0] + pp2[0]*GPS_TO_IMAGE_RATIO[0] , p2.gps.UL_coord[1] - pp2[1]*GPS_TO_IMAGE_RATIO[1])
+
+		diff = (abs(GPS_p2[0]-GPS_p1[0]),abs(GPS_p2[1]-GPS_p1[1]))
+
+		if diff[0]<GPS_ERROR_X and diff[1]<GPS_ERROR_Y:
 			good.append(m)
-
-	sorted_matches = sorted(good, key=lambda x: x[0].distance)
-
-	good = []
-
-	# if len(sorted_matches)>NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION:
-	# 	good += sorted_matches[0:NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION]
-	# else:
-	# 	good += sorted_matches
-
-	number_of_good_matches = int(math.floor(len(sorted_matches)*PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION))
-	good = sorted_matches[0:number_of_good_matches]
+		
 
 	matches = np.asarray(good)
 
@@ -2298,9 +2304,9 @@ class Patch:
 			return None
 
 		# matches = get_good_matches(desc2,desc1)
-		matches = get_top_percentage_matches(desc2,desc1,kp2,kp1)
+		# matches = get_top_percentage_matches(desc2,desc1,kp2,kp1)
 		# matches = get_top_n_matches(desc2,desc1,kp2,kp1,50)
-		# matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1)
+		matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1)
 
 		if matches is None or len(matches) == 0:
 			# print('match is none or len matches is 0.')
@@ -3855,21 +3861,23 @@ def test_function():
 	
 	p1.load_SIFT_points()
 	p2.load_SIFT_points()
-
-	kp1,desc1 = choose_SIFT_key_points(p1,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
-	kp2,desc2 = choose_SIFT_key_points(p2,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
-
-	matches = get_top_percentage_matches(desc1,desc2,kp1,kp2)
-
 	p1.load_img()
 	p2.load_img()
 
+	kp1,desc1 = detect_SIFT_key_points(p1.rgb_img,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
+	kp2,desc2 = detect_SIFT_key_points(p2.rgb_img,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
+
+	matches = get_good_matches(desc1,desc2)
+
+
 	img1 = p1.rgb_img
 	img2 = p2.rgb_img
+	cv2.rectangle(img1,(overlap_1[0],overlap_1[1]),(overlap_1[2],overlap_1[3]),(255,0,0),10)
+	cv2.rectangle(img2,(overlap_2[0],overlap_2[1]),(overlap_2[2],overlap_2[3]),(255,0,0),10)
+
 	img3 = cv2.hconcat([img1,img2])
 
-	# cv2.rectangle(img1,(overlap_1[0],overlap_1[1]),(overlap_1[2],overlap_1[3]),(0,0,255),20)
-	# cv2.rectangle(img2,(overlap_2[0],overlap_2[1]),(overlap_2[2],overlap_2[3]),(0,0,255),20)
+	
 
 	# draw_together([patches[0],patches[3]])
 	# patches[0].gps =add_to_gps_coord(patches[0].gps,0.00000009,0)
@@ -3886,25 +3894,6 @@ def test_function():
 
 	# img_g=cv2.drawKeypoints(img_g,kp,img_g)
 
-	
-	cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
-	cv2.resizeWindow('fig3', 500,500)
-	cv2.imshow('fig3',img3)
-	cv2.waitKey(0)
-
-	for m in matches:
-		pp1 = kp1[m[0].queryIdx]
-		pp2 = kp2[m[0].trainIdx]
-
-		GPS_p1 = (p1.gps.UL_coord[0] - pp1[0]*GPS_TO_IMAGE_RATIO[0] , p1.gps.UL_coord[1] + pp1[1]*GPS_TO_IMAGE_RATIO[1])
-		GPS_p2 = (p2.gps.UL_coord[0] - pp2[0]*GPS_TO_IMAGE_RATIO[0] , p2.gps.UL_coord[1] + pp2[1]*GPS_TO_IMAGE_RATIO[1])
-
-		diff = (GPS_p2[0]-GPS_p1[0],GPS_p2[1]-GPS_p1[1])
-		print(diff)
-		cv2.line(img3,(int(pp1[0]),int(pp1[1])),(int(pp2[0]+PATCH_SIZE[1]),int(pp2[1])),(255,0,0),5)
-		cv2.imshow('fig3',img3)
-		cv2.waitKey(0)
-
 	# cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
 	# cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
 	# cv2.resizeWindow('fig1', 500,500)
@@ -3912,6 +3901,41 @@ def test_function():
 	# cv2.imshow('fig1',img1)
 	# cv2.imshow('fig2',img2)
 	# cv2.waitKey(0)
+
+
+	cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
+	cv2.resizeWindow('fig3', 700,700)
+	cv2.imshow('fig3',img3)
+	cv2.waitKey(0)
+	imgtmp = img3.copy()
+
+	for m in matches:
+		# img3 = imgtmp.copy()
+
+		pp1 = kp1[m[0].queryIdx].pt
+		pp2 = kp2[m[0].trainIdx].pt
+
+		# print(pp1)
+		# print(pp2)
+		
+		GPS_p1 = (p1.gps.UL_coord[0] + pp1[0]*GPS_TO_IMAGE_RATIO[0] , p1.gps.UL_coord[1] - pp1[1]*GPS_TO_IMAGE_RATIO[1])
+		GPS_p2 = (p2.gps.UL_coord[0] + pp2[0]*GPS_TO_IMAGE_RATIO[0] , p2.gps.UL_coord[1] - pp2[1]*GPS_TO_IMAGE_RATIO[1])
+
+		diff = (abs(GPS_p2[0]-GPS_p1[0]),abs(GPS_p2[1]-GPS_p1[1]))
+		# print(m[0].distance,m[1].distance)
+		
+
+		if diff[0]<GPS_ERROR_X and diff[1]<GPS_ERROR_Y:
+			c = (0,255,0)
+		else:
+			c = (0,0,255)
+			print(diff)
+		
+		cv2.line(img3,(int(pp1[0]),int(pp1[1])),(int(pp2[0]+PATCH_SIZE[1]),int(pp2[1])),c,5)
+		
+	cv2.imshow('fig3',img3)
+	cv2.waitKey(0)
+
 
 def main(scan_date):
 	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path,lettuce_heads_coordinates_file,lettuce_coords,method,correction_log_file
@@ -3966,8 +3990,20 @@ def main(scan_date):
 	if server == 'coge':
 		print('RUNNING ON -- {0} --'.format(server))
 		
-		# err = calculate_error_of_correction(True)
-		# print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# Measure Errors
+		print('------------------ ERROR MEASUREMENT ------------------ ')
+
+		err = calculate_error_of_correction(True)
+		print("({:.10f},{:.10f})".format(err[0],err[1]))
+
+		field = Field(False)
+		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		np.save('RMSE_before.npy',res)
+		print(np.mean(res[:,3]))
+
+		
+		# Corrections
+		print('------------------ BEGINNING CORRECTION ------------------ ')
 
 		field = Field()
 		# lettuce_coords = read_lettuce_heads_coordinates()
@@ -3980,25 +4016,18 @@ def main(scan_date):
 		field.correct_field()
 		field.draw_and_save_field(is_old=False)
 		# field.save_new_coordinate()
-		
-		# err = calculate_error_of_correction()
-		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
-		# field = Field()
 
-		# ------------
+		# Measure Errors after correction
+		print('------------------ ERROR MEASUREMENT ------------------ ')
 
-		# field = Field(False)
-		# res = get_approximate_random_RMSE_overlap(field,10,60)
-		# np.save('RMSE_before.npy',res)
-		# print(np.mean(res[:,3]))
+		err = calculate_error_of_correction()
+		print("({:.10f},{:.10f})".format(err[0],err[1]))
 
-		# field = Field(True)
-		# res = get_approximate_random_RMSE_overlap(field,10,60)
-		# np.save('RMSE_after.npy',res)
-		# print(np.mean(res[:,3]))
-
-		# ------------
+		field = Field(True)
+		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		np.save('RMSE_after.npy',res)
+		print(np.mean(res[:,3]))
 
 
 	elif server == 'laplace.cs.arizona.edu':
@@ -4075,6 +4104,7 @@ def main(scan_date):
 		print('RUNNING ON -- {0} --'.format(server))
 
 		# visualize_plot()
+
 		test_function()
 
 		
@@ -4096,7 +4126,7 @@ def main(scan_date):
 
 
 
-server_core = {'coge':25,'laplace.cs.arizona.edu':6,'ariyan':4}
+server_core = {'coge':15,'laplace.cs.arizona.edu':6,'ariyan':4}
 server_core_max = {'coge':60,'laplace.cs.arizona.edu':45,'ariyan':4}
 
 server = socket.gethostname()
