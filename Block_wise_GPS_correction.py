@@ -30,13 +30,30 @@ from collections import OrderedDict,Counter
 # -----------------------------------------------------------------------------------------------------------------------------------
 
 # PATCH_SIZE = (330, 247) # 0.1
+# SCALE = 0.1
+
 PATCH_SIZE = (659, 494) # 0.2
+SCALE = 0.2
+
 # PATCH_SIZE = (989, 742) # 0.3
+# SCALE = 0.3
+
 # PATCH_SIZE = (1318, 989) # 0.4
+# SCALE = 0.4
+
 # PATCH_SIZE = (1648, 1236) # 0.5 
+# SCALE = 0.5
+
 # PATCH_SIZE = (1978, 1483) # 0.6
+# SCALE = 0.6
+
 # PATCH_SIZE = (2637, 1978) # 0.8
+# SCALE = 0.8
+
 # PATCH_SIZE = (3296, 2472) # 1
+# SCALE = 1
+
+LID_SIZE_AT_SCALE_1 = (400,600)
 
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
@@ -920,7 +937,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 	# cv2.circle(rgb_img,(x,y),20,(0,255,0),thickness=-1)
 	# cv2.imwrite('tmp-{0}-{1}.jpg'.format(x,y),rgb_img)
 
-	if r >= 400 and r <= 500:
+	if r >= LID_SIZE_AT_SCALE_1[0]*SCALE and r <= LID_SIZE_AT_SCALE_1[1]*SCALE:
 		return x,y,r,l,pname,coord
 	else:
 		return -1,-1,-1,-1,-1,-1
@@ -3991,15 +4008,15 @@ def main(scan_date):
 		print('RUNNING ON -- {0} --'.format(server))
 		
 		# Measure Errors
-		print('------------------ ERROR MEASUREMENT ------------------ ')
+		# print('------------------ ERROR MEASUREMENT ------------------ ')
 
-		err = calculate_error_of_correction(True)
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction(True)
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
-		field = Field(False)
-		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		np.save('RMSE_before.npy',res)
-		print(np.mean(res[:,3]))
+		# field = Field(False)
+		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# np.save('RMSE_before.npy',res)
+		# print(np.mean(res[:,3]))
 
 		
 		# Corrections
