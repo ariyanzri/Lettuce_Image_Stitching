@@ -618,8 +618,8 @@ def get_good_matches_based_on_GPS_error(desc1,desc2,kp1,kp2):
 
 	for m in matches:
 		
-		pp1 = kp1[m[0].queryIdx].pt
-		pp2 = kp2[m[0].trainIdx].pt
+		pp1 = kp1[m[0].queryIdx]
+		pp2 = kp2[m[0].trainIdx]
 
 		GPS_p1 = (p1.gps.UL_coord[0] + pp1[0]*GPS_TO_IMAGE_RATIO[0] , p1.gps.UL_coord[1] - pp1[1]*GPS_TO_IMAGE_RATIO[1])
 		GPS_p2 = (p2.gps.UL_coord[0] + pp2[0]*GPS_TO_IMAGE_RATIO[0] , p2.gps.UL_coord[1] - pp2[1]*GPS_TO_IMAGE_RATIO[1])
