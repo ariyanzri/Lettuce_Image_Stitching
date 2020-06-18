@@ -2363,9 +2363,9 @@ class Patch:
 			return None
 
 		# matches = get_good_matches(desc2,desc1)
-		matches = get_top_percentage_matches(desc2,desc1,kp2,kp1)
+		# matches = get_top_percentage_matches(desc2,desc1,kp2,kp1)
 		# matches = get_top_n_matches(desc2,desc1,kp2,kp1,50)
-		# matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1,self,neighbor,True)
+		matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1,self,neighbor,True)
 
 		if matches is None or len(matches) == 0:
 			# print('match is none or len matches is 0.')
