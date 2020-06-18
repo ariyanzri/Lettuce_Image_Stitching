@@ -2375,8 +2375,8 @@ class Patch:
 
 		H,percentage_inliers,scale,theta = find_homography(matches,kp2,kp1,overlap1,overlap2)
 
-		if percentage_inliers<0.1 or num_matches<100:
-			return None
+		# if percentage_inliers<0.1 or num_matches<100:
+		# 	return None
 
 		# H,percentage_inliers = find_translation(matches,kp2,kp1)
 
@@ -2389,7 +2389,8 @@ class Patch:
 		percentage_inliers = round(percentage_inliers*100,2)
 
 		# dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
-		dissimilarity = - percentage_inliers*num_matches
+		# dissimilarity = - percentage_inliers*num_matches
+		dissimilarity = 1 - percentage_inliers
 
 		if dissimilarity == -1:
 			# print('dissimilarity -1.')
@@ -4203,7 +4204,7 @@ def main(scan_date):
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
-		# os.system("taskset -p -c 0-39 %d" % os.getpid())
+		os.system("taskset -p -c 0-38 %d" % os.getpid())
 		# os.system("taskset -p -c 40-47 %d" % os.getpid())
 		
 		# ------------
