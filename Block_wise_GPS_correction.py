@@ -4226,13 +4226,36 @@ def main(scan_date):
 		field = Field()
 		field.create_patches_SIFT_files()
 		# field.calculate_scale_effect(200)
-		field.save_plot()
+		# field.save_plot()
 		field.draw_and_save_field(is_old=True)
 
 		field.correct_field()
 
 		field.draw_and_save_field(is_old=False)
+		field.save_new_coordinate()
 
+		# print('------------------ ERROR MEASUREMENT ------------------ ')
+
+		# print('*** Before')
+
+		# err = calculate_error_of_correction(True)
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
+
+		# field = Field(False)
+		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# np.save('RMSE_before.npy',res)
+		# print(np.mean(res[:,3]))
+
+		# print('*** After')
+
+		# err = calculate_error_of_correction()
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
+
+		# field = Field(True)
+		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# np.save('RMSE_after.npy',res)
+		# print(np.mean(res[:,3]))
+		
 		# ------------
 		# err = calculate_error_of_correction(True)
 		# print("({:.10f},{:.10f})".format(err[0],err[1]))
