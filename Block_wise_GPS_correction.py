@@ -32,14 +32,14 @@ from collections import OrderedDict,Counter
 # PATCH_SIZE = (330, 247) # 0.1
 # SCALE = 0.1
 
-PATCH_SIZE = (659, 494) # 0.2
-SCALE = 0.2
+# PATCH_SIZE = (659, 494) # 0.2
+# SCALE = 0.2
 
 # PATCH_SIZE = (989, 742) # 0.3
 # SCALE = 0.3
 
-# PATCH_SIZE = (1318, 989) # 0.4
-# SCALE = 0.4
+PATCH_SIZE = (1318, 989) # 0.4
+SCALE = 0.4
 
 # PATCH_SIZE = (1648, 1236) # 0.5 
 # SCALE = 0.5
@@ -72,7 +72,8 @@ RANSAC_MAX_ITER = 1000
 RANSAC_ERROR_THRESHOLD = 5
 PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
 LETTUCE_AREA_THRESHOLD = 5000
-REDUCTION_FACTOR = 0.1
+ORTHO_SCALE = 0.05
+REDUCTION_FACTOR = ORTHO_SCALE/SCALE
 OVERLAP_DISCARD_RATIO = 0.05
 CONTOUR_MATCHING_MIN_MATCH = 2
 
@@ -4032,43 +4033,40 @@ def main(scan_date):
 		
 		
 		# Corrections
-		# print('------------------ BEGINNING CORRECTION ------------------ ')
+		print('------------------ BEGINNING CORRECTION ------------------ ')
 
-		# field = Field()
-		# lettuce_coords = read_lettuce_heads_coordinates()
-
-		# field.save_plot()
-		# field.create_patches_SIFT_files()
-
-		# field.groups[14].correct_internally()
-		# field.draw_and_save_field(is_old=True)
-		# field.correct_field()
-		# field.draw_and_save_field(is_old=False)
-		# field.save_new_coordinate()
+		field = Field()
+		lettuce_coords = read_lettuce_heads_coordinates()
+		
+		
+		field.draw_and_save_field(is_old=True)
+		field.correct_field()
+		field.draw_and_save_field(is_old=False)
+		field.save_new_coordinate()
 
 
 		# Measure Errors after correction
-		print('------------------ ERROR MEASUREMENT ------------------ ')
+		# print('------------------ ERROR MEASUREMENT ------------------ ')
 
-		print('*** Before')
+		# print('*** Before')
 
-		err = calculate_error_of_correction(True)
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction(True)
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
-		field = Field(False)
-		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		np.save('RMSE_before.npy',res)
-		print(np.mean(res[:,3]))
+		# field = Field(False)
+		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# np.save('RMSE_before.npy',res)
+		# print(np.mean(res[:,3]))
 
-		print('*** After')
+		# print('*** After')
 
-		err = calculate_error_of_correction()
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction()
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
-		field = Field(True)
-		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		np.save('RMSE_after.npy',res)
-		print(np.mean(res[:,3]))
+		# field = Field(True)
+		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# np.save('RMSE_after.npy',res)
+		# print(np.mean(res[:,3]))
 
 
 	elif server == 'laplace.cs.arizona.edu':
