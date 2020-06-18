@@ -38,11 +38,11 @@ from collections import OrderedDict,Counter
 # PATCH_SIZE = (989, 742) # 0.3
 # SCALE = 0.3
 
-# PATCH_SIZE = (1318, 989) # 0.4
-# SCALE = 0.4
+PATCH_SIZE = (1318, 989) # 0.4
+SCALE = 0.4
 
-PATCH_SIZE = (1648, 1236) # 0.5 
-SCALE = 0.5
+# PATCH_SIZE = (1648, 1236) # 0.5 
+# SCALE = 0.5
 
 # PATCH_SIZE = (1978, 1483) # 0.6
 # SCALE = 0.6
@@ -78,8 +78,8 @@ REDUCTION_FACTOR = ORTHO_SCALE/SCALE
 OVERLAP_DISCARD_RATIO = 0.05
 CONTOUR_MATCHING_MIN_MATCH = 2
 
-GPS_ERROR_Y = 0.0000003
-GPS_ERROR_X = 0.0000006
+GPS_ERROR_Y = 0.0000005
+GPS_ERROR_X = 0.000001
 # GPS_ERROR_Y = 1
 # GPS_ERROR_X = 1
 
@@ -491,26 +491,26 @@ def get_dissimilarity_on_overlaps(p1,p2,H):
 	if shape_1[0] == 0 or shape_1[1] == 0 or shape_2[0] == 0 or shape_2[1] == 0:
 		return -1
 
-	overlap_1_img = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2GRAY)
-	overlap_2_img = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2GRAY)
+	# overlap_1_img = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2GRAY)
+	# overlap_2_img = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2GRAY)
 
-	overlap_1_img = cv2.blur(overlap_1_img,(5,5))
-	overlap_2_img = cv2.blur(overlap_2_img,(5,5))
+	# overlap_1_img = cv2.blur(overlap_1_img,(5,5))
+	# overlap_2_img = cv2.blur(overlap_2_img,(5,5))
 
-	ret1,overlap_1_img = cv2.threshold(overlap_1_img,0,255,cv2.THRESH_OTSU)
-	ret1,overlap_2_img = cv2.threshold(overlap_2_img,0,255,cv2.THRESH_OTSU)
+	# ret1,overlap_1_img = cv2.threshold(overlap_1_img,0,255,cv2.THRESH_OTSU)
+	# ret1,overlap_2_img = cv2.threshold(overlap_2_img,0,255,cv2.THRESH_OTSU)
 
-	tmp_size = np.shape(overlap_1_img)
+	# tmp_size = np.shape(overlap_1_img)
 	
-	overlap_1_img[overlap_1_img==255] = 1
-	overlap_2_img[overlap_2_img==255] = 1
+	# overlap_1_img[overlap_1_img==255] = 1
+	# overlap_2_img[overlap_2_img==255] = 1
 
-	xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
+	# xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
 
-	dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
+	# dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
 	
-	p1.delete_img()
-	p2.delete_img()
+	# p1.delete_img()
+	# p2.delete_img()
 
 	## FFT dissimilarity 
 
@@ -531,16 +531,16 @@ def get_dissimilarity_on_overlaps(p1,p2,H):
 
 	## RMSE simple
 
-	# p1.load_img()
-	# p2.load_img()
+	p1.load_img()
+	p2.load_img()
 
-	# overlap_1_img = p1.rgb_img[p1_y1:p1_y2,p1_x1:p1_x2,:]
-	# overlap_2_img = p2.rgb_img[p2_y1:p2_y2,p2_x1:p2_x2,:]
+	overlap_1_img = p1.rgb_img[p1_y1:p1_y2,p1_x1:p1_x2,:]
+	overlap_2_img = p2.rgb_img[p2_y1:p2_y2,p2_x1:p2_x2,:]
 
-	# dissimilarity = np.sqrt(np.sum((overlap_1_img-overlap_2_img)**2)/(overlap_2_img.shape[0]*overlap_2_img.shape[1]*overlap_2_img.shape[2]))
+	dissimilarity = np.sqrt(np.sum((overlap_1_img-overlap_2_img)**2)/(overlap_2_img.shape[0]*overlap_2_img.shape[1]*overlap_2_img.shape[2]))
 
-	# p1.delete_img()
-	# p2.delete_img()
+	p1.delete_img()
+	p2.delete_img()
 
 	return dissimilarity
 
@@ -2388,9 +2388,9 @@ class Patch:
 
 		percentage_inliers = round(percentage_inliers*100,2)
 
-		# dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
+		dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
 		# dissimilarity = - percentage_inliers*num_matches
-		dissimilarity = 1 - percentage_inliers
+		# dissimilarity = 1 - percentage_inliers
 
 		if dissimilarity == -1:
 			# print('dissimilarity -1.')
