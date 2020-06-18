@@ -32,14 +32,14 @@ from collections import OrderedDict,Counter
 # PATCH_SIZE = (330, 247) # 0.1
 # SCALE = 0.1
 
-# PATCH_SIZE = (659, 494) # 0.2
-# SCALE = 0.2
+PATCH_SIZE = (659, 494) # 0.2
+SCALE = 0.2
 
 # PATCH_SIZE = (989, 742) # 0.3
 # SCALE = 0.3
 
-PATCH_SIZE = (1318, 989) # 0.4
-SCALE = 0.4
+# PATCH_SIZE = (1318, 989) # 0.4
+# SCALE = 0.4
 
 # PATCH_SIZE = (1648, 1236) # 0.5 
 # SCALE = 0.5
@@ -4222,6 +4222,7 @@ def main(scan_date):
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
 		field = Field()
+		field.create_patches_SIFT_files()
 		# field.calculate_scale_effect(200)
 
 		field.draw_and_save_field(is_old=True)
