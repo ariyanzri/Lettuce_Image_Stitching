@@ -32,8 +32,8 @@ from collections import OrderedDict,Counter
 # PATCH_SIZE = (330, 247) # 0.1
 # SCALE = 0.1
 
-PATCH_SIZE = (659, 494) # 0.2
-SCALE = 0.2
+# PATCH_SIZE = (659, 494) # 0.2
+# SCALE = 0.2
 
 # PATCH_SIZE = (989, 742) # 0.3
 # SCALE = 0.3
@@ -41,8 +41,8 @@ SCALE = 0.2
 # PATCH_SIZE = (1318, 989) # 0.4
 # SCALE = 0.4
 
-# PATCH_SIZE = (1648, 1236) # 0.5 
-# SCALE = 0.5
+PATCH_SIZE = (1648, 1236) # 0.5 
+SCALE = 0.5
 
 # PATCH_SIZE = (1978, 1483) # 0.6
 # SCALE = 0.6
