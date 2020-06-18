@@ -3806,7 +3806,87 @@ class Field:
 			for i,row in enumerate(group.rows):
 				print('\t**** ROW {0} with {1} patches.'.format(i,len(row)))
 
+	def calculate_scale_effect(self,num_patches):
+		global no_of_cores_to_use_max,SCALE,PATCH_SIZE,GPS_TO_IMAGE_RATIO
 
+		scales = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
+
+		for s in scales:
+			SCALE = s
+			PATCH_SIZE = (int(3296*SCALE), int(2472*SCALE))
+			GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
+
+			all_patches = []
+			for g in self.grousp:
+				all_patches+=g.patches
+
+			sample_patches = random.sample(all_patches,min(num_patches,len(all_patches)))
+
+			args = []
+
+			for p1 in sample_patches:
+				for p2 in all_patches:
+					if p1 == p2 or ((not p1.has_overlap(p2)) and (not p2.has_overlap(p1))):
+						continue
+
+					args.append((p1,p2))
+
+			processes = MyPool(int(no_of_cores_to_use_max))
+			result = processes.map(calculate_scale_effect_inside_helper,args)
+			processes.close()
+
+			print(statistics.mean(result),statistics.stdev(result))
+
+def calculate_scale_effect_inside(p1,p2):
+	overlap_1,overlap_2 = p1.get_overlap_rectangles(p2)
+			
+	p1.load_img()
+	p2.load_img()
+
+	if p1.rgb_img is None or p2.rgb_img is None :
+		continue
+
+	try:
+		kp1,desc1 = detect_SIFT_key_points(p1.rgb_img,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
+		kp2,desc2 = detect_SIFT_key_points(p2.rgb_img,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
+	except Exception as e:
+		continue
+
+	if desc2 is None or desc1 is None or len(desc1) == 0 or len(desc2) == 0:
+		continue
+
+	matches = get_all_matches(desc1,desc2)
+
+	img1 = p1.rgb_img
+	img2 = p2.rgb_img
+
+	good_count = 0
+	bad_count = 0
+
+	for m in matches:
+		
+		pp1 = kp1[m[0].queryIdx].pt
+		pp2 = kp2[m[0].trainIdx].pt
+
+		GPS_p1 = (p1.gps.UL_coord[0] + pp1[0]*GPS_TO_IMAGE_RATIO[0] , p1.gps.UL_coord[1] - pp1[1]*GPS_TO_IMAGE_RATIO[1])
+		GPS_p2 = (p2.gps.UL_coord[0] + pp2[0]*GPS_TO_IMAGE_RATIO[0] , p2.gps.UL_coord[1] - pp2[1]*GPS_TO_IMAGE_RATIO[1])
+
+		diff = (abs(GPS_p2[0]-GPS_p1[0]),abs(GPS_p2[1]-GPS_p1[1]))
+		
+
+		if diff[0]<GPS_ERROR_X and diff[1]<GPS_ERROR_Y:
+			good_count+=1
+		else:
+			bad_count+=1
+		
+	
+	if (good_count+bad_count) <=7:
+		continue
+
+	return good_count/(good_count+bad_count)
+
+def calculate_scale_effect_inside_helper(args):
+	return calculate_scale_effect_inside(*args)
 
 def get_RMSE_error_function(p,n,gid):
 	p.load_img()
@@ -4136,7 +4216,9 @@ def main(scan_date):
 
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
-		# field = Field()
+		field = Field()
+		field.calculate_scale_effect(10)
+		
 		# # field.draw_and_save_field(is_old=True)
 
 		# field.correct_field()
