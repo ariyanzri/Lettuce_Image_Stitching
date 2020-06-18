@@ -47,13 +47,19 @@ SCALE = 0.2
 # PATCH_SIZE = (1978, 1483) # 0.6
 # SCALE = 0.6
 
+# PATCH_SIZE = (2307, 1730) # 0.6
+# SCALE = 0.7
+
 # PATCH_SIZE = (2637, 1978) # 0.8
 # SCALE = 0.8
+
+# PATCH_SIZE = (2966, 2225) # 0.6
+# SCALE = 0.9
 
 # PATCH_SIZE = (3296, 2472) # 1
 # SCALE = 1
 
-LID_SIZE_AT_SCALE_1 = (400,600)
+LID_SIZE_AT_SCALE_1 = (400*SCALE,600*SCALE)
 
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
@@ -207,7 +213,19 @@ def get_good_matches(desc1,desc2):
 		print('Error in get_good_matches: {0}'.format(e))
 		return None
 
+
+def get_all_matches(desc1,desc2):
 	
+	bf = cv2.BFMatcher()
+	
+	matches = bf.knnMatch(desc1,desc2, k=2)
+
+	good = []
+	for m in matches:
+		good.append(m)
+			
+	matches = np.asarray(good)
+	return matches
 
 def get_translation_from_single_matches(x1,y1,x2,y2):
 	x_t = x2-x1
@@ -626,7 +644,7 @@ def get_good_matches_based_on_GPS_error(desc1,desc2,kp1,kp2,p1,p2):
 
 		diff = (abs(GPS_p2[0]-GPS_p1[0]),abs(GPS_p2[1]-GPS_p1[1]))
 
-		if diff[0]<GPS_ERROR_X and diff[1]<GPS_ERROR_Y:
+		if diff[0]<GPS_ERROR_X and diff[1]<GPS_ERROR_Y and m[0].distance <= PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
 			good.append(m)
 		
 
@@ -937,7 +955,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 	# cv2.circle(rgb_img,(x,y),20,(0,255,0),thickness=-1)
 	# cv2.imwrite('tmp-{0}-{1}.jpg'.format(x,y),rgb_img)
 
-	if r >= LID_SIZE_AT_SCALE_1[0]*SCALE and r <= LID_SIZE_AT_SCALE_1[1]*SCALE:
+	if r >= LID_SIZE_AT_SCALE_1[0] and r <= LID_SIZE_AT_SCALE_1[1]:
 		return x,y,r,l,pname,coord
 	else:
 		return -1,-1,-1,-1,-1,-1
@@ -3884,7 +3902,7 @@ def test_function():
 	kp1,desc1 = detect_SIFT_key_points(p1.rgb_img,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
 	kp2,desc2 = detect_SIFT_key_points(p2.rgb_img,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
 
-	matches = get_good_matches(desc1,desc2)
+	matches = get_all_matches(desc1,desc2)
 
 
 	img1 = p1.rgb_img
@@ -3920,11 +3938,13 @@ def test_function():
 	# cv2.waitKey(0)
 
 
-	cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
-	cv2.resizeWindow('fig3', 700,700)
-	cv2.imshow('fig3',img3)
-	cv2.waitKey(0)
+	# cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
+	# cv2.resizeWindow('fig3', 700,700)
+	# cv2.imshow('fig3',img3)
+	# cv2.waitKey(0)
 	imgtmp = img3.copy()
+	good_count = 0
+	bad_count = 0
 
 	for m in matches:
 		# img3 = imgtmp.copy()
@@ -3944,14 +3964,17 @@ def test_function():
 
 		if diff[0]<GPS_ERROR_X and diff[1]<GPS_ERROR_Y:
 			c = (0,255,0)
+			good_count+=1
 		else:
 			c = (0,0,255)
+			bad_count+=1
 			print(diff)
 		
 		cv2.line(img3,(int(pp1[0]),int(pp1[1])),(int(pp2[0]+PATCH_SIZE[1]),int(pp2[1])),c,5)
-		
-	cv2.imshow('fig3',img3)
-	cv2.waitKey(0)
+	
+	print(SCALE,good_count,bad_count,good_count/(good_count+bad_count))
+	# cv2.imshow('fig3',img3)
+	# cv2.waitKey(0)
 
 
 def main(scan_date):
@@ -4008,15 +4031,15 @@ def main(scan_date):
 		print('RUNNING ON -- {0} --'.format(server))
 		
 		# Measure Errors
-		# print('------------------ ERROR MEASUREMENT ------------------ ')
+		print('------------------ ERROR MEASUREMENT ------------------ ')
 
-		# err = calculate_error_of_correction(True)
-		# print("({:.10f},{:.10f})".format(err[0],err[1]))
+		err = calculate_error_of_correction(True)
+		print("({:.10f},{:.10f})".format(err[0],err[1]))
 
-		# field = Field(False)
-		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		# np.save('RMSE_before.npy',res)
-		# print(np.mean(res[:,3]))
+		field = Field(False)
+		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		np.save('RMSE_before.npy',res)
+		print(np.mean(res[:,3]))
 
 		
 		# Corrections
@@ -4143,7 +4166,7 @@ def main(scan_date):
 
 
 
-server_core = {'coge':15,'laplace.cs.arizona.edu':6,'ariyan':4}
+server_core = {'coge':25,'laplace.cs.arizona.edu':6,'ariyan':4}
 server_core_max = {'coge':60,'laplace.cs.arizona.edu':45,'ariyan':4}
 
 server = socket.gethostname()
@@ -4168,7 +4191,7 @@ patches_to_use = slice(0,None)
 # patches_to_use = slice(5,10)
 
 
-inside_radius_lettuce_matching_threshold = 200
+inside_radius_lettuce_matching_threshold = 200*SCALE
 discard_right_flag = False
 
 method = 'MST'
