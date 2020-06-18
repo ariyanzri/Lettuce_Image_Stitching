@@ -150,7 +150,7 @@ def histogram_equalization(img):
 def load_preprocess_image(address):
 	img = cv2.imread(address)
 	img = cv2.resize(img,(PATCH_SIZE[1],PATCH_SIZE[0]))
-	img = histogram_equalization(img)
+	# img = histogram_equalization(img)
 	img = img.astype('uint8')
 	img_g = convert_to_gray(img)
 
@@ -4336,7 +4336,7 @@ method = 'MST'
 # method = 'Old_method'
 
 
-# scan_date = '2020-02-18'
+scan_date = '2020-02-18'
 # scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
@@ -4350,7 +4350,7 @@ method = 'MST'
 # scan_date = '2020-06-05_hardware_north'
 # scan_date = '2020-06-05_hardware_south'
 # scan_date = 'hardware_f6,7_summer_shade'
-scan_date = 'hardware_f6,7_summer_suntest061620'
+# scan_date = 'hardware_f6,7_summer_suntest061620'
 # scan_date = 'software_f6,7_summer_shade'
 
 
