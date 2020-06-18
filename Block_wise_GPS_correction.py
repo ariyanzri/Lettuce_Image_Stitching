@@ -3835,6 +3835,8 @@ class Field:
 			result = processes.map(calculate_scale_effect_inside_helper,args)
 			processes.close()
 
+			result = [r for r in result if r!=-1]
+
 			print(statistics.mean(result),statistics.stdev(result))
 
 def calculate_scale_effect_inside(p1,p2):
@@ -3844,16 +3846,16 @@ def calculate_scale_effect_inside(p1,p2):
 	p2.load_img()
 
 	if p1.rgb_img is None or p2.rgb_img is None :
-		continue
+		return -1
 
 	try:
 		kp1,desc1 = detect_SIFT_key_points(p1.rgb_img,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
 		kp2,desc2 = detect_SIFT_key_points(p2.rgb_img,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
 	except Exception as e:
-		continue
+		return -1
 
 	if desc2 is None or desc1 is None or len(desc1) == 0 or len(desc2) == 0:
-		continue
+		return -1
 
 	matches = get_all_matches(desc1,desc2)
 
@@ -3881,7 +3883,7 @@ def calculate_scale_effect_inside(p1,p2):
 		
 	
 	if (good_count+bad_count) <=7:
-		continue
+		return -1
 
 	return good_count/(good_count+bad_count)
 
@@ -4218,7 +4220,7 @@ def main(scan_date):
 
 		field = Field()
 		field.calculate_scale_effect(10)
-		
+
 		# # field.draw_and_save_field(is_old=True)
 
 		# field.correct_field()
