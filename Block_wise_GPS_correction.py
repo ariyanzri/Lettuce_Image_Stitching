@@ -4165,7 +4165,7 @@ def main(scan_date):
 
 
 
-server_core = {'coge':25,'laplace.cs.arizona.edu':6,'ariyan':4}
+server_core = {'coge':20,'laplace.cs.arizona.edu':6,'ariyan':4}
 server_core_max = {'coge':60,'laplace.cs.arizona.edu':45,'ariyan':4}
 
 server = socket.gethostname()
