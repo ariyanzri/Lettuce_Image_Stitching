@@ -135,9 +135,9 @@ def convert_to_gray(img):
 	return img_g
 
 def histogram_equalization(img):
-	channel_0 = cv.equalizeHist(img[:,:,0])
-	channel_1 = cv.equalizeHist(img[:,:,1])
-	channel_2 = cv.equalizeHist(img[:,:,2])
+	channel_0 = cv2.equalizeHist(img[:,:,0])
+	channel_1 = cv2.equalizeHist(img[:,:,1])
+	channel_2 = cv2.equalizeHist(img[:,:,2])
 
 	img[:,:,0] = channel_0
 	img[:,:,1] = channel_1
@@ -150,7 +150,7 @@ def histogram_equalization(img):
 def load_preprocess_image(address):
 	img = cv2.imread(address)
 	img = cv2.resize(img,(PATCH_SIZE[1],PATCH_SIZE[0]))
-	img = histogram_equalization(img)
+	# img = histogram_equalization(img)
 	img = img.astype('uint8')
 	img_g = convert_to_gray(img)
 
@@ -3972,10 +3972,10 @@ def test_function():
 			# cv2.waitKey(0)
 
 
-			# cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
-			# cv2.resizeWindow('fig3', 700,700)
-			# cv2.imshow('fig3',img3)
-			# cv2.waitKey(0)
+			cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
+			cv2.resizeWindow('fig3', 700,700)
+			cv2.imshow('fig3',img3)
+			cv2.waitKey(0)
 			imgtmp = img3.copy()
 			good_count = 0
 			bad_count = 0
@@ -4011,8 +4011,8 @@ def test_function():
 
 			dd.append(good_count/(good_count+bad_count))
 			# print(SCALE,good_count/(good_count+bad_count))
-			# cv2.imshow('fig3',img3)
-			# cv2.waitKey(0)
+			cv2.imshow('fig3',img3)
+			cv2.waitKey(0)
 
 	print(SCALE,statistics.mean(dd),statistics.stdev(dd))
 
@@ -4181,9 +4181,9 @@ def main(scan_date):
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
 
-		visualize_plot()
+		# visualize_plot()
 
-		# test_function()
+		test_function()
 
 		
 	else:
