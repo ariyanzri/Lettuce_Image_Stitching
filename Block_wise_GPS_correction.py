@@ -32,8 +32,8 @@ from collections import OrderedDict,Counter
 # PATCH_SIZE = (330, 247) # 0.1
 # SCALE = 0.1
 
-# PATCH_SIZE = (659, 494) # 0.2
-# SCALE = 0.2
+PATCH_SIZE = (659, 494) # 0.2
+SCALE = 0.2
 
 # PATCH_SIZE = (989, 742) # 0.3
 # SCALE = 0.3
@@ -56,8 +56,8 @@ from collections import OrderedDict,Counter
 # PATCH_SIZE = (2966, 2225) # 0.6
 # SCALE = 0.9
 
-PATCH_SIZE = (3296, 2472) # 1
-SCALE = 1
+# PATCH_SIZE = (3296, 2472) # 1
+# SCALE = 1
 
 LID_SIZE_AT_SCALE_1 = (400*SCALE,600*SCALE)
 
@@ -1483,9 +1483,9 @@ def detect_SIFT_key_points(img,x1,y1,x2,y2):
 
 def parallel_patch_creator(patch):
 	
-	global SIFT_folder,patch_folder
+	global SIFT_folder,patch_folder,override_sifts
 
-	if os.path.exists('{0}/{1}_SIFT.data'.format(SIFT_folder,patch.name.replace('.tif',''))):
+	if os.path.exists('{0}/{1}_SIFT.data'.format(SIFT_folder,patch.name.replace('.tif',''))) and override_sifts==False:
 		return
 
 	patch.load_img()
@@ -4326,6 +4326,8 @@ patches_to_use = slice(5,10)
 
 inside_radius_lettuce_matching_threshold = 200*SCALE
 discard_right_flag = True
+
+override_sifts = True
 
 method = 'MST'
 # method = 'Hybrid'
