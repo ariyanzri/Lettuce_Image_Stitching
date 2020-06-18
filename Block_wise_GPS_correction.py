@@ -4152,8 +4152,8 @@ def main(scan_date):
 		print('RUNNING ON -- {0} --'.format(server))
 		field = Field()
 		field.create_patches_SIFT_files()
-		# field.draw_and_save_field(is_old=True)
-		# field.save_plot()
+		field.draw_and_save_field(is_old=True)
+		field.save_plot()
 		field.correct_field()
 		field.draw_and_save_field(is_old=False)
 		# field.print_field_in_text()
@@ -4215,7 +4215,8 @@ method = 'MST'
 # scan_date = '2020-06-05_35m_0875mEW_125mNS'
 # scan_date = '2020-06-05_hardware_north'
 # scan_date = '2020-06-05_hardware_south'
-scan_date = 'hardware_f6,7_summer_shade'
+# scan_date = 'hardware_f6,7_summer_shade'
+scan_date = 'hardware_f6,7_summer_suntest061620'
 
 
 # -----------------------------------------------------------------------------------------------------------------------------------
