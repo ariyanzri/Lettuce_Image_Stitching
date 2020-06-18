@@ -38,8 +38,8 @@ from collections import OrderedDict,Counter
 # PATCH_SIZE = (989, 742) # 0.3
 # SCALE = 0.3
 
-# PATCH_SIZE = (1318, 989) # 0.4
-# SCALE = 0.4
+PATCH_SIZE = (1318, 989) # 0.4
+SCALE = 0.4
 
 # PATCH_SIZE = (1648, 1236) # 0.5 
 # SCALE = 0.5
@@ -56,8 +56,8 @@ from collections import OrderedDict,Counter
 # PATCH_SIZE = (2966, 2225) # 0.6
 # SCALE = 0.9
 
-PATCH_SIZE = (3296, 2472) # 1
-SCALE = 1
+# PATCH_SIZE = (3296, 2472) # 1
+# SCALE = 1
 
 LID_SIZE_AT_SCALE_1 = (400*SCALE,600*SCALE)
 
@@ -77,8 +77,10 @@ REDUCTION_FACTOR = ORTHO_SCALE/SCALE
 OVERLAP_DISCARD_RATIO = 0.05
 CONTOUR_MATCHING_MIN_MATCH = 2
 
-GPS_ERROR_Y = 0.0000005
-GPS_ERROR_X = 0.000001
+# GPS_ERROR_Y = 0.0000005
+# GPS_ERROR_X = 0.000001
+GPS_ERROR_Y = 0.0000008
+GPS_ERROR_X = 0.0000015
 
 FFT_PARALLEL_CORES_TO_USE = 20
 
@@ -4215,8 +4217,8 @@ method = 'MST'
 # scan_date = '2020-06-05_35m_0875mEW_125mNS'
 # scan_date = '2020-06-05_hardware_north'
 # scan_date = '2020-06-05_hardware_south'
-# scan_date = 'hardware_f6,7_summer_shade'
-scan_date = 'hardware_f6,7_summer_suntest061620'
+scan_date = 'hardware_f6,7_summer_shade'
+# scan_date = 'hardware_f6,7_summer_suntest061620'
 
 
 # -----------------------------------------------------------------------------------------------------------------------------------
