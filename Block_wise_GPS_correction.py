@@ -47,8 +47,8 @@ from collections import OrderedDict,Counter
 # PATCH_SIZE = (1978, 1483) # 0.6
 # SCALE = 0.6
 
-PATCH_SIZE = (2307, 1730) # 0.6
-SCALE = 0.7
+# PATCH_SIZE = (2307, 1730) # 0.6
+# SCALE = 0.7
 
 # PATCH_SIZE = (2637, 1978) # 0.8
 # SCALE = 0.8
@@ -56,8 +56,8 @@ SCALE = 0.7
 # PATCH_SIZE = (2966, 2225) # 0.6
 # SCALE = 0.9
 
-# PATCH_SIZE = (3296, 2472) # 1
-# SCALE = 1
+PATCH_SIZE = (3296, 2472) # 1
+SCALE = 1
 
 LID_SIZE_AT_SCALE_1 = (400*SCALE,600*SCALE)
 
@@ -2363,9 +2363,9 @@ class Patch:
 			return None
 
 		# matches = get_good_matches(desc2,desc1)
-		# matches = get_top_percentage_matches(desc2,desc1,kp2,kp1)
+		matches = get_top_percentage_matches(desc2,desc1,kp2,kp1)
 		# matches = get_top_n_matches(desc2,desc1,kp2,kp1,50)
-		matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1,self,neighbor,True)
+		# matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1,self,neighbor,True)
 
 		if matches is None or len(matches) == 0:
 			# print('match is none or len matches is 0.')
@@ -4222,13 +4222,13 @@ def main(scan_date):
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
 		field = Field()
-		field.calculate_scale_effect(200)
+		# field.calculate_scale_effect(200)
 
-		# # field.draw_and_save_field(is_old=True)
+		field.draw_and_save_field(is_old=True)
 
-		# field.correct_field()
+		field.correct_field()
 
-		# field.draw_and_save_field(is_old=False)
+		field.draw_and_save_field(is_old=False)
 
 		# ------------
 		# err = calculate_error_of_correction(True)
@@ -4315,13 +4315,13 @@ else:
 # -------------------------------------------------- Runtime Settings ---------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
 
-number_of_rows_in_groups = 10
-groups_to_use = slice(0,None)
-patches_to_use = slice(0,None)
+# number_of_rows_in_groups = 10
+# groups_to_use = slice(0,None)
+# patches_to_use = slice(0,None)
 
-# number_of_rows_in_groups = 3
-# groups_to_use = slice(5,7)
-# patches_to_use = slice(5,10)
+number_of_rows_in_groups = 3
+groups_to_use = slice(5,7)
+patches_to_use = slice(5,10)
 
 
 inside_radius_lettuce_matching_threshold = 200*SCALE
