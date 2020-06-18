@@ -4036,8 +4036,8 @@ def main(scan_date):
 		print('------------------ BEGINNING CORRECTION ------------------ ')
 
 		field = Field()
-		lettuce_coords = read_lettuce_heads_coordinates()
-		
+		# lettuce_coords = read_lettuce_heads_coordinates()
+		field.create_patches_SIFT_files()
 		
 		field.draw_and_save_field(is_old=True)
 		field.correct_field()
