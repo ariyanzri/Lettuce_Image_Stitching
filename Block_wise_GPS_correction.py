@@ -136,13 +136,19 @@ def convert_to_gray(img):
 
 def histogram_equalization(img_main):
 	img = img_main.copy()
-	channel_0 = cv2.equalizeHist(img[:,:,0])
-	channel_1 = cv2.equalizeHist(img[:,:,1])
-	channel_2 = cv2.equalizeHist(img[:,:,2])
 
-	img[:,:,0] = channel_0
-	img[:,:,1] = channel_1
-	img[:,:,2] = channel_2
+	hsvImg = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+	img[:,:,2] = cv2.equalizeHist(img[:,:,2])
+
+	rgb_img = cv2.cvtColor(hsvImg,cv2.COLOR_HSV2BGR)
+
+	# channel_0 = cv2.equalizeHist(img[:,:,0])
+	# channel_1 = cv2.equalizeHist(img[:,:,1])
+	# channel_2 = cv2.equalizeHist(img[:,:,2])
+
+	# img[:,:,0] = channel_0
+	# img[:,:,1] = channel_1
+	# img[:,:,2] = channel_2
 
 	return img
 
@@ -4132,7 +4138,7 @@ def main(scan_date):
 
 		field = Field()
 		field.groups[11].patches[34].load_img()
-		
+
 		# # field.draw_and_save_field(is_old=True)
 
 		# field.correct_field()
