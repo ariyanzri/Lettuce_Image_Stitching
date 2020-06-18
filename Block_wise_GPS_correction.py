@@ -32,8 +32,8 @@ from collections import OrderedDict,Counter
 # PATCH_SIZE = (330, 247) # 0.1
 # SCALE = 0.1
 
-PATCH_SIZE = (659, 494) # 0.2
-SCALE = 0.2
+# PATCH_SIZE = (659, 494) # 0.2
+# SCALE = 0.2
 
 # PATCH_SIZE = (989, 742) # 0.3
 # SCALE = 0.3
@@ -41,8 +41,8 @@ SCALE = 0.2
 # PATCH_SIZE = (1318, 989) # 0.4
 # SCALE = 0.4
 
-# PATCH_SIZE = (1648, 1236) # 0.5 
-# SCALE = 0.5
+PATCH_SIZE = (1648, 1236) # 0.5 
+SCALE = 0.5
 
 # PATCH_SIZE = (1978, 1483) # 0.6
 # SCALE = 0.6
@@ -78,10 +78,10 @@ REDUCTION_FACTOR = ORTHO_SCALE/SCALE
 OVERLAP_DISCARD_RATIO = 0.05
 CONTOUR_MATCHING_MIN_MATCH = 2
 
-# GPS_ERROR_Y = 0.0000005
-# GPS_ERROR_X = 0.000001
-GPS_ERROR_Y = 1
-GPS_ERROR_X = 1
+GPS_ERROR_Y = 0.0000005
+GPS_ERROR_X = 0.000001
+# GPS_ERROR_Y = 1
+# GPS_ERROR_X = 1
 
 FFT_PARALLEL_CORES_TO_USE = 20
 
@@ -150,7 +150,7 @@ def histogram_equalization(img):
 def load_preprocess_image(address):
 	img = cv2.imread(address)
 	img = cv2.resize(img,(PATCH_SIZE[1],PATCH_SIZE[0]))
-	# img = histogram_equalization(img)
+	img = histogram_equalization(img)
 	img = img.astype('uint8')
 	img_g = convert_to_gray(img)
 
@@ -4242,7 +4242,7 @@ method = 'MST'
 
 
 # scan_date = '2020-02-18'
-scan_date = '2020-01-08'
+# scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
@@ -4255,7 +4255,7 @@ scan_date = '2020-01-08'
 # scan_date = '2020-06-05_hardware_north'
 # scan_date = '2020-06-05_hardware_south'
 # scan_date = 'hardware_f6,7_summer_shade'
-# scan_date = 'hardware_f6,7_summer_suntest061620'
+scan_date = 'hardware_f6,7_summer_suntest061620'
 # scan_date = 'software_f6,7_summer_shade'
 
 
