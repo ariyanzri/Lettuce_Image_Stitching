@@ -3832,6 +3832,7 @@ class Field:
 					p1.delete_img()
 					p2.delete_img()
 					args.append((p1,p2))
+					break
 
 			processes = MyPool(int(no_of_cores_to_use_max))
 			result = processes.map(calculate_scale_effect_inside_helper,args)
@@ -3839,7 +3840,7 @@ class Field:
 
 			result = [r for r in result if r!=-1]
 
-			print(statistics.mean(result),statistics.stdev(result))
+			print('{0},{1},{2}'.format(SCALE,statistics.mean(result),statistics.stdev(result)))
 
 def calculate_scale_effect_inside(p1,p2):
 	overlap_1,overlap_2 = p1.get_overlap_rectangles(p2)
@@ -4221,7 +4222,7 @@ def main(scan_date):
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
 		field = Field()
-		field.calculate_scale_effect(10)
+		field.calculate_scale_effect(200)
 
 		# # field.draw_and_save_field(is_old=True)
 
@@ -4297,7 +4298,7 @@ def main(scan_date):
 
 
 
-server_core = {'coge':20,'laplace.cs.arizona.edu':6,'ariyan':4}
+server_core = {'coge':20,'laplace.cs.arizona.edu':20,'ariyan':4}
 server_core_max = {'coge':60,'laplace.cs.arizona.edu':45,'ariyan':4}
 
 server = socket.gethostname()
