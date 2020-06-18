@@ -32,14 +32,14 @@ from collections import OrderedDict,Counter
 # PATCH_SIZE = (330, 247) # 0.1
 # SCALE = 0.1
 
-PATCH_SIZE = (659, 494) # 0.2
-SCALE = 0.2
+# PATCH_SIZE = (659, 494) # 0.2
+# SCALE = 0.2
 
 # PATCH_SIZE = (989, 742) # 0.3
 # SCALE = 0.3
 
-# PATCH_SIZE = (1318, 989) # 0.4
-# SCALE = 0.4
+PATCH_SIZE = (1318, 989) # 0.4
+SCALE = 0.4
 
 # PATCH_SIZE = (1648, 1236) # 0.5 
 # SCALE = 0.5
@@ -3978,7 +3978,7 @@ def test_function():
 
 
 def main(scan_date):
-	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path,lettuce_heads_coordinates_file,lettuce_coords,method,correction_log_file
+	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path,lettuce_heads_coordinates_file,lettuce_coords,method,correction_log_file,discard_right_flag
 
 	if server == 'coge':
 		patch_folder = '/storage/ariyanzarei/{0}-rgb/bin2tif_out'.format(scan_date)
@@ -4153,9 +4153,9 @@ def main(scan_date):
 		# HPC
 		print('RUNNING ON -- {0} --'.format(server))
 		field = Field()
-		# field.create_patches_SIFT_files()
-		# field.draw_and_save_field(is_old=True)
-		# field.save_plot()
+		field.create_patches_SIFT_files()
+		field.draw_and_save_field(is_old=True)
+		field.save_plot()
 		field.correct_field()
 		field.draw_and_save_field(is_old=False)
 		# field.print_field_in_text()
@@ -4205,7 +4205,7 @@ method = 'MST'
 
 
 # scan_date = '2020-02-18'
-scan_date = '2020-01-08'
+# scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
@@ -4217,6 +4217,8 @@ scan_date = '2020-01-08'
 # scan_date = '2020-06-05_35m_0875mEW_125mNS'
 # scan_date = '2020-06-05_hardware_north'
 # scan_date = '2020-06-05_hardware_south'
+scan_date = 'hardware_f6,7_summer_shade'
+
 
 # -----------------------------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
