@@ -138,7 +138,7 @@ def histogram_equalization(img_main):
 	img = img_main.copy()
 
 	hsvImg = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-	img[:,:,2] = cv2.equalizeHist(img[:,:,2])
+	img[:,:,1] = cv2.equalizeHist(img[:,:,1])
 
 	rgb_img = cv2.cvtColor(hsvImg,cv2.COLOR_HSV2BGR)
 
