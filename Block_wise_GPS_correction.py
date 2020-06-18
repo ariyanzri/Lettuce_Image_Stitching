@@ -4225,7 +4225,7 @@ def main(scan_date):
 		field = Field()
 		field.create_patches_SIFT_files()
 		# field.calculate_scale_effect(200)
-
+		field.save_plot()
 		field.draw_and_save_field(is_old=True)
 
 		field.correct_field()
