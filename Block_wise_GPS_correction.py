@@ -78,8 +78,8 @@ REDUCTION_FACTOR = ORTHO_SCALE/SCALE
 OVERLAP_DISCARD_RATIO = 0.05
 CONTOUR_MATCHING_MIN_MATCH = 2
 
-GPS_ERROR_Y = 0.0000005
-GPS_ERROR_X = 0.000001
+GPS_ERROR_Y = 0.0000003
+GPS_ERROR_X = 0.0000006
 # GPS_ERROR_Y = 1
 # GPS_ERROR_X = 1
 
@@ -4204,7 +4204,7 @@ def main(scan_date):
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
-		os.system("taskset -p -c 0-38 %d" % os.getpid())
+		os.system("taskset -p -c 0-37 %d" % os.getpid())
 		# os.system("taskset -p -c 40-47 %d" % os.getpid())
 		
 		# ------------
