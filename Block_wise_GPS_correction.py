@@ -3817,7 +3817,7 @@ class Field:
 			GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 
 			all_patches = []
-			for g in self.grousp:
+			for g in self.groups:
 				all_patches+=g.patches
 
 			sample_patches = random.sample(all_patches,min(num_patches,len(all_patches)))
