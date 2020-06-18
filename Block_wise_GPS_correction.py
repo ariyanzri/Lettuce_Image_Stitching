@@ -3829,6 +3829,8 @@ class Field:
 					if p1 == p2 or ((not p1.has_overlap(p2)) and (not p2.has_overlap(p1))):
 						continue
 
+					p1.delete_img()
+					p2.delete_img()
 					args.append((p1,p2))
 
 			processes = MyPool(int(no_of_cores_to_use_max))
@@ -3841,7 +3843,7 @@ class Field:
 
 def calculate_scale_effect_inside(p1,p2):
 	overlap_1,overlap_2 = p1.get_overlap_rectangles(p2)
-			
+	
 	p1.load_img()
 	p2.load_img()
 
