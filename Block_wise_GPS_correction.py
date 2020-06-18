@@ -150,7 +150,7 @@ def histogram_equalization(img):
 def load_preprocess_image(address):
 	img = cv2.imread(address)
 	img = cv2.resize(img,(PATCH_SIZE[1],PATCH_SIZE[0]))
-	# img = histogram_equalization(img)
+	img = histogram_equalization(img)
 	img = img.astype('uint8')
 	img_g = convert_to_gray(img)
 
@@ -639,7 +639,7 @@ def correct_groups_internally_helper(args):
 
 # 	result_dict[gid] = group.correct_internally()
 
-def get_good_matches_based_on_GPS_error(desc1,desc2,kp1,kp2,p1,p2):
+def get_good_matches_based_on_GPS_error(desc1,desc2,kp1,kp2,p1,p2,top_percent):
 	bf = cv2.BFMatcher()
 	matches = bf.knnMatch(desc1,desc2, k=2)
 
@@ -664,6 +664,13 @@ def get_good_matches_based_on_GPS_error(desc1,desc2,kp1,kp2,p1,p2):
 		if diff[0]<GPS_ERROR_X and diff[1]<GPS_ERROR_Y and m[0].distance <= PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
 			good.append(m)
 		
+	if top_percent:
+		sorted_matches = sorted(good, key=lambda x: x[0].distance)
+
+		good = []
+
+		number_of_good_matches = int(math.floor(len(sorted_matches)*PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION))
+		good = sorted_matches[0:number_of_good_matches]
 
 	matches = np.asarray(good)
 
@@ -2358,7 +2365,7 @@ class Patch:
 		# matches = get_good_matches(desc2,desc1)
 		# matches = get_top_percentage_matches(desc2,desc1,kp2,kp1)
 		# matches = get_top_n_matches(desc2,desc1,kp2,kp1,50)
-		matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1,self,neighbor)
+		matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1,self,neighbor,True)
 
 		if matches is None or len(matches) == 0:
 			# print('match is none or len matches is 0.')
@@ -4230,7 +4237,7 @@ patches_to_use = slice(0,None)
 
 
 inside_radius_lettuce_matching_threshold = 200*SCALE
-discard_right_flag = False
+discard_right_flag = True
 
 method = 'MST'
 # method = 'Hybrid'
@@ -4242,7 +4249,7 @@ method = 'MST'
 
 
 # scan_date = '2020-02-18'
-scan_date = '2020-01-08'
+# scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
@@ -4255,7 +4262,7 @@ scan_date = '2020-01-08'
 # scan_date = '2020-06-05_hardware_north'
 # scan_date = '2020-06-05_hardware_south'
 # scan_date = 'hardware_f6,7_summer_shade'
-# scan_date = 'hardware_f6,7_summer_suntest061620'
+scan_date = 'hardware_f6,7_summer_suntest061620'
 # scan_date = 'software_f6,7_summer_shade'
 
 
