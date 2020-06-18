@@ -4030,17 +4030,6 @@ def main(scan_date):
 	if server == 'coge':
 		print('RUNNING ON -- {0} --'.format(server))
 		
-		# Measure Errors
-		print('------------------ ERROR MEASUREMENT ------------------ ')
-
-		err = calculate_error_of_correction(True)
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
-
-		field = Field(False)
-		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		np.save('RMSE_before.npy',res)
-		print(np.mean(res[:,3]))
-
 		
 		# Corrections
 		print('------------------ BEGINNING CORRECTION ------------------ ')
@@ -4061,13 +4050,25 @@ def main(scan_date):
 		# Measure Errors after correction
 		print('------------------ ERROR MEASUREMENT ------------------ ')
 
-		err = calculate_error_of_correction()
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# print('*** Before')
 
-		field = Field(True)
-		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		np.save('RMSE_after.npy',res)
-		print(np.mean(res[:,3]))
+		# err = calculate_error_of_correction(True)
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
+
+		# field = Field(False)
+		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# np.save('RMSE_before.npy',res)
+		# print(np.mean(res[:,3]))
+
+		# print('*** After')
+
+		# err = calculate_error_of_correction()
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
+
+		# field = Field(True)
+		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# np.save('RMSE_after.npy',res)
+		# print(np.mean(res[:,3]))
 
 
 	elif server == 'laplace.cs.arizona.edu':
