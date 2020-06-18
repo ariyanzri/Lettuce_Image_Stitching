@@ -3359,71 +3359,71 @@ class Group:
 	def correct_self_based_on_previous_group(self,previous_group):
 		global number_of_rows_in_groups
 
-		diff_x = []
-		diff_y = []
+		# diff_x = []
+		# diff_y = []
 
-		for i,patch_self in enumerate(self.rows[0]):
+		# for i,patch_self in enumerate(self.rows[0]):
 
-			patch_prev = previous_group.rows[number_of_rows_in_groups-1][i]
+		# 	patch_prev = previous_group.rows[number_of_rows_in_groups-1][i]
 
-			diff = (patch_self.gps.UL_coord[0] - patch_prev.gps.UL_coord[0],patch_self.gps.UL_coord[1] - patch_prev.gps.UL_coord[1])
+		# 	diff = (patch_self.gps.UL_coord[0] - patch_prev.gps.UL_coord[0],patch_self.gps.UL_coord[1] - patch_prev.gps.UL_coord[1])
 			
-			diff_x.append(diff[0])
-			diff_y.append(diff[1])
+		# 	diff_x.append(diff[0])
+		# 	diff_y.append(diff[1])
 		
-		diff = (max(set(diff_x), key=diff_x.count),max(set(diff_y), key=diff_y.count))
+		# diff = (max(set(diff_x), key=diff_x.count),max(set(diff_y), key=diff_y.count))
 
-		for p in self.patches:
+		# for p in self.patches:
 
-			new_UL = (p.gps.UL_coord[0]-diff[0],p.gps.UL_coord[1]-diff[1])
-			new_UR = (p.gps.UR_coord[0]-diff[0],p.gps.UR_coord[1]-diff[1])
-			new_LL = (p.gps.LL_coord[0]-diff[0],p.gps.LL_coord[1]-diff[1])
-			new_LR = (p.gps.LR_coord[0]-diff[0],p.gps.LR_coord[1]-diff[1])
-			new_center = (p.gps.Center[0]-diff[0],p.gps.Center[1]-diff[1])
+		# 	new_UL = (p.gps.UL_coord[0]-diff[0],p.gps.UL_coord[1]-diff[1])
+		# 	new_UR = (p.gps.UR_coord[0]-diff[0],p.gps.UR_coord[1]-diff[1])
+		# 	new_LL = (p.gps.LL_coord[0]-diff[0],p.gps.LL_coord[1]-diff[1])
+		# 	new_LR = (p.gps.LR_coord[0]-diff[0],p.gps.LR_coord[1]-diff[1])
+		# 	new_center = (p.gps.Center[0]-diff[0],p.gps.Center[1]-diff[1])
 
-			new_coords = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+		# 	new_coords = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
 
-			p.gps = new_coords
-
-		print('Block {0} corrected based on previous block.'.format(self.group_id))
-		sys.stdout.flush()
-
-		# matches = []
-		# kp = []
-		# desc = []
-		# prev_kp = []
-		# prev_desc = []
-
-		# for self_patch in self.rows[0]:
-			
-		# 	for prev_patch in previous_group.rows[-1]:
-
-		# 		if self_patch.has_overlap(prev_patch) or prev_patch.has_overlap(self_patch):
-		# 			overlap1 = self_patch.get_overlap_rectangle(prev_patch)
-		# 			overlap2 = prev_patch.get_overlap_rectangle(self_patch)
-
-		# 			kp1,desc1 = choose_SIFT_key_points(self_patch,overlap1[0],overlap1[1],overlap1[2],overlap1[3])
-		# 			kp2,desc2 = choose_SIFT_key_points(prev_patch,overlap2[0],overlap2[1],overlap2[2],overlap2[3])
-
-		# 			# print('overlap detected. {0}-\n\t{1}'.format(overlap1,overlap2))
-
-		# 			kp.append(kp1)
-		# 			desc.append(desc1)
-		# 			prev_kp.append(kp2)
-		# 			prev_desc.append(desc2)
-					
-		# 			matches.append(get_top_percentage_matches(desc2,desc1,kp2,kp1))
-
-		# H = calculate_homography_for_super_patches(prev_kp,kp,matches)
-
-		# base_patch_from_prev = previous_group.rows[-1][0]
-
-		# for patch in self.patches:
-
-		# 	patch.gps = get_new_GPS_Coords_for_groups(patch,base_patch_from_prev,H)
+		# 	p.gps = new_coords
 
 		# print('Block {0} corrected based on previous block.'.format(self.group_id))
 		# sys.stdout.flush()
+
+		matches = []
+		kp = []
+		desc = []
+		prev_kp = []
+		prev_desc = []
+
+		for self_patch in self.rows[0]:
+			
+			for prev_patch in previous_group.rows[-1]:
+
+				if self_patch.has_overlap(prev_patch) or prev_patch.has_overlap(self_patch):
+					overlap1 = self_patch.get_overlap_rectangle(prev_patch)
+					overlap2 = prev_patch.get_overlap_rectangle(self_patch)
+
+					kp1,desc1 = choose_SIFT_key_points(self_patch,overlap1[0],overlap1[1],overlap1[2],overlap1[3])
+					kp2,desc2 = choose_SIFT_key_points(prev_patch,overlap2[0],overlap2[1],overlap2[2],overlap2[3])
+
+					# print('overlap detected. {0}-\n\t{1}'.format(overlap1,overlap2))
+
+					kp.append(kp1)
+					desc.append(desc1)
+					prev_kp.append(kp2)
+					prev_desc.append(desc2)
+					
+					matches.append(get_top_percentage_matches(desc2,desc1,kp2,kp1))
+
+		H = calculate_homography_for_super_patches(prev_kp,kp,matches)
+
+		base_patch_from_prev = previous_group.rows[-1][0]
+
+		for patch in self.patches:
+
+			patch.gps = get_new_GPS_Coords_for_groups(patch,base_patch_from_prev,H)
+
+		print('Block {0} corrected based on previous block.'.format(self.group_id))
+		sys.stdout.flush()
 
 class Field:
 	def __init__(self,use_corrected=False):
