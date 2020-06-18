@@ -2375,8 +2375,8 @@ class Patch:
 
 		H,percentage_inliers,scale,theta = find_homography(matches,kp2,kp1,overlap1,overlap2)
 
-		# if percentage_inliers<0.10 or num_matches<100:
-		# 	return None
+		if percentage_inliers<0.15 or num_matches<200:
+			return None
 
 		# H,percentage_inliers = find_translation(matches,kp2,kp1)
 
