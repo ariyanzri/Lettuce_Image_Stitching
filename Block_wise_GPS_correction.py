@@ -150,7 +150,7 @@ def histogram_equalization(img):
 def load_preprocess_image(address):
 	img = cv2.imread(address)
 	img = cv2.resize(img,(PATCH_SIZE[1],PATCH_SIZE[0]))
-	# img = histogram_equalization(img)
+	img = histogram_equalization(img)
 	img = img.astype('uint8')
 	img_g = convert_to_gray(img)
 
@@ -3371,8 +3371,8 @@ class Group:
 			diff_x.append(diff[0])
 			diff_y.append(diff[1])
 		
-		# diff = (max(set(diff_x), key=diff_x.count),max(set(diff_y), key=diff_y.count))
-		diff = (statistics.mean(diff_x),statistics.mean(diff_y))
+		diff = (max(set(diff_x), key=diff_x.count),max(set(diff_y), key=diff_y.count))
+		# diff = (statistics.mean(diff_x),statistics.mean(diff_y))
 
 		for p in self.patches:
 
@@ -4277,9 +4277,9 @@ def main(scan_date):
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
 
-		# visualize_plot()
+		visualize_plot()
 
-		test_function()
+		# test_function()
 
 		
 	else:
