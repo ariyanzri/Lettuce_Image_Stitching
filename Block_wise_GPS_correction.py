@@ -134,7 +134,8 @@ def convert_to_gray(img):
 
 	return img_g
 
-def histogram_equalization(img):
+def histogram_equalization(img_main):
+	img = img_main.copy()
 	channel_0 = cv2.equalizeHist(img[:,:,0])
 	channel_1 = cv2.equalizeHist(img[:,:,1])
 	channel_2 = cv2.equalizeHist(img[:,:,2])
@@ -150,17 +151,17 @@ def histogram_equalization(img):
 def load_preprocess_image(address):
 	img = cv2.imread(address)
 	img = cv2.resize(img,(PATCH_SIZE[1],PATCH_SIZE[0]))
-	img = histogram_equalization(img)
-	img = img.astype('uint8')
-	img_g = convert_to_gray(img)
+	img_b = histogram_equalization(img)
+	img_b = img_b.astype('uint8')
+	img_g = convert_to_gray(img_b)
 
-	# cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
-	# cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
-	# cv2.resizeWindow('fig1', 500,500)
-	# cv2.resizeWindow('fig2', 500,500)
-	# cv2.imshow('fig1',img)
-	# cv2.imshow('fig2',img_g)
-	# cv2.waitKey(0)
+	cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
+	cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
+	cv2.resizeWindow('fig1', 500,500)
+	cv2.resizeWindow('fig2', 500,500)
+	cv2.imshow('fig1',img)
+	cv2.imshow('fig2',img_b)
+	cv2.waitKey(0)
 
 	return img, img_g
 
@@ -4129,7 +4130,9 @@ def main(scan_date):
 
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
-		# field = Field()
+		field = Field()
+		field.groups[11].patches[34].load_img()
+		
 		# # field.draw_and_save_field(is_old=True)
 
 		# field.correct_field()
@@ -4241,7 +4244,7 @@ method = 'MST'
 # method = 'Old_method'
 
 
-# scan_date = '2020-02-18'
+scan_date = '2020-02-18'
 # scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
@@ -4255,7 +4258,7 @@ method = 'MST'
 # scan_date = '2020-06-05_hardware_north'
 # scan_date = '2020-06-05_hardware_south'
 # scan_date = 'hardware_f6,7_summer_shade'
-scan_date = 'hardware_f6,7_summer_suntest061620'
+# scan_date = 'hardware_f6,7_summer_suntest061620'
 # scan_date = 'software_f6,7_summer_shade'
 
 
