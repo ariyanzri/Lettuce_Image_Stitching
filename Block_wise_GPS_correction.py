@@ -4237,7 +4237,7 @@ patches_to_use = slice(0,None)
 
 
 inside_radius_lettuce_matching_threshold = 200*SCALE
-discard_right_flag = True
+discard_right_flag = False
 
 method = 'MST'
 # method = 'Hybrid'
