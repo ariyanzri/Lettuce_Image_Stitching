@@ -32,8 +32,8 @@ from collections import OrderedDict,Counter
 # PATCH_SIZE = (330, 247) # 0.1
 # SCALE = 0.1
 
-# PATCH_SIZE = (659, 494) # 0.2
-# SCALE = 0.2
+PATCH_SIZE = (659, 494) # 0.2
+SCALE = 0.2
 
 # PATCH_SIZE = (989, 742) # 0.3
 # SCALE = 0.3
@@ -41,8 +41,8 @@ from collections import OrderedDict,Counter
 # PATCH_SIZE = (1318, 989) # 0.4
 # SCALE = 0.4
 
-PATCH_SIZE = (1648, 1236) # 0.5 
-SCALE = 0.5
+# PATCH_SIZE = (1648, 1236) # 0.5 
+# SCALE = 0.5
 
 # PATCH_SIZE = (1978, 1483) # 0.6
 # SCALE = 0.6
@@ -134,22 +134,14 @@ def convert_to_gray(img):
 
 	return img_g
 
-def histogram_equalization(img_main):
-	img = img_main.copy()
+def histogram_equalization(img):
+	channel_0 = cv2.equalizeHist(img[:,:,0])
+	channel_1 = cv2.equalizeHist(img[:,:,1])
+	channel_2 = cv2.equalizeHist(img[:,:,2])
 
-	hsvImg = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-	img[:,:,1] = cv2.equalizeHist(img[:,:,1])
-	img[:,:,2] = cv2.equalizeHist(img[:,:,2])
-
-	rgb_img = cv2.cvtColor(hsvImg,cv2.COLOR_HSV2BGR)
-
-	# channel_0 = cv2.equalizeHist(img[:,:,0])
-	# channel_1 = cv2.equalizeHist(img[:,:,1])
-	# channel_2 = cv2.equalizeHist(img[:,:,2])
-
-	# img[:,:,0] = channel_0
-	# img[:,:,1] = channel_1
-	# img[:,:,2] = channel_2
+	img[:,:,0] = channel_0
+	img[:,:,1] = channel_1
+	img[:,:,2] = channel_2
 
 	return img
 
@@ -158,17 +150,17 @@ def histogram_equalization(img_main):
 def load_preprocess_image(address):
 	img = cv2.imread(address)
 	img = cv2.resize(img,(PATCH_SIZE[1],PATCH_SIZE[0]))
-	img_b = histogram_equalization(img)
-	img_b = img_b.astype('uint8')
-	img_g = convert_to_gray(img_b)
+	# img = histogram_equalization(img)
+	img = img.astype('uint8')
+	img_g = convert_to_gray(img)
 
-	cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
-	cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
-	cv2.resizeWindow('fig1', 500,500)
-	cv2.resizeWindow('fig2', 500,500)
-	cv2.imshow('fig1',img)
-	cv2.imshow('fig2',img_b)
-	cv2.waitKey(0)
+	# cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
+	# cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
+	# cv2.resizeWindow('fig1', 500,500)
+	# cv2.resizeWindow('fig2', 500,500)
+	# cv2.imshow('fig1',img)
+	# cv2.imshow('fig2',img_g)
+	# cv2.waitKey(0)
 
 	return img, img_g
 
@@ -4080,16 +4072,16 @@ def main(scan_date):
 		
 		
 		# Corrections
-		print('------------------ BEGINNING CORRECTION ------------------ ')
+		# print('------------------ BEGINNING CORRECTION ------------------ ')
 
-		field = Field()
-		# lettuce_coords = read_lettuce_heads_coordinates()
-		field.create_patches_SIFT_files()
+		# field = Field()
+		# # lettuce_coords = read_lettuce_heads_coordinates()
+		# field.create_patches_SIFT_files()
 		
-		field.draw_and_save_field(is_old=True)
-		field.correct_field()
-		field.draw_and_save_field(is_old=False)
-		field.save_new_coordinate()
+		# field.draw_and_save_field(is_old=True)
+		# field.correct_field()
+		# field.draw_and_save_field(is_old=False)
+		# field.save_new_coordinate()
 
 
 		# Measure Errors after correction
@@ -4097,8 +4089,8 @@ def main(scan_date):
 
 		print('*** Before')
 
-		# err = calculate_error_of_correction(True)
-		# print("({:.10f},{:.10f})".format(err[0],err[1]))
+		err = calculate_error_of_correction(True)
+		print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 		field = Field(False)
 		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
@@ -4107,8 +4099,8 @@ def main(scan_date):
 
 		print('*** After')
 
-		# err = calculate_error_of_correction()
-		# print("({:.10f},{:.10f})".format(err[0],err[1]))
+		err = calculate_error_of_correction()
+		print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 		field = Field(True)
 		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
@@ -4137,9 +4129,7 @@ def main(scan_date):
 
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
-		field = Field()
-		field.groups[11].patches[34].load_img()
-
+		# field = Field()
 		# # field.draw_and_save_field(is_old=True)
 
 		# field.correct_field()
@@ -4251,8 +4241,8 @@ method = 'MST'
 # method = 'Old_method'
 
 
-scan_date = '2020-02-18'
-# scan_date = '2020-01-08'
+# scan_date = '2020-02-18'
+scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
