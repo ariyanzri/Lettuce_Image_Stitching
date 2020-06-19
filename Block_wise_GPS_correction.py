@@ -4236,8 +4236,8 @@ def main(scan_date):
 
 		print('*** Before')
 
-		err = calculate_error_of_correction(True)
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction(True)
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 		field = Field(False)
 		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
@@ -4246,8 +4246,8 @@ def main(scan_date):
 
 		print('*** After')
 
-		err = calculate_error_of_correction()
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction()
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
 		field = Field(True)
 		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
