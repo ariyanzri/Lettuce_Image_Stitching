@@ -64,7 +64,7 @@ LID_SIZE_AT_SCALE_1 = (400*SCALE,600*SCALE)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
 
-PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.2
+PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
 MINIMUM_NUMBER_OF_MATCHES = 100
@@ -4346,9 +4346,9 @@ number_of_rows_in_groups = 10
 groups_to_use = slice(0,None)
 patches_to_use = slice(0,None)
 
-number_of_rows_in_groups = 3
-groups_to_use = slice(5,9)
-patches_to_use = slice(2,17)
+# number_of_rows_in_groups = 3
+# groups_to_use = slice(5,9)
+# patches_to_use = slice(2,17)
 
 
 inside_radius_lettuce_matching_threshold = 200*SCALE
