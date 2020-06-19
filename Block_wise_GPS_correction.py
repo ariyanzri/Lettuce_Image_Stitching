@@ -4168,38 +4168,38 @@ def main(scan_date):
 		# Corrections
 		# print('------------------ BEGINNING CORRECTION ------------------ ')
 
-		# field = Field()
-		# # lettuce_coords = read_lettuce_heads_coordinates()
-		# field.create_patches_SIFT_files()
+		field = Field()
+		# lettuce_coords = read_lettuce_heads_coordinates()
+		field.create_patches_SIFT_files()
 		
-		# field.draw_and_save_field(is_old=True)
-		# field.correct_field()
-		# field.draw_and_save_field(is_old=False)
-		# field.save_new_coordinate()
+		field.draw_and_save_field(is_old=True)
+		field.correct_field()
+		field.draw_and_save_field(is_old=False)
+		field.save_new_coordinate()
 
 
 		# Measure Errors after correction
-		print('------------------ ERROR MEASUREMENT ------------------ ')
+		# print('------------------ ERROR MEASUREMENT ------------------ ')
 
-		print('*** Before')
+		# print('*** Before')
 
-		err = calculate_error_of_correction(True)
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction(True)
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
-		field = Field(False)
-		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		np.save('RMSE_before.npy',res)
-		print(np.mean(res[:,3]))
+		# field = Field(False)
+		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# np.save('RMSE_before.npy',res)
+		# print(np.mean(res[:,3]))
 
-		print('*** After')
+		# print('*** After')
 
-		err = calculate_error_of_correction()
-		print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# err = calculate_error_of_correction()
+		# print("({:.10f},{:.10f})".format(err[0],err[1]))
 
-		field = Field(True)
-		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		np.save('RMSE_after.npy',res)
-		print(np.mean(res[:,3]))
+		# field = Field(True)
+		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# np.save('RMSE_after.npy',res)
+		# print(np.mean(res[:,3]))
 
 
 	elif server == 'laplace.cs.arizona.edu':
@@ -4364,8 +4364,8 @@ method = 'MST'
 # method = 'Old_method'
 
 
-# scan_date = '2020-02-18'
-scan_date = '2020-01-08'
+scan_date = '2020-02-18'
+# scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
