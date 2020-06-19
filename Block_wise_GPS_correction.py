@@ -4255,7 +4255,7 @@ def main(scan_date):
 		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 		# np.save('RMSE_after.npy',res)
 		# print(np.mean(res[:,3]))
-		
+
 		# ------------
 		# err = calculate_error_of_correction(True)
 		# print("({:.10f},{:.10f})".format(err[0],err[1]))
@@ -4324,8 +4324,8 @@ def main(scan_date):
 
 
 
-server_core = {'coge':20,'laplace.cs.arizona.edu':20,'ariyan':4}
-server_core_max = {'coge':60,'laplace.cs.arizona.edu':45,'ariyan':4}
+server_core = {'coge':20,'laplace.cs.arizona.edu':10,'ariyan':4}
+server_core_max = {'coge':60,'laplace.cs.arizona.edu':30,'ariyan':4}
 
 server = socket.gethostname()
 if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
@@ -4353,7 +4353,7 @@ patches_to_use = slice(0,None)
 inside_radius_lettuce_matching_threshold = 200*SCALE
 discard_right_flag = True
 
-override_sifts = True
+override_sifts = False
 
 method = 'MST'
 # method = 'Hybrid'
