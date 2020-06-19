@@ -4205,7 +4205,7 @@ def main(scan_date):
 
 	elif server == 'laplace.cs.arizona.edu':
 		print('RUNNING ON -- {0} --'.format(server))
-		os.system("taskset -p -c 0-37 %d" % os.getpid())
+		# os.system("taskset -p -c 0-37 %d" % os.getpid())
 		# os.system("taskset -p -c 40-47 %d" % os.getpid())
 		
 		# ------------
