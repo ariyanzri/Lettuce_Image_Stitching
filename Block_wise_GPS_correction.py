@@ -64,7 +64,7 @@ LID_SIZE_AT_SCALE_1 = (400*SCALE,600*SCALE)
 PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
 
-PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
+PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.2
 GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
 MINIMUM_NUMBER_OF_MATCHES = 100
@@ -2388,8 +2388,8 @@ class Patch:
 
 		percentage_inliers = round(percentage_inliers*100,2)
 
-		print(percentage_inliers*num_matches)
-		
+		# print(percentage_inliers*num_matches)
+
 		dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
 		# dissimilarity = - percentage_inliers*num_matches
 		# dissimilarity = 1 - percentage_inliers
