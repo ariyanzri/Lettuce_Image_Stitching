@@ -4224,10 +4224,10 @@ def main(scan_date):
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
 		field = Field()
-		field.create_patches_SIFT_files()
+		# field.create_patches_SIFT_files()
 		# field.calculate_scale_effect(200)
 		# field.save_plot()
-		field.draw_and_save_field(is_old=True)
+		# field.draw_and_save_field(is_old=True)
 
 		field.correct_field()
 
@@ -4353,7 +4353,7 @@ patches_to_use = slice(0,None)
 inside_radius_lettuce_matching_threshold = 200*SCALE
 discard_right_flag = True
 
-override_sifts = False
+override_sifts = True
 
 method = 'MST'
 # method = 'Hybrid'
