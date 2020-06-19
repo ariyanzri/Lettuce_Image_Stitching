@@ -2231,7 +2231,7 @@ class Patch:
 		gc.collect()
 
 
-	def load_img(self,hist_eq=False):
+	def load_img(self,hist_eq=True):
 		global patch_folder
 
 		img,img_g = load_preprocess_image('{0}/{1}'.format(patch_folder,self.name),hist_eq)
@@ -2395,7 +2395,7 @@ class Patch:
 		num_matches = len(matches)
 
 		H,percentage_inliers,scale,theta = find_homography(matches,kp2,kp1,overlap1,overlap2)
-
+		print(len(matches),percentage_inliers)
 		# if percentage_inliers<0.1:
 		# 	return None
 
@@ -4210,9 +4210,9 @@ def main(scan_date):
 
 		field = Field()
 		# lettuce_coords = read_lettuce_heads_coordinates()
-		# field.create_patches_SIFT_files()
+		field.create_patches_SIFT_files()
 		
-		# field.draw_and_save_field(is_old=True)
+		field.draw_and_save_field(is_old=True)
 		field.correct_field()
 		field.draw_and_save_field(is_old=False)
 		field.save_new_coordinate()
@@ -4382,13 +4382,13 @@ else:
 # -------------------------------------------------- Runtime Settings ---------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
 
-number_of_rows_in_groups = 10
-groups_to_use = slice(0,None)
-patches_to_use = slice(0,None)
+# number_of_rows_in_groups = 10
+# groups_to_use = slice(0,None)
+# patches_to_use = slice(0,None)
 
-# number_of_rows_in_groups = 3
-# groups_to_use = slice(5,9)
-# patches_to_use = slice(2,17)
+number_of_rows_in_groups = 3
+groups_to_use = slice(5,9)
+patches_to_use = slice(2,17)
 
 
 inside_radius_lettuce_matching_threshold = 200*SCALE
