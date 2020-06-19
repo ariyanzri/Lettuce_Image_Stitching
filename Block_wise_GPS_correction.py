@@ -3444,12 +3444,13 @@ class Group:
 
 class Field:
 	def __init__(self,use_corrected=False):
-		global coordinates_file,PATCH_SIZE_GPS,GPS_TO_IMAGE_RATIO,PATCH_SIZE
+		global coordinates_file
 
 		self.groups = self.initialize_field(use_corrected)
+		
+	def initialize_GPS_size(p):
+		global PATCH_SIZE_GPS,GPS_TO_IMAGE_RATIO,PATCH_SIZE
 
-
-		p = self.groups[0].patches[0]
 		PATCH_SIZE_GPS = (p.gps.UR_coord[0]-p.gps.UL_coord[0],p.gps.UL_coord[1]-p.gps.LL_coord[1])
 		GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 		
@@ -3486,7 +3487,7 @@ class Field:
 		return groups[groups_to_use]
 
 	def get_rows(self,use_corrected=False):
-		global coordinates_file, CORRECTED_coordinates_file, patches_to_use, discard_right_flag
+		global coordinates_file, CORRECTED_coordinates_file, patches_to_use, discard_right_flag,PATCH_SIZE_GPS
 
 		center_of_rows = []
 		patches = []
@@ -3520,7 +3521,11 @@ class Field:
 				center = (float(features[9]),float(features[10]))
 				
 				coord = GPS_Coordinate(upper_left,upper_right,lower_left,lower_right,center)
-				patches.append(Patch(filename,coord))
+				patch = Patch(filename,coord)
+				patches.append(patch)
+
+				if PATCH_SIZE_GPS[0] == -1:
+					self.initialize_GPS_size(patch)
 
 				is_new = True
 
