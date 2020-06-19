@@ -3448,7 +3448,7 @@ class Field:
 
 		self.groups = self.initialize_field(use_corrected)
 		
-	def initialize_GPS_size(p):
+	def initialize_GPS_size(self,p):
 		global PATCH_SIZE_GPS,GPS_TO_IMAGE_RATIO,PATCH_SIZE
 
 		PATCH_SIZE_GPS = (p.gps.UR_coord[0]-p.gps.UL_coord[0],p.gps.UL_coord[1]-p.gps.LL_coord[1])
