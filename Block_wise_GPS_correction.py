@@ -3552,7 +3552,7 @@ class Field:
 			for patch in group.patches:
 				args_list.append(patch)
 		
-		processes = multiprocessing.Pool(no_of_cores_to_use)
+		processes = multiprocessing.Pool(no_of_cores_to_use_max)
 		processes.map(parallel_patch_creator,args_list)
 		processes.close()
 
