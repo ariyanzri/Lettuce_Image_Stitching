@@ -4435,8 +4435,8 @@ scan_date = 'hardware_f6,7_summer_shade'
 
 original = sys.stdout
 
-if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
-	sys.stdout = open('/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/log_{1}_at_{2}.txt'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M")), 'w+')
+# if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
+# 	sys.stdout = open('/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/log_{1}_at_{2}.txt'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M")), 'w+')
 
 
 print('Starting process on {0} for scan date {1} using method {2} and scale {3}.'.format(server,scan_date,method,SCALE))
