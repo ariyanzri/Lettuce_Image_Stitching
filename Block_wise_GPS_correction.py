@@ -2395,7 +2395,12 @@ class Patch:
 		num_matches = len(matches)
 
 		H,percentage_inliers,scale,theta = find_homography(matches,kp2,kp1,overlap1,overlap2)
-		print(len(matches),percentage_inliers)
+		# print(len(matches),percentage_inliers)
+
+		# if abs(scale-1) > 0.01 or abs(theta-0)>5:
+			# # print('\t Discarding {0} due to scale or rotation being off (s:{1},r:{2}).'.format(scale,theta))
+			# return None
+
 		# if percentage_inliers<0.1:
 		# 	return None
 
@@ -4351,11 +4356,12 @@ def main(scan_date):
 		print('RUNNING ON -- {0} --'.format(server))
 		discard_right_flag = False
 		field = Field()
-		field.create_patches_SIFT_files()
-		field.draw_and_save_field(is_old=True)
-		field.save_plot()
+		# field.create_patches_SIFT_files()
+		# field.draw_and_save_field(is_old=True)
+		
 		field.correct_field()
-		field.draw_and_save_field(is_old=False)
+		field.save_plot()
+		# field.draw_and_save_field(is_old=False)
 		# field.print_field_in_text()
 
 
@@ -4382,9 +4388,9 @@ else:
 # -------------------------------------------------- Runtime Settings ---------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
 
-number_of_rows_in_groups = 10
-groups_to_use = slice(0,None)
-patches_to_use = slice(0,None)
+# number_of_rows_in_groups = 10
+# groups_to_use = slice(0,None)
+# patches_to_use = slice(0,None)
 
 # number_of_rows_in_groups = 3
 # groups_to_use = slice(0,2)
@@ -4418,14 +4424,19 @@ method = 'MST'
 # scan_date = '2020-06-05_35m_0875mEW_125mNS'
 # scan_date = '2020-06-05_hardware_north'
 # scan_date = '2020-06-05_hardware_south'
-# scan_date = 'hardware_f6,7_summer_shade'
-scan_date = 'hardware_f6,7_summer_suntest061620'
+scan_date = 'hardware_f6,7_summer_shade'
+# scan_date = 'hardware_f6,7_summer_suntest061620'
 # scan_date = 'software_f6,7_summer_shade'
 
 
 # -----------------------------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
+
+original = sys.stdout
+
+if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
+	sys.stdout = open('/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/log_{1}_at_{2}.txt'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M")), 'w+')
 
 
 print('Starting process on {0} for scan date {1} using method {2} and scale {3}.'.format(server,scan_date,method,SCALE))
@@ -4437,3 +4448,5 @@ main(scan_date)
 end_time = datetime.datetime.now()
 
 report_time(start_time,end_time)
+
+sys.stdout = original
