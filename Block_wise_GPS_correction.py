@@ -29,39 +29,26 @@ from collections import OrderedDict,Counter
 # ------------------------------------------------------- Settings ------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
 
-# PATCH_SIZE = (330, 247) # 0.1
 # SCALE = 0.1
-
-PATCH_SIZE = (659, 494) # 0.2
 SCALE = 0.2
-
-# PATCH_SIZE = (989, 742) # 0.3
 # SCALE = 0.3
-
-# PATCH_SIZE = (1318, 989) # 0.4
 # SCALE = 0.4
-
-# PATCH_SIZE = (1648, 1236) # 0.5 
 # SCALE = 0.5
-
-# PATCH_SIZE = (1978, 1483) # 0.6
 # SCALE = 0.6
-
-# PATCH_SIZE = (2307, 1730) # 0.6
 # SCALE = 0.7
-
-# PATCH_SIZE = (2637, 1978) # 0.8
 # SCALE = 0.8
-
-# PATCH_SIZE = (2966, 2225) # 0.6
 # SCALE = 0.9
-
-# PATCH_SIZE = (3296, 2472) # 1
 # SCALE = 1
+
+
+
+PATCH_SIZE = (int(3296*SCALE),int(2472*SCALE))
 
 LID_SIZE_AT_SCALE_1 = (400*SCALE,600*SCALE)
 
-PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
+# PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
+PATCH_SIZE_GPS = (-1,-1)
+
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
 
 PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
@@ -3457,12 +3444,14 @@ class Group:
 
 class Field:
 	def __init__(self,use_corrected=False):
-		global coordinates_file
+		global coordinates_file,PATCH_SIZE_GPS,GPS_TO_IMAGE_RATIO,PATCH_SIZE
 
 		self.groups = self.initialize_field(use_corrected)
-		print([g.group_id for g in self.groups])
-		# for group in self.groups:
-		# 	group.load_all_patches_SIFT_points()
+
+
+		p = self.groups[0].patches[0]
+		PATCH_SIZE_GPS = (p.gps.UR_coord[0]-p.gps.UL_coord[0],p.gps.UL_coord[1]-p.gps.LL_coord[1])
+		GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 		
 	def initialize_field(self,use_corrected):
 		global coordinates_file, number_of_rows_in_groups, groups_to_use
@@ -4356,12 +4345,12 @@ def main(scan_date):
 		print('RUNNING ON -- {0} --'.format(server))
 		discard_right_flag = False
 		field = Field()
-		# field.create_patches_SIFT_files()
-		# field.draw_and_save_field(is_old=True)
+		field.create_patches_SIFT_files()
+		field.draw_and_save_field(is_old=True)
 		
 		field.correct_field()
 		field.save_plot()
-		# field.draw_and_save_field(is_old=False)
+		field.draw_and_save_field(is_old=False)
 		# field.print_field_in_text()
 
 
@@ -4412,7 +4401,7 @@ method = 'MST'
 
 
 # scan_date = '2020-02-18'
-scan_date = '2020-01-08'
+# scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
@@ -4424,7 +4413,7 @@ scan_date = '2020-01-08'
 # scan_date = '2020-06-05_35m_0875mEW_125mNS'
 # scan_date = '2020-06-05_hardware_north'
 # scan_date = '2020-06-05_hardware_south'
-# scan_date = 'hardware_f6,7_summer_shade'
+scan_date = 'hardware_f6,7_summer_shade'
 # scan_date = 'hardware_f6,7_summer_suntest061620'
 # scan_date = 'software_f6,7_summer_shade'
 
