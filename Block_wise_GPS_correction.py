@@ -4382,13 +4382,13 @@ else:
 # -------------------------------------------------- Runtime Settings ---------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
 
-# number_of_rows_in_groups = 10
-# groups_to_use = slice(0,None)
-# patches_to_use = slice(0,None)
+number_of_rows_in_groups = 10
+groups_to_use = slice(0,None)
+patches_to_use = slice(0,None)
 
-number_of_rows_in_groups = 3
-groups_to_use = slice(5,9)
-patches_to_use = slice(2,17)
+# number_of_rows_in_groups = 3
+# groups_to_use = slice(0,2)
+# patches_to_use = slice(0,5)
 
 
 inside_radius_lettuce_matching_threshold = 200*SCALE
@@ -4405,7 +4405,7 @@ method = 'MST'
 # method = 'Old_method'
 
 
-scan_date = '2020-02-18'
+# scan_date = '2020-02-18'
 # scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
@@ -4418,7 +4418,7 @@ scan_date = '2020-02-18'
 # scan_date = '2020-06-05_35m_0875mEW_125mNS'
 # scan_date = '2020-06-05_hardware_north'
 # scan_date = '2020-06-05_hardware_south'
-# scan_date = 'hardware_f6,7_summer_shade'
+scan_date = 'hardware_f6,7_summer_shade'
 # scan_date = 'hardware_f6,7_summer_suntest061620'
 # scan_date = 'software_f6,7_summer_shade'
 
