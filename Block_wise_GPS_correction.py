@@ -147,10 +147,11 @@ def histogram_equalization(img):
 
 
 
-def load_preprocess_image(address):
+def load_preprocess_image(address,hist_eq=False):
 	img = cv2.imread(address)
 	img = cv2.resize(img,(PATCH_SIZE[1],PATCH_SIZE[0]))
-	img = histogram_equalization(img)
+	if hist_eq:
+		img = histogram_equalization(img)
 	img = img.astype('uint8')
 	img_g = convert_to_gray(img)
 
@@ -1488,7 +1489,7 @@ def parallel_patch_creator(patch):
 	if os.path.exists('{0}/{1}_SIFT.data'.format(SIFT_folder,patch.name.replace('.tif',''))) and override_sifts==False:
 		return
 
-	patch.load_img()
+	patch.load_img(True)
 	img = patch.rgb_img
 	kp,desc = detect_SIFT_key_points(img,0,0,PATCH_SIZE[1],PATCH_SIZE[0])
 
@@ -2210,10 +2211,10 @@ class Patch:
 		gc.collect()
 
 
-	def load_img(self):
+	def load_img(self,hist_eq=False):
 		global patch_folder
 
-		img,img_g = load_preprocess_image('{0}/{1}'.format(patch_folder,self.name))
+		img,img_g = load_preprocess_image('{0}/{1}'.format(patch_folder,self.name),hist_eq)
 		self.rgb_img = img
 		self.gray_img = img_g
 
