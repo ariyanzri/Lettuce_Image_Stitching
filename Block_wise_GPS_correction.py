@@ -2376,7 +2376,7 @@ class Patch:
 
 		H,percentage_inliers,scale,theta = find_homography(matches,kp2,kp1,overlap1,overlap2)
 
-		if percentage_inliers<0.15:
+		if percentage_inliers<0.1:
 			return None
 
 		# H,percentage_inliers = find_translation(matches,kp2,kp1)
@@ -3555,7 +3555,7 @@ class Field:
 			for patch in group.patches:
 				args_list.append(patch)
 		
-		processes = multiprocessing.Pool(no_of_cores_to_use)
+		processes = multiprocessing.Pool(no_of_cores_to_use_max)
 		processes.map(parallel_patch_creator,args_list)
 		processes.close()
 
@@ -4310,6 +4310,7 @@ def main(scan_date):
 	else:
 		# HPC
 		print('RUNNING ON -- {0} --'.format(server))
+		discard_right_flag = False
 		field = Field()
 		field.create_patches_SIFT_files()
 		field.draw_and_save_field(is_old=True)
@@ -4326,7 +4327,7 @@ def main(scan_date):
 
 
 server_core = {'coge':20,'laplace.cs.arizona.edu':10,'ariyan':4}
-server_core_max = {'coge':60,'laplace.cs.arizona.edu':30,'ariyan':4}
+server_core_max = {'coge':45,'laplace.cs.arizona.edu':30,'ariyan':4}
 
 server = socket.gethostname()
 if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
@@ -4352,7 +4353,7 @@ patches_to_use = slice(0,None)
 
 
 inside_radius_lettuce_matching_threshold = 200*SCALE
-discard_right_flag = False
+discard_right_flag = True
 
 override_sifts = True
 
@@ -4366,7 +4367,7 @@ method = 'MST'
 
 
 # scan_date = '2020-02-18'
-scan_date = '2020-01-08'
+# scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
@@ -4379,7 +4380,7 @@ scan_date = '2020-01-08'
 # scan_date = '2020-06-05_hardware_north'
 # scan_date = '2020-06-05_hardware_south'
 # scan_date = 'hardware_f6,7_summer_shade'
-# scan_date = 'hardware_f6,7_summer_suntest061620'
+scan_date = 'hardware_f6,7_summer_suntest061620'
 # scan_date = 'software_f6,7_summer_shade'
 
 
