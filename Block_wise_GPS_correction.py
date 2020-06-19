@@ -32,8 +32,8 @@ from collections import OrderedDict,Counter
 # PATCH_SIZE = (330, 247) # 0.1
 # SCALE = 0.1
 
-# PATCH_SIZE = (659, 494) # 0.2
-# SCALE = 0.2
+PATCH_SIZE = (659, 494) # 0.2
+SCALE = 0.2
 
 # PATCH_SIZE = (989, 742) # 0.3
 # SCALE = 0.3
@@ -41,8 +41,8 @@ from collections import OrderedDict,Counter
 # PATCH_SIZE = (1318, 989) # 0.4
 # SCALE = 0.4
 
-PATCH_SIZE = (1648, 1236) # 0.5 
-SCALE = 0.5
+# PATCH_SIZE = (1648, 1236) # 0.5 
+# SCALE = 0.5
 
 # PATCH_SIZE = (1978, 1483) # 0.6
 # SCALE = 0.6
@@ -78,10 +78,10 @@ REDUCTION_FACTOR = ORTHO_SCALE/SCALE
 OVERLAP_DISCARD_RATIO = 0.05
 CONTOUR_MATCHING_MIN_MATCH = 2
 
-# GPS_ERROR_Y = 0.0000005
-# GPS_ERROR_X = 0.000001
-GPS_ERROR_Y = 0.000001
-GPS_ERROR_X = 0.000002
+GPS_ERROR_Y = 0.0000005
+GPS_ERROR_X = 0.000001
+# GPS_ERROR_Y = 0.000001
+# GPS_ERROR_X = 0.000002
 
 FFT_PARALLEL_CORES_TO_USE = 20
 
@@ -135,13 +135,18 @@ def convert_to_gray(img):
 	return img_g
 
 def histogram_equalization(img):
-	channel_0 = cv2.equalizeHist(img[:,:,0])
-	channel_1 = cv2.equalizeHist(img[:,:,1])
-	channel_2 = cv2.equalizeHist(img[:,:,2])
+	if len(img.shape) == 2:
+		channel_0 = cv2.equalizeHist(img[:,:])
 
-	img[:,:,0] = channel_0
-	img[:,:,1] = channel_1
-	img[:,:,2] = channel_2
+		img[:,:] = channel_0
+	else:
+		channel_0 = cv2.equalizeHist(img[:,:,0])
+		channel_1 = cv2.equalizeHist(img[:,:,1])
+		channel_2 = cv2.equalizeHist(img[:,:,2])
+
+		img[:,:,0] = channel_0
+		img[:,:,1] = channel_1
+		img[:,:,2] = channel_2
 
 	return img
 
@@ -154,6 +159,8 @@ def load_preprocess_image(address,hist_eq=False):
 		img = histogram_equalization(img)
 	img = img.astype('uint8')
 	img_g = convert_to_gray(img)
+	# if hist_eq:
+	# 	img_g = histogram_equalization(img_g)
 
 	# cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
 	# cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
@@ -2377,9 +2384,9 @@ class Patch:
 			return None
 
 		# matches = get_good_matches(desc2,desc1)
-		# matches = get_top_percentage_matches(desc2,desc1,kp2,kp1)
+		matches = get_top_percentage_matches(desc2,desc1,kp2,kp1)
 		# matches = get_top_n_matches(desc2,desc1,kp2,kp1,50)
-		matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1,self,neighbor,True)
+		# matches = get_good_matches_based_on_GPS_error(desc2,desc1,kp2,kp1,self,neighbor,True)
 
 		if matches is None or len(matches) == 0:
 			# print('match is none or len matches is 0.')
@@ -4017,127 +4024,131 @@ def test_function():
 	global patch_folder
 
 	patches = read_all_data()
-	lids = get_lids()
+	# lids = get_lids()
 
-	names = get_name_of_patches_with_lids(lids)
+	# names = get_name_of_patches_with_lids(lids)
 
-	cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
-	cv2.resizeWindow('fig2', 500,500)
+	# cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
+	# cv2.resizeWindow('fig2', 500,500)
 
-	for p in patches:	
-		if p.name == '5849eeb8-8bb1-4bd7-a0e6-4113afb91ea7_right.tif':
-			p.load_img()
-			lid_info = get_lid_in_patch(p.name,'d','d',p.gps)
-			print(lid_info)
-			cv2.imshow('fig2',p.rgb_img)
+	# for p in patches:	
+	# 	if p.name == '5849eeb8-8bb1-4bd7-a0e6-4113afb91ea7_right.tif':
+	# 		p.load_img()
+	# 		lid_info = get_lid_in_patch(p.name,'d','d',p.gps)
+	# 		print(lid_info)
+	# 		cv2.imshow('fig2',p.rgb_img)
+	# 		cv2.waitKey(0)
+
+	dd = []
+
+	for p1 in patches:
+		for p2 in patches:
+			if not p1.has_overlap(p2) and not p2.has_overlap(p1):
+				continue
+			if p1 == p2:
+				continue
+
+
+			overlap_1,overlap_2 = p1.get_overlap_rectangles(p2)
+			
+			p1.load_img(True)
+			p2.load_img(True)
+
+			if p1.rgb_img is None or p2.rgb_img is None :
+				continue
+
+			try:
+				kp1,desc1 = detect_SIFT_key_points(p1.gray_img,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
+				kp2,desc2 = detect_SIFT_key_points(p2.gray_img,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
+			except Exception as e:
+				continue
+
+			if desc2 is None or desc1 is None or len(desc1) == 0 or len(desc2) == 0:
+				continue
+
+			matches = get_top_percentage_matches(desc1,desc2,kp1,kp2)
+
+
+			H,percentage_inliers,scale,theta = find_homography(matches,[k.pt for k in kp1],[k.pt for k in kp2],overlap_2,overlap_1)
+
+			print(len(matches),percentage_inliers,scale,theta)
+
+			img1 = p1.rgb_img
+			img2 = p2.rgb_img
+			cv2.rectangle(img1,(overlap_1[0],overlap_1[1]),(overlap_1[2],overlap_1[3]),(255,0,0),10)
+			cv2.rectangle(img2,(overlap_2[0],overlap_2[1]),(overlap_2[2],overlap_2[3]),(255,0,0),10)
+
+			img3 = cv2.hconcat([img1,img2])
+
+			
+
+			# draw_together([patches[0],patches[3]])
+			# patches[0].gps =add_to_gps_coord(patches[0].gps,0.00000009,0)
+			# img = Image.open('{0}/{1}'.format(patch_folder,patches[0].name))
+			# print(img.tag[33922])
+			# print(patches[0].gps.UL_coord)
+			# img.tag[33922] = (0.0, 0.0, 0.0, patches[0].gps.UL_coord[0], patches[0].gps.UL_coord[1], 0.0)
+			# print(img.tag[33922])
+			# img.save('{0}/{1}'.format(patch_folder,patches[0].name),tiffinfo=img.tag)
+			# img.close()
+
+			# draw_together([patches[0],patches[3]])
+			# kp,desc = detect_SIFT_key_points(img_g,0,0,img_g.shape[1],img_g.shape[0])
+
+			# img_g=cv2.drawKeypoints(img_g,kp,img_g)
+
+			# cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
+			# cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
+			# cv2.resizeWindow('fig1', 500,500)
+			# cv2.resizeWindow('fig2', 500,500)
+			# cv2.imshow('fig1',img1)
+			# cv2.imshow('fig2',img2)
+			# cv2.waitKey(0)
+
+
+			cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
+			cv2.resizeWindow('fig3', 700,700)
+			cv2.imshow('fig3',img3)
+			cv2.waitKey(0)
+			imgtmp = img3.copy()
+			good_count = 0
+			bad_count = 0
+
+			for m in matches:
+				# img3 = imgtmp.copy()
+
+				pp1 = kp1[m[0].queryIdx].pt
+				pp2 = kp2[m[0].trainIdx].pt
+
+				# print(pp1)
+				# print(pp2)
+				
+				GPS_p1 = (p1.gps.UL_coord[0] + pp1[0]*GPS_TO_IMAGE_RATIO[0] , p1.gps.UL_coord[1] - pp1[1]*GPS_TO_IMAGE_RATIO[1])
+				GPS_p2 = (p2.gps.UL_coord[0] + pp2[0]*GPS_TO_IMAGE_RATIO[0] , p2.gps.UL_coord[1] - pp2[1]*GPS_TO_IMAGE_RATIO[1])
+
+				diff = (abs(GPS_p2[0]-GPS_p1[0]),abs(GPS_p2[1]-GPS_p1[1]))
+				# print(m[0].distance,m[1].distance)
+				
+
+				if diff[0]<GPS_ERROR_X and diff[1]<GPS_ERROR_Y:
+					c = (0,255,0)
+					good_count+=1
+				else:
+					c = (0,0,255)
+					bad_count+=1
+					# print(diff)
+				
+				cv2.line(img3,(int(pp1[0]),int(pp1[1])),(int(pp2[0]+PATCH_SIZE[1]),int(pp2[1])),c,5)
+			
+			if (good_count+bad_count) <=7:
+				continue
+
+			dd.append(good_count/(good_count+bad_count))
+			# print(SCALE,good_count/(good_count+bad_count))
+			cv2.imshow('fig3',img3)
 			cv2.waitKey(0)
 
-	# dd = []
-
-	# for p1 in patches:
-	# 	for p2 in patches:
-	# 		if not p1.has_overlap(p2) and not p2.has_overlap(p1):
-	# 			continue
-	# 		if p1 == p2:
-	# 			continue
-
-
-	# 		overlap_1,overlap_2 = p1.get_overlap_rectangles(p2)
-			
-	# 		p1.load_img()
-	# 		p2.load_img()
-
-	# 		if p1.rgb_img is None or p2.rgb_img is None :
-	# 			continue
-
-	# 		try:
-	# 			kp1,desc1 = detect_SIFT_key_points(p1.rgb_img,overlap_1[0],overlap_1[1],overlap_1[2],overlap_1[3])
-	# 			kp2,desc2 = detect_SIFT_key_points(p2.rgb_img,overlap_2[0],overlap_2[1],overlap_2[2],overlap_2[3])
-	# 		except Exception as e:
-	# 			continue
-
-	# 		if desc2 is None or desc1 is None or len(desc1) == 0 or len(desc2) == 0:
-	# 			continue
-
-	# 		matches = get_all_matches(desc1,desc2)
-
-
-	# 		img1 = p1.rgb_img
-	# 		img2 = p2.rgb_img
-	# 		cv2.rectangle(img1,(overlap_1[0],overlap_1[1]),(overlap_1[2],overlap_1[3]),(255,0,0),10)
-	# 		cv2.rectangle(img2,(overlap_2[0],overlap_2[1]),(overlap_2[2],overlap_2[3]),(255,0,0),10)
-
-	# 		img3 = cv2.hconcat([img1,img2])
-
-			
-
-	# 		# draw_together([patches[0],patches[3]])
-	# 		# patches[0].gps =add_to_gps_coord(patches[0].gps,0.00000009,0)
-	# 		# img = Image.open('{0}/{1}'.format(patch_folder,patches[0].name))
-	# 		# print(img.tag[33922])
-	# 		# print(patches[0].gps.UL_coord)
-	# 		# img.tag[33922] = (0.0, 0.0, 0.0, patches[0].gps.UL_coord[0], patches[0].gps.UL_coord[1], 0.0)
-	# 		# print(img.tag[33922])
-	# 		# img.save('{0}/{1}'.format(patch_folder,patches[0].name),tiffinfo=img.tag)
-	# 		# img.close()
-
-	# 		# draw_together([patches[0],patches[3]])
-	# 		# kp,desc = detect_SIFT_key_points(img_g,0,0,img_g.shape[1],img_g.shape[0])
-
-	# 		# img_g=cv2.drawKeypoints(img_g,kp,img_g)
-
-	# 		# cv2.namedWindow('fig1',cv2.WINDOW_NORMAL)
-	# 		# cv2.namedWindow('fig2',cv2.WINDOW_NORMAL)
-	# 		# cv2.resizeWindow('fig1', 500,500)
-	# 		# cv2.resizeWindow('fig2', 500,500)
-	# 		# cv2.imshow('fig1',img1)
-	# 		# cv2.imshow('fig2',img2)
-	# 		# cv2.waitKey(0)
-
-
-	# 		cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
-	# 		cv2.resizeWindow('fig3', 700,700)
-	# 		cv2.imshow('fig3',img3)
-	# 		cv2.waitKey(0)
-	# 		imgtmp = img3.copy()
-	# 		good_count = 0
-	# 		bad_count = 0
-
-	# 		for m in matches:
-	# 			# img3 = imgtmp.copy()
-
-	# 			pp1 = kp1[m[0].queryIdx].pt
-	# 			pp2 = kp2[m[0].trainIdx].pt
-
-	# 			# print(pp1)
-	# 			# print(pp2)
-				
-	# 			GPS_p1 = (p1.gps.UL_coord[0] + pp1[0]*GPS_TO_IMAGE_RATIO[0] , p1.gps.UL_coord[1] - pp1[1]*GPS_TO_IMAGE_RATIO[1])
-	# 			GPS_p2 = (p2.gps.UL_coord[0] + pp2[0]*GPS_TO_IMAGE_RATIO[0] , p2.gps.UL_coord[1] - pp2[1]*GPS_TO_IMAGE_RATIO[1])
-
-	# 			diff = (abs(GPS_p2[0]-GPS_p1[0]),abs(GPS_p2[1]-GPS_p1[1]))
-	# 			# print(m[0].distance,m[1].distance)
-				
-
-	# 			if diff[0]<GPS_ERROR_X and diff[1]<GPS_ERROR_Y:
-	# 				c = (0,255,0)
-	# 				good_count+=1
-	# 			else:
-	# 				c = (0,0,255)
-	# 				bad_count+=1
-	# 				# print(diff)
-				
-	# 			cv2.line(img3,(int(pp1[0]),int(pp1[1])),(int(pp2[0]+PATCH_SIZE[1]),int(pp2[1])),c,5)
-			
-	# 		if (good_count+bad_count) <=7:
-	# 			continue
-
-	# 		dd.append(good_count/(good_count+bad_count))
-	# 		# print(SCALE,good_count/(good_count+bad_count))
-	# 		cv2.imshow('fig3',img3)
-	# 		cv2.waitKey(0)
-
-	# print(SCALE,statistics.mean(dd),statistics.stdev(dd))
+	print(SCALE,statistics.mean(dd),statistics.stdev(dd))
 
 
 def main(scan_date):
@@ -4199,9 +4210,9 @@ def main(scan_date):
 
 		field = Field()
 		# lettuce_coords = read_lettuce_heads_coordinates()
-		field.create_patches_SIFT_files()
+		# field.create_patches_SIFT_files()
 		
-		field.draw_and_save_field(is_old=True)
+		# field.draw_and_save_field(is_old=True)
 		field.correct_field()
 		field.draw_and_save_field(is_old=False)
 		field.save_new_coordinate()
@@ -4394,7 +4405,7 @@ method = 'MST'
 # method = 'Old_method'
 
 
-# scan_date = '2020-02-18'
+scan_date = '2020-02-18'
 # scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
@@ -4408,7 +4419,7 @@ method = 'MST'
 # scan_date = '2020-06-05_hardware_north'
 # scan_date = '2020-06-05_hardware_south'
 # scan_date = 'hardware_f6,7_summer_shade'
-scan_date = 'hardware_f6,7_summer_suntest061620'
+# scan_date = 'hardware_f6,7_summer_suntest061620'
 # scan_date = 'software_f6,7_summer_shade'
 
 
