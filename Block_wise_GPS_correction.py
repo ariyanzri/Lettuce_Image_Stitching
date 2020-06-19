@@ -4347,8 +4347,8 @@ groups_to_use = slice(0,None)
 patches_to_use = slice(0,None)
 
 number_of_rows_in_groups = 3
-groups_to_use = slice(5,7)
-patches_to_use = slice(5,15)
+groups_to_use = slice(5,9)
+patches_to_use = slice(2,17)
 
 
 inside_radius_lettuce_matching_threshold = 200*SCALE
