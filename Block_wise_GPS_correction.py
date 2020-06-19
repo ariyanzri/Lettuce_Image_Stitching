@@ -32,14 +32,14 @@ from collections import OrderedDict,Counter
 # PATCH_SIZE = (330, 247) # 0.1
 # SCALE = 0.1
 
-# PATCH_SIZE = (659, 494) # 0.2
-# SCALE = 0.2
+PATCH_SIZE = (659, 494) # 0.2
+SCALE = 0.2
 
 # PATCH_SIZE = (989, 742) # 0.3
 # SCALE = 0.3
 
-PATCH_SIZE = (1318, 989) # 0.4
-SCALE = 0.4
+# PATCH_SIZE = (1318, 989) # 0.4
+# SCALE = 0.4
 
 # PATCH_SIZE = (1648, 1236) # 0.5 
 # SCALE = 0.5
@@ -2388,8 +2388,10 @@ class Patch:
 
 		percentage_inliers = round(percentage_inliers*100,2)
 
-		# dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
-		dissimilarity = - percentage_inliers*num_matches
+		print(percentage_inliers*num_matches)
+		
+		dissimilarity = get_dissimilarity_on_overlaps(neighbor,self,H)
+		# dissimilarity = - percentage_inliers*num_matches
 		# dissimilarity = 1 - percentage_inliers
 
 		if dissimilarity == -1:
@@ -4221,38 +4223,38 @@ def main(scan_date):
 
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
-		# field = Field()
-		# # field.create_patches_SIFT_files()
-		# # field.calculate_scale_effect(200)
-		# # field.save_plot()
-		# # field.draw_and_save_field(is_old=True)
+		field = Field()
+		field.create_patches_SIFT_files()
+		# field.calculate_scale_effect(200)
+		# field.save_plot()
+		field.draw_and_save_field(is_old=True)
 
-		# field.correct_field()
+		field.correct_field()
 
-		# field.draw_and_save_field(is_old=False)
-		# field.save_new_coordinate()
+		field.draw_and_save_field(is_old=False)
+		field.save_new_coordinate()
 
 		# print('------------------ ERROR MEASUREMENT ------------------ ')
 
-		print('*** Before')
+		# print('*** Before')
 
-		# err = calculate_error_of_correction(True)
-		# print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# # err = calculate_error_of_correction(True)
+		# # print("({:.10f},{:.10f})".format(err[0],err[1]))
 
-		field = Field(False)
-		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		np.save('RMSE_before.npy',res)
-		print(np.mean(res[:,3]))
+		# field = Field(False)
+		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# np.save('RMSE_before.npy',res)
+		# print(np.mean(res[:,3]))
 
-		print('*** After')
+		# print('*** After')
 
-		# err = calculate_error_of_correction()
-		# print("({:.10f},{:.10f})".format(err[0],err[1]))
+		# # err = calculate_error_of_correction()
+		# # print("({:.10f},{:.10f})".format(err[0],err[1]))
 
-		field = Field(True)
-		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		np.save('RMSE_after.npy',res)
-		print(np.mean(res[:,3]))
+		# field = Field(True)
+		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# np.save('RMSE_after.npy',res)
+		# print(np.mean(res[:,3]))
 
 		# ------------
 		# err = calculate_error_of_correction(True)
@@ -4343,9 +4345,9 @@ number_of_rows_in_groups = 10
 groups_to_use = slice(0,None)
 patches_to_use = slice(0,None)
 
-# number_of_rows_in_groups = 4
-# groups_to_use = slice(5,8)
-# patches_to_use = slice(5,20)
+number_of_rows_in_groups = 3
+groups_to_use = slice(5,7)
+patches_to_use = slice(5,15)
 
 
 inside_radius_lettuce_matching_threshold = 200*SCALE
