@@ -986,6 +986,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 	x,y,r = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
 	
 	# print(x,y)
+	print(r)
 	cv2.circle(rgb_img,(x,y),r,(0,255,0),thickness=5)
 	cv2.imshow('a',rgb_img)
 	cv2.waitKey(0)
