@@ -4287,15 +4287,15 @@ def main(scan_date):
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
 		field = Field()
-		field.create_patches_SIFT_files()
+		# field.create_patches_SIFT_files()
 		# field.calculate_scale_effect(200)
-		# field.save_plot()
-		field.draw_and_save_field(is_old=True)
+		field.save_plot()
+		# field.draw_and_save_field(is_old=True)
 
-		field.correct_field()
+		# field.correct_field()
 
-		field.draw_and_save_field(is_old=False)
-		field.save_new_coordinate()
+		# field.draw_and_save_field(is_old=False)
+		# field.save_new_coordinate()
 
 		# print('------------------ ERROR MEASUREMENT ------------------ ')
 
