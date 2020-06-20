@@ -4354,6 +4354,7 @@ def main(scan_date):
 		for p,l,x,y in field.detected_lid_patches:
 			p.load_img()
 			print(l)
+			cv2.circle(p.rgb_img,(x,y),10,(0,0,255),-1)
 			cv2.imshow('fig3',p.rgb_img)
 			cv2.waitKey(0)
 
