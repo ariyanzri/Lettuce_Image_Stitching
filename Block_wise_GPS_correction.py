@@ -3483,7 +3483,7 @@ class Field:
 		for x,y,r,l,pn,crd in results:
 			if r!=-1:
 				
-				patch = [p for p in possible_patches if p.name = pn]
+				patch = [p for p in possible_patches if p.name == pn]
 				patch = patch[0]
 
 				if patch not in final_list_patches:
