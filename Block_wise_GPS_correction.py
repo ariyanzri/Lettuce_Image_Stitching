@@ -951,10 +951,10 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 	(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
 
 
-	cv2.namedWindow('a',cv2.WINDOW_NORMAL)
-	cv2.resizeWindow('a',500,500)
-	cv2.imshow('a',img)
-	cv2.waitKey(0)
+	# cv2.namedWindow('a',cv2.WINDOW_NORMAL)
+	# cv2.resizeWindow('a',500,500)
+	# cv2.imshow('a',img)
+	# cv2.waitKey(0)
 
 	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(OPEN_MORPH_LID_SIZE*SCALE), int(OPEN_MORPH_LID_SIZE*SCALE)))
 	img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
@@ -963,8 +963,8 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 	img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
 	
-	cv2.imshow('a',img)
-	cv2.waitKey(0)
+	# cv2.imshow('a',img)
+	# cv2.waitKey(0)
 	
 
 
@@ -994,10 +994,10 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 	x,y,r = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
 	
 	# print(x,y)
-	print(r)
-	cv2.circle(rgb_img,(x,y),r,(0,255,0),thickness=5)
-	cv2.imshow('a',rgb_img)
-	cv2.waitKey(0)
+	# print(r)
+	# cv2.circle(rgb_img,(x,y),r,(0,255,0),thickness=5)
+	# cv2.imshow('a',rgb_img)
+	# cv2.waitKey(0)
 
 	# cv2.imwrite('tmp-{0}-{1}.jpg'.format(x,y),rgb_img)
 
