@@ -4430,7 +4430,7 @@ method = 'MST'
 
 
 # scan_date = '2020-02-18'
-# scan_date = '2020-01-08'
+scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
@@ -4444,7 +4444,7 @@ method = 'MST'
 # scan_date = '2020-06-05_hardware_south'
 # scan_date = 'hardware_f6,7_summer_shade'
 # scan_date = 'hardware_f6,7_summer_suntest061620'
-scan_date = 'software_f6,7_summer_shade'
+# scan_date = 'software_f6,7_summer_shade'
 
 
 # -----------------------------------------------------------------------------------------------------------------------------------
