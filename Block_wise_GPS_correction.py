@@ -874,7 +874,7 @@ def get_unique_lists(xs,ys):
 
 	return xs[ind],ys[ind]
 
-def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=10):
+def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=300,ransac_min_num_fit=10):
 	global patch_folder
 	img = cv2.imread('{0}/{1}'.format(patch_folder,img_name))
 	img = cv2.resize(img,(int(img.shape[1]*SCALE),int(img.shape[0]*SCALE)))
