@@ -65,6 +65,9 @@ REDUCTION_FACTOR = ORTHO_SCALE/SCALE
 OVERLAP_DISCARD_RATIO = 0.05
 CONTOUR_MATCHING_MIN_MATCH = 2
 
+OPEN_MORPH_LID_SIZE = 40
+CLOSE_MORPH_LID_SIZE = 220
+
 GPS_ERROR_Y = 0.0000005
 GPS_ERROR_X = 0.000001
 # GPS_ERROR_Y = 0.000001
@@ -953,10 +956,10 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 	cv2.imshow('a',img)
 	cv2.waitKey(0)
 
-	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(40*SCALE), int(40*SCALE)))
+	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(OPEN_MORPH_LID_SIZE*SCALE), int(OPEN_MORPH_LID_SIZE*SCALE)))
 	img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
 
-	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(220*SCALE), int(220*SCALE)))
+	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(CLOSE_MORPH_LID_SIZE*SCALE), int(CLOSE_MORPH_LID_SIZE*SCALE)))
 	img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
 	
