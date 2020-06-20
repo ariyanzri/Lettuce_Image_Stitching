@@ -25,60 +25,6 @@ from collections import OrderedDict,Counter
 # from PIL import Image
 # from PIL.TiffTags import TAGS
 
-# -----------------------------------------------------------------------------------------------------------------------------------
-# ------------------------------------------------------- Settings ------------------------------------------------------------------
-# -----------------------------------------------------------------------------------------------------------------------------------
-
-# SCALE = 0.1
-SCALE = 0.2
-# SCALE = 0.3
-# SCALE = 0.4
-# SCALE = 0.5
-# SCALE = 0.6
-# SCALE = 0.7
-# SCALE = 0.8
-# SCALE = 0.9
-# SCALE = 1
-
-
-
-PATCH_SIZE = (int(3296*SCALE),int(2472*SCALE))
-
-LID_SIZE_AT_SCALE_1 = (400*SCALE,600*SCALE)
-
-# PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
-PATCH_SIZE_GPS = (-1,-1)
-
-HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-
-PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
-GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
-MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
-MINIMUM_NUMBER_OF_MATCHES = 100
-RANSAC_MAX_ITER = 1000
-RANSAC_ERROR_THRESHOLD = 5
-PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
-LETTUCE_AREA_THRESHOLD = 5000
-ORTHO_SCALE = 0.05
-REDUCTION_FACTOR = ORTHO_SCALE/SCALE
-# REDUCTION_FACTOR = 0.05
-OVERLAP_DISCARD_RATIO = 0.05
-CONTOUR_MATCHING_MIN_MATCH = 2
-
-OPEN_MORPH_LID_SIZE = 40
-CLOSE_MORPH_LID_SIZE = 220
-
-GPS_ERROR_Y = 0.0000005
-GPS_ERROR_X = 0.000001
-# GPS_ERROR_Y = 0.000001
-# GPS_ERROR_X = 0.000002
-
-FFT_PARALLEL_CORES_TO_USE = 20
-
-# -----------------------------------------------------------------------------------------------------------------------------------
-# -----------------------------------------------------------------------------------------------------------------------------------
-# -----------------------------------------------------------------------------------------------------------------------------------
-
 
 def remove_shadow(image):
 
@@ -4399,9 +4345,9 @@ def main(scan_date):
 
 		# ------------
 
-		field = Field(True)
-		field.detect_lid_patches()
-		print(field.calculate_lid_based_error())
+		# field = Field()
+		# field.detect_lid_patches()
+		# print(field.calculate_lid_based_error())
 		# cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
 		# cv2.resizeWindow('fig3', 700,700)
 
@@ -4451,6 +4397,59 @@ else:
 	no_of_cores_to_use_max = server_core_max[server]
 
 
+# -----------------------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------- Settings ------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------------------
+
+# SCALE = 0.1
+SCALE = 0.2
+# SCALE = 0.3
+# SCALE = 0.4
+# SCALE = 0.5
+# SCALE = 0.6
+# SCALE = 0.7
+# SCALE = 0.8
+# SCALE = 0.9
+# SCALE = 1
+
+
+
+PATCH_SIZE = (int(3296*SCALE),int(2472*SCALE))
+
+LID_SIZE_AT_SCALE_1 = (400*SCALE,600*SCALE)
+
+# PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
+PATCH_SIZE_GPS = (-1,-1)
+
+HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
+
+PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
+GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
+MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
+MINIMUM_NUMBER_OF_MATCHES = 100
+RANSAC_MAX_ITER = 1000
+RANSAC_ERROR_THRESHOLD = 5
+PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
+LETTUCE_AREA_THRESHOLD = 5000
+ORTHO_SCALE = 0.05
+REDUCTION_FACTOR = ORTHO_SCALE/SCALE
+# REDUCTION_FACTOR = 0.05
+OVERLAP_DISCARD_RATIO = 0.05
+CONTOUR_MATCHING_MIN_MATCH = 2
+
+OPEN_MORPH_LID_SIZE = 40
+CLOSE_MORPH_LID_SIZE = 220
+
+GPS_ERROR_Y = 0.0000005
+GPS_ERROR_X = 0.000001
+# GPS_ERROR_Y = 0.000001
+# GPS_ERROR_X = 0.000002
+
+FFT_PARALLEL_CORES_TO_USE = 20
+
+# -----------------------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------------------------------------------------------------
 # -------------------------------------------------- Runtime Settings ---------------------------------------------------------------
