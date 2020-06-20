@@ -955,8 +955,8 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(50*SCALE/2), int(50*SCALE/2)))
 	img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
 	
-	# cv2.namedWindow('a',cv2.WINDOW_NORMAL)
-	# cv2.resizeWindow('a',500,500)
+	cv2.namedWindow('a',cv2.WINDOW_NORMAL)
+	cv2.resizeWindow('a',500,500)
 	# cv2.imshow('a',img)
 	# cv2.waitKey(0)
 
@@ -986,7 +986,10 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 	x,y,r = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
 	
 	# print(x,y)
-	# cv2.circle(rgb_img,(x,y),20,(0,255,0),thickness=-1)
+	cv2.circle(rgb_img,(x,y),20,(0,255,0),thickness=-1)
+	cv2.imshow('a',rgb_img)
+	cv2.waitKey(0)
+	
 	# cv2.imwrite('tmp-{0}-{1}.jpg'.format(x,y),rgb_img)
 
 	if r >= LID_SIZE_AT_SCALE_1[0] and r <= LID_SIZE_AT_SCALE_1[1]:
