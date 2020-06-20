@@ -986,10 +986,10 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 	x,y,r = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
 	
 	# print(x,y)
-	cv2.circle(rgb_img,(x,y),20,(0,255,0),thickness=-1)
+	cv2.circle(rgb_img,(x,y),r,(0,255,0),thickness=5)
 	cv2.imshow('a',rgb_img)
 	cv2.waitKey(0)
-	
+
 	# cv2.imwrite('tmp-{0}-{1}.jpg'.format(x,y),rgb_img)
 
 	if r >= LID_SIZE_AT_SCALE_1[0] and r <= LID_SIZE_AT_SCALE_1[1]:
@@ -4412,7 +4412,7 @@ def main(scan_date):
 
 
 server_core = {'coge':20,'laplace.cs.arizona.edu':10,'ariyan':4}
-server_core_max = {'coge':50,'laplace.cs.arizona.edu':30,'ariyan':4}
+server_core_max = {'coge':50,'laplace.cs.arizona.edu':1,'ariyan':4}
 
 server = socket.gethostname()
 if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
