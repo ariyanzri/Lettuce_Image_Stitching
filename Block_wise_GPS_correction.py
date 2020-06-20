@@ -3499,12 +3499,29 @@ class Field:
 				patch = patch[0]
 
 				if patch not in [f[0] for f in final_list_patches]:
-					final_list_patches.append((patch,l))
+					final_list_patches.append((patch,l,x,y))
 
 		print('Detected {0} distinct lid patches in the field.'.format(len(final_list_patches)))
 		sys.stdout.flush()
 
 		self.detected_lid_patches = final_list_patches
+
+	def calculate_lid_based_error(self):
+		distances = []
+
+		lids = get_lids()
+		
+		for p,l,x,y in self.detected_lid_patches:
+
+			old_lid = lids[l]
+
+			point = p.convert_image_to_GPS_coordinate((x,y))
+			
+			distances.append(math.sqrt((old_lid[0]-point[0])**2+(old_lid[1]-point[1])**2))
+
+		print(distances)
+
+		return statistics.mean(distances),statistics.stdev(distances)
 
 
 	def initialize_GPS_size(self,p):
@@ -4384,14 +4401,15 @@ def main(scan_date):
 
 		field = Field()
 		field.detect_lid_patches()
-		cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('fig3', 700,700)
+		print(field.calculate_lid_based_error())
+		# cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('fig3', 700,700)
 
-		for p,l in field.detected_lid_patches:
-			p.load_img()
-			print(l)
-			cv2.imshow('fig3',p.rgb_img)
-			cv2.waitKey(0)
+		# for p,l,x,y in field.detected_lid_patches:
+		# 	p.load_img()
+		# 	print(l)
+		# 	cv2.imshow('fig3',p.rgb_img)
+		# 	cv2.waitKey(0)
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
