@@ -953,9 +953,9 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 	cv2.imshow('a',img)
 	cv2.waitKey(0)
 
-	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(50*SCALE), int(50*SCALE)))
+	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(30*SCALE), int(30*SCALE)))
 	img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
-	
+
 	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(200*SCALE), int(200*SCALE)))
 	img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
