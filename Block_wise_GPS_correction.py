@@ -3463,7 +3463,7 @@ class Field:
 			for p in g.patches:
 
 				for l in lids:
-					if (p.gps.is_coord_inside(lids[l]) or p.gps.is_point_near(lids[l],PATCH_SIZE_GPS[1])) and (p not in lid_patches):
+					if (p.gps.is_coord_inside(lids[l]) or p.gps.is_point_near(lids[l],PATCH_SIZE_GPS[1])) and (p not in [ptch[0] for ptch in lid_patches]):
 						lid_patches.append((p,l))
 
 		return lid_patches
@@ -3487,7 +3487,7 @@ class Field:
 		for x,y,r,l,pn,crd in results:
 			if r!=-1:
 				
-				patch = [p for p in possible_patches if p.name == pn]
+				patch = [p[0] for p in possible_patches if p[0].name == pn]
 				patch = patch[0]
 
 				if patch not in final_list_patches:
