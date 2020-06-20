@@ -943,7 +943,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 
 	max_intensity = np.amax(img)
 	
-	t = max_intensity-10
+	t = max_intensity-1
 	
 	(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
 
@@ -957,8 +957,8 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 	
 	cv2.namedWindow('a',cv2.WINDOW_NORMAL)
 	cv2.resizeWindow('a',500,500)
-	# cv2.imshow('a',img)
-	# cv2.waitKey(0)
+	cv2.imshow('a',img)
+	cv2.waitKey(0)
 
 	shp = np.shape(img)
 
