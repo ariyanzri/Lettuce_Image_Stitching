@@ -939,7 +939,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 	cv2.resizeWindow('a',500,500)
 	cv2.imshow('a',img)
 	cv2.waitKey(0)
-	
+
 	img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 	
 	# img = adjust_gamma(img,2.5)
@@ -953,10 +953,10 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=100,ransac_min_num_fit=1
 
 
 
-	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(200*SCALE/2), int(200*SCALE/2)))
+	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(200*SCALE), int(200*SCALE)))
 	img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
-	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(50*SCALE/2), int(50*SCALE/2)))
+	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(50*SCALE), int(50*SCALE)))
 	img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
 	
 	
