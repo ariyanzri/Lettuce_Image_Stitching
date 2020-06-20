@@ -3449,13 +3449,58 @@ class Field:
 		global coordinates_file
 
 		self.groups = self.initialize_field(use_corrected)
-		
+		self.detected_lid_patches = []
+	
+	def get_patches_with_possible_lids(self):
+		lids = get_lids()
+		lid_patches = []
+
+		for g in self.groups:
+			for p in g.patches:
+
+				for l in lids:
+					if (p.gps.is_coord_inside(lids[l]) or p.gps.is_point_near(lids[l],2*PATCH_SIZE_GPS[0])) and (p not in lid_patches):
+						lid_patches.append(p)
+
+		return lid_patches
+
+	def detect_lid_patches(self):
+		lids = get_lids()
+		possible_patches = self.get_patches_with_possible_lids()
+
+		args_list = []
+
+		for p in possible_patches:
+			args_list.append((p.name,-1,p.name,p.gps))
+
+		processes = MyPool(no_of_cores_to_use_max)
+
+		results = processes.map(get_lid_in_patch_helper,args_list)
+		processes.close()
+
+		final_list_patches = []
+
+		for x,y,r,l,pn,crd in results:
+			if r!=-1:
+				
+				patch = [p for p in possible_patches if p.name = pn]
+				patch = patch[0]
+
+				if patch not in final_list_patches:
+					final_list_patches.append(patch)
+
+		print('Detected {0} distinct lid patches in the field.'.format(len(final_list_patches)))
+		sys.stdout.flush()
+
+		self.detected_lid_patches = final_list_patches
+
+
 	def initialize_GPS_size(self,p):
 		global PATCH_SIZE_GPS,GPS_TO_IMAGE_RATIO,PATCH_SIZE
 
 		PATCH_SIZE_GPS = (p.gps.UR_coord[0]-p.gps.UL_coord[0],p.gps.UL_coord[1]-p.gps.LL_coord[1])
 		GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
-		
+
 	def initialize_field(self,use_corrected):
 		global coordinates_file, number_of_rows_in_groups, groups_to_use
 
@@ -3580,18 +3625,6 @@ class Field:
 		processes.map(parallel_patch_creator,args_list)
 		processes.close()
 
-	def get_patches_with_possible_lids(self):
-		lids = get_lids()
-		lid_patches = []
-
-		for g in self.groups:
-			for p in g.patches:
-
-				for l in lids:
-					if (p.gps.is_coord_inside(lids[l]) or p.gps.is_point_near(lids[l],2*PATCH_SIZE_GPS[0])) and (p not in lid_patches):
-						lid_patches.append(p)
-
-		return lid_patches
 
 	def save_plot(self,show_possible_lids=True):
 		global plot_npy_file
@@ -4286,10 +4319,11 @@ def main(scan_date):
 
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
-		field = Field(True)
+		# field = Field()
+
 		# field.create_patches_SIFT_files()
 		# field.calculate_scale_effect(200)
-		field.save_plot()
+		# field.save_plot()
 		# field.draw_and_save_field(is_old=True)
 
 		# field.correct_field()
@@ -4336,30 +4370,15 @@ def main(scan_date):
 
 		# ------------
 
-		# p1 = field.groups[0].patches[3]
-		# p1.get_lettuce_contours_centers(lettuce_coords)
-		# p1.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
+		field = Field()
+		field.detect_lid_patches()
+		cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('fig3', 700,700)
 
-		# r = Row(field.groups[0].rows[0])
+		for p in field.detected_lid_patches:
 
-		# draw_together(field.groups[0].patches)
-		# field.draw_and_save_field()
-		
-		# field.groups[0].load_all_patches_SIFT_points()
-		# new_patches = super_patch_pool_merging_method(field.groups[0].patches)
-		# field.draw_and_save_field()
-		# r.correct_row_by_matching_lettuce_contours()
-		# draw_together(new_patches)
-
-		# correct_patch_group_all_corrected_neighbors(field.groups[0].patches)
-		# print(calculate_error_of_correction(True))
-		# field.draw_and_save_field()
-		# field.groups[0].correct_internally()
-		# field.correct_field()
-		# field.groups[0].correct_internally()
-		# field.draw_and_save_field()
-		
-		# print(calculate_error_of_correction())
+			cv2.imshow('fig3',p.rgb_img)
+			cv2.waitKey(0)
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
