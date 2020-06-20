@@ -4399,7 +4399,7 @@ def main(scan_date):
 
 		# ------------
 
-		field = Field()
+		field = Field(True)
 		field.detect_lid_patches()
 		print(field.calculate_lid_based_error())
 		# cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
