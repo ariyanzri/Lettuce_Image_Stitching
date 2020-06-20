@@ -4286,7 +4286,7 @@ def main(scan_date):
 
 		# lettuce_coords = read_lettuce_heads_coordinates()
 
-		field = Field()
+		field = Field(True)
 		# field.create_patches_SIFT_files()
 		# field.calculate_scale_effect(200)
 		field.save_plot()
@@ -4364,9 +4364,9 @@ def main(scan_date):
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
 
-		# visualize_plot()
+		visualize_plot()
 
-		test_function()
+		# test_function()
 
 		
 	else:
