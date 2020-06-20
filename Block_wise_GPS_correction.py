@@ -3498,8 +3498,8 @@ class Field:
 				patch = [p[0] for p in possible_patches if p[0].name == pn]
 				patch = patch[0]
 
-				if patch not in final_list_patches:
-					final_list_patches.append(patch)
+				if patch not in [f[0] for f in final_list_patches]:
+					final_list_patches.append((patch,l))
 
 		print('Detected {0} distinct lid patches in the field.'.format(len(final_list_patches)))
 		sys.stdout.flush()
@@ -4387,8 +4387,9 @@ def main(scan_date):
 		cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
 		cv2.resizeWindow('fig3', 700,700)
 
-		for p in field.detected_lid_patches:
+		for p,l in field.detected_lid_patches:
 			p.load_img()
+			print(l)
 			cv2.imshow('fig3',p.rgb_img)
 			cv2.waitKey(0)
 
