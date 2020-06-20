@@ -4348,14 +4348,14 @@ def main(scan_date):
 		field = Field()
 		field.detect_lid_patches()
 		print(field.calculate_lid_based_error())
-		# cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
-		# cv2.resizeWindow('fig3', 700,700)
+		cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('fig3', 700,700)
 
-		# for p,l,x,y in field.detected_lid_patches:
-		# 	p.load_img()
-		# 	print(l)
-		# 	cv2.imshow('fig3',p.rgb_img)
-		# 	cv2.waitKey(0)
+		for p,l,x,y in field.detected_lid_patches:
+			p.load_img()
+			print(l)
+			cv2.imshow('fig3',p.rgb_img)
+			cv2.waitKey(0)
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
