@@ -3464,7 +3464,7 @@ class Field:
 
 				for l in lids:
 					if (p.gps.is_coord_inside(lids[l]) or p.gps.is_point_near(lids[l],PATCH_SIZE_GPS[1])) and (p not in lid_patches):
-						lid_patches.append(p)
+						lid_patches.append((p,l))
 
 		return lid_patches
 
@@ -3474,8 +3474,8 @@ class Field:
 
 		args_list = []
 
-		for p in possible_patches:
-			args_list.append((p.name,-1,p.name,p.gps))
+		for p,l in possible_patches:
+			args_list.append((p.name,l,p.name,p.gps))
 
 		processes = MyPool(no_of_cores_to_use_max)
 
