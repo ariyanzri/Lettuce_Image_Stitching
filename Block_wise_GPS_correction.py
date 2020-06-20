@@ -4376,7 +4376,7 @@ def main(scan_date):
 		cv2.resizeWindow('fig3', 700,700)
 
 		for p in field.detected_lid_patches:
-
+			p.load_img()
 			cv2.imshow('fig3',p.rgb_img)
 			cv2.waitKey(0)
 
