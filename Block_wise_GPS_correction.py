@@ -556,6 +556,8 @@ def visualize_plot():
 			c.append('green')
 		elif d[2] == 2:
 			c.append('blue')
+		elif d[2] == 4:
+			c.append('black')
 		else:
 			c.append('yellow')
 
@@ -850,7 +852,7 @@ def get_name_of_patches_with_lids(lids,use_not_corrected=False):
 			coord = GPS_Coordinate(upper_left,upper_right,lower_left,lower_right,center)
 			
 			for l in lids:
-				if coord.is_coord_inside(lids[l]) or coord.is_point_near(lids[l],PATCH_SIZE_GPS[1]):
+				if coord.is_coord_inside(lids[l]) or coord.is_point_near(lids[l],2*PATCH_SIZE_GPS[0]):
 					patches_names_with_lid.append((l,filename,coord))
 
 	return patches_names_with_lid
@@ -3578,8 +3580,23 @@ class Field:
 		processes.map(parallel_patch_creator,args_list)
 		processes.close()
 
-	def save_plot(self):
+	def get_patches_with_possible_lids(self):
+		lids = get_lids()
+		lid_patches = []
+
+		for g in self.groups:
+			for p in g.patches:
+
+				for l in lids:
+					if (p.gps.is_coord_inside(lids[l]) or p.gps.is_point_near(lids[l],2*PATCH_SIZE_GPS[0])) and (p not in lid_patches):
+						lid_patches.append(p)
+
+		return lid_patches
+
+	def save_plot(self,show_possible_lids=True):
 		global plot_npy_file
+
+		lid_patches = self.get_patches_with_possible_lids()
 
 		# result = []
 		# color = 0
@@ -3627,7 +3644,14 @@ class Field:
 					color = row_color[0]
 
 				for p in row:
-					result.append([p.gps.Center[0],p.gps.Center[1],color])
+
+					if show_possible_lids:
+						if p in lid_patches:
+							result.append([p.gps.Center[0],p.gps.Center[1],4])
+						else:
+							result.append([p.gps.Center[0],p.gps.Center[1],color])	
+					else:
+						result.append([p.gps.Center[0],p.gps.Center[1],color])
 		
 		np.save(plot_npy_file,np.array(result))	
 
