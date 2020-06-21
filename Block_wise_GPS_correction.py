@@ -4355,7 +4355,7 @@ def main(scan_date):
 		
 		# field.draw_and_save_field(is_old=True)
 
-		# field.correct_field()
+		field.correct_field()
 
 		# field.draw_and_save_field(is_old=False)
 
