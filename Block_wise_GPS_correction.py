@@ -4052,7 +4052,6 @@ def logger(corrected_patch,gps_diff,param,gid,step_id):
 
 
 def print_settings():
-	global correction_log_file
 
 	print('-------------------------------- SETTINGS --------------------------------')
 
