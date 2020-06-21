@@ -615,7 +615,7 @@ def get_good_matches_based_on_GPS_error(desc1,desc2,kp1,kp2,p1,p2,top_percent):
 
 		good = []
 
-		number_of_good_matches = int(math.floor(len(sorted_matches)*PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION))
+		number_of_good_matches = int(math.floor(len(sorted_matches)*PERCENTAGE_OF_GOOD_MATCHES))
 		good = sorted_matches[0:number_of_good_matches]
 
 	matches = np.asarray(good)
@@ -647,7 +647,7 @@ def get_top_percentage_matches(desc1,desc2,kp1,kp2):
 	# else:
 	# 	good += sorted_matches
 
-	number_of_good_matches = int(math.floor(len(sorted_matches)*PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION))
+	number_of_good_matches = int(math.floor(len(sorted_matches)*PERCENTAGE_OF_GOOD_MATCHES))
 	good = sorted_matches[0:number_of_good_matches]
 
 	matches = np.asarray(good)
@@ -947,7 +947,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 
 	# cv2.imwrite('tmp-{0}-{1}.jpg'.format(x,y),rgb_img)
 
-	if r >= LID_SIZE_AT_SCALE_1[0] and r <= LID_SIZE_AT_SCALE_1[1]:
+	if r >= LID_SIZE_AT_SCALE[0] and r <= LID_SIZE_AT_SCALE[1]:
 		return x,y,r,l,pname,coord
 	else:
 		return -1,-1,-1,-1,-1,-1
@@ -4051,6 +4051,47 @@ def logger(corrected_patch,gps_diff,param,gid,step_id):
 		f.write(string_log)
 
 
+def print_settings():
+	global correction_log_file
+
+	print('-------------------------------- SETTINGS --------------------------------')
+
+	print('- Current Server : {0}'.format(server))
+	print('- Correction Log File : {0}'.format(correction_log_file))
+	
+	print('- Methodology Settings ')
+	print('\t * Current Method: {0}'.format(method))
+	print('\t * Scan Name/Date: {0}'.format(scan_date))
+	print('\t * Discard right images: {0}'.format(discard_right_flag))
+	print('\t * Override SIFT files: {0}'.format(override_sifts))
+
+	print('- Basic Settings ')
+	print('\t * Scale of Images: {0}'.format(SCALE))
+	print('\t * Image Size in pixels (rows/y,columns/x): {0}'.format(PATCH_SIZE))
+	print('\t * Image Size in GPS (x,y): {0}'.format(PATCH_SIZE_GPS))
+	print('\t * Heigh ratio used in row seperation: {0}'.format(HEIGHT_RATIO_FOR_ROW_SEPARATION))
+	print('\t * Lid radious at current scale (min,max): {0}'.format(LID_SIZE_AT_SCALE))
+	
+	print('- Transformation, SIFT and RANSAC Settings ')
+	print('\t * Percentage of top matches to take: {0}'.format(PERCENTAGE_OF_GOOD_MATCHES))
+	print('\t * Minimum acceptable percentage of inliers: {0}'.format(MINIMUM_PERCENTAGE_OF_INLIERS))
+	print('\t * Minimum acceptable number of matches: {0}'.format(MINIMUM_NUMBER_OF_MATCHES))
+	print('\t * RANSAC max iterations: {0}'.format(RANSAC_MAX_ITER))
+	print('\t * Percentage of second to first match distance: {0}'.format(PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES))
+	print('\t * Minimum ratio for overlap: {0}'.format(OVERLAP_DISCARD_RATIO))
+	print('\t * Minimum number of plants to match in contours matching: {0}'.format(CONTOUR_MATCHING_MIN_MATCH))
+	print('\t * GPS Error (x,y): {0},{1}'.format(GPS_ERROR_X,GPS_ERROR_Y))
+	print('\t * Minimum lettuce radious at scale for considering OK: {0}'.format(inside_radius_lettuce_matching_threshold))
+
+	print('- Orthomosaic Settings ')
+	print('\t * Final Scale of the ortho: {0}'.format(ORTHO_SCALE))
+	print('\t * Number of rows in each group: {0}'.format(number_of_rows_in_groups))
+
+	print('- Lid detection Settings ')
+	print('\t * Open and Closing SE diameters: {0},{1}'.format(OPEN_MORPH_LID_SIZE,CLOSE_MORPH_LID_SIZE))
+
+	print('--------------------------------------------------------------------------')
+
 def test_function():
 	global patch_folder
 
@@ -4348,15 +4389,15 @@ def main(scan_date):
 		field = Field()
 		field.detect_lid_patches()
 		print(field.calculate_lid_based_error())
-		cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('fig3', 700,700)
+		# cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('fig3', 700,700)
 
-		for p,l,x,y in field.detected_lid_patches:
-			p.load_img()
-			print(l)
-			cv2.circle(p.rgb_img,(x,y),10,(0,0,255),-1)
-			cv2.imshow('fig3',p.rgb_img)
-			cv2.waitKey(0)
+		# for p,l,x,y in field.detected_lid_patches:
+		# 	p.load_img()
+		# 	print(l)
+		# 	cv2.circle(p.rgb_img,(x,y),10,(0,0,255),-1)
+		# 	cv2.imshow('fig3',p.rgb_img)
+		# 	cv2.waitKey(0)
 
 	elif server == 'ariyan':
 		print('RUNNING ON -- {0} --'.format(server))
@@ -4413,48 +4454,35 @@ SCALE = 0.2
 # SCALE = 0.9
 # SCALE = 1
 
-
-
 PATCH_SIZE = (int(3296*SCALE),int(2472*SCALE))
-
-LID_SIZE_AT_SCALE_1 = (400*SCALE,600*SCALE)
-
-# PATCH_SIZE_GPS = (8.899999997424857e-06,1.0199999998405929e-05)
+LID_SIZE_AT_SCALE = (400*SCALE,600*SCALE)
 PATCH_SIZE_GPS = (-1,-1)
-
+GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
 
-PERCENTAGE_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION = 0.5
-GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
+PERCENTAGE_OF_GOOD_MATCHES = 0.5
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
 MINIMUM_NUMBER_OF_MATCHES = 100
 RANSAC_MAX_ITER = 1000
 RANSAC_ERROR_THRESHOLD = 5
 PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
+OVERLAP_DISCARD_RATIO = 0.05
+
 LETTUCE_AREA_THRESHOLD = 5000
+CONTOUR_MATCHING_MIN_MATCH = 2
+
 ORTHO_SCALE = 0.05
 REDUCTION_FACTOR = ORTHO_SCALE/SCALE
-# REDUCTION_FACTOR = 0.05
-OVERLAP_DISCARD_RATIO = 0.05
-CONTOUR_MATCHING_MIN_MATCH = 2
+
 
 OPEN_MORPH_LID_SIZE = 40
 CLOSE_MORPH_LID_SIZE = 220
 
 GPS_ERROR_Y = 0.0000005
 GPS_ERROR_X = 0.000001
-# GPS_ERROR_Y = 0.000001
-# GPS_ERROR_X = 0.000002
 
 FFT_PARALLEL_CORES_TO_USE = 20
 
-# -----------------------------------------------------------------------------------------------------------------------------------
-# -----------------------------------------------------------------------------------------------------------------------------------
-# -----------------------------------------------------------------------------------------------------------------------------------
-
-# -----------------------------------------------------------------------------------------------------------------------------------
-# -------------------------------------------------- Runtime Settings ---------------------------------------------------------------
-# -----------------------------------------------------------------------------------------------------------------------------------
 
 number_of_rows_in_groups = 10
 groups_to_use = slice(0,None)
@@ -4506,7 +4534,7 @@ original = sys.stdout
 # if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
 # 	sys.stdout = open('/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/log_{1}_at_{2}.txt'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M")), 'w+')
 
-print('Starting process on {0} for scan date {1} using method {2} and scale {3}.'.format(server,scan_date,method,SCALE))
+print_settings()
 
 start_time = datetime.datetime.now()
 
