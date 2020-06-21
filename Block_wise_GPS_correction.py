@@ -4285,7 +4285,7 @@ def main(scan_date):
 		
 		old_lid_base_error = field.calculate_lid_based_error()
 
-		field.create_patches_SIFT_files()
+		# field.create_patches_SIFT_files()
 		
 		field.draw_and_save_field(is_old=True)
 
