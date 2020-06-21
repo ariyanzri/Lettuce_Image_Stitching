@@ -4028,7 +4028,7 @@ def get_RMSE_error_function(p,n,gid):
 	p.delete_img()
 	n.delete_img()
 
-	return gid,n.gps.Center[0],n.gps.Center[1],similarity
+	return gid,n.gps.Center[0],n.gps.Center[1],dissimilarity
 
 
 def get_RMSE_error_function_helper(args):
@@ -4302,7 +4302,6 @@ def main(scan_date):
 		print_settings()
 		
 		# Corrections
-		print('------------------ BEGINNING CORRECTION ------------------ ')
 
 		lettuce_coords = read_lettuce_heads_coordinates()
 
@@ -4312,7 +4311,7 @@ def main(scan_date):
 
 		# field.create_patches_SIFT_files()
 		
-		field.draw_and_save_field(is_old=True)
+		# field.draw_and_save_field(is_old=True)
 
 		field.correct_field()
 
