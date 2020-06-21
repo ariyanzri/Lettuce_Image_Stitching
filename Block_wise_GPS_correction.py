@@ -4352,43 +4352,43 @@ def main(scan_date):
 
 		# ------------
 
-		# lettuce_coords = read_lettuce_heads_coordinates()
+		lettuce_coords = read_lettuce_heads_coordinates()
 
-		# field = Field()
+		field = Field()
 		
-		# old_lid_base_error = field.calculate_lid_based_error()
+		old_lid_base_error = field.calculate_lid_based_error()
 
-		# # field.create_patches_SIFT_files()
+		# field.create_patches_SIFT_files()
 		
-		# field.draw_and_save_field(is_old=True)
+		field.draw_and_save_field(is_old=True)
 
-		# field.correct_field()
+		field.correct_field()
 
-		# field.draw_and_save_field(is_old=False)
+		field.draw_and_save_field(is_old=False)
 
-		# field.save_new_coordinate()
+		field.save_new_coordinate()
 
-		# new_lid_base_error = field.calculate_lid_based_error()
+		new_lid_base_error = field.calculate_lid_based_error()
 
-		# print('------------------ ERROR MEASUREMENT ------------------ ')
+		print('------------------ ERROR MEASUREMENT ------------------ ')
 
-		# print('*** Before')
+		print('*** Before')
 
-		# print('Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+		print('Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
 
-		# field = Field(False)
-		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		# np.save('RMSE_before.npy',res)
-		# print(np.mean(res[:,3]))
+		field = Field(False)
+		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		np.save('RMSE_before.npy',res)
+		print(np.mean(res[:,3]))
 
-		# print('*** After')
+		print('*** After')
 
-		# print('Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+		print('Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
 
-		# field = Field(True)
-		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		# np.save('RMSE_after.npy',res)
-		# print(np.mean(res[:,3]))
+		field = Field(True)
+		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		np.save('RMSE_after.npy',res)
+		print(np.mean(res[:,3]))
 
 		# ------------
 		# err = calculate_error_of_correction(True)
@@ -4407,18 +4407,18 @@ def main(scan_date):
 
 		# ------------
 
-		field = Field()
-		field.detect_lid_patches()
-		print(field.calculate_lid_based_error())
-		cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('fig3', 700,700)
+		# field = Field()
+		# field.detect_lid_patches()
+		# print(field.calculate_lid_based_error())
+		# cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('fig3', 700,700)
 
-		for p,l,x,y in field.detected_lid_patches:
-			p.load_img()
-			print(l)
-			cv2.circle(p.rgb_img,(x,y),10,(0,0,255),-1)
-			cv2.imshow('fig3',p.rgb_img)
-			cv2.waitKey(0)
+		# for p,l,x,y in field.detected_lid_patches:
+		# 	p.load_img()
+		# 	print(l)
+		# 	cv2.circle(p.rgb_img,(x,y),10,(0,0,255),-1)
+		# 	cv2.imshow('fig3',p.rgb_img)
+		# 	cv2.waitKey(0)
 
 	elif server == 'ariyan':
 		print_settings()
