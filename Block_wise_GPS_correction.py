@@ -2344,9 +2344,9 @@ class Patch:
 		H,percentage_inliers,scale,theta = find_homography(matches,kp2,kp1,overlap1,overlap2)
 		# print(len(matches),percentage_inliers)
 
-		# if abs(scale-1) > 0.01 or abs(theta-0)>5:
-			# # print('\t Discarding {0} due to scale or rotation being off (s:{1},r:{2}).'.format(scale,theta))
-			# return None
+		if abs(scale-1) > TRANSFORMATION_SCALE_DISCARD_THRESHOLD or abs(theta-0)>TRANSFORMATION_ANGLE_DISCARD_THRESHOLD:
+			# print('\t Discarding {0} due to scale or rotation being off (s:{1},r:{2}).'.format(scale,theta))
+			return None
 
 		# if percentage_inliers<0.1:
 		# 	return None
