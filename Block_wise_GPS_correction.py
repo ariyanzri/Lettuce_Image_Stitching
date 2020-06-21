@@ -4243,7 +4243,7 @@ def test_function():
 
 
 def main(scan_date):
-	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path,lettuce_heads_coordinates_file,lettuce_coords,method,correction_log_file,discard_right_flag
+	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path,lettuce_heads_coordinates_file,lettuce_coords,method,correction_log_file,discard_right_flag,SCALE,PATCH_SIZE
 
 	if server == 'coge':
 		patch_folder = '/storage/ariyanzarei/{0}-rgb/bin2tif_out'.format(scan_date)
@@ -4422,16 +4422,24 @@ def main(scan_date):
 		# HPC
 		print_settings()
 		discard_right_flag = False
-		field = Field()
-		field.create_patches_SIFT_files()
-		# field.draw_and_save_field(is_old=True)
 		
-		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		field.correct_field()
-		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		for s in [0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]:
 
-		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
-		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
+			SCALE = s
+			PATCH_SIZE = (int(3296*SCALE),int(2472*SCALE))
+
+			field = Field()
+			print('Patch Numbers: {0}'.format(len(field.groups[0].patches)))
+			
+			field.create_patches_SIFT_files()
+			# field.draw_and_save_field(is_old=True)
+			
+			old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+			field.correct_field()
+			new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+
+			print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+			print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 		# field.save_plot()
 		# field.draw_and_save_field(is_old=False)
@@ -4492,7 +4500,7 @@ FFT_PARALLEL_CORES_TO_USE = 20
 
 
 number_of_rows_in_groups = 10
-groups_to_use = slice(0,None)
+groups_to_use = slice(0,1)
 patches_to_use = slice(0,None)
 
 # number_of_rows_in_groups = 3
@@ -4537,8 +4545,8 @@ scan_date = 'software_f6,7_summer_shade'
 
 original = sys.stdout
 
-# if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
-# 	sys.stdout = open('/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/log_{1}_at_{2}.txt'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M")), 'w+')
+if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
+	sys.stdout = open('log.txt', 'w+')
 
 start_time = datetime.datetime.now()
 
