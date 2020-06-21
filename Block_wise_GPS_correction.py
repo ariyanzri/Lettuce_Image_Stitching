@@ -4431,7 +4431,7 @@ def main(scan_date):
 			print_settings()
 
 			field = Field()
-			print('Patch Numbers: {0}'.format(len(field.groups[0].patches)))
+			print('Patch Numbers: {0}'.format(len(field.groups[0].patches)*5))
 
 			field.create_patches_SIFT_files()
 			# field.draw_and_save_field(is_old=True)
@@ -4501,13 +4501,13 @@ GPS_ERROR_X = 0.000001
 FFT_PARALLEL_CORES_TO_USE = 20
 
 
-number_of_rows_in_groups = 10
-groups_to_use = slice(0,1)
-patches_to_use = slice(0,None)
+# number_of_rows_in_groups = 10
+# groups_to_use = slice(0,None)
+# patches_to_use = slice(0,None)
 
-# number_of_rows_in_groups = 3
-# groups_to_use = slice(0,1)
-# patches_to_use = slice(0,5)
+number_of_rows_in_groups = 3
+groups_to_use = slice(0,4)
+patches_to_use = slice(0,30)
 
 
 inside_radius_lettuce_matching_threshold = 200*SCALE
