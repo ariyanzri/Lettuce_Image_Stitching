@@ -2499,10 +2499,10 @@ class Patch:
 
 		img  = cv2.medianBlur(img,int(17*SCALE))
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(55*SCALE),int(55*SCALE)))
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(50*SCALE),int(50*SCALE)))
 		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(50*SCALE),int(50*SCALE)))
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(60*SCALE),int(60*SCALE)))
 		img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
 
 		cv2.namedWindow('ffg',cv2.WINDOW_NORMAL)
