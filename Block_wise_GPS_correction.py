@@ -4422,26 +4422,28 @@ def main(scan_date):
 		# HPC
 		# print_settings()
 		discard_right_flag = False
+		field = Field()
+		field.save_plot()
 		
-		for s in [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]:
+		# for s in [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]:
 
-			SCALE = s
-			PATCH_SIZE = (int(3296*SCALE),int(2472*SCALE))
+		# 	SCALE = s
+		# 	PATCH_SIZE = (int(3296*SCALE),int(2472*SCALE))
 
-			print_settings()
+		# 	print_settings()
 
-			field = Field()
-			print('Patch Numbers: {0}'.format(len(field.groups[0].patches)*5))
+		# 	field = Field()
+		# 	print('Patch Numbers: {0}'.format(len(field.groups[0].patches)*5))
 
-			field.create_patches_SIFT_files()
-			# field.draw_and_save_field(is_old=True)
+		# 	field.create_patches_SIFT_files()
+		# 	# field.draw_and_save_field(is_old=True)
 			
-			old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-			field.correct_field()
-			new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# 	old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# 	field.correct_field()
+		# 	new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-			print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
-			print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
+		# 	print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+		# 	print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 		# field.save_plot()
 		# field.draw_and_save_field(is_old=False)
