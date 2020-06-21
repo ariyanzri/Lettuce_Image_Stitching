@@ -3070,7 +3070,7 @@ class Group:
 				if params is None:
 					
 					if i>0:
-						prev_p = self.rows[i-1]r[j]
+						prev_p = self.rows[i-1][j]
 						params = prev_p.get_pairwise_transformation_info(p)
 
 						if param is None:
