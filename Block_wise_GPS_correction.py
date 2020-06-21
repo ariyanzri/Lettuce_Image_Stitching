@@ -4273,8 +4273,7 @@ def main(scan_date):
 
 
 	if server == 'coge':
-		print('RUNNING ON -- {0} --'.format(server))
-		
+		print_settings()
 		
 		# Corrections
 		# print('------------------ BEGINNING CORRECTION ------------------ ')
@@ -4314,7 +4313,7 @@ def main(scan_date):
 
 
 	elif server == 'laplace.cs.arizona.edu':
-		print('RUNNING ON -- {0} --'.format(server))
+		print_settings()
 		# os.system("taskset -p -c 0-40 %d" % os.getpid())
 		# os.system("taskset -p -c 40-47 %d" % os.getpid())
 		
@@ -4399,7 +4398,7 @@ def main(scan_date):
 		# 	cv2.waitKey(0)
 
 	elif server == 'ariyan':
-		print('RUNNING ON -- {0} --'.format(server))
+		print_settings()
 
 		visualize_plot()
 
@@ -4408,7 +4407,7 @@ def main(scan_date):
 		
 	else:
 		# HPC
-		print('RUNNING ON -- {0} --'.format(server))
+		print_settings()
 		discard_right_flag = False
 		field = Field()
 		field.create_patches_SIFT_files()
@@ -4419,11 +4418,6 @@ def main(scan_date):
 		field.draw_and_save_field(is_old=False)
 		# field.print_field_in_text()
 
-
-		
-
-
-correction_log_file = ''
 
 
 server_core = {'coge':20,'laplace.cs.arizona.edu':10,'ariyan':4}
@@ -4532,8 +4526,6 @@ original = sys.stdout
 
 # if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
 # 	sys.stdout = open('/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/log_{1}_at_{2}.txt'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M")), 'w+')
-
-print_settings()
 
 start_time = datetime.datetime.now()
 
