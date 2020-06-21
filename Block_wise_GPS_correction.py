@@ -2354,7 +2354,8 @@ class Patch:
 
 		if abs(scale-1) > TRANSFORMATION_SCALE_DISCARD_THRESHOLD or abs(theta-0)>TRANSFORMATION_ANGLE_DISCARD_THRESHOLD:
 			# print('\t Discarding {0} due to scale or rotation being off (s:{1},r:{2}).'.format(scale,theta))
-			return None
+			percentage_inliers = round(percentage_inliers*100,2)
+			return Neighbor_Parameters(overlap2,overlap1,H,num_matches,percentage_inliers,2,scale,theta)
 
 		# if percentage_inliers<0.1:
 		# 	return None
