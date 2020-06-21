@@ -4424,11 +4424,17 @@ def main(scan_date):
 		discard_right_flag = False
 		field = Field()
 		field.create_patches_SIFT_files()
-		field.draw_and_save_field(is_old=True)
+		# field.draw_and_save_field(is_old=True)
 		
+		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 		field.correct_field()
-		field.save_plot()
-		field.draw_and_save_field(is_old=False)
+		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+
+		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
+
+		# field.save_plot()
+		# field.draw_and_save_field(is_old=False)
 		# field.print_field_in_text()
 
 
@@ -4509,7 +4515,7 @@ method = 'MST'
 
 
 # scan_date = '2020-02-18'
-scan_date = '2020-01-08'
+# scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
@@ -4523,7 +4529,7 @@ scan_date = '2020-01-08'
 # scan_date = '2020-06-05_hardware_south'
 # scan_date = 'hardware_f6,7_summer_shade'
 # scan_date = 'hardware_f6,7_summer_suntest061620'
-# scan_date = 'software_f6,7_summer_shade'
+scan_date = 'software_f6,7_summer_shade'
 
 # -----------------------------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
