@@ -2509,10 +2509,10 @@ class Patch:
 		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(100*SCALE),int(100*SCALE)))
 		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
 
-		cv2.namedWindow('ffg',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('ffg', 500,500)
-		cv2.imshow('ffg',img)
-		cv2.waitKey(0)
+		# cv2.namedWindow('ffg',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('ffg', 500,500)
+		# cv2.imshow('ffg',img)
+		# cv2.waitKey(0)
 
 		image, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 		
@@ -4356,39 +4356,39 @@ def main(scan_date):
 
 		field = Field()
 		
-		# old_lid_base_error = field.calculate_lid_based_error()
+		old_lid_base_error = field.calculate_lid_based_error()
 
 		# field.create_patches_SIFT_files()
 		
-		# field.draw_and_save_field(is_old=True)
+		field.draw_and_save_field(is_old=True)
 
 		field.correct_field()
 
-		# field.draw_and_save_field(is_old=False)
+		field.draw_and_save_field(is_old=False)
 
-		# field.save_new_coordinate()
+		field.save_new_coordinate()
 
-		# new_lid_base_error = field.calculate_lid_based_error()
+		new_lid_base_error = field.calculate_lid_based_error()
 
-		# print('------------------ ERROR MEASUREMENT ------------------ ')
+		print('------------------ ERROR MEASUREMENT ------------------ ')
 
-		# print('*** Before')
+		print('*** Before')
 
-		# print('Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+		print('Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
 
-		# field = Field(False)
-		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		# np.save('RMSE_before.npy',res)
-		# print(np.mean(res[:,3]))
+		field = Field(False)
+		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		np.save('RMSE_before.npy',res)
+		print(np.mean(res[:,3]))
 
-		# print('*** After')
+		print('*** After')
 
-		# print('Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+		print('Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
 
-		# field = Field(True)
-		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		# np.save('RMSE_after.npy',res)
-		# print(np.mean(res[:,3]))
+		field = Field(True)
+		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		np.save('RMSE_after.npy',res)
+		print(np.mean(res[:,3]))
 
 		# ------------
 		# err = calculate_error_of_correction(True)
@@ -4409,16 +4409,16 @@ def main(scan_date):
 
 		# field = Field()
 		# field.detect_lid_patches()
-		print(field.calculate_lid_based_error())
-		cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('fig3', 700,700)
+		# print(field.calculate_lid_based_error())
+		# cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('fig3', 700,700)
 
-		for p,l,x,y in field.detected_lid_patches:
-			p.load_img()
-			print(l)
-			cv2.circle(p.rgb_img,(x,y),10,(0,0,255),-1)
-			cv2.imshow('fig3',p.rgb_img)
-			cv2.waitKey(0)
+		# for p,l,x,y in field.detected_lid_patches:
+		# 	p.load_img()
+		# 	print(l)
+		# 	cv2.circle(p.rgb_img,(x,y),10,(0,0,255),-1)
+		# 	cv2.imshow('fig3',p.rgb_img)
+		# 	cv2.waitKey(0)
 
 	elif server == 'ariyan':
 		print_settings()
@@ -4444,7 +4444,7 @@ def main(scan_date):
 
 
 server_core = {'coge':20,'laplace.cs.arizona.edu':10,'ariyan':4}
-server_core_max = {'coge':50,'laplace.cs.arizona.edu':25,'ariyan':4}
+server_core_max = {'coge':50,'laplace.cs.arizona.edu':35,'ariyan':4}
 
 server = socket.gethostname()
 if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
@@ -4495,13 +4495,13 @@ GPS_ERROR_X = 0.000001
 FFT_PARALLEL_CORES_TO_USE = 20
 
 
-# number_of_rows_in_groups = 10
-# groups_to_use = slice(0,None)
-# patches_to_use = slice(0,None)
+number_of_rows_in_groups = 10
+groups_to_use = slice(0,None)
+patches_to_use = slice(0,None)
 
-number_of_rows_in_groups = 3
-groups_to_use = slice(0,1)
-patches_to_use = slice(0,5)
+# number_of_rows_in_groups = 3
+# groups_to_use = slice(0,1)
+# patches_to_use = slice(0,5)
 
 
 inside_radius_lettuce_matching_threshold = 200*SCALE
@@ -4509,8 +4509,8 @@ discard_right_flag = True
 
 override_sifts = True
 
-# method = 'MST'
-method = 'Hybrid'
+method = 'MST'
+# method = 'Hybrid'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
