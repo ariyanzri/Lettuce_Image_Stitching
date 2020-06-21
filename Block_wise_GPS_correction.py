@@ -4015,7 +4015,7 @@ def get_RMSE_error_function(p,n,gid):
 	# dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
 	
 	# similarity = measure.compare_ssim(overlap_1_img,overlap_2_img)
-	similarity = structural_similarity(overlap_1_img,overlap_2_img)
+	similarity = structural_similarity(overlap_1_img,overlap_2_img,multichannel=True)
 
 	# err = np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
 	# err /= float(overlap_1_img.shape[0] * overlap_2_img.shape[1] * overlap_2_img.shape[1])
