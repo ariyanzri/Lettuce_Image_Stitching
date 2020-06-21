@@ -2505,7 +2505,7 @@ class Patch:
 		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(50*SCALE),int(50*SCALE)))
 		img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(70*SCALE),int(70*SCALE)))
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(100*SCALE),int(100*SCALE)))
 		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
 
 		cv2.namedWindow('ffg',cv2.WINDOW_NORMAL)
