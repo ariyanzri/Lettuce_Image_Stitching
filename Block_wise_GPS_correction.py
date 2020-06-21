@@ -4243,7 +4243,7 @@ def test_function():
 
 
 def main(scan_date):
-	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path,lettuce_heads_coordinates_file,lettuce_coords,method,correction_log_file,discard_right_flag,SCALE,PATCH_SIZE
+	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path,lettuce_heads_coordinates_file,lettuce_coords,method,correction_log_file,discard_right_flag,SCALE,PATCH_SIZE,GPS_TO_IMAGE_RATIO
 
 	if server == 'coge':
 		patch_folder = '/storage/ariyanzarei/{0}-rgb/bin2tif_out'.format(scan_date)
@@ -4504,13 +4504,13 @@ GPS_ERROR_X = 0.000001
 FFT_PARALLEL_CORES_TO_USE = 20
 
 
-# number_of_rows_in_groups = 10
-# groups_to_use = slice(0,None)
-# patches_to_use = slice(0,None)
+number_of_rows_in_groups = 10
+groups_to_use = slice(0,None)
+patches_to_use = slice(0,None)
 
-number_of_rows_in_groups = 3
-groups_to_use = slice(0,4)
-patches_to_use = slice(0,30)
+# number_of_rows_in_groups = 3
+# groups_to_use = slice(0,4)
+# patches_to_use = slice(0,30)
 
 
 inside_radius_lettuce_matching_threshold = 200*SCALE
@@ -4518,8 +4518,8 @@ discard_right_flag = True
 
 override_sifts = True
 
-method = 'MST'
-# method = 'Hybrid'
+# method = 'MST'
+method = 'Hybrid'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
@@ -4527,7 +4527,7 @@ method = 'MST'
 # method = 'Old_method'
 
 
-# scan_date = '2020-02-18'
+scan_date = '2020-02-18'
 # scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
@@ -4542,7 +4542,7 @@ method = 'MST'
 # scan_date = '2020-06-05_hardware_south'
 # scan_date = 'hardware_f6,7_summer_shade'
 # scan_date = 'hardware_f6,7_summer_suntest061620'
-scan_date = 'software_f6,7_summer_shade'
+# scan_date = 'software_f6,7_summer_shade'
 
 # -----------------------------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
