@@ -4489,7 +4489,7 @@ FFT_PARALLEL_CORES_TO_USE = 20
 
 
 number_of_rows_in_groups = 10
-groups_to_use = slice(0,None)
+groups_to_use = slice(0,1)
 patches_to_use = slice(0,None)
 
 # number_of_rows_in_groups = 3
