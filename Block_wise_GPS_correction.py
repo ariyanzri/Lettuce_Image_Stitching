@@ -17,8 +17,7 @@ import datetime
 # from sklearn.datasets import make_regression
 # from sklearn.base import BaseEstimator
 # from skimage.feature import hog
-
-from skimage.measure import structural_similarity as ssim
+from skimage import measure
 
 from Customized_myltiprocessing import MyPool
 from heapq import heappush, heappop, heapify
@@ -4014,7 +4013,7 @@ def get_RMSE_error_function(p,n,gid):
 
 	# dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
 	
-	similarity = ssim(overlap_1_img,overlap_2_img)
+	similarity = measure.compare_ssim(overlap_1_img,overlap_2_img)
 
 	# err = np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
 	# err /= float(overlap_1_img.shape[0] * overlap_2_img.shape[1] * overlap_2_img.shape[1])
