@@ -18,7 +18,7 @@ import datetime
 # from sklearn.base import BaseEstimator
 # from skimage.feature import hog
 # from skimage import measure
-from skimage.metrics import structural_similarity
+# from skimage.metrics import structural_similarity
 
 from Customized_myltiprocessing import MyPool
 from heapq import heappush, heappop, heapify
