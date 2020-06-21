@@ -1752,7 +1752,7 @@ def hybrid_method_UAV_lettuce_matching_step(patches,gid):
 
 		total_matched,total_contours = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
 
-		if total_matched <CONTOUR_MATCHING_MIN_MATCH or total_matched/total_contours <=0.5:
+		if total_matched <CONTOUR_MATCHING_MIN_MATCH or total_matched/total_contours <=0.75:
 			not_corrected.append(p)
 		else:
 			print('Group ID {0}: patch {1} corrected with {2} number of matches ({3}).'.format(gid,p.name,total_matched,total_matched/total_contours))
@@ -1837,14 +1837,14 @@ def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step
 			number_of_iterations_without_change+=1
 			continue
 
-		if params.percentage_inliers<0.1:
+		if params.percentage_inliers<MINIMUM_PERCENTAGE_OF_INLIERS:
 			print('Group ID {0}: ERROR- patch {1} Percentage Inliers < 10 Percente. will be pushed back.'.format(gid,p1.name))
 			sys.stdout.flush()
 			can_be_corrected_patches.insert(0,p1)
 			number_of_iterations_without_change+=1
 			continue
 
-		if params.num_matches<40 and number_of_iterations_without_change<len(can_be_corrected_patches):
+		if params.num_matches<MINIMUM_NUMBER_OF_MATCHES and number_of_iterations_without_change<len(can_be_corrected_patches):
 			print('Group ID {0}: ERROR- patch {1} NUM Matches < 40. will be pushed back.'.format(gid,p1.name))
 			sys.stdout.flush()
 			can_be_corrected_patches.insert(0,p1)
@@ -4479,7 +4479,7 @@ HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
 
 PERCENTAGE_OF_GOOD_MATCHES = 0.5
 MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
-MINIMUM_NUMBER_OF_MATCHES = 100
+MINIMUM_NUMBER_OF_MATCHES = 15
 RANSAC_MAX_ITER = 1000
 RANSAC_ERROR_THRESHOLD = 5
 PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
