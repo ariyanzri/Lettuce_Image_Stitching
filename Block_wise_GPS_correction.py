@@ -4549,8 +4549,8 @@ scan_date = 'software_f6,7_summer_shade'
 
 original = sys.stdout
 
-if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
-	sys.stdout = open('log.txt', 'w+')
+# if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
+# 	sys.stdout = open('log.txt', 'w+')
 
 start_time = datetime.datetime.now()
 
