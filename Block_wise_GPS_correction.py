@@ -4420,17 +4420,19 @@ def main(scan_date):
 		
 	else:
 		# HPC
-		print_settings()
+		# print_settings()
 		discard_right_flag = False
 		
-		for s in [0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]:
+		for s in [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]:
 
 			SCALE = s
 			PATCH_SIZE = (int(3296*SCALE),int(2472*SCALE))
 
+			print_settings()
+
 			field = Field()
 			print('Patch Numbers: {0}'.format(len(field.groups[0].patches)))
-			
+
 			field.create_patches_SIFT_files()
 			# field.draw_and_save_field(is_old=True)
 			
