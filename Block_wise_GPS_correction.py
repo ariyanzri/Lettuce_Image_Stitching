@@ -4301,13 +4301,14 @@ def main(scan_date):
 	if server == 'coge':
 		print_settings()
 		
-		# Corrections
 
 		lettuce_coords = read_lettuce_heads_coordinates()
 
 		field = Field()
 		
+
 		old_lid_base_error = field.calculate_lid_based_error()
+		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
 		# field.create_patches_SIFT_files()
 		
@@ -4319,27 +4320,19 @@ def main(scan_date):
 
 		field.save_new_coordinate()
 
+
 		new_lid_base_error = field.calculate_lid_based_error()
+		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
 		print('------------------ ERROR MEASUREMENT ------------------ ')
 
-		print('*** Before')
 
-		print('Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+		print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+		
 
-		field = Field(False)
-		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		np.save('RMSE_before.npy',res)
-		print(np.mean(res[:,3]))
-
-		print('*** After')
-
-		print('Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
-
-		field = Field(True)
-		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		np.save('RMSE_after.npy',res)
-		print(np.mean(res[:,3]))
+		print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 
 	elif server == 'laplace.cs.arizona.edu':
@@ -4365,11 +4358,13 @@ def main(scan_date):
 
 		field = Field()
 		
-		old_lid_base_error = field.calculate_lid_based_error()
 
-		field.create_patches_SIFT_files()
+		old_lid_base_error = field.calculate_lid_based_error()
+		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+
+		# field.create_patches_SIFT_files()
 		
-		field.draw_and_save_field(is_old=True)
+		# field.draw_and_save_field(is_old=True)
 
 		field.correct_field()
 
@@ -4377,27 +4372,19 @@ def main(scan_date):
 
 		field.save_new_coordinate()
 
+
 		new_lid_base_error = field.calculate_lid_based_error()
+		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
 		print('------------------ ERROR MEASUREMENT ------------------ ')
 
-		print('*** Before')
 
-		print('Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+		print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+		
 
-		field = Field(False)
-		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		np.save('RMSE_before.npy',res)
-		print(np.mean(res[:,3]))
-
-		print('*** After')
-
-		print('Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
-
-		field = Field(True)
-		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		np.save('RMSE_after.npy',res)
-		print(np.mean(res[:,3]))
+		print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 		# ------------
 		# err = calculate_error_of_correction(True)
@@ -4527,8 +4514,8 @@ method = 'MST'
 # method = 'Old_method'
 
 
-scan_date = '2020-02-18'
-# scan_date = '2020-01-08'
+# scan_date = '2020-02-18'
+scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
