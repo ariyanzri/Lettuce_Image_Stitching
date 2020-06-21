@@ -18,6 +18,8 @@ import datetime
 # from sklearn.base import BaseEstimator
 # from skimage.feature import hog
 
+from skimage.measure import structural_similarity as ssim
+
 from Customized_myltiprocessing import MyPool
 from heapq import heappush, heappop, heapify
 from collections import OrderedDict,Counter
@@ -3997,21 +3999,22 @@ def get_RMSE_error_function(p,n,gid):
 	overlap_1_img = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2GRAY)
 	overlap_2_img = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2GRAY)
 
-	overlap_1_img = cv2.blur(overlap_1_img,(5,5))
-	overlap_2_img = cv2.blur(overlap_2_img,(5,5))
+	# overlap_1_img = cv2.blur(overlap_1_img,(5,5))
+	# overlap_2_img = cv2.blur(overlap_2_img,(5,5))
 
-	ret1,overlap_1_img = cv2.threshold(overlap_1_img,0,255,cv2.THRESH_OTSU)
-	ret1,overlap_2_img = cv2.threshold(overlap_2_img,0,255,cv2.THRESH_OTSU)
+	# ret1,overlap_1_img = cv2.threshold(overlap_1_img,0,255,cv2.THRESH_OTSU)
+	# ret1,overlap_2_img = cv2.threshold(overlap_2_img,0,255,cv2.THRESH_OTSU)
 
-	tmp_size = np.shape(overlap_1_img)
+	# tmp_size = np.shape(overlap_1_img)
 	
-	overlap_1_img[overlap_1_img==255] = 1
-	overlap_2_img[overlap_2_img==255] = 1
+	# overlap_1_img[overlap_1_img==255] = 1
+	# overlap_2_img[overlap_2_img==255] = 1
 
-	xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
+	# xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
 
-	dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
+	# dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
 	
+	similarity = ssim(overlap_1_img,overlap_2_img)
 
 	# err = np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
 	# err /= float(overlap_1_img.shape[0] * overlap_2_img.shape[1] * overlap_2_img.shape[1])
@@ -4021,7 +4024,7 @@ def get_RMSE_error_function(p,n,gid):
 	p.delete_img()
 	n.delete_img()
 
-	return gid,n.gps.Center[0],n.gps.Center[1],dissimilarity
+	return gid,n.gps.Center[0],n.gps.Center[1],similarity
 
 
 def get_RMSE_error_function_helper(args):
@@ -4302,40 +4305,40 @@ def main(scan_date):
 
 		# field.create_patches_SIFT_files()
 		
-		field.draw_and_save_field(is_old=True)
+		# field.draw_and_save_field(is_old=True)
 
-		field.correct_field()
+		# field.correct_field()
 
-		field.draw_and_save_field(is_old=False)
+		# field.draw_and_save_field(is_old=False)
 
-		field.save_new_coordinate()
+		# field.save_new_coordinate()
 
-		new_lid_base_error = field.calculate_lid_based_error()
+		# new_lid_base_error = field.calculate_lid_based_error()
 
-		print('------------------ ERROR MEASUREMENT ------------------ ')
+		# print('------------------ ERROR MEASUREMENT ------------------ ')
 
-		print('*** Before')
+		# print('*** Before')
 
 		print('Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
 
-		field = Field(False)
-		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		np.save('RMSE_before.npy',res)
-		print(np.mean(res[:,3]))
+		# field = Field(False)
+		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# np.save('RMSE_before.npy',res)
+		# print(np.mean(res[:,3]))
 
-		print('*** After')
+		# print('*** After')
 
-		print('Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+		# print('Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
 
-		field = Field(True)
-		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		np.save('RMSE_after.npy',res)
-		print(np.mean(res[:,3]))
+		# field = Field(True)
+		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# np.save('RMSE_after.npy',res)
+		# print(np.mean(res[:,3]))
 
 
 	elif server == 'laplace.cs.arizona.edu':
 		print_settings()
-		# os.system("taskset -p -c 0-40 %d" % os.getpid())
+		os.system("taskset -p -c 0-45 %d" % os.getpid())
 		# os.system("taskset -p -c 40-47 %d" % os.getpid())
 		
 		# ------------
@@ -4518,8 +4521,8 @@ method = 'MST'
 # method = 'Old_method'
 
 
-# scan_date = '2020-02-18'
-scan_date = '2020-01-08'
+scan_date = '2020-02-18'
+# scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
