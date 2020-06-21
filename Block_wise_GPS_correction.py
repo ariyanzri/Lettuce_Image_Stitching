@@ -3408,6 +3408,7 @@ class Field:
 
 		self.groups = self.initialize_field(use_corrected)
 		self.detected_lid_patches = []
+		self.detect_lid_patches()
 	
 	def get_patches_with_possible_lids(self):
 		lids = get_lids()
@@ -3447,7 +3448,7 @@ class Field:
 				if patch not in [f[0] for f in final_list_patches]:
 					final_list_patches.append((patch,l,x,y))
 
-		print('Detected {0} distinct lid patches in the field.'.format(len(final_list_patches)))
+		print('Detected {0} lid patches in the field.'.format(len(final_list_patches)))
 		sys.stdout.flush()
 
 		self.detected_lid_patches = final_list_patches
@@ -3465,7 +3466,7 @@ class Field:
 			
 			distances.append(math.sqrt((old_lid[0]-point[0])**2+(old_lid[1]-point[1])**2))
 
-		print(distances)
+		# print(distances)
 
 		return statistics.mean(distances),statistics.stdev(distances)
 
@@ -4331,41 +4332,43 @@ def main(scan_date):
 
 		# ------------
 
-		# lettuce_coords = read_lettuce_heads_coordinates()
+		lettuce_coords = read_lettuce_heads_coordinates()
 
-		# field = Field()
+		field = Field()
+		
+		old_lid_base_error = field.calculate_lid_based_error()
 
-		# field.create_patches_SIFT_files()
-		# field.calculate_scale_effect(200)
-		# field.save_plot()
-		# field.draw_and_save_field(is_old=True)
+		field.create_patches_SIFT_files()
+		
+		field.draw_and_save_field(is_old=True)
 
-		# field.correct_field()
+		field.correct_field()
 
-		# field.draw_and_save_field(is_old=False)
-		# field.save_new_coordinate()
+		field.draw_and_save_field(is_old=False)
 
-		# print('------------------ ERROR MEASUREMENT ------------------ ')
+		field.save_new_coordinate()
 
-		# print('*** Before')
+		new_lid_base_error = field.calculate_lid_based_error()
 
-		# # err = calculate_error_of_correction(True)
-		# # print("({:.10f},{:.10f})".format(err[0],err[1]))
+		print('------------------ ERROR MEASUREMENT ------------------ ')
 
-		# field = Field(False)
-		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		# np.save('RMSE_before.npy',res)
-		# print(np.mean(res[:,3]))
+		print('*** Before')
 
-		# print('*** After')
+		print('Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
 
-		# # err = calculate_error_of_correction()
-		# # print("({:.10f},{:.10f})".format(err[0],err[1]))
+		field = Field(False)
+		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		np.save('RMSE_before.npy',res)
+		print(np.mean(res[:,3]))
 
-		# field = Field(True)
-		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		# np.save('RMSE_after.npy',res)
-		# print(np.mean(res[:,3]))
+		print('*** After')
+
+		print('Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+
+		field = Field(True)
+		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		np.save('RMSE_after.npy',res)
+		print(np.mean(res[:,3]))
 
 		# ------------
 		# err = calculate_error_of_correction(True)
@@ -4384,9 +4387,9 @@ def main(scan_date):
 
 		# ------------
 
-		field = Field()
-		field.detect_lid_patches()
-		print(field.calculate_lid_based_error())
+		# field = Field()
+		# field.detect_lid_patches()
+		# print(field.calculate_lid_based_error())
 		# cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
 		# cv2.resizeWindow('fig3', 700,700)
 
@@ -4436,16 +4439,8 @@ else:
 # ------------------------------------------------------- Settings ------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
 
-# SCALE = 0.1
+
 SCALE = 0.2
-# SCALE = 0.3
-# SCALE = 0.4
-# SCALE = 0.5
-# SCALE = 0.6
-# SCALE = 0.7
-# SCALE = 0.8
-# SCALE = 0.9
-# SCALE = 1
 
 PATCH_SIZE = (int(3296*SCALE),int(2472*SCALE))
 LID_SIZE_AT_SCALE = (400*SCALE,600*SCALE)
@@ -4460,6 +4455,9 @@ RANSAC_MAX_ITER = 1000
 RANSAC_ERROR_THRESHOLD = 5
 PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
 OVERLAP_DISCARD_RATIO = 0.05
+TRANSFORMATION_SCALE_DISCARD_THRESHOLD = 0.01
+TRANSFORMATION_ANGLE_DISCARD_THRESHOLD = 1
+
 
 LETTUCE_AREA_THRESHOLD = 5000
 CONTOUR_MATCHING_MIN_MATCH = 2
