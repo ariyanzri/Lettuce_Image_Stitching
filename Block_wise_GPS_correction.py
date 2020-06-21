@@ -1478,7 +1478,7 @@ def parallel_patch_creator_helper(args):
 
 def read_all_data():
 
-	global patch_folder,coordinates_file
+	global patch_folder,coordinates_file,PATCH_SIZE_GPS,GPS_TO_IMAGE_RATIO
 	patches = []
 
 	with open(coordinates_file) as f:
@@ -1501,9 +1501,15 @@ def read_all_data():
 			lower_right = (float(features[7]),float(features[8]))
 			center = (float(features[9]),float(features[10]))
 
+			
 			coord = GPS_Coordinate(upper_left,upper_right,lower_left,lower_right,center)
 
 			patch = Patch(features[0],coord)
+
+			if PATCH_SIZE_GPS[0] == -1:
+				PATCH_SIZE_GPS = (patch.gps.UR_coord[0]-patch.gps.UL_coord[0],patch.gps.UL_coord[1]-patch.gps.LL_coord[1])
+				GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
+
 			patches.append(patch)
 
 	return patches
@@ -3999,24 +4005,21 @@ def get_RMSE_error_function(p,n,gid):
 	overlap_1_img = cv2.cvtColor(overlap_1_img, cv2.COLOR_BGR2GRAY)
 	overlap_2_img = cv2.cvtColor(overlap_2_img, cv2.COLOR_BGR2GRAY)
 
-	# overlap_1_img = cv2.blur(overlap_1_img,(5,5))
-	# overlap_2_img = cv2.blur(overlap_2_img,(5,5))
+	overlap_1_img = cv2.blur(overlap_1_img,(5,5))
+	overlap_2_img = cv2.blur(overlap_2_img,(5,5))
 
-	# ret1,overlap_1_img = cv2.threshold(overlap_1_img,0,255,cv2.THRESH_OTSU)
-	# ret1,overlap_2_img = cv2.threshold(overlap_2_img,0,255,cv2.THRESH_OTSU)
+	ret1,overlap_1_img = cv2.threshold(overlap_1_img,0,255,cv2.THRESH_OTSU)
+	ret1,overlap_2_img = cv2.threshold(overlap_2_img,0,255,cv2.THRESH_OTSU)
 
-	# tmp_size = np.shape(overlap_1_img)
+	tmp_size = np.shape(overlap_1_img)
 	
-	# overlap_1_img[overlap_1_img==255] = 1
-	# overlap_2_img[overlap_2_img==255] = 1
+	overlap_1_img[overlap_1_img==255] = 1
+	overlap_2_img[overlap_2_img==255] = 1
 
-	# xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
+	xnor_images = np.logical_xor(overlap_1_img,overlap_2_img)
 
-	# dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
+	dissimilarity = round(np.sum(xnor_images)/(tmp_size[0]*tmp_size[1]),2)
 	
-	# similarity = measure.compare_ssim(overlap_1_img,overlap_2_img)
-	similarity = structural_similarity(overlap_1_img,overlap_2_img,multichannel=True)
-
 	# err = np.sum((overlap_1_img.astype("float") - overlap_2_img.astype("float")) ** 2)
 	# err /= float(overlap_1_img.shape[0] * overlap_2_img.shape[1] * overlap_2_img.shape[1])
 
@@ -4132,6 +4135,8 @@ def test_function():
 
 	dd = []
 
+	
+
 	for p1 in patches:
 		for p2 in patches:
 			if not p1.has_overlap(p2) and not p2.has_overlap(p1):
@@ -4144,6 +4149,7 @@ def test_function():
 			
 			p1.load_img(True)
 			p2.load_img(True)
+			# get_RMSE_error_function(p1,p2,1)
 
 			if p1.rgb_img is None or p2.rgb_img is None :
 				continue
@@ -4162,7 +4168,7 @@ def test_function():
 
 			H,percentage_inliers,scale,theta = find_homography(matches,[k.pt for k in kp1],[k.pt for k in kp2],overlap_2,overlap_1)
 
-			print(len(matches),percentage_inliers,scale,theta)
+			# print(len(matches),percentage_inliers,scale,theta)
 
 			img1 = p1.rgb_img
 			img2 = p2.rgb_img
@@ -4296,45 +4302,45 @@ def main(scan_date):
 		print_settings()
 		
 		# Corrections
-		# print('------------------ BEGINNING CORRECTION ------------------ ')
+		print('------------------ BEGINNING CORRECTION ------------------ ')
 
-		# lettuce_coords = read_lettuce_heads_coordinates()
+		lettuce_coords = read_lettuce_heads_coordinates()
 
-		# field = Field()
+		field = Field()
 		
-		# old_lid_base_error = field.calculate_lid_based_error()
+		old_lid_base_error = field.calculate_lid_based_error()
 
 		# field.create_patches_SIFT_files()
 		
-		# field.draw_and_save_field(is_old=True)
+		field.draw_and_save_field(is_old=True)
 
-		# field.correct_field()
+		field.correct_field()
 
-		# field.draw_and_save_field(is_old=False)
+		field.draw_and_save_field(is_old=False)
 
-		# field.save_new_coordinate()
+		field.save_new_coordinate()
 
-		# new_lid_base_error = field.calculate_lid_based_error()
+		new_lid_base_error = field.calculate_lid_based_error()
 
-		# print('------------------ ERROR MEASUREMENT ------------------ ')
+		print('------------------ ERROR MEASUREMENT ------------------ ')
 
-		# print('*** Before')
+		print('*** Before')
 
-		# print('Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+		print('Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
 
 		field = Field(False)
 		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 		np.save('RMSE_before.npy',res)
 		print(np.mean(res[:,3]))
 
-		# print('*** After')
+		print('*** After')
 
-		# print('Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+		print('Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
 
-		# field = Field(True)
-		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		# np.save('RMSE_after.npy',res)
-		# print(np.mean(res[:,3]))
+		field = Field(True)
+		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		np.save('RMSE_after.npy',res)
+		print(np.mean(res[:,3]))
 
 
 	elif server == 'laplace.cs.arizona.edu':
@@ -4427,9 +4433,9 @@ def main(scan_date):
 	elif server == 'ariyan':
 		print_settings()
 
-		visualize_plot()
+		# visualize_plot()
 
-		# test_function()
+		test_function()
 
 		
 	else:
