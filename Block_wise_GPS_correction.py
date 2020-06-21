@@ -4296,11 +4296,11 @@ def main(scan_date):
 		# Corrections
 		# print('------------------ BEGINNING CORRECTION ------------------ ')
 
-		lettuce_coords = read_lettuce_heads_coordinates()
+		# lettuce_coords = read_lettuce_heads_coordinates()
 
-		field = Field()
+		# field = Field()
 		
-		old_lid_base_error = field.calculate_lid_based_error()
+		# old_lid_base_error = field.calculate_lid_based_error()
 
 		# field.create_patches_SIFT_files()
 		
@@ -4318,12 +4318,12 @@ def main(scan_date):
 
 		# print('*** Before')
 
-		print('Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+		# print('Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
 
-		# field = Field(False)
-		# res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-		# np.save('RMSE_before.npy',res)
-		# print(np.mean(res[:,3]))
+		field = Field(False)
+		res = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		np.save('RMSE_before.npy',res)
+		print(np.mean(res[:,3]))
 
 		# print('*** After')
 
