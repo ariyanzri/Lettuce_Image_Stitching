@@ -4423,7 +4423,7 @@ def main(scan_date):
 		
 
 
-
+correction_log_file = ''
 
 
 server_core = {'coge':20,'laplace.cs.arizona.edu':10,'ariyan':4}
