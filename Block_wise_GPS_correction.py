@@ -2508,10 +2508,10 @@ class Patch:
 		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(100*SCALE),int(100*SCALE)))
 		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
 
-		cv2.namedWindow('ffg',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('ffg', 500,500)
-		cv2.imshow('ffg',img)
-		cv2.waitKey(0)
+		# cv2.namedWindow('ffg',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('ffg', 500,500)
+		# cv2.imshow('ffg',img)
+		# cv2.waitKey(0)
 
 		image, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 		
@@ -2738,28 +2738,28 @@ class Patch:
 
 		# ---------------- DRAW -----------------------
 
-		imgg = self.rgb_img.copy()
+		# imgg = self.rgb_img.copy()
 
-		cv2.drawContours(imgg, contours, -1, (0,255,0),10)
+		# cv2.drawContours(imgg, contours, -1, (0,255,0),10)
 
-		for c in contour_centers:
-			cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
-			# imgg = cv2.putText(imgg, '{0},{1}'.format(c[0],c[1]), (c[0]+50,c[1]), cv2.FONT_HERSHEY_SIMPLEX,4, (0,255,0), 4, cv2.LINE_AA) 
+		# for c in contour_centers:
+		# 	cv2.circle(imgg, (c[0], c[1]), 20, (0, 255, 0), -1)
+		# 	# imgg = cv2.putText(imgg, '{0},{1}'.format(c[0],c[1]), (c[0]+50,c[1]), cv2.FONT_HERSHEY_SIMPLEX,4, (0,255,0), 4, cv2.LINE_AA) 
 
-		inside_lettuce_heads = []
+		# inside_lettuce_heads = []
 
-		for coord in list_lettuce_heads:
-			if self.gps.is_coord_inside(coord):
+		# for coord in list_lettuce_heads:
+		# 	if self.gps.is_coord_inside(coord):
 
-				pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
-				pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
-				inside_lettuce_heads.append((pX,pY))
+		# 		pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
+		# 		pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
+		# 		inside_lettuce_heads.append((pX,pY))
 
-		for l in inside_lettuce_heads:
-			cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
+		# for l in inside_lettuce_heads:
+		# 	cv2.circle(imgg, (l[0], l[1]), 20, (0, 0, 255 ), -1)
 			
-		cv2.imshow('reg',imgg)
-		cv2.waitKey(0)
+		# cv2.imshow('reg',imgg)
+		# cv2.waitKey(0)
 
 		# ---------------- DRAW -----------------------
 
@@ -4494,13 +4494,13 @@ GPS_ERROR_X = 0.000001
 FFT_PARALLEL_CORES_TO_USE = 20
 
 
-number_of_rows_in_groups = 10
-groups_to_use = slice(0,1)
-patches_to_use = slice(0,None)
+# number_of_rows_in_groups = 10
+# groups_to_use = slice(0,None)
+# patches_to_use = slice(0,None)
 
-# number_of_rows_in_groups = 3
-# groups_to_use = slice(0,2)
-# patches_to_use = slice(0,5)
+number_of_rows_in_groups = 3
+groups_to_use = slice(0,1)
+patches_to_use = slice(0,5)
 
 
 inside_radius_lettuce_matching_threshold = 200*SCALE
@@ -4517,8 +4517,8 @@ method = 'Hybrid'
 # method = 'Old_method'
 
 
-scan_date = '2020-02-18'
-# scan_date = '2020-01-08'
+# scan_date = '2020-02-18'
+scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
