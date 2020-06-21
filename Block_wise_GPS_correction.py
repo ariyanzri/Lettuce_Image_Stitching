@@ -2352,23 +2352,16 @@ class Patch:
 		H,percentage_inliers,scale,theta = find_homography(matches,kp2,kp1,overlap1,overlap2)
 		# print(len(matches),percentage_inliers)
 
-		if abs(scale-1) > TRANSFORMATION_SCALE_DISCARD_THRESHOLD or abs(theta-0)>TRANSFORMATION_ANGLE_DISCARD_THRESHOLD:
-			# print('\t Discarding {0} due to scale or rotation being off (s:{1},r:{2}).'.format(scale,theta))
-			percentage_inliers = round(percentage_inliers*100,2)
-			return Neighbor_Parameters(overlap2,overlap1,H,num_matches,percentage_inliers,2,scale,theta)
-
-		# if percentage_inliers<0.1:
-		# 	return None
-
-		# H,percentage_inliers = find_translation(matches,kp2,kp1)
-
-		# print(percentage_inliers)
-
 		if H is None:
 			# print('H is none.')
 			return None
 
 		percentage_inliers = round(percentage_inliers*100,2)
+
+
+		if abs(scale-1) > TRANSFORMATION_SCALE_DISCARD_THRESHOLD or abs(theta-0)>TRANSFORMATION_ANGLE_DISCARD_THRESHOLD:
+			
+			return Neighbor_Parameters(overlap2,overlap1,H,num_matches,percentage_inliers,2,scale,theta)
 
 		# print(percentage_inliers*num_matches)
 
