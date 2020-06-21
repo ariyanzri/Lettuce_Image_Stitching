@@ -2476,6 +2476,7 @@ class Patch:
 		if self.rgb_img is None:
 			self.load_img()
 
+		img = self.rgb_img.copy()
 		# img = remove_shadow(self.rgb_img.copy())
 		
 		if overlap is not None:
