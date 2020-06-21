@@ -4349,7 +4349,7 @@ def main(scan_date):
 
 		field = Field()
 		
-		old_lid_base_error = field.calculate_lid_based_error()
+		# old_lid_base_error = field.calculate_lid_based_error()
 
 		# field.create_patches_SIFT_files()
 		
@@ -4402,16 +4402,16 @@ def main(scan_date):
 
 		# field = Field()
 		# field.detect_lid_patches()
-		# print(field.calculate_lid_based_error())
-		# cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
-		# cv2.resizeWindow('fig3', 700,700)
+		print(field.calculate_lid_based_error())
+		cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('fig3', 700,700)
 
-		# for p,l,x,y in field.detected_lid_patches:
-		# 	p.load_img()
-		# 	print(l)
-		# 	cv2.circle(p.rgb_img,(x,y),10,(0,0,255),-1)
-		# 	cv2.imshow('fig3',p.rgb_img)
-		# 	cv2.waitKey(0)
+		for p,l,x,y in field.detected_lid_patches:
+			p.load_img()
+			print(l)
+			cv2.circle(p.rgb_img,(x,y),10,(0,0,255),-1)
+			cv2.imshow('fig3',p.rgb_img)
+			cv2.waitKey(0)
 
 	elif server == 'ariyan':
 		print_settings()
