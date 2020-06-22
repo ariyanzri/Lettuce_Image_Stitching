@@ -3630,23 +3630,6 @@ class Field:
 
 				p.gps = new_coords
 			
-			
-
-		for p, l, x, y in self.detected_lid_patches:
-			point_in_GPS = lids[l]
-
-			ratio_x = x/PATCH_SIZE[1]
-			ratio_y = y/PATCH_SIZE[0]
-
-			diff_x_GPS = PATCH_SIZE_GPS[0]*ratio_x
-			diff_y_GPS = PATCH_SIZE_GPS[1]*ratio_y
-
-			old_GPS_point = (p.gps.UL_coord[0]+diff_x_GPS,p.gps.UL_coord[1]-diff_y_GPS)
-
-			diff_GPS_after_correction = (old_GPS_point[0]-point_in_GPS[0],old_GPS_point[1]-point_in_GPS[1])
-
-			print(diff_GPS_after_correction)
-			
 
 	def initialize_GPS_size(self,p):
 		global PATCH_SIZE_GPS,GPS_TO_IMAGE_RATIO,PATCH_SIZE
@@ -4462,37 +4445,32 @@ def main(scan_date):
 		
 
 		old_lid_base_error = field.calculate_lid_based_error()
-		print(old_lid_base_error)
-		field.move_initial_based_on_lids()
 
-		old_lid_base_error = field.calculate_lid_based_error()
-		print(old_lid_base_error)
+		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-		# old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-
-		# # field.create_patches_SIFT_files()
+		field.create_patches_SIFT_files()
 		
-		# # field.draw_and_save_field(is_old=True)
+		field.draw_and_save_field(is_old=True)
 
-		# field.correct_field()
+		field.correct_field()
 
-		# field.draw_and_save_field(is_old=False)
+		field.draw_and_save_field(is_old=False)
 
-		# field.save_new_coordinate()
-
-
-		# new_lid_base_error = field.calculate_lid_based_error()
-		# new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-
-		# print('------------------ ERROR MEASUREMENT ------------------ ')
+		field.save_new_coordinate()
 
 
-		# print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
-		# print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+		new_lid_base_error = field.calculate_lid_based_error()
+		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+
+		print('------------------ ERROR MEASUREMENT ------------------ ')
+
+
+		print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
 		
 
-		# print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
-		# print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
+		print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 
 	elif server == 'laplace.cs.arizona.edu':
@@ -4626,7 +4604,7 @@ else:
 # -----------------------------------------------------------------------------------------------------------------------------------
 
 
-SCALE = 0.2
+SCALE = 0.4
 
 PATCH_SIZE = (int(3296*SCALE),int(2472*SCALE))
 LID_SIZE_AT_SCALE = (400*SCALE,600*SCALE)
@@ -4648,7 +4626,7 @@ TRANSFORMATION_ANGLE_DISCARD_THRESHOLD = 4
 LETTUCE_AREA_THRESHOLD = 5000
 CONTOUR_MATCHING_MIN_MATCH = 2
 
-ORTHO_SCALE = 0.01
+ORTHO_SCALE = 0.05
 REDUCTION_FACTOR = ORTHO_SCALE/SCALE
 
 
