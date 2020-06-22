@@ -2532,6 +2532,9 @@ class Patch:
 
 		for i,cnt in enumerate(contours):
 			M = cv2.moments(cnt)
+			if M["m00"] == 0:
+				continue
+				
 			cX = int(M["m10"] / M["m00"])
 			cY = int(M["m01"] / M["m00"])
 
