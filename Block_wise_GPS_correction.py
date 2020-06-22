@@ -2586,9 +2586,9 @@ class Patch:
 			cX = int(M["m10"] / M["m00"])
 			cY = int(M["m01"] / M["m00"])
 
-			if cX<=inside_radius_lettuce_matching_threshold or cY<=inside_radius_lettuce_matching_threshold or \
-			abs(PATCH_SIZE[1]-cX)<inside_radius_lettuce_matching_threshold or abs(PATCH_SIZE[0]-cY)<inside_radius_lettuce_matching_threshold:
-				continue
+			# if cX<=inside_radius_lettuce_matching_threshold or cY<=inside_radius_lettuce_matching_threshold or \
+			# abs(PATCH_SIZE[1]-cX)<inside_radius_lettuce_matching_threshold or abs(PATCH_SIZE[0]-cY)<inside_radius_lettuce_matching_threshold:
+			# 	continue
 
 			if areas[i]>threshold:
 				final_contours.append(cnt)
@@ -4606,7 +4606,7 @@ else:
 # -----------------------------------------------------------------------------------------------------------------------------------
 
 
-SCALE = 0.4
+SCALE = 0.2
 
 PATCH_SIZE = (int(3296*SCALE),int(2472*SCALE))
 LID_SIZE_AT_SCALE = (400*SCALE,600*SCALE)
