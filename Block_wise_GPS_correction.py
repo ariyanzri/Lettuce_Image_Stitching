@@ -4548,7 +4548,7 @@ def main(scan_date):
 
 
 
-server_core = {'coge':20,'laplace.cs.arizona.edu':20,'ariyan':4}
+server_core = {'coge':20,'laplace.cs.arizona.edu':10,'ariyan':4}
 server_core_max = {'coge':50,'laplace.cs.arizona.edu':35,'ariyan':4}
 
 server = socket.gethostname()
@@ -4624,8 +4624,8 @@ method = 'HybridMST'
 # method = 'Old_method'
 
 
-scan_date = '2020-02-18'
-# scan_date = '2020-01-08'
+# scan_date = '2020-02-18'
+scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
