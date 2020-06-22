@@ -3618,17 +3618,19 @@ class Field:
 		avgy = avgy/len(self.detected_lid_patches)
 		diff_final = (avgx,avgy)
 
-		for p, l, x, y in self.detected_lid_patches:
+		for g in self.groups:
+			for p in g.patches:
+				new_UR = (p.gps.UR_coord[0]-diff_final[0],p.gps.UR_coord[1]-diff_final[1],7)
+				new_UL = (p.gps.UL_coord[0]-diff_final[0],p.gps.UL_coord[1]-diff_final[1],7)
+				new_LL = (p.gps.LL_coord[0]-diff_final[0],p.gps.LL_coord[1]-diff_final[1],7)
+				new_LR = (p.gps.LR_coord[0]-diff_final[0],p.gps.LR_coord[1]-diff_final[1],7)
+				new_center = (p.gps.Center[0]-diff_final[0],p.gps.Center[1]-diff_final[1],7)
+
+				new_coords = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+
+				p.gps = new_coords
 			
-			new_UR = (p.gps.UR_coord[0]-diff_final[0],p.gps.UR_coord[1]-diff_final[1],7)
-			new_UL = (p.gps.UL_coord[0]-diff_final[0],p.gps.UL_coord[1]-diff_final[1],7)
-			new_LL = (p.gps.LL_coord[0]-diff_final[0],p.gps.LL_coord[1]-diff_final[1],7)
-			new_LR = (p.gps.LR_coord[0]-diff_final[0],p.gps.LR_coord[1]-diff_final[1],7)
-			new_center = (p.gps.Center[0]-diff_final[0],p.gps.Center[1]-diff_final[1],7)
-
-			new_coords = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
-
-			p.gps = new_coords
+			
 
 		
 			
