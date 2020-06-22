@@ -4441,31 +4441,22 @@ def main(scan_date):
 		
 	else:
 		# HPC
-		# print_settings()
+		print_settings()
 		discard_right_flag = False
 		
+		field = Field()
 
-		for s in [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1]:
+		print('Patch Numbers: {0}'.format(len(field.groups[0].patches)*5))
 
-			SCALE = s
-			PATCH_SIZE = (int(3296*SCALE),int(2472*SCALE))
-			field = Field()
+		field.create_patches_SIFT_files()
+		# field.draw_and_save_field(is_old=True)
+		
+		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		field.correct_field()
+		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-			GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
-
-			print_settings()
-			
-			print('Patch Numbers: {0}'.format(len(field.groups[0].patches)*5))
-
-			field.create_patches_SIFT_files()
-			# field.draw_and_save_field(is_old=True)
-			
-			old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-			field.correct_field()
-			new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-
-			print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
-			print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
+		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 		# field.save_plot()
 		# field.draw_and_save_field(is_old=False)
@@ -4539,8 +4530,8 @@ discard_right_flag = True
 
 override_sifts = True
 
-# method = 'MST'
-method = 'Hybrid'
+method = 'MST'
+# method = 'Hybrid'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
@@ -4549,7 +4540,7 @@ method = 'Hybrid'
 
 
 # scan_date = '2020-02-18'
-scan_date = '2020-01-08'
+# scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
@@ -4563,7 +4554,7 @@ scan_date = '2020-01-08'
 # scan_date = '2020-06-05_hardware_south'
 # scan_date = 'hardware_f6,7_summer_shade'
 # scan_date = 'hardware_f6,7_summer_suntest061620'
-# scan_date = 'software_f6,7_summer_shade'
+scan_date = 'software_f6,7_summer_shade'
 
 # -----------------------------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
