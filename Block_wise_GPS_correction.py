@@ -3160,7 +3160,7 @@ class Group:
 
 			if i == 0:
 				continue
-
+				
 			best_params = None 
 			best_gps_diff = None
 
