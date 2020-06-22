@@ -3318,7 +3318,7 @@ class Group:
 
 	def correct_internally(self):
 
-		global lettuce_coords,no_of_cores_to_use,method
+		global lettuce_coords,no_of_cores_to_use,method,CONTOUR_MATCHING_MIN_MATCH
 
 		print('Group {0} with {1} rows and {2} patches internally correction started.'.format(self.group_id,len(self.rows),len(self.patches)))
 		
