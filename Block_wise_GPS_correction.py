@@ -3369,7 +3369,7 @@ class Group:
 			self.load_all_patches_SIFT_points()
 			# self.load_all_patches_images()
 
-			CONTOUR_MATCHING_MIN_MATCH = 3
+			CONTOUR_MATCHING_MIN_MATCH = 4
 
 			corrected,not_corrected,step = hybrid_method_UAV_lettuce_matching_step(self.patches,self.group_id,1)
 			
@@ -4450,7 +4450,7 @@ def main(scan_date):
 
 		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-		field.create_patches_SIFT_files()
+		# field.create_patches_SIFT_files()
 		
 		# field.draw_and_save_field(is_old=True)
 
