@@ -2547,7 +2547,7 @@ class Patch:
 		img[img<150] = 0
 
 		MB_size = int(17*SCALE) if int(17*SCALE) % 2 == 1 else int(17*SCALE)+1
-		
+
 		img  = cv2.medianBlur(img,MB_size)
 
 		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(50*SCALE),int(50*SCALE)))
@@ -4589,8 +4589,8 @@ def main(scan_date):
 
 
 
-server_core = {'coge':20,'laplace.cs.arizona.edu':10,'ariyan':4}
-server_core_max = {'coge':50,'laplace.cs.arizona.edu':35,'ariyan':4}
+server_core = {'coge':15,'laplace.cs.arizona.edu':10,'ariyan':4}
+server_core_max = {'coge':45,'laplace.cs.arizona.edu':35,'ariyan':4}
 
 server = socket.gethostname()
 if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
