@@ -2538,7 +2538,7 @@ class Patch:
 		cv2.resizeWindow('ffg', 500,500)
 		cv2.imshow('ffg',img)
 		cv2.waitKey(0)
-		
+
 		img = green_channel-0.61*blue_channel-0.39*red_channel
 
 		min_p = np.amin(img)
@@ -2566,13 +2566,13 @@ class Patch:
 		cv2.imshow('ffg',img)
 		cv2.waitKey(0)
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(50*SCALE),int(50*SCALE)))
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(70*SCALE),int(70*SCALE)))
 		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
 		cv2.imshow('ffg',img)
 		cv2.waitKey(0)
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(50*SCALE),int(50*SCALE)))
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(70*SCALE),int(70*SCALE)))
 		img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
 
 		cv2.imshow('ffg',img)
