@@ -3614,7 +3614,23 @@ class Field:
 			avgx+=diff_GPS_after_correction[0]
 			avgy+=diff_GPS_after_correction[1]
 
-		print(avgx/len(self.detected_lid_patches),avgy/len(self.detected_lid_patches))
+		avgx = avgx/len(self.detected_lid_patches)
+		avgy = avgy/len(self.detected_lid_patches)
+		diff_final = (avgx,avgy)
+
+		for p, l, x, y in self.detected_lid_patches:
+			
+			new_UR = (p.gps.UR_coord[0]-diff_final[0],p.gps.UR_coord[1]-diff_final[1],7)
+			new_UL = (p.gps.UL_coord[0]-diff_final[0],p.gps.UL_coord[1]-diff_final[1],7)
+			new_LL = (p.gps.LL_coord[0]-diff_final[0],p.gps.LL_coord[1]-diff_final[1],7)
+			new_LR = (p.gps.LR_coord[0]-diff_final[0],p.gps.LR_coord[1]-diff_final[1],7)
+			new_center = (p.gps.Center[0]-diff_final[0],p.gps.Center[1]-diff_final[1],7)
+
+			new_coords = Patch_GPS_coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+
+			p.gps = new_coords
+
+		
 			
 
 	def initialize_GPS_size(self,p):
@@ -4431,9 +4447,12 @@ def main(scan_date):
 		
 
 		old_lid_base_error = field.calculate_lid_based_error()
-
+		print(old_lid_base_error)
 		field.move_initial_based_on_lids()
 
+		old_lid_base_error = field.calculate_lid_based_error()
+		print(old_lid_base_error)
+		
 		# old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
 		# # field.create_patches_SIFT_files()
