@@ -4587,7 +4587,7 @@ TRANSFORMATION_ANGLE_DISCARD_THRESHOLD = 4
 LETTUCE_AREA_THRESHOLD = 5000
 CONTOUR_MATCHING_MIN_MATCH = 2
 
-ORTHO_SCALE = 0.05
+ORTHO_SCALE = 0.01
 REDUCTION_FACTOR = ORTHO_SCALE/SCALE
 
 
@@ -4625,8 +4625,8 @@ method = 'HybridMST'
 # method = 'Old_method'
 
 
-scan_date = '2020-02-18'
-# scan_date = '2020-01-08'
+# scan_date = '2020-02-18'
+scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
