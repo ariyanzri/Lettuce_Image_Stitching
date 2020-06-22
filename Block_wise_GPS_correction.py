@@ -3632,7 +3632,20 @@ class Field:
 			
 			
 
-		
+		for p, l, x, y in self.detected_lid_patches:
+			point_in_GPS = lids[l]
+
+			ratio_x = x/PATCH_SIZE[1]
+			ratio_y = y/PATCH_SIZE[0]
+
+			diff_x_GPS = PATCH_SIZE_GPS[0]*ratio_x
+			diff_y_GPS = PATCH_SIZE_GPS[1]*ratio_y
+
+			old_GPS_point = (p.gps.UL_coord[0]+diff_x_GPS,p.gps.UL_coord[1]-diff_y_GPS)
+
+			diff_GPS_after_correction = (old_GPS_point[0]-point_in_GPS[0],old_GPS_point[1]-point_in_GPS[1])
+
+			print(diff_GPS_after_correction)
 			
 
 	def initialize_GPS_size(self,p):
