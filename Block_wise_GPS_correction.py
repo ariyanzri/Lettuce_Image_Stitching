@@ -3626,7 +3626,7 @@ class Field:
 			new_LR = (p.gps.LR_coord[0]-diff_final[0],p.gps.LR_coord[1]-diff_final[1],7)
 			new_center = (p.gps.Center[0]-diff_final[0],p.gps.Center[1]-diff_final[1],7)
 
-			new_coords = Patch_GPS_coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+			new_coords = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
 
 			p.gps = new_coords
 
@@ -4452,7 +4452,7 @@ def main(scan_date):
 
 		old_lid_base_error = field.calculate_lid_based_error()
 		print(old_lid_base_error)
-		
+
 		# old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
 		# # field.create_patches_SIFT_files()
