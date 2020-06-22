@@ -3365,7 +3365,7 @@ class Group:
 		elif method == 'HybridMST':
 
 			self.load_all_patches_SIFT_points()
-			self.load_all_patches_images()
+			# self.load_all_patches_images()
 
 			CONTOUR_MATCHING_MIN_MATCH = 3
 
