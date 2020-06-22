@@ -2540,11 +2540,13 @@ class Patch:
 		cv2.waitKey(0)
 
 		img = green_channel-0.61*blue_channel-0.39*red_channel
+		img[img<0] = 0
+		img = img.astype('uint8')
 
 		min_p = np.amin(img)
 		max_p = np.amax(img)
 		rng = (max_p-min_p)
-		print(min_p,max_p)
+		
 		cv2.imshow('ffg',img)
 		cv2.waitKey(0)
 
