@@ -1718,10 +1718,10 @@ def get_best_neighbor_hybrid_method(p1,corrected):
 	best_p = None
 	best_params = None
 
-	p1.load_SIFT_points()
+	# p1.load_SIFT_points()
 
 	for p_tmp in corrected_neighbors:
-		p_tmp.load_SIFT_points()
+		# p_tmp.load_SIFT_points()
 
 		params = p_tmp.get_pairwise_transformation_info(p1)
 		
@@ -2534,7 +2534,7 @@ class Patch:
 			M = cv2.moments(cnt)
 			if M["m00"] == 0:
 				continue
-				
+
 			cX = int(M["m10"] / M["m00"])
 			cY = int(M["m01"] / M["m00"])
 
@@ -2982,11 +2982,25 @@ class Group:
 		print('SIFT for all patches in group {0} loaded.'.format(self.group_id))
 		sys.stdout.flush()
 
+	def load_all_patches_images(self):
+		for p in self.patches:
+			p.load_img()
+
+		print('Images for all patches in group {0} loaded.'.format(self.group_id))
+		sys.stdout.flush()
+
 	def delete_all_patches_SIFT_points(self):
 		for p in self.patches:
 			p.delete_SIFT_points()
 
 		print('SIFT for all patches in group {0} deleted.'.format(self.group_id))
+		sys.stdout.flush()
+
+	def delete_all_patches_images(self):
+		for p in self.patches:
+			p.delete_img()
+
+		print('Images for all patches in group {0} deleted.'.format(self.group_id))
 		sys.stdout.flush()
 
 	def pre_calculate_internal_neighbors_and_transformation_parameters(self,print_flg=True):
@@ -3290,13 +3304,17 @@ class Group:
 
 		elif method == 'Hybrid':
 			
+			self.load_all_patches_SIFT_points()
+			self.load_all_patches_images()
+
 			corrected,not_corrected,step = hybrid_method_UAV_lettuce_matching_step(self.patches,self.group_id)
 			
 			final_patches = hybrid_method_sift_correction_step(corrected,not_corrected,self.group_id,step)
 
 			string_res = get_corrected_string(self.patches)
 
-			self.delete_all_patches_SIFT_points()
+			# self.delete_all_patches_SIFT_points()
+			# self.delete_all_patches_images()
 
 		elif method == 'Merge':
 			
