@@ -1984,10 +1984,10 @@ class GPS_Coordinate:
 			return False
 
 	def is_coord_in_GPS_error_proximity(self,coord):
-		if coord[0]>=self.UL_coord[0] and coord[0]<=self.UR_coord[0] and (abs(coord[1]-self.LL_coord[1])<GPS_ERROR_Y*2 or abs(coord[1]-self.UL_coord[1])<GPS_ERROR_Y*2):
+		if coord[0]>=self.UL_coord[0] and coord[0]<=self.UR_coord[0] and (abs(coord[1]-self.LL_coord[1])<GPS_ERROR_Y or abs(coord[1]-self.UL_coord[1])<GPS_ERROR_Y):
 			return True
 
-		if coord[1]<=self.UL_coord[1] and coord[1]>=self.LL_coord[1] and (abs(coord[0]-self.LL_coord[0])<GPS_ERROR_X*2 or abs(coord[0]-self.LR_coord[0])<GPS_ERROR_X*2):
+		if coord[1]<=self.UL_coord[1] and coord[1]>=self.LL_coord[1] and (abs(coord[0]-self.LL_coord[0])<GPS_ERROR_X or abs(coord[0]-self.LR_coord[0])<GPS_ERROR_X):
 			return True
 
 		return False
@@ -4594,8 +4594,8 @@ REDUCTION_FACTOR = ORTHO_SCALE/SCALE
 OPEN_MORPH_LID_SIZE = 40
 CLOSE_MORPH_LID_SIZE = 220
 
-GPS_ERROR_Y = 0.0000005
-GPS_ERROR_X = 0.000001
+GPS_ERROR_Y = 0.000001
+GPS_ERROR_X = 0.000002
 
 FFT_PARALLEL_CORES_TO_USE = 20
 
