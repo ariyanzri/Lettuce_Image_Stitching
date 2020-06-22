@@ -2234,9 +2234,10 @@ class Patch:
 	def load_img(self,hist_eq=True):
 		global patch_folder
 
-		img,img_g = load_preprocess_image('{0}/{1}'.format(patch_folder,self.name),hist_eq)
-		self.rgb_img = img
-		self.gray_img = img_g
+		if self.rgb_img is None:
+			img,img_g = load_preprocess_image('{0}/{1}'.format(patch_folder,self.name),hist_eq)
+			self.rgb_img = img
+			self.gray_img = img_g
 
 	def delete_img(self):
 
@@ -3160,7 +3161,7 @@ class Group:
 
 			if i == 0:
 				continue
-				
+
 			best_params = None 
 			best_gps_diff = None
 
@@ -3364,7 +3365,8 @@ class Group:
 		elif method == 'HybridMST':
 
 			self.load_all_patches_SIFT_points()
-			
+			self.load_all_patches_images()
+
 			CONTOUR_MATCHING_MIN_MATCH = 3
 
 			corrected,not_corrected,step = hybrid_method_UAV_lettuce_matching_step(self.patches,self.group_id,1)
