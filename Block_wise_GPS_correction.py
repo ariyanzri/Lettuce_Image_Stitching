@@ -2543,8 +2543,8 @@ class Patch:
 
 		img = cv2.normalize(img, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
 		
-		img[img>=150] = 255
-		img[img<150] = 0
+		img[img>=130] = 255
+		img[img<130] = 0
 
 		MB_size = int(17*SCALE) if int(17*SCALE) % 2 == 1 else int(17*SCALE)+1
 
