@@ -2559,10 +2559,10 @@ class Patch:
 		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(100*SCALE),int(100*SCALE)))
 		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
 
-		# cv2.namedWindow('ffg',cv2.WINDOW_NORMAL)
-		# cv2.resizeWindow('ffg', 500,500)
-		# cv2.imshow('ffg',img)
-		# cv2.waitKey(0)
+		cv2.namedWindow('ffg',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('ffg', 500,500)
+		cv2.imshow('ffg',img)
+		cv2.waitKey(0)
 
 		image, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 		
@@ -2598,12 +2598,12 @@ class Patch:
 		# for cnt in contours:
 		# 	contours_new.append(cnt+(overlap[0],overlap[1]))
 
-		cv2.drawContours(self.rgb_img, final_contours, -1, (0,255,0),10)
+		# cv2.drawContours(self.rgb_img, final_contours, -1, (0,255,0),10)
 
-		cv2.namedWindow('gr',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('gr', 500,500)
-		cv2.imshow('gr',self.rgb_img)
-		cv2.waitKey(0)
+		# cv2.namedWindow('gr',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('gr', 500,500)
+		# cv2.imshow('gr',self.rgb_img)
+		# cv2.waitKey(0)
 
 		return final_contours
 
