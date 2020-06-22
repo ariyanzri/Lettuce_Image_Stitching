@@ -2598,12 +2598,12 @@ class Patch:
 		# for cnt in contours:
 		# 	contours_new.append(cnt+(overlap[0],overlap[1]))
 
-		# cv2.drawContours(self.rgb_img, final_contours, -1, (0,255,0),10)
+		cv2.drawContours(self.rgb_img, final_contours, -1, (0,255,0),10)
 
-		# cv2.namedWindow('gr',cv2.WINDOW_NORMAL)
-		# cv2.resizeWindow('gr', 500,500)
-		# cv2.imshow('gr',self.rgb_img)
-		# cv2.waitKey(0)
+		cv2.namedWindow('gr',cv2.WINDOW_NORMAL)
+		cv2.resizeWindow('gr', 500,500)
+		cv2.imshow('gr',self.rgb_img)
+		cv2.waitKey(0)
 
 		return final_contours
 
@@ -4499,32 +4499,32 @@ def main(scan_date):
 		field = Field()
 		
 
-		old_lid_base_error = field.calculate_lid_based_error()
-		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# old_lid_base_error = field.calculate_lid_based_error()
+		# old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-		# field.create_patches_SIFT_files()
+		field.create_patches_SIFT_files()
 		
 		# field.draw_and_save_field(is_old=True)
 
 		field.correct_field()
 
-		field.draw_and_save_field(is_old=False)
+		# field.draw_and_save_field(is_old=False)
 
-		field.save_new_coordinate()
-
-
-		new_lid_base_error = field.calculate_lid_based_error()
-		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-
-		print('------------------ ERROR MEASUREMENT ------------------ ')
+		# field.save_new_coordinate()
 
 
-		print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
-		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+		# new_lid_base_error = field.calculate_lid_based_error()
+		# new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+
+		# print('------------------ ERROR MEASUREMENT ------------------ ')
+
+
+		# print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+		# print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
 		
 
-		print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
-		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
+		# print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+		# print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 		# ------------
 		# err = calculate_error_of_correction(True)
@@ -4641,13 +4641,13 @@ GPS_ERROR_X = 0.000002
 FFT_PARALLEL_CORES_TO_USE = 20
 
 
-number_of_rows_in_groups = 10
-groups_to_use = slice(0,None)
-patches_to_use = slice(0,None)
+# number_of_rows_in_groups = 10
+# groups_to_use = slice(0,None)
+# patches_to_use = slice(0,None)
 
-# number_of_rows_in_groups = 3
-# groups_to_use = slice(0,4)
-# patches_to_use = slice(0,30)
+number_of_rows_in_groups = 4
+groups_to_use = slice(0,2)
+patches_to_use = slice(0,20)
 
 
 
