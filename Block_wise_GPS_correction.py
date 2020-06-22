@@ -1739,7 +1739,7 @@ def get_best_neighbor_hybrid_method(p1,corrected):
 	return best_p,best_params
 
 
-def hybrid_method_UAV_lettuce_matching_step(patches,gid):
+def hybrid_method_UAV_lettuce_matching_step(patches,gid,percetage_matched=0.75):
 	global lettuce_coords
 
 	not_corrected = []
@@ -1752,7 +1752,7 @@ def hybrid_method_UAV_lettuce_matching_step(patches,gid):
 
 		total_matched,total_contours = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
 
-		if total_matched <CONTOUR_MATCHING_MIN_MATCH or total_matched/total_contours <=0.75:
+		if total_matched <CONTOUR_MATCHING_MIN_MATCH or total_matched/total_contours <percetage_matched:
 			not_corrected.append(p)
 		else:
 			print('Group ID {0}: patch {1} corrected with {2} number of matches ({3}).'.format(gid,p.name,total_matched,total_matched/total_contours))
@@ -2109,6 +2109,51 @@ class Graph():
 
 					patch = dict_patches[self.vertex_index_to_name_dict[v]]
 					parent_patch = dict_patches[self.vertex_index_to_name_dict[p]]
+					# H = [n[1].H for n in parent_patch.neighbors if n[0] == patch]
+					# H = H[0]
+					params = [n[1] for n in parent_patch.neighbors if n[0] == patch]
+					param = params[0]
+					H = param.H
+
+					new_gps = get_new_GPS_Coords(patch,parent_patch,H)
+
+					gps_diff = (patch.gps.UL_coord[0]-new_gps.UL_coord[0],patch.gps.UL_coord[1]-new_gps.UL_coord[1])
+					# print(gps_diff)
+					
+					patch.gps = new_gps
+
+					logger(patch,gps_diff,param,self.gid,step)
+					
+					step+=1
+
+		string_corrected = get_corrected_string(patches)
+		return string_corrected
+
+	def revise_GPS_from_generated_MST_for_Hybrid(self,patches,parents,corrected):
+		dict_patches = self.get_patches_dict(patches)
+
+		queue_traverse = []
+		
+		for v,p in enumerate(parents):
+			if p == -1:
+				queue_traverse = [v]
+				break
+		
+		step = 0
+
+		while len(queue_traverse) > 0:
+			u = queue_traverse.pop()
+
+			for v,p in enumerate(parents):
+				if p == u:
+					queue_traverse = [v] + queue_traverse
+
+					patch = dict_patches[self.vertex_index_to_name_dict[v]]
+					parent_patch = dict_patches[self.vertex_index_to_name_dict[p]]
+
+					if patch in corrected:
+						continue
+
 					# H = [n[1].H for n in parent_patch.neighbors if n[0] == patch]
 					# H = H[0]
 					params = [n[1] for n in parent_patch.neighbors if n[0] == patch]
@@ -2728,8 +2773,8 @@ class Patch:
 
 				T = get_translation_from_single_matches(c[0],c[1],l[0],l[1])
 
-				# if abs(T[0,2])>=GPS_ERROR_X/GPS_TO_IMAGE_RATIO[0] or abs(T[1,2])>=GPS_ERROR_Y/GPS_TO_IMAGE_RATIO[1]:
-				# 	continue
+				if abs(T[0,2])>=GPS_ERROR_X/GPS_TO_IMAGE_RATIO[0] or abs(T[1,2])>=GPS_ERROR_Y/GPS_TO_IMAGE_RATIO[1]:
+					continue
 
 				# mean_error = calculate_average_min_distance_lettuce_heads(contour_centers,inside_lettuce_heads,T)
 
@@ -3305,7 +3350,7 @@ class Group:
 		elif method == 'Hybrid':
 			
 			self.load_all_patches_SIFT_points()
-			self.load_all_patches_images()
+			# self.load_all_patches_images()
 
 			corrected,not_corrected,step = hybrid_method_UAV_lettuce_matching_step(self.patches,self.group_id)
 			
@@ -3315,6 +3360,43 @@ class Group:
 
 			# self.delete_all_patches_SIFT_points()
 			# self.delete_all_patches_images()
+
+		elif method == 'HybridMST':
+
+			self.load_all_patches_SIFT_points()
+			
+			CONTOUR_MATCHING_MIN_MATCH = 3
+
+			corrected,not_corrected,step = hybrid_method_UAV_lettuce_matching_step(self.patches,self.group_id,1)
+			
+			self.pre_calculate_internal_neighbors_and_transformation_parameters()
+
+			connected_patches = self.connected_component_patches()
+
+			G = Graph(len(connected_patches),[p.name for p in connected_patches],self.group_id)
+			G.initialize_edge_weights(connected_patches)
+
+			try:
+				starting_patch = connected_patches[0]
+				for p in corrected:
+					if p in connected_patches:
+						starting_patch = p
+						break
+
+				parents = G.generate_MST_prim(starting_patch.name)
+				string_res = G.revise_GPS_from_generated_MST_for_Hybrid(connected_patches,parents,corrected)
+			except Exception as e:
+				print(e)	
+				string_res = get_corrected_string(self.patches)
+
+			self.delete_all_patches_SIFT_points()
+
+			print('Group {0} - Not corrected patches (Left over in disconnected Graph:'.format(self.group_id))
+			for lp in self.patches:
+				if lp not in connected_patches:
+					print('\t{0}'.format(lp.name))
+
+			string_res = get_corrected_string(self.patches)
 
 		elif method == 'Merge':
 			
@@ -4532,10 +4614,11 @@ override_sifts = True
 
 # method = 'MST'
 # method = 'Hybrid'
+method = 'HybridMST'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
-method = 'UAVmatching'
+# method = 'UAVmatching'
 # method = 'Old_method'
 
 
