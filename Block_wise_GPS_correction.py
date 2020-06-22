@@ -2548,16 +2548,16 @@ class Patch:
 		cv2.imshow('ffg',img)
 		cv2.waitKey(0)
 
-		img = cv2.normalize(img, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
+		# img = cv2.normalize(img, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
 		
-		cv2.imshow('ffg',img)
-		cv2.waitKey(0)
+		# cv2.imshow('ffg',img)
+		# cv2.waitKey(0)
 
-		img[img>=130] = 255
-		img[img<130] = 0
+		# img[img>=130] = 255
+		# img[img<130] = 0
 
-		cv2.imshow('ffg',img)
-		cv2.waitKey(0)
+		# cv2.imshow('ffg',img)
+		# cv2.waitKey(0)
 
 		MB_size = int(17*SCALE) if int(17*SCALE) % 2 == 1 else int(17*SCALE)+1
 
@@ -4522,7 +4522,7 @@ def main(scan_date):
 		# old_lid_base_error = field.calculate_lid_based_error()
 		# old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-		field.create_patches_SIFT_files()
+		# field.create_patches_SIFT_files()
 		
 		# field.draw_and_save_field(is_old=True)
 
