@@ -3595,6 +3595,8 @@ class Field:
 	def move_initial_based_on_lids(self):
 		
 		lids = get_lids()
+		avgx = 0
+		avgy = 0
 
 		for p, l, x, y in self.detected_lid_patches:
 			point_in_GPS = lids[l]
@@ -3609,7 +3611,10 @@ class Field:
 
 			diff_GPS_after_correction = (old_GPS_point[0]-point_in_GPS[0],old_GPS_point[1]-point_in_GPS[1])
 
-			print(diff_GPS_after_correction)
+			avgx+=diff_GPS_after_correction[0]
+			avgy+=diff_GPS_after_correction[1]
+
+		print(avgx/len(self.detected_lid_patches),avgy/len(self.detected_lid_patches))
 			
 
 	def initialize_GPS_size(self,p):
