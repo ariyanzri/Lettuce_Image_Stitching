@@ -3339,21 +3339,6 @@ class Group:
 
 		return list_connected_patches
 
-	def calculate_scores_for_evaluation_and_test(self):
-		percentage_list = []
-		num_matches_list = []
-		dissimilarity_list = []
-
-		for patch in self.patches:
-			for n,prm in patch.neighbors:
-				percentage_list.append(prm.percentage_inliers)
-				num_matches_list.append(prm.num_matches)
-				dissimilarity_list.append(prm.dissimilarity)
-
-		print('Percentage inliers: {0},{1}'.format(statistics.mean(percentage_list),statistics.stdev(percentage_list)))
-		print('Num matches: {0},{1}'.format(statistics.mean(num_matches_list),statistics.stdev(num_matches_list)))
-		print('dissimilarity: {0},{1}'.format(statistics.mean(dissimilarity_list),statistics.stdev(dissimilarity_list)))
-
 	def correct_internally(self):
 
 		global lettuce_coords,no_of_cores_to_use,method,CONTOUR_MATCHING_MIN_MATCH
@@ -3384,8 +3369,6 @@ class Group:
 			for lp in self.patches:
 				if lp not in connected_patches:
 					print('\t{0}'.format(lp.name))
-
-			self.calculate_scores_for_evaluation_and_test()
 
 		elif method == 'Hybrid':
 			
@@ -4531,52 +4514,50 @@ def main(scan_date):
 
 		# ------------
 
-		# lettuce_coords = read_lettuce_heads_coordinates()
+		lettuce_coords = read_lettuce_heads_coordinates()
 
-		# field = Field()
+		field = Field()
 		
 
 		# old_lid_base_error = field.calculate_lid_based_error()
-		# old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-		# field.create_patches_SIFT_files()
+		field.create_patches_SIFT_files()
 		
 		# field.draw_and_save_field(is_old=True)
 
-		# field.correct_field()
+		field.correct_field()
 
-		# field.draw_and_save_field(is_old=False)
+		field.draw_and_save_field(is_old=False)
 
 		# field.save_new_coordinate()
 
 
 		# new_lid_base_error = field.calculate_lid_based_error()
-		# new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-		# print('------------------ ERROR MEASUREMENT ------------------ ')
+		print('------------------ ERROR MEASUREMENT ------------------ ')
 
 
 		# print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
-		# print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
 		
 
 		# print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
-		# print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
+		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 		# ------------
 
-		field = Field()
-		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# field = Field()
+		# old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-		field.create_patches_SIFT_files()
-		field.correct_field()
+		# field.create_patches_SIFT_files()
+		# field.correct_field()
 
-		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-		print('OLD, New and diff SI: {0},{1},{2}'.format(np.mean(old_RMSE[:,3]),np.mean(new_RMSE[:,3]),(np.mean(old_RMSE[:,3])-np.mean(new_RMSE[:,3]))))
+		# print('OLD, New and diff SI: {0},{1},{2}'.format(np.mean(old_RMSE[:,3]),np.mean(new_RMSE[:,3]),(np.mean(old_RMSE[:,3])-np.mean(new_RMSE[:,3]))))
 		
-		print('Percentage Inliers Mean and Stdev: {0},{1}'.format(perc_mean,perc_std))
-		print('Num Matches Mean and Stdev: {0},{1}'.format(num_mean,num_std))
 
 		# field.detect_lid_patches()
 		# print(field.calculate_lid_based_error())
@@ -4622,7 +4603,7 @@ def main(scan_date):
 
 
 
-server_core = {'coge':23,'laplace.cs.arizona.edu':10,'ariyan':4}
+server_core = {'coge':23,'laplace.cs.arizona.edu':12,'ariyan':4}
 server_core_max = {'coge':50,'laplace.cs.arizona.edu':35,'ariyan':4}
 
 server = socket.gethostname()
@@ -4639,7 +4620,7 @@ else:
 # -----------------------------------------------------------------------------------------------------------------------------------
 
 
-SCALE = 0.2
+SCALE = 0.1
 
 PATCH_SIZE = (int(3296*SCALE),int(2472*SCALE))
 LID_SIZE_AT_SCALE = (400*SCALE,600*SCALE)
@@ -4674,9 +4655,9 @@ GPS_ERROR_X = 0.000002
 FFT_PARALLEL_CORES_TO_USE = 20
 
 
-# number_of_rows_in_groups = 10
-# groups_to_use = slice(0,None)
-# patches_to_use = slice(0,None)
+number_of_rows_in_groups = 10
+groups_to_use = slice(0,None)
+patches_to_use = slice(0,None)
 
 number_of_rows_in_groups = 4
 groups_to_use = slice(0,5)
