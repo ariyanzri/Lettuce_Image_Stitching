@@ -3683,8 +3683,8 @@ class Field:
 			group = Group(len(groups),row_window)
 			groups.append(group)
 
-			start = end-1
-			end = start + number_of_rows_in_groups
+			start = end
+			end = start + number_of_rows_in_groups -1
 
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),number_of_rows_in_groups))
 		sys.stdout.flush()
