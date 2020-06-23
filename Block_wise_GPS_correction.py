@@ -3666,29 +3666,37 @@ class Field:
 
 		groups = []
 
-		start = 0
-		end = number_of_rows_in_groups - 1
+		# start = 0
+		# end = number_of_rows_in_groups -1
 
-		while start<len(rows):
+		# while start<len(rows):
 			
-			if end >= len(rows):
-				end = len(rows)
-				row_window = rows[start:end]
-				group = Group(len(groups),row_window)
-				groups.append(group)
-				break
+		# 	if end >= len(rows):
+		# 		end = len(rows)
+		# 		row_window = rows[start:end]
+		# 		group = Group(len(groups),row_window)
+		# 		groups.append(group)
+		# 		break
 					
-			row_window = rows[start:end+1]
+		# 	row_window = rows[start:end+1]
 
-			group = Group(len(groups),row_window)
-			groups.append(group)
+		# 	group = Group(len(groups),row_window)
+		# 	groups.append(group)
 
-			start = end - 1
-			end = start + number_of_rows_in_groups -1
+		# 	start = end - 1
+		# 	end = start + number_of_rows_in_groups -1
 
-		# while True:
+		while len(rows)>0:
 
-		# 	rows[:number_of_rows_in_groups]
+			r = rows[0]
+			tmp.append(r)
+			rows = rows[1:]
+			if len(tmp) == number_of_rows_in_groups:
+				groups.append(Group(len(groups),tmp))
+				tmp = tmp[-1:]
+
+		if len(tmp) > 0:
+			groups.append(Group(len(groups),tmp))
 
 		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),number_of_rows_in_groups))
 		sys.stdout.flush()
