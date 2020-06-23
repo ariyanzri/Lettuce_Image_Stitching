@@ -4514,20 +4514,6 @@ def main(scan_date):
 		print_settings()
 		os.system("taskset -p -c 0-45 %d" % os.getpid())
 		# os.system("taskset -p -c 40-47 %d" % os.getpid())
-		
-		# ------------
-
-		# field = Field(False)
-		# res = get_approximate_random_RMSE_overlap(field,10,40)
-		# np.save('RMSE_before.npy',res)
-		# print(np.mean(res[:,3]))
-
-		# field = Field(True)
-		# res = get_approximate_random_RMSE_overlap(field,10,40)
-		# np.save('RMSE_after.npy',res)
-		# print(np.mean(res[:,3]))
-
-		# ------------
 
 		lettuce_coords = read_lettuce_heads_coordinates()
 
@@ -4535,13 +4521,13 @@ def main(scan_date):
 		
 		# field.save_plot()
 
-		# old_lid_base_error = field.calculate_lid_based_error()
+		old_lid_base_error = field.calculate_lid_based_error()
 
-		# old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
 		field.create_patches_SIFT_files()
 		
-		# field.draw_and_save_field(is_old=True)
+		field.draw_and_save_field(is_old=True)
 
 		field.correct_field()
 
@@ -4696,8 +4682,8 @@ method = 'MST'
 # method = 'Old_method'
 
 
-# scan_date = '2020-02-18'
-scan_date = '2020-01-08'
+scan_date = '2020-02-18'
+# scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
