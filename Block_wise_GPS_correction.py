@@ -2540,8 +2540,6 @@ class Patch:
 		cv2.waitKey(0)
 
 		img = green_channel-0.61*blue_channel-0.39*red_channel
-		img[img<0] = 0
-		# img = img.astype('uint8')
 
 		min_p = np.amin(img)
 		max_p = np.amax(img)
@@ -2550,16 +2548,16 @@ class Patch:
 		cv2.imshow('ffg',img)
 		cv2.waitKey(0)
 
-		# img = cv2.normalize(img, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
+		img = cv2.normalize(img, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
 		
-		# cv2.imshow('ffg',img)
-		# cv2.waitKey(0)
+		cv2.imshow('ffg',img)
+		cv2.waitKey(0)
 
-		# img[img>=130] = 255
-		# img[img<130] = 0
+		img[img>=130] = 255
+		img[img<130] = 0
 
-		# cv2.imshow('ffg',img)
-		# cv2.waitKey(0)
+		cv2.imshow('ffg',img)
+		cv2.waitKey(0)
 
 		MB_size = int(17*SCALE) if int(17*SCALE) % 2 == 1 else int(17*SCALE)+1
 
@@ -2568,13 +2566,13 @@ class Patch:
 		cv2.imshow('ffg',img)
 		cv2.waitKey(0)
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(70*SCALE),int(70*SCALE)))
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(100*SCALE),int(100*SCALE)))
 		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
 		cv2.imshow('ffg',img)
 		cv2.waitKey(0)
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(70*SCALE),int(70*SCALE)))
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(100*SCALE),int(100*SCALE)))
 		img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
 
 		cv2.imshow('ffg',img)
