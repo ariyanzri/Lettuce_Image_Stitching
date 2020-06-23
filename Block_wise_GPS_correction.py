@@ -3443,7 +3443,7 @@ class Group:
 		elif method == 'UAVmatching':
 			for p in self.patches:
 				total_matched,total_contours = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
-				if total_matched <CONTOUR_MATCHING_MIN_MATCH or total_matched/total_contours <0.5:
+				if total_matched <CONTOUR_MATCHING_MIN_MATCH or total_matched/total_contours <=0.5:
 					print('Group ID {0}: patch {1} not corrected. '.format(self.group_id,p.name))
 					sys.stdout.flush()
 				else:
