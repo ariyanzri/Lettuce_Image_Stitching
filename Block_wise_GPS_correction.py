@@ -2572,13 +2572,13 @@ class Patch:
 		cv2.imshow('ffg',img)
 		cv2.waitKey(0)
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(150*SCALE),int(150*SCALE)))
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(100*SCALE),int(100*SCALE)))
 		img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
 
 		cv2.imshow('ffg',img)
 		cv2.waitKey(0)
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(120*SCALE),int(120*SCALE)))
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(inside_radius_lettuce_matching_threshold*SCALE),int(inside_radius_lettuce_matching_threshold*SCALE)))
 		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
 
 		cv2.imshow('ffg',img)
