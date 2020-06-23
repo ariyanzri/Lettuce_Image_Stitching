@@ -3339,17 +3339,20 @@ class Group:
 
 		return list_connected_patches
 
-	def calculate_average_and_std_for_test(self):
+	def calculate_scores_for_evaluation_and_test(self):
 		percentage_list = []
 		num_matches_list = []
+		dissimilarity_list = []
 
-		
 		for patch in self.patches:
 			for n,prm in patch.neighbors:
 				percentage_list.append(prm.percentage_inliers)
 				num_matches_list.append(prm.num_matches)
+				dissimilarity_list.append(prm.dissimilarity)
 
-		return statistics.mean(percentage_list),statistics.stdev(percentage_list),statistics.mean(num_matches_list),statistics.stdev(num_matches_list)
+		print('Percentage inliers: {0},{1}'.format(statistics.mean(percentage_list),statistics.stdev(percentage_list)))
+		print('Num matches: {0},{1}'.format(statistics.mean(num_matches_list),statistics.stdev(num_matches_list)))
+		print('dissimilarity: {0},{1}'.format(statistics.mean(dissimilarity_list),statistics.stdev(dissimilarity_list)))
 
 	def correct_internally(self):
 
@@ -3382,7 +3385,7 @@ class Group:
 				if lp not in connected_patches:
 					print('\t{0}'.format(lp.name))
 
-			print(self.calculate_average_and_std_for_test())
+			self.calculate_scores_for_evaluation_and_test()
 
 		elif method == 'Hybrid':
 			
