@@ -2606,9 +2606,9 @@ class Patch:
 			cX = int(M["m10"] / M["m00"])
 			cY = int(M["m01"] / M["m00"])
 
-			# if cX<=inside_radius_lettuce_matching_threshold or cY<=inside_radius_lettuce_matching_threshold or \
-			# abs(PATCH_SIZE[1]-cX)<inside_radius_lettuce_matching_threshold or abs(PATCH_SIZE[0]-cY)<inside_radius_lettuce_matching_threshold:
-			# 	continue
+			if cX<=inside_radius_lettuce_matching_threshold or cY<=inside_radius_lettuce_matching_threshold or \
+			abs(PATCH_SIZE[1]-cX)<inside_radius_lettuce_matching_threshold or abs(PATCH_SIZE[0]-cY)<inside_radius_lettuce_matching_threshold:
+				continue
 
 			if areas[i]>threshold:
 				final_contours.append(cnt)
@@ -3339,6 +3339,18 @@ class Group:
 
 		return list_connected_patches
 
+	def calculate_average_and_std_for_test(self):
+		percentage_list = []
+		num_matches_list = []
+
+		
+		for patch in self.patches:
+			for n,prm in patch.neighbors:
+				percentage_list.append(prm.percentage_inliers)
+				num_matches_list.append(prm.num_matches)
+
+		return statistics.mean(percentage_list),statistics.stdev(percentage_list),statistics.mean(num_matches_list),statistics.stdev(num_matches_list)
+
 	def correct_internally(self):
 
 		global lettuce_coords,no_of_cores_to_use,method,CONTOUR_MATCHING_MIN_MATCH
@@ -3370,6 +3382,8 @@ class Group:
 				if lp not in connected_patches:
 					print('\t{0}'.format(lp.name))
 
+			print(self.calculate_average_and_std_for_test())
+
 		elif method == 'Hybrid':
 			
 			self.load_all_patches_SIFT_points()
@@ -3389,7 +3403,7 @@ class Group:
 			self.load_all_patches_SIFT_points()
 			# self.load_all_patches_images()
 
-			CONTOUR_MATCHING_MIN_MATCH = 4
+			CONTOUR_MATCHING_MIN_MATCH = 3
 
 			corrected,not_corrected,step = hybrid_method_UAV_lettuce_matching_step(self.patches,self.group_id,1)
 			
@@ -4045,19 +4059,6 @@ class Field:
 			for i,row in enumerate(group.rows):
 				print('\t**** ROW {0} with {1} patches.'.format(i,len(row)))
 
-	def get_average_stdev_num_matches_and_percentage_inliers(self):
-
-		percentage_list = []
-		num_matches_list = []
-
-		for group in self.groups:
-			for patch in group.patches:
-				for n,prm in patch.neighbors:
-					percentage_list.append(prm.percentage_inliers)
-					num_matches_list.append(prm.num_matches)
-
-		return statistics.mean(percentage_list),statistics.stdev(percentage_list),statistics.mean(num_matches_list),statistics.stdev(num_matches_list)
-
 	def calculate_scale_effect(self,num_patches):
 		global no_of_cores_to_use_max,SCALE,PATCH_SIZE,GPS_TO_IMAGE_RATIO
 
@@ -4568,8 +4569,6 @@ def main(scan_date):
 		field.correct_field()
 
 		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-
-		perc_mean,perc_std,num_mean,num_std = field.get_average_stdev_num_matches_and_percentage_inliers()
 
 		print('OLD, New and diff SI: {0},{1},{2}'.format(np.mean(old_RMSE[:,3]),np.mean(new_RMSE[:,3]),(np.mean(old_RMSE[:,3])-np.mean(new_RMSE[:,3]))))
 		
