@@ -3443,7 +3443,7 @@ class Group:
 		elif method == 'UAVmatching':
 			for p in self.patches:
 				total_matched,total_contours = p.correct_based_on_contours_and_lettuce_heads(lettuce_coords)
-				if total_matched <CONTOUR_MATCHING_MIN_MATCH or total_matched/total_contours <0.5:
+				if total_matched <CONTOUR_MATCHING_MIN_MATCH or total_matched/total_contours <=0.5:
 					print('Group ID {0}: patch {1} not corrected. '.format(self.group_id,p.name))
 					sys.stdout.flush()
 				else:
@@ -4674,16 +4674,16 @@ override_sifts = True
 
 # method = 'MST'
 # method = 'Hybrid'
-method = 'HybridMST'
+# method = 'HybridMST'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
-# method = 'UAVmatching'
+method = 'UAVmatching'
 # method = 'Old_method'
 
 
-scan_date = '2020-02-18'
-# scan_date = '2020-01-08'
+# scan_date = '2020-02-18'
+scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
