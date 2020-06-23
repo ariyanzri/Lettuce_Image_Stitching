@@ -4045,6 +4045,19 @@ class Field:
 			for i,row in enumerate(group.rows):
 				print('\t**** ROW {0} with {1} patches.'.format(i,len(row)))
 
+	def get_average_stdev_num_matches_and_percentage_inliers(self):
+
+		percentage_list = []
+		num_matches_list = []
+
+		for group in self.groups:
+			for patch in group.patches:
+				for n,prm in patch.neighbors:
+					percentage_list.append(prm.percentage_inliers)
+					num_matches_list.append(prm.num_matches)
+
+		return statistics.mean(percentage_list),statistics.stdev(percentage_list),statistics.mean(num_matches_list),statistics.stdev(num_matches_list)
+
 	def calculate_scale_effect(self,num_patches):
 		global no_of_cores_to_use_max,SCALE,PATCH_SIZE,GPS_TO_IMAGE_RATIO
 
@@ -4514,41 +4527,55 @@ def main(scan_date):
 
 		# ------------
 
-		lettuce_coords = read_lettuce_heads_coordinates()
+		# lettuce_coords = read_lettuce_heads_coordinates()
 
-		field = Field()
+		# field = Field()
 		
 
-		old_lid_base_error = field.calculate_lid_based_error()
-		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# old_lid_base_error = field.calculate_lid_based_error()
+		# old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-		field.create_patches_SIFT_files()
+		# field.create_patches_SIFT_files()
 		
-		field.draw_and_save_field(is_old=True)
+		# field.draw_and_save_field(is_old=True)
 
-		field.correct_field()
+		# field.correct_field()
 
-		field.draw_and_save_field(is_old=False)
+		# field.draw_and_save_field(is_old=False)
 
-		field.save_new_coordinate()
-
-
-		new_lid_base_error = field.calculate_lid_based_error()
-		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-
-		print('------------------ ERROR MEASUREMENT ------------------ ')
+		# field.save_new_coordinate()
 
 
-		print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
-		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+		# new_lid_base_error = field.calculate_lid_based_error()
+		# new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+
+		# print('------------------ ERROR MEASUREMENT ------------------ ')
+
+
+		# print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+		# print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
 		
 
-		print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
-		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
+		# print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+		# print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 		# ------------
 
-		# field = Field()
+		field = Field()
+		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+
+		field.create_patches_SIFT_files()
+		field.correct_field()
+
+		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+
+		perc_mean,perc_std,num_mean,num_std = field.get_average_stdev_num_matches_and_percentage_inliers()
+
+		print('OLD, New and diff SI: {0},{1},{2}'.format(np.mean(old_RMSE[:,3]),np.mean(new_RMSE[:,3]),(np.mean(old_RMSE[:,3])-np.mean(new_RMSE[:,3]))))
+		
+		print('Percentage Inliers Mean and Stdev: {0},{1}'.format(perc_mean,perc_std))
+		print('Num Matches Mean and Stdev: {0},{1}'.format(num_mean,num_std))
+
 		# field.detect_lid_patches()
 		# print(field.calculate_lid_based_error())
 		# cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
@@ -4645,13 +4672,13 @@ GPS_ERROR_X = 0.000002
 FFT_PARALLEL_CORES_TO_USE = 20
 
 
-number_of_rows_in_groups = 10
-groups_to_use = slice(0,None)
-patches_to_use = slice(0,None)
+# number_of_rows_in_groups = 10
+# groups_to_use = slice(0,None)
+# patches_to_use = slice(0,None)
 
-# number_of_rows_in_groups = 4
-# groups_to_use = slice(0,1)
-# patches_to_use = slice(0,20)
+number_of_rows_in_groups = 4
+groups_to_use = slice(0,2)
+patches_to_use = slice(0,15)
 
 
 inside_radius_lettuce_matching_threshold = 200*SCALE
@@ -4670,7 +4697,7 @@ method = 'MST'
 
 
 # scan_date = '2020-02-18'
-# scan_date = '2020-01-08'
+scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
@@ -4684,7 +4711,7 @@ method = 'MST'
 # scan_date = '2020-06-05_hardware_south'
 # scan_date = 'hardware_f6,7_summer_shade'
 # scan_date = 'hardware_f6,7_summer_suntest061620'
-scan_date = 'software_f6,7_summer_shade'
+# scan_date = 'software_f6,7_summer_shade'
 
 # -----------------------------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
