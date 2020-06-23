@@ -1453,12 +1453,12 @@ def detect_SIFT_key_points(img,x1,y1,x2,y2):
 
 def parallel_patch_creator(patch):
 	
-	global SIFT_folder,patch_folder,override_sifts
+	global SIFT_folder,patch_folder,override_sifts,HISTOGRAM_EQUAL_FOR_SIFT
 
 	if os.path.exists('{0}/{1}_SIFT.data'.format(SIFT_folder,patch.name.replace('.tif',''))) and override_sifts==False:
 		return
 
-	patch.load_img(True)
+	patch.load_img(HISTOGRAM_EQUAL_FOR_SIFT)
 	img = patch.rgb_img
 	kp,desc = detect_SIFT_key_points(img,0,0,PATCH_SIZE[1],PATCH_SIZE[0])
 
@@ -2231,11 +2231,11 @@ class Patch:
 		gc.collect()
 
 
-	def load_img(self,hist_eq=True):
-		global patch_folder
+	def load_img(self):
+		global patch_folder,HISTOGRAM_EQUAL_GENERAL
 
 		if self.rgb_img is None:
-			img,img_g = load_preprocess_image('{0}/{1}'.format(patch_folder,self.name),hist_eq)
+			img,img_g = load_preprocess_image('{0}/{1}'.format(patch_folder,self.name),HISTOGRAM_EQUAL_GENERAL)
 			self.rgb_img = img
 			self.gray_img = img_g
 
@@ -4571,12 +4571,11 @@ def main(scan_date):
 		
 	else:
 		# HPC
-		print_settings()
 		discard_right_flag = False
+
+		print_settings()
 		
 		field = Field()
-
-		print('Patch Numbers: {0}'.format(len(field.groups[0].patches)*5))
 
 		field.create_patches_SIFT_files()
 		# field.draw_and_save_field(is_old=True)
@@ -4589,7 +4588,7 @@ def main(scan_date):
 		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 		# field.save_plot()
-		# field.draw_and_save_field(is_old=False)
+		field.draw_and_save_field(is_old=False)
 		# field.print_field_in_text()
 
 
@@ -4610,6 +4609,9 @@ else:
 # ------------------------------------------------------- Settings ------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
 
+
+HISTOGRAM_EQUAL_FOR_SIFT = True
+HISTOGRAM_EQUAL_GENERAL = True
 
 SCALE = 0.2
 
@@ -4660,9 +4662,9 @@ discard_right_flag = True
 
 override_sifts = True
 
-# method = 'MST'
+method = 'MST'
 # method = 'Hybrid'
-method = 'HybridMST'
+# method = 'HybridMST'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
@@ -4670,7 +4672,7 @@ method = 'HybridMST'
 # method = 'Old_method'
 
 
-scan_date = '2020-02-18'
+# scan_date = '2020-02-18'
 # scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
@@ -4685,7 +4687,7 @@ scan_date = '2020-02-18'
 # scan_date = '2020-06-05_hardware_south'
 # scan_date = 'hardware_f6,7_summer_shade'
 # scan_date = 'hardware_f6,7_summer_suntest061620'
-# scan_date = 'software_f6,7_summer_shade'
+scan_date = 'software_f6,7_summer_shade'
 
 # -----------------------------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------------------
