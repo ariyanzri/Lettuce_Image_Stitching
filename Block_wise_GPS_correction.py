@@ -3687,7 +3687,7 @@ class Field:
 		# 	end = start + number_of_rows_in_groups -1
 
 		tmp = []
-		
+
 		while len(rows)>0:
 
 			r = rows[0]
@@ -4485,9 +4485,9 @@ def main(scan_date):
 
 		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-		field.create_patches_SIFT_files()
+		# field.create_patches_SIFT_files()
 		
-		field.draw_and_save_field(is_old=True)
+		# field.draw_and_save_field(is_old=True)
 
 		field.correct_field()
 
@@ -4533,9 +4533,11 @@ def main(scan_date):
 
 		field = Field()
 		
+		# field.save_plot()
 
 		# old_lid_base_error = field.calculate_lid_based_error()
-		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+
+		# old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
 		field.create_patches_SIFT_files()
 		
@@ -4545,20 +4547,20 @@ def main(scan_date):
 
 		field.draw_and_save_field(is_old=False)
 
-		# field.save_new_coordinate()
+		field.save_new_coordinate()
 
 
-		# new_lid_base_error = field.calculate_lid_based_error()
+		new_lid_base_error = field.calculate_lid_based_error()
 		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
 		print('------------------ ERROR MEASUREMENT ------------------ ')
 
 
-		# print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+		print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
 		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
 		
 
-		# print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+		print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
 		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 		# ------------
@@ -4684,9 +4686,9 @@ discard_right_flag = True
 
 override_sifts = True
 
-# method = 'MST'
+method = 'MST'
 # method = 'Hybrid'
-method = 'HybridMST'
+# method = 'HybridMST'
 # method = 'Merge'
 # method = 'AllNeighbor'
 # method = 'Rowbyrow'
