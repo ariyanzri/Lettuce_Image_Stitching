@@ -2578,7 +2578,7 @@ class Patch:
 		cv2.imshow('ffg',img)
 		cv2.waitKey(0)
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(inside_radius_lettuce_matching_threshold*SCALE),int(inside_radius_lettuce_matching_threshold*SCALE)))
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(inside_radius_lettuce_matching_threshold),int(inside_radius_lettuce_matching_threshold)))
 		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
 
 		cv2.imshow('ffg',img)
