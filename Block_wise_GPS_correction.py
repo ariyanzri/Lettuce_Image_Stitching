@@ -2534,10 +2534,10 @@ class Patch:
 		red_channel = img[:,:,2].copy()
 		blue_channel = img[:,:,0].copy()
 
-		cv2.namedWindow('ffg',cv2.WINDOW_NORMAL)
-		cv2.resizeWindow('ffg', 500,500)
-		cv2.imshow('ffg',img)
-		cv2.waitKey(0)
+		# cv2.namedWindow('ffg',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('ffg', 500,500)
+		# cv2.imshow('ffg',img)
+		# cv2.waitKey(0)
 
 		img = green_channel-0.61*blue_channel-0.39*red_channel
 
@@ -2545,38 +2545,38 @@ class Patch:
 		max_p = np.amax(img)
 		rng = (max_p-min_p)
 		
-		cv2.imshow('ffg',img)
-		cv2.waitKey(0)
+		# cv2.imshow('ffg',img)
+		# cv2.waitKey(0)
 
 		img = cv2.normalize(img, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
 		
-		cv2.imshow('ffg',img)
-		cv2.waitKey(0)
+		# cv2.imshow('ffg',img)
+		# cv2.waitKey(0)
 
 		img[img>=130] = 255
 		img[img<130] = 0
 
-		cv2.imshow('ffg',img)
-		cv2.waitKey(0)
+		# cv2.imshow('ffg',img)
+		# cv2.waitKey(0)
 
 		MB_size = int(17*SCALE) if int(17*SCALE) % 2 == 1 else int(17*SCALE)+1
 
 		img  = cv2.medianBlur(img,MB_size)
 
-		cv2.imshow('ffg',img)
-		cv2.waitKey(0)
+		# cv2.imshow('ffg',img)
+		# cv2.waitKey(0)
 
 		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(inside_radius_lettuce_matching_threshold),int(inside_radius_lettuce_matching_threshold)))
 		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
-		cv2.imshow('ffg',img)
-		cv2.waitKey(0)
+		# cv2.imshow('ffg',img)
+		# cv2.waitKey(0)
 
 		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(inside_radius_lettuce_matching_threshold),int(inside_radius_lettuce_matching_threshold)))
 		img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
 
-		cv2.imshow('ffg',img)
-		cv2.waitKey(0)
+		# cv2.imshow('ffg',img)
+		# cv2.waitKey(0)
 
 		# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(inside_radius_lettuce_matching_threshold),int(inside_radius_lettuce_matching_threshold)))
 		# img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
@@ -4519,47 +4519,32 @@ def main(scan_date):
 		field = Field()
 		
 
-		# old_lid_base_error = field.calculate_lid_based_error()
-		# old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		old_lid_base_error = field.calculate_lid_based_error()
+		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-		# field.create_patches_SIFT_files()
+		field.create_patches_SIFT_files()
 		
-		# field.draw_and_save_field(is_old=True)
+		field.draw_and_save_field(is_old=True)
 
 		field.correct_field()
 
-		# field.draw_and_save_field(is_old=False)
+		field.draw_and_save_field(is_old=False)
 
-		# field.save_new_coordinate()
-
-
-		# new_lid_base_error = field.calculate_lid_based_error()
-		# new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-
-		# print('------------------ ERROR MEASUREMENT ------------------ ')
+		field.save_new_coordinate()
 
 
-		# print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
-		# print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+		new_lid_base_error = field.calculate_lid_based_error()
+		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+
+		print('------------------ ERROR MEASUREMENT ------------------ ')
+
+
+		print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
 		
 
-		# print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
-		# print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
-
-		# ------------
-		# err = calculate_error_of_correction(True)
-		# print("({:.10f},{:.10f})".format(err[0],err[1]))
-
-
-		# field = Field()
-		# field.create_patches_SIFT_files()
-		# lettuce_coords = read_lettuce_heads_coordinates()
-		
-		# field.correct_field()
-		# field.save_new_coordinate()
-
-		# err = calculate_error_of_correction()
-		# print("({:.10f},{:.10f})".format(err[0],err[1]))
+		print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 		# ------------
 
@@ -4661,13 +4646,13 @@ GPS_ERROR_X = 0.000002
 FFT_PARALLEL_CORES_TO_USE = 20
 
 
-# number_of_rows_in_groups = 10
-# groups_to_use = slice(0,None)
-# patches_to_use = slice(0,None)
+number_of_rows_in_groups = 10
+groups_to_use = slice(0,None)
+patches_to_use = slice(0,None)
 
-number_of_rows_in_groups = 4
-groups_to_use = slice(0,1)
-patches_to_use = slice(0,20)
+# number_of_rows_in_groups = 4
+# groups_to_use = slice(0,1)
+# patches_to_use = slice(0,20)
 
 
 
