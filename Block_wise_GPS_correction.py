@@ -4594,8 +4594,8 @@ def main(scan_date):
 
 
 
-server_core = {'coge':15,'laplace.cs.arizona.edu':10,'ariyan':4}
-server_core_max = {'coge':45,'laplace.cs.arizona.edu':35,'ariyan':4}
+server_core = {'coge':23,'laplace.cs.arizona.edu':10,'ariyan':4}
+server_core_max = {'coge':50,'laplace.cs.arizona.edu':35,'ariyan':4}
 
 server = socket.gethostname()
 if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
