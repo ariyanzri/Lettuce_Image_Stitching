@@ -4655,7 +4655,6 @@ patches_to_use = slice(0,None)
 # patches_to_use = slice(0,20)
 
 
-
 inside_radius_lettuce_matching_threshold = 200*SCALE
 discard_right_flag = True
 
