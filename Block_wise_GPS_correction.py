@@ -3667,7 +3667,7 @@ class Field:
 		groups = []
 
 		start = 0
-		end = number_of_rows_in_groups
+		end = number_of_rows_in_groups - 1
 
 		while start<len(rows):
 			
@@ -3678,7 +3678,7 @@ class Field:
 				groups.append(group)
 				break
 					
-			row_window = rows[start:end]
+			row_window = rows[start:end+1]
 
 			group = Group(len(groups),row_window)
 			groups.append(group)
