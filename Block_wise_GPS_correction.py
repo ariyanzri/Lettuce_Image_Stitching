@@ -3686,6 +3686,8 @@ class Field:
 		# 	start = end - 1
 		# 	end = start + number_of_rows_in_groups -1
 
+		tmp = []
+		
 		while len(rows)>0:
 
 			r = rows[0]
