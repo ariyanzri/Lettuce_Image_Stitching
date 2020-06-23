@@ -2572,7 +2572,7 @@ class Patch:
 		cv2.imshow('ffg',img)
 		cv2.waitKey(0)
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(100*SCALE),int(100*SCALE)))
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(150*SCALE),int(150*SCALE)))
 		img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
 
 		cv2.imshow('ffg',img)
