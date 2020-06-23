@@ -3837,7 +3837,7 @@ class Field:
 				for p in row:
 
 					if show_possible_lids:
-						if p,l in lid_patches:
+						if p in [lp[0] for lp in lid_patches]:
 							result.append([p.gps.Center[0],p.gps.Center[1],4])
 						else:
 							result.append([p.gps.Center[0],p.gps.Center[1],color])	
