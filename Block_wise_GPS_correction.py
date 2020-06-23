@@ -2566,23 +2566,23 @@ class Patch:
 		cv2.imshow('ffg',img)
 		cv2.waitKey(0)
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(100*SCALE),int(100*SCALE)))
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(inside_radius_lettuce_matching_threshold),int(inside_radius_lettuce_matching_threshold)))
 		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
 		cv2.imshow('ffg',img)
 		cv2.waitKey(0)
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(100*SCALE),int(100*SCALE)))
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(inside_radius_lettuce_matching_threshold),int(inside_radius_lettuce_matching_threshold)))
 		img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)		
 
 		cv2.imshow('ffg',img)
 		cv2.waitKey(0)
 
-		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(inside_radius_lettuce_matching_threshold),int(inside_radius_lettuce_matching_threshold)))
-		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
+		# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(inside_radius_lettuce_matching_threshold),int(inside_radius_lettuce_matching_threshold)))
+		# img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
 
-		cv2.imshow('ffg',img)
-		cv2.waitKey(0)
+		# cv2.imshow('ffg',img)
+		# cv2.waitKey(0)
 		
 		image, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 		
