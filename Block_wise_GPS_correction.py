@@ -4487,7 +4487,7 @@ def main(scan_date):
 
 		field.create_patches_SIFT_files()
 		
-		# field.draw_and_save_field(is_old=True)
+		field.draw_and_save_field(is_old=True)
 
 		field.correct_field()
 
@@ -4694,8 +4694,8 @@ method = 'HybridMST'
 # method = 'Old_method'
 
 
-scan_date = '2020-02-18'
-# scan_date = '2020-01-08'
+# scan_date = '2020-02-18'
+scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'
