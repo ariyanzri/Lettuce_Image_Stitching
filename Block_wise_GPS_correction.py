@@ -3837,7 +3837,7 @@ class Field:
 				for p in row:
 
 					if show_possible_lids:
-						if p in lid_patches:
+						if p,l in lid_patches:
 							result.append([p.gps.Center[0],p.gps.Center[1],4])
 						else:
 							result.append([p.gps.Center[0],p.gps.Center[1],color])	
@@ -4466,7 +4466,7 @@ def main(scan_date):
 		field = Field()
 		
 		field.save_plot()
-		
+
 		# old_lid_base_error = field.calculate_lid_based_error()
 
 		# old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
