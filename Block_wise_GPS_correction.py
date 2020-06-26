@@ -3618,8 +3618,16 @@ class Field:
 		self.groups = self.initialize_field(use_corrected)
 		self.detected_lid_patches = []
 		self.detect_lid_patches()
+
+		old_lid_base_error = self.calculate_lid_based_error()
+
 		for g in self.groups:
 			g.update_lid_patches(self.detected_lid_patches)
+
+		new_lid_base_error = self.calculate_lid_based_error()
+
+		print(old_lid_base_error)
+		print(new_lid_base_error)
 	
 	def get_patches_with_possible_lids(self):
 		lids = get_lids()
