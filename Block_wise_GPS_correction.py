@@ -1961,6 +1961,13 @@ def ortho_generation_sub_function_helper(args):
 	return ortho_generation_sub_function(*args)	
 
 
+def get_pairwise_params_parallel(p,n):
+	neighbor_param = p.get_pairwise_transformation_info(n)
+	return neighbor_param,p,n
+
+def get_pairwise_params_parallel_helper(args):
+	return get_pairwise_params_parallel(*args)
+
 class GPS_Coordinate:
 	
 	def __init__(self,UL_coord,UR_coord,LL_coord,LR_coord,Center):
@@ -3105,67 +3112,28 @@ class Group:
 		sys.stdout.flush()
 
 	def pre_calculate_internal_neighbors_and_transformation_parameters(self,print_flg=True):
-		remove_neighbors = []
-
-		for p in self.patches:
-
-			for n in self.patches:
-
-				if n != p and (p.has_overlap(n) or n.has_overlap(p)):
-
-					neighbor_param = p.get_pairwise_transformation_info(n)
-					
-					if neighbor_param is None:
-						remove_neighbors.append((n,p))
-						# print('GROPU ID: {0} - REMOVED PATCH'.format(self.group_id))
-						continue
-					
-					p.neighbors.append((n,neighbor_param))
-
-			if print_flg:
-				print('GROPU ID: {0} - Calculated Transformation and error values for {1} neighbors of {2}'.format(self.group_id,len(p.neighbors),p.name))
-
-			sys.stdout.flush()
-
-		for a,b in remove_neighbors:
-			new_neighbors = []
-
-			for n in a.neighbors:
-				if b != n[0]:
-					new_neighbors.append(n)
-				
-			a.neighbors = new_neighbors
+		global no_of_cores_to_use_max
 
 		# remove_neighbors = []
 
 		# for p in self.patches:
 
-		# 	manager = multiprocessing.Manager()
-		# 	return_dict = manager.dict()
-		# 	jobs = []
-
 		# 	for n in self.patches:
 
 		# 		if n != p and (p.has_overlap(n) or n.has_overlap(p)):
 
-		# 			process = multiprocessing.Process(target=get_pairwise_transformation_info_helper, args=(p,n,return_dict))
-		# 			jobs.append(process)
-		# 			process.daemon = False
-		# 			process.start()	
+		# 			neighbor_param = p.get_pairwise_transformation_info(n)
 					
-		# 	for proc in jobs:
-		# 		proc.join()
+		# 			if neighbor_param is None:
+		# 				remove_neighbors.append((n,p))
+		# 				# print('GROPU ID: {0} - REMOVED PATCH'.format(self.group_id))
+		# 				continue
+					
+		# 			p.neighbors.append((n,neighbor_param))
 
-		# 	for name in return_dict:
-		# 		neighbor_param = return_dict[name][0]
-		# 		n = return_dict[name][1]
-		# 		if neighbor_param == None:
-		# 			remove_neighbors.append((n,p))
-		# 			continue
+		# 	if print_flg:
+		# 		print('GROPU ID: {0} - Calculated Transformation and error values for {1} neighbors of {2}'.format(self.group_id,len(p.neighbors),p.name))
 
-		# 		p.neighbors.append((n,neighbor_param))
-
-		# 	print('GROPU ID: {0} - Calculated Transformation and error values for {1} neighbors of {2}'.format(self.group_id,len(p.neighbors),p.name))
 		# 	sys.stdout.flush()
 
 		# for a,b in remove_neighbors:
@@ -3176,6 +3144,40 @@ class Group:
 		# 			new_neighbors.append(n)
 				
 		# 	a.neighbors = new_neighbors
+
+		# ---- parallel
+
+		remove_neighbors = []
+		args = []
+
+		for p in self.patches:
+
+			for n in self.patches:
+
+				if n != p and (p.has_overlap(n) or n.has_overlap(p)):
+
+					args.append((p,n))
+
+		processes = MyPool(no_of_cores_to_use_max)
+
+		results = processes.map(get_pairwise_params_parallel_helper,args)
+		processes.close()
+
+		for nbp,p,n in results:
+			if nbp is None:
+				remove_neighbors.append(n,p)
+			else:
+				p.neighbors.append((n,nbp))
+
+		for a,b in remove_neighbors:
+			new_neighbors = []
+
+			for n in a.neighbors:
+				if b != n[0]:
+					new_neighbors.append(n)
+				
+			a.neighbors = new_neighbors
+
 
 
 	def correct_row_by_row(self):
