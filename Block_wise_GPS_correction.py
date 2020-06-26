@@ -4732,13 +4732,13 @@ GPS_ERROR_X = 0.000002
 FFT_PARALLEL_CORES_TO_USE = 20
 
 
-# number_of_rows_in_groups = 10
-# groups_to_use = slice(0,None)
-# patches_to_use = slice(0,None)
-
 number_of_rows_in_groups = 10
 groups_to_use = slice(0,None)
-patches_to_use = slice(0,10)
+patches_to_use = slice(0,None)
+
+# number_of_rows_in_groups = 10
+# groups_to_use = slice(0,None)
+# patches_to_use = slice(0,10)
 
 
 inside_radius_lettuce_matching_threshold = 200*SCALE
