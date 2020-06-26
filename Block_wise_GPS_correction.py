@@ -2447,6 +2447,28 @@ class Patch:
 
 		return magnitude_spectrum.astype('uint8')
 
+	def correct_GPS_based_on_point(self,point_in_img,point_in_GPS):
+		ratio_x = point_in_img[0]/PATCH_SIZE[1]
+		ratio_y = point_in_img[1]/PATCH_SIZE[0]
+
+		diff_x_GPS = PATCH_SIZE_GPS[0]*ratio_x
+		diff_y_GPS = PATCH_SIZE_GPS[1]*ratio_y
+
+		old_GPS_point = (self.gps.UL_coord[0]+diff_x_GPS,self.gps.UL_coord[1]-diff_y_GPS)
+
+		diff_GPS_after_correction = (old_GPS_point[0]-point_in_GPS[0],old_GPS_point[1]-point_in_GPS[1])
+
+
+		new_UR = (self.gps.UR_coord[0]-diff_GPS_after_correction[0],self.gps.UR_coord[1]-diff_GPS_after_correction[1])
+		new_UL = (self.gps.UL_coord[0]-diff_GPS_after_correction[0],self.gps.UL_coord[1]-diff_GPS_after_correction[1])
+		new_LL = (self.gps.LL_coord[0]-diff_GPS_after_correction[0],self.gps.LL_coord[1]-diff_GPS_after_correction[1])
+		new_LR = (self.gps.LR_coord[0]-diff_GPS_after_correction[0],self.gps.LR_coord[1]-diff_GPS_after_correction[1])
+		new_center = (self.gps.Center[0]-diff_GPS_after_correction[0],self.gps.Center[1]-diff_GPS_after_correction[1])
+
+		new_coords = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+
+		self.gps = new_coords
+
 	def correct_based_on_neighbors(self,neighbors):
 
 		list_jitter_x = np.arange(-GPS_ERROR_X, GPS_ERROR_X, 0.0000001)
@@ -3041,7 +3063,18 @@ class Group:
 			self.patches += new_row
 
 		self.rows = new_rows
-		
+		self.corrected_patches = []		
+
+	def update_lid_patches(self,lid_patches):
+		lids = get_lids()
+
+		for p,l,x,y in lid_patches:
+			if p in self.patches:
+				self.corrected_patches.append(p)
+				p.correct_GPS_based_on_point((x,y),lids[l])
+
+		print('Group {0} - detected lids: {1}'.format(gid,len(self.corrected_patches)))
+
 
 	def load_all_patches_SIFT_points(self):
 		for p in self.patches:
@@ -3370,6 +3403,38 @@ class Group:
 				if lp not in connected_patches:
 					print('\t{0}'.format(lp.name))
 
+		elif method == 'MSTLid':
+
+			self.load_all_patches_SIFT_points()
+
+			self.pre_calculate_internal_neighbors_and_transformation_parameters()
+
+			connected_patches = self.connected_component_patches()
+
+			G = Graph(len(connected_patches),[p.name for p in connected_patches],self.group_id)
+			G.initialize_edge_weights(connected_patches)
+
+			try:
+				starting_patch = connected_patches[0]
+				for p in corrected:
+					if p in connected_patches:
+						starting_patch = p
+						break
+
+				parents = G.generate_MST_prim(starting_patch.name)
+				string_res = G.revise_GPS_from_generated_MST_for_Hybrid(connected_patches,parents,corrected)
+
+			except Exception as e:
+				print(e)	
+				string_res = get_corrected_string(self.patches)
+
+			self.delete_all_patches_SIFT_points()
+
+			print('Group {0} - Not corrected patches (Left over in disconnected Graph:'.format(self.group_id))
+			for lp in self.patches:
+				if lp not in connected_patches:
+					print('\t{0}'.format(lp.name))
+
 		elif method == 'Hybrid':
 			
 			self.load_all_patches_SIFT_points()
@@ -3553,6 +3618,8 @@ class Field:
 		self.groups = self.initialize_field(use_corrected)
 		self.detected_lid_patches = []
 		self.detect_lid_patches()
+		for g in self.groups:
+			g.update_lid_patches(self.detected_lid_patches)
 	
 	def get_patches_with_possible_lids(self):
 		lids = get_lids()
@@ -4481,33 +4548,33 @@ def main(scan_date):
 		
 		# field.save_plot()
 
-		old_lid_base_error = field.calculate_lid_based_error()
+		# old_lid_base_error = field.calculate_lid_based_error()
 
-		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		# old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-		# field.create_patches_SIFT_files()
+		# # field.create_patches_SIFT_files()
 		
-		# field.draw_and_save_field(is_old=True)
+		# # field.draw_and_save_field(is_old=True)
 
-		field.correct_field()
+		# field.correct_field()
 
-		field.draw_and_save_field(is_old=False)
+		# field.draw_and_save_field(is_old=False)
 
-		field.save_new_coordinate()
-
-
-		new_lid_base_error = field.calculate_lid_based_error()
-		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-
-		print('------------------ ERROR MEASUREMENT ------------------ ')
+		# field.save_new_coordinate()
 
 
-		print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
-		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+		# new_lid_base_error = field.calculate_lid_based_error()
+		# new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+
+		# print('------------------ ERROR MEASUREMENT ------------------ ')
+
+
+		# print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+		# print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
 		
 
-		print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
-		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
+		# print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+		# print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 
 	elif server == 'laplace.cs.arizona.edu':
@@ -4673,17 +4740,18 @@ discard_right_flag = True
 override_sifts = True
 
 # method = 'MST'
+method = 'MSTLid'
 # method = 'Hybrid'
 # method = 'HybridMST'
 # method = 'Merge'
 # method = 'AllNeighbor'
-method = 'Rowbyrow'
+# method = 'Rowbyrow'
 # method = 'UAVmatching'
 # method = 'Old_method'
 
 
-scan_date = '2020-02-18'
-# scan_date = '2020-01-08'
+# scan_date = '2020-02-18'
+scan_date = '2020-01-08'
 # scan_date = '2020-05-18'
 # scan_date = '2020-05-19'
 # scan_date = '2020-06-02'

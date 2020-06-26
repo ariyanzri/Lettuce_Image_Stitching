@@ -3010,7 +3010,6 @@ class SuperPatch():
 			except Exception as e:
 				print(e)
 			# cv2.rectangle(result,(st_x+1,st_y+1),(st_x+p.size[1]-1,st_y+p.size[0]-1),(0,0,255),20)
-			
 			p.del_img()
 
 		result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
