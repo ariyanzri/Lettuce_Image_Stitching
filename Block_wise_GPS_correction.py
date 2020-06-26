@@ -3073,7 +3073,7 @@ class Group:
 				self.corrected_patches.append(p)
 				p.correct_GPS_based_on_point((x,y),lids[l])
 
-		print('Group {0} - detected lids: {1}'.format(gid,len(self.corrected_patches)))
+		print('Group {0} - detected lids: {1}'.format(self.group_id,len(self.corrected_patches)))
 
 
 	def load_all_patches_SIFT_points(self):
