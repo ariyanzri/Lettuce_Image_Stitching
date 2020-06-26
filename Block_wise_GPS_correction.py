@@ -4559,7 +4559,7 @@ def main(scan_date):
 
 		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-		# field.create_patches_SIFT_files()
+		field.create_patches_SIFT_files()
 		
 		field.draw_and_save_field(is_old=True)
 
