@@ -3414,6 +3414,8 @@ class Group:
 			G = Graph(len(connected_patches),[p.name for p in connected_patches],self.group_id)
 			G.initialize_edge_weights(connected_patches)
 
+			corrected = self.corrected_patches
+
 			try:
 				starting_patch = connected_patches[0]
 				for p in corrected:
@@ -3612,22 +3614,17 @@ class Group:
 		# sys.stdout.flush()
 
 class Field:
-	def __init__(self,use_corrected=False):
+	def __init__(self,correct_lid_patches=True,use_corrected=False):
 		global coordinates_file
 
 		self.groups = self.initialize_field(use_corrected)
 		self.detected_lid_patches = []
 		self.detect_lid_patches()
 
-		old_lid_base_error = self.calculate_lid_based_error()
+		if correct_lid_patches:
+			for g in self.groups:
+				g.update_lid_patches(self.detected_lid_patches)
 
-		for g in self.groups:
-			g.update_lid_patches(self.detected_lid_patches)
-
-		new_lid_base_error = self.calculate_lid_based_error()
-
-		print(old_lid_base_error)
-		print(new_lid_base_error)
 	
 	def get_patches_with_possible_lids(self):
 		lids = get_lids()
@@ -4556,33 +4553,33 @@ def main(scan_date):
 		
 		# field.save_plot()
 
-		# old_lid_base_error = field.calculate_lid_based_error()
+		old_lid_base_error = field.calculate_lid_based_error()
 
-		# old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-		# # field.create_patches_SIFT_files()
+		field.create_patches_SIFT_files()
 		
-		# # field.draw_and_save_field(is_old=True)
+		field.draw_and_save_field(is_old=True)
 
-		# field.correct_field()
+		field.correct_field()
 
-		# field.draw_and_save_field(is_old=False)
+		field.draw_and_save_field(is_old=False)
 
 		# field.save_new_coordinate()
 
 
-		# new_lid_base_error = field.calculate_lid_based_error()
-		# new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		new_lid_base_error = field.calculate_lid_based_error()
+		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-		# print('------------------ ERROR MEASUREMENT ------------------ ')
+		print('------------------ ERROR MEASUREMENT ------------------ ')
 
 
-		# print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
-		# print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+		print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
 		
 
-		# print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
-		# print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
+		print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 
 	elif server == 'laplace.cs.arizona.edu':
@@ -4733,13 +4730,13 @@ GPS_ERROR_X = 0.000002
 FFT_PARALLEL_CORES_TO_USE = 20
 
 
-number_of_rows_in_groups = 10
-groups_to_use = slice(0,None)
-patches_to_use = slice(0,None)
+# number_of_rows_in_groups = 10
+# groups_to_use = slice(0,None)
+# patches_to_use = slice(0,None)
 
-# number_of_rows_in_groups = 4
-# groups_to_use = slice(0,5)
-# patches_to_use = slice(0,10)
+number_of_rows_in_groups = 10
+groups_to_use = slice(5,6)
+patches_to_use = slice(0,None)
 
 
 inside_radius_lettuce_matching_threshold = 200*SCALE
