@@ -3165,7 +3165,7 @@ class Group:
 
 		for nbp,p,n in results:
 			if nbp is None:
-				remove_neighbors.append(n,p)
+				remove_neighbors.append((n,p))
 			else:
 				p.neighbors.append((n,nbp))
 
