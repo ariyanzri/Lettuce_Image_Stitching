@@ -3652,7 +3652,7 @@ class Field:
 		for p,l in possible_patches:
 			args_list.append((p.name,l,p.name,p.gps))
 
-		processes = MyPool(no_of_cores_to_use_max)
+		processes = MyPool(settings.no_of_cores_to_use_max)
 
 		results = processes.map(get_lid_in_patch_helper,args_list)
 		processes.close()
