@@ -18,7 +18,6 @@ from collections import OrderedDict,Counter
 
 from Block_wise_GPS_correction import *
 
-
 def initialize_settings(scan_date,config_file,local_address)
 	global method,no_of_cores_to_use,no_of_cores_to_use_max,SCALE,PATCH_SIZE,LID_SIZE_AT_SCALE,PATCH_SIZE_GPS,\
 	GPS_TO_IMAGE_RATIO,HEIGHT_RATIO_FOR_ROW_SEPARATION,PERCENTAGE_OF_GOOD_MATCHES,MINIMUM_PERCENTAGE_OF_INLIERS,\
