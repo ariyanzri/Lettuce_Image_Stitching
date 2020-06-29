@@ -21,5 +21,5 @@ GPS_ERROR_Y:0.000001
 GPS_ERROR_X:0.000002
 FFT_PARALLEL_CORES_TO_USE:20
 discard_right_flag:True
-override_sifts:True
+override_sifts:False
 number_of_rows_in_groups:10
