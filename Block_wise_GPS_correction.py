@@ -27,7 +27,7 @@ from collections import OrderedDict,Counter
 # from PIL import Image
 # from PIL.TiffTags import TAGS
 
-from settings import *
+import settings
 
 
 def remove_shadow(image):
@@ -113,6 +113,7 @@ def load_preprocess_image(address,hist_eq=False):
 	return img, img_g
 
 def choose_SIFT_key_points(patch,x1,y1,x2,y2):
+	global SIFT_folder
 
 	kp = []
 	desc = []
@@ -492,6 +493,7 @@ def get_dissimilarity_on_overlaps(p1,p2,H):
 	return dissimilarity
 
 def visualize_plot():
+	global plot_npy_file
 	import matplotlib.pyplot as plt
 
 	plt.axis('equal')
@@ -746,6 +748,7 @@ def get_result_dict_from_strings(s):
 # lid methods
 
 def get_lids():
+	global lid_file
 
 	lids = {}
 
@@ -767,6 +770,7 @@ def get_lids():
 	return lids
 
 def get_name_of_patches_with_lids(lids,use_not_corrected=False):
+	global CORRECTED_coordinates_file,coordinates_file,discard_right_flag
 
 	patches_names_with_lid = []
 
@@ -875,7 +879,7 @@ def get_unique_lists(xs,ys):
 	return xs[ind],ys[ind]
 
 def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=10):
-
+	global patch_folder
 	img = cv2.imread('{0}/{1}'.format(patch_folder,img_name))
 	img = cv2.resize(img,(int(img.shape[1]*SCALE),int(img.shape[0]*SCALE)))
 	rgb_img = img.copy()
@@ -1450,6 +1454,8 @@ def detect_SIFT_key_points(img,x1,y1,x2,y2):
 	return kp_n,desc
 
 def parallel_patch_creator(patch):
+	
+	global SIFT_folder,patch_folder,override_sifts
 
 	if os.path.exists('{0}/{1}_SIFT.data'.format(SIFT_folder,patch.name.replace('.tif',''))) and override_sifts==False:
 		return
@@ -1474,6 +1480,7 @@ def parallel_patch_creator_helper(args):
 
 def read_all_data():
 
+	global patch_folder,coordinates_file,PATCH_SIZE_GPS,GPS_TO_IMAGE_RATIO
 	patches = []
 
 	with open(coordinates_file) as f:
@@ -1547,9 +1554,10 @@ def jitter_and_calculate_fft_helper(args):
 	return jitter_and_calculate_fft(*args)
 
 def read_lettuce_heads_coordinates():
+	# global lettuce_heads_coordinates_file
 	from numpy import genfromtxt
 
-	lettuce_coords = genfromtxt(lettuce_heads_coordinates_file, delimiter=',',skip_header=1)
+	lettuce_coords = genfromtxt(settings.lettuce_heads_coordinates_file, delimiter=',',skip_header=1)
 
 	col1 = lettuce_coords[:,0].copy()
 	lettuce_coords[:,0] = lettuce_coords[:,1].copy()
@@ -1734,6 +1742,7 @@ def get_best_neighbor_hybrid_method(p1,corrected):
 
 
 def hybrid_method_UAV_lettuce_matching_step(patches,gid,percetage_matched=0.75):
+	global lettuce_coords
 
 	not_corrected = []
 	corrected = []
@@ -2217,6 +2226,7 @@ class Patch:
 			return False
 
 	def load_SIFT_points(self):
+		global SIFT_folder
 
 		if len(self.SIFT_kp_locations) == 0:
 			(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(SIFT_folder,self.name.replace('.tif','')), "rb"))
@@ -2231,6 +2241,7 @@ class Patch:
 
 
 	def load_img(self,hist_eq=True):
+		global patch_folder
 
 		if self.rgb_img is None:
 			img,img_g = load_preprocess_image('{0}/{1}'.format(patch_folder,self.name),hist_eq)
@@ -2539,6 +2550,7 @@ class Patch:
 		return contours
 
 	def get_lettuce_contours(self,list_lettuce_heads=None,overlap=None):
+		global inside_radius_lettuce_matching_threshold
 
 		if self.rgb_img is None:
 			self.load_img()
@@ -2764,6 +2776,7 @@ class Patch:
 		p2.delete_img()
 		
 	def correct_based_on_contours_and_lettuce_heads(self,list_lettuce_heads):
+		global inside_radius_lettuce_matching_threshold
 
 		self.load_img()
 
@@ -3101,6 +3114,7 @@ class Group:
 		sys.stdout.flush()
 
 	def pre_calculate_internal_neighbors_and_transformation_parameters(self,print_flg=True):
+		global no_of_cores_to_use_max
 
 		remove_neighbors = []
 
@@ -3364,6 +3378,8 @@ class Group:
 
 	def correct_internally(self):
 
+		global lettuce_coords,no_of_cores_to_use,method,CONTOUR_MATCHING_MIN_MATCH
+
 		print('Group {0} with {1} rows and {2} patches internally correction started.'.format(self.group_id,len(self.rows),len(self.patches)))
 		
 		if method == 'MST':
@@ -3532,6 +3548,7 @@ class Group:
 
 
 	def correct_self_based_on_previous_group(self,previous_group):
+		global number_of_rows_in_groups
 
 		diff_x = []
 		diff_y = []
@@ -3602,6 +3619,7 @@ class Group:
 
 class Field:
 	def __init__(self,correct_lid_patches=True,use_corrected=False):
+		global coordinates_file
 
 		self.groups = self.initialize_field(use_corrected)
 		self.detected_lid_patches = []
@@ -3712,11 +3730,13 @@ class Field:
 			
 
 	def initialize_GPS_size(self,p):
+		global PATCH_SIZE_GPS,GPS_TO_IMAGE_RATIO,PATCH_SIZE
 
 		PATCH_SIZE_GPS = (p.gps.UR_coord[0]-p.gps.UL_coord[0],p.gps.UL_coord[1]-p.gps.LL_coord[1])
 		GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 
 	def initialize_field(self,use_corrected):
+		global coordinates_file, number_of_rows_in_groups, groups_to_use
 
 		rows = self.get_rows(use_corrected)
 
@@ -3762,6 +3782,7 @@ class Field:
 		return groups[groups_to_use]
 
 	def get_rows(self,use_corrected=False):
+		global coordinates_file, CORRECTED_coordinates_file, patches_to_use, discard_right_flag,PATCH_SIZE_GPS
 
 		center_of_rows = []
 		patches = []
@@ -3854,6 +3875,7 @@ class Field:
 
 
 	def save_plot(self,show_possible_lids=True):
+		global plot_npy_file
 
 		lid_patches = self.get_patches_with_possible_lids()
 
@@ -3915,6 +3937,7 @@ class Field:
 		np.save(plot_npy_file,np.array(result))	
 
 	def correct_groups_internally(self):
+		global no_of_cores_to_use
 
 		args_list = []
 
@@ -3995,6 +4018,7 @@ class Field:
 		sys.stdout.flush()
 
 	def draw_and_save_field(self,is_old=False):
+		global patch_folder, field_image_path, no_of_cores_to_use_max
 
 		all_patches = []
 
@@ -4064,6 +4088,7 @@ class Field:
 		sys.stdout.flush()
 
 	def save_new_coordinate(self):
+		global CORRECTED_coordinates_file
 
 		all_patches = []
 
@@ -4093,6 +4118,7 @@ class Field:
 		sys.stdout.flush()
 
 	def save_new_coordinates_on_tiff(self):
+		global patch_folder
 
 		for group in self.groups:
 			for patch in self.patches:
@@ -4110,6 +4136,7 @@ class Field:
 				print('\t**** ROW {0} with {1} patches.'.format(i,len(row)))
 
 	def calculate_scale_effect(self,num_patches):
+		global no_of_cores_to_use_max,SCALE,PATCH_SIZE,GPS_TO_IMAGE_RATIO
 
 		scales = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
 
@@ -4279,6 +4306,7 @@ def get_approximate_random_RMSE_overlap(field,sample_no_per_group,core_to_use):
 
 		
 def logger(corrected_patch,gps_diff,param,gid,step_id):
+	global correction_log_file
 
 	with open(correction_log_file,"a+") as f:
 		
@@ -4336,6 +4364,7 @@ def print_settings():
 	print('--------------------------------------------------------------------------')
 
 def test_function():
+	global patch_folder
 
 	patches = read_all_data()
 	# lids = get_lids()
@@ -4468,187 +4497,188 @@ def test_function():
 	print(SCALE,statistics.mean(dd),statistics.stdev(dd))
 
 
-# def main(scan_date):
+def main(scan_date):
+	global server,patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path,lettuce_heads_coordinates_file,lettuce_coords,method,correction_log_file,discard_right_flag,SCALE,PATCH_SIZE,GPS_TO_IMAGE_RATIO
 
-# 	if server == 'coge':
-# 		patch_folder = '/storage/ariyanzarei/{0}-rgb/bin2tif_out'.format(scan_date)
-# 		SIFT_folder = '/storage/ariyanzarei/{0}-rgb/SIFT'.format(scan_date)
-# 		lid_file = '/storage/ariyanzarei/{0}-rgb/lids.txt'.format(scan_date)
-# 		coordinates_file = '/storage/ariyanzarei/{0}-rgb/{0}_coordinates.csv'.format(scan_date)
-# 		CORRECTED_coordinates_file = '/storage/ariyanzarei/{0}-rgb/{0}_coordinates_CORRECTED.csv'.format(scan_date)
-# 		plot_npy_file = '/storage/ariyanzarei/{0}-rgb/plt.npy'.format(scan_date)
-# 		row_save_path = '/storage/ariyanzarei/{0}-rgb/rows'.format(scan_date)
-# 		field_image_path = '.'
-# 		correction_log_file = '/storage/ariyanzarei/{0}-rgb/logs/log_{1}_at_{2}.csv'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
-# 		lettuce_heads_coordinates_file = 'season10_ind_lettuce_2020-05-27.csv'.format(scan_date)
+	if server == 'coge':
+		patch_folder = '/storage/ariyanzarei/{0}-rgb/bin2tif_out'.format(scan_date)
+		SIFT_folder = '/storage/ariyanzarei/{0}-rgb/SIFT'.format(scan_date)
+		lid_file = '/storage/ariyanzarei/{0}-rgb/lids.txt'.format(scan_date)
+		coordinates_file = '/storage/ariyanzarei/{0}-rgb/{0}_coordinates.csv'.format(scan_date)
+		CORRECTED_coordinates_file = '/storage/ariyanzarei/{0}-rgb/{0}_coordinates_CORRECTED.csv'.format(scan_date)
+		plot_npy_file = '/storage/ariyanzarei/{0}-rgb/plt.npy'.format(scan_date)
+		row_save_path = '/storage/ariyanzarei/{0}-rgb/rows'.format(scan_date)
+		field_image_path = '.'
+		correction_log_file = '/storage/ariyanzarei/{0}-rgb/logs/log_{1}_at_{2}.csv'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
+		lettuce_heads_coordinates_file = 'season10_ind_lettuce_2020-05-27.csv'.format(scan_date)
 
-# 	elif server == 'laplace.cs.arizona.edu':
-# 		patch_folder = '/data/plant/full_scans/{0}-rgb/bin2tif_out'.format(scan_date)
-# 		SIFT_folder = '/data/plant/full_scans/{0}-rgb/SIFT'.format(scan_date)
-# 		lid_file = '/data/plant/full_scans/{0}-rgb/lids.txt'.format(scan_date)
-# 		coordinates_file = '/data/plant/full_scans/metadata/{0}_coordinates.csv'.format(scan_date)
-# 		CORRECTED_coordinates_file = '/data/plant/full_scans/metadata/{0}_coordinates_CORRECTED.csv'.format(scan_date)
-# 		plot_npy_file = '/data/plant/full_scans/{0}-rgb/plt.npy'.format(scan_date)
-# 		field_image_path = '.'
-# 		lettuce_heads_coordinates_file = 'season10_ind_lettuce_2020-05-27.csv'
-# 		correction_log_file = '/data/plant/full_scans/{0}-rgb/logs/log_{1}_at_{2}.csv'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
+	elif server == 'laplace.cs.arizona.edu':
+		patch_folder = '/data/plant/full_scans/{0}-rgb/bin2tif_out'.format(scan_date)
+		SIFT_folder = '/data/plant/full_scans/{0}-rgb/SIFT'.format(scan_date)
+		lid_file = '/data/plant/full_scans/{0}-rgb/lids.txt'.format(scan_date)
+		coordinates_file = '/data/plant/full_scans/metadata/{0}_coordinates.csv'.format(scan_date)
+		CORRECTED_coordinates_file = '/data/plant/full_scans/metadata/{0}_coordinates_CORRECTED.csv'.format(scan_date)
+		plot_npy_file = '/data/plant/full_scans/{0}-rgb/plt.npy'.format(scan_date)
+		field_image_path = '.'
+		lettuce_heads_coordinates_file = 'season10_ind_lettuce_2020-05-27.csv'
+		correction_log_file = '/data/plant/full_scans/{0}-rgb/logs/log_{1}_at_{2}.csv'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
 
-# 	elif server == 'ariyan':
-# 		patch_folder = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures'
-# 		SIFT_folder = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT'
-# 		lid_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/lids.txt'
-# 		coordinates_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt'
-# 		CORRECTED_coordinates_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt'
-# 		plot_npy_file = '/home/ariyan/Desktop/plt.npy'
-# 		field_image_path = '/home/ariyan/Desktop'
-# 		lettuce_heads_coordinates_file = '/home/ariyan/Desktop/season10_lettuce_latlon.csv'
-# 		correction_log_file = ''
+	elif server == 'ariyan':
+		patch_folder = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/Figures'
+		SIFT_folder = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/SIFT'
+		lid_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/lids.txt'
+		coordinates_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords.txt'
+		CORRECTED_coordinates_file = '/home/ariyan/Desktop/200203_Mosaic_Training_Data/200203_Mosaic_Training_Data/coords2.txt'
+		plot_npy_file = '/home/ariyan/Desktop/plt.npy'
+		field_image_path = '/home/ariyan/Desktop'
+		lettuce_heads_coordinates_file = '/home/ariyan/Desktop/season10_lettuce_latlon.csv'
+		correction_log_file = ''
 
-# 	else:
-# 		# HPC
-# 		patch_folder = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/bin2tif_out'.format(scan_date)
-# 		SIFT_folder = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/SIFT'.format(scan_date)
-# 		lid_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/lids.txt'.format(scan_date)
-# 		coordinates_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/{1}_coordinates.csv'.format(scan_date,scan_date)
-# 		CORRECTED_coordinates_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/{1}_coordinates_CORRECTED.csv'.format(scan_date,scan_date)
-# 		plot_npy_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/plt.npy'.format(scan_date)
-# 		field_image_path = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb'.format(scan_date)
-# 		lettuce_heads_coordinates_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/season10_ind_lettuce_2020-05-27.csv'.format(scan_date)
-# 		correction_log_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/logs/log_{1}_at_{2}.csv'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
+	else:
+		# HPC
+		patch_folder = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/bin2tif_out'.format(scan_date)
+		SIFT_folder = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/SIFT'.format(scan_date)
+		lid_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/lids.txt'.format(scan_date)
+		coordinates_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/{1}_coordinates.csv'.format(scan_date,scan_date)
+		CORRECTED_coordinates_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/{1}_coordinates_CORRECTED.csv'.format(scan_date,scan_date)
+		plot_npy_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/plt.npy'.format(scan_date)
+		field_image_path = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb'.format(scan_date)
+		lettuce_heads_coordinates_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/season10_ind_lettuce_2020-05-27.csv'.format(scan_date)
+		correction_log_file = '/xdisk/ericlyons/big_data/ariyanzarei/test_datasets/{0}-rgb/logs/log_{1}_at_{2}.csv'.format(scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
 
 
-# 	if server == 'coge':
-# 		print_settings()
+	if server == 'coge':
+		print_settings()
 		
 
-# 		lettuce_coords = read_lettuce_heads_coordinates()
+		lettuce_coords = read_lettuce_heads_coordinates()
 
-# 		field = Field()
+		field = Field()
 		
-# 		# field.save_plot()
+		# field.save_plot()
 
-# 		old_lid_base_error = field.calculate_lid_based_error()
+		old_lid_base_error = field.calculate_lid_based_error()
 
-# 		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-# 		field.create_patches_SIFT_files()
+		field.create_patches_SIFT_files()
 		
-# 		field.draw_and_save_field(is_old=True)
+		field.draw_and_save_field(is_old=True)
 
-# 		field.correct_field()
+		field.correct_field()
 
-# 		field.draw_and_save_field(is_old=False)
+		field.draw_and_save_field(is_old=False)
 
-# 		# field.save_new_coordinate()
-
-
-# 		new_lid_base_error = field.calculate_lid_based_error()
-# 		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-
-# 		print('------------------ ERROR MEASUREMENT ------------------ ')
+		# field.save_new_coordinate()
 
 
-# 		print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
-# 		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
-		
+		new_lid_base_error = field.calculate_lid_based_error()
+		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-# 		print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
-# 		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
+		print('------------------ ERROR MEASUREMENT ------------------ ')
 
 
-# 	elif server == 'laplace.cs.arizona.edu':
-# 		print_settings()
-# 		os.system("taskset -p -c 0-45 %d" % os.getpid())
-# 		# os.system("taskset -p -c 40-47 %d" % os.getpid())
-
-# 		lettuce_coords = read_lettuce_heads_coordinates()
-
-# 		field = Field()
-		
-# 		# field.save_plot()
-
-# 		old_lid_base_error = field.calculate_lid_based_error()
-
-# 		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-
-# 		# field.create_patches_SIFT_files()
-		
-# 		# field.draw_and_save_field(is_old=True)
-
-# 		field.correct_field()
-
-# 		field.draw_and_save_field(is_old=False)
-
-# 		field.save_new_coordinate()
-
-
-# 		new_lid_base_error = field.calculate_lid_based_error()
-# 		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-
-# 		print('------------------ ERROR MEASUREMENT ------------------ ')
-
-
-# 		print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
-# 		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+		print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
 		
 
-# 		print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
-# 		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
+		print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
-# 		# ------------
 
-# 		# field = Field()
-# 		# old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+	elif server == 'laplace.cs.arizona.edu':
+		print_settings()
+		os.system("taskset -p -c 0-45 %d" % os.getpid())
+		# os.system("taskset -p -c 40-47 %d" % os.getpid())
 
-# 		# field.create_patches_SIFT_files()
-# 		# field.correct_field()
+		lettuce_coords = read_lettuce_heads_coordinates()
 
-# 		# new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		field = Field()
+		
+		# field.save_plot()
 
-# 		# print('OLD, New and diff SI: {0},{1},{2}'.format(np.mean(old_RMSE[:,3]),np.mean(new_RMSE[:,3]),(np.mean(old_RMSE[:,3])-np.mean(new_RMSE[:,3]))))
+		old_lid_base_error = field.calculate_lid_based_error()
+
+		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+
+		# field.create_patches_SIFT_files()
+		
+		# field.draw_and_save_field(is_old=True)
+
+		field.correct_field()
+
+		field.draw_and_save_field(is_old=False)
+
+		field.save_new_coordinate()
+
+
+		new_lid_base_error = field.calculate_lid_based_error()
+		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+
+		print('------------------ ERROR MEASUREMENT ------------------ ')
+
+
+		print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
 		
 
-# 		# field.detect_lid_patches()
-# 		# print(field.calculate_lid_based_error())
-# 		# cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
-# 		# cv2.resizeWindow('fig3', 700,700)
+		print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
-# 		# for p,l,x,y in field.detected_lid_patches:
-# 		# 	p.load_img()
-# 		# 	print(l)
-# 		# 	cv2.circle(p.rgb_img,(x,y),10,(0,0,255),-1)
-# 		# 	cv2.imshow('fig3',p.rgb_img)
-# 		# 	cv2.waitKey(0)
+		# ------------
 
-# 	elif server == 'ariyan':
-# 		print_settings()
+		# field = Field()
+		# old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-# 		visualize_plot()
+		# field.create_patches_SIFT_files()
+		# field.correct_field()
 
-# 		# test_function()
+		# new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+
+		# print('OLD, New and diff SI: {0},{1},{2}'.format(np.mean(old_RMSE[:,3]),np.mean(new_RMSE[:,3]),(np.mean(old_RMSE[:,3])-np.mean(new_RMSE[:,3]))))
+		
+
+		# field.detect_lid_patches()
+		# print(field.calculate_lid_based_error())
+		# cv2.namedWindow('fig3',cv2.WINDOW_NORMAL)
+		# cv2.resizeWindow('fig3', 700,700)
+
+		# for p,l,x,y in field.detected_lid_patches:
+		# 	p.load_img()
+		# 	print(l)
+		# 	cv2.circle(p.rgb_img,(x,y),10,(0,0,255),-1)
+		# 	cv2.imshow('fig3',p.rgb_img)
+		# 	cv2.waitKey(0)
+
+	elif server == 'ariyan':
+		print_settings()
+
+		visualize_plot()
+
+		# test_function()
 
 		
-# 	else:
-# 		# HPC
-# 		discard_right_flag = False
+	else:
+		# HPC
+		discard_right_flag = False
 
-# 		print_settings()
+		print_settings()
 		
-# 		field = Field()
+		field = Field()
 
-# 		field.create_patches_SIFT_files()
-# 		# field.draw_and_save_field(is_old=True)
+		field.create_patches_SIFT_files()
+		# field.draw_and_save_field(is_old=True)
 		
-# 		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
-# 		field.correct_field()
-# 		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+		field.correct_field()
+		new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
 
-# 		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
-# 		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
+		print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+		print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
-# 		# field.save_plot()
-# 		field.draw_and_save_field(is_old=False)
-# 		# field.print_field_in_text()
+		# field.save_plot()
+		field.draw_and_save_field(is_old=False)
+		# field.print_field_in_text()
 
 
 
