@@ -9,7 +9,7 @@ def initialize_settings(scan_date,config_file,local_address):
 	CLOSE_MORPH_LID_SIZE,GPS_ERROR_Y,GPS_ERROR_X,FFT_PARALLEL_CORES_TO_USE,discard_right_flag,override_sifts,\
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,method,correction_log_file,inside_radius_lettuce_matching_threshold,\
-	number_of_rows_in_groups,groups_to_use,patches_to_use
+	number_of_rows_in_groups,groups_to_use,patches_to_use,scane_date_stng
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -58,5 +58,5 @@ def initialize_settings(scan_date,config_file,local_address):
 		field_image_path = '/app/{0}/{1}-rgb'.format(local_address,scan_date)
 		correction_log_file = '/app/{0}/{1}-rgb/logs/log_{2}_at_{3}.csv'.format(local_address,scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
 		lettuce_heads_coordinates_file = '/app/{0}/{1}-rgb/season10_ind_lettuce_2020-05-27.csv'.format(local_address,scan_date)
-
+		scane_date_stng = scan_date
 
