@@ -66,16 +66,16 @@ def initialize_settings(scan_date,config_file,local_address):
 		groups_to_use = slice(0,None)
 		patches_to_use = slice(0,None)
 
-		patch_folder = 'app/{0}/{1}-rgb/bin2tif_out'.format(local_address,scan_date)
-		SIFT_folder = 'app/{0}/{1}-rgb/SIFT'.format(local_address,scan_date)
-		lid_file = 'app/{0}/{1}-rgb/lids.txt'.format(local_address,scan_date)
-		coordinates_file = 'app/{0}/{1}-rgb/{2}_coordinates.csv'.format(local_address,scan_date,scan_date)
-		CORRECTED_coordinates_file = 'app/{0}/{1}-rgb/{2}_coordinates_CORRECTED.csv'.format(local_address,scan_date,scan_date)
-		plot_npy_file = 'app/{0}/{1}-rgb/plt.npy'.format(local_address,scan_date)
-		row_save_path = 'app/{0}/{1}-rgb/rows'.format(local_address,scan_date)
-		field_image_path = 'app/{0}/{1}-rgb'.format(local_address,scan_date)
-		correction_log_file = 'app/{0}/{1}-rgb/logs/log_{2}_at_{3}.csv'.format(local_address,scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
-		lettuce_heads_coordinates_file = 'app/{0}/{1}-rgb/season10_ind_lettuce_2020-05-27.csv'.format(local_address,scan_date)
+		patch_folder = '/app/{0}/{1}-rgb/bin2tif_out'.format(local_address,scan_date)
+		SIFT_folder = '/app/{0}/{1}-rgb/SIFT'.format(local_address,scan_date)
+		lid_file = '/app/{0}/{1}-rgb/lids.txt'.format(local_address,scan_date)
+		coordinates_file = '/app/{0}/{1}-rgb/{2}_coordinates.csv'.format(local_address,scan_date,scan_date)
+		CORRECTED_coordinates_file = '/app/{0}/{1}-rgb/{2}_coordinates_CORRECTED.csv'.format(local_address,scan_date,scan_date)
+		plot_npy_file = '/app/{0}/{1}-rgb/plt.npy'.format(local_address,scan_date)
+		row_save_path = '/app/{0}/{1}-rgb/rows'.format(local_address,scan_date)
+		field_image_path = '/app/{0}/{1}-rgb'.format(local_address,scan_date)
+		correction_log_file = '/app/{0}/{1}-rgb/logs/log_{2}_at_{3}.csv'.format(local_address,scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
+		lettuce_heads_coordinates_file = '/app/{0}/{1}-rgb/season10_ind_lettuce_2020-05-27.csv'.format(local_address,scan_date)
 
 
 def main(scan_date):
@@ -117,12 +117,16 @@ def main(scan_date):
 
 
 
-
 start_time = datetime.datetime.now()
 
 scan_date = sys.argv[1]
 config_file = sys.argv[2]
 local_address = sys.argv[3]
+
+print('Geo-correction started. Log is being saved in {0}'.format(local_address))
+
+original = sys.stdout
+sys.stdout = open('/app/{0}/{1}-rgb/{2}.txt'.format(local_address,scan_date,'geo_correction_output'), 'w')
 
 initialize_settings(scan_date,config_file,local_address)
 main(scan_date)
@@ -130,3 +134,5 @@ main(scan_date)
 end_time = datetime.datetime.now()
 
 report_time(start_time,end_time)
+
+sys.stdout = original

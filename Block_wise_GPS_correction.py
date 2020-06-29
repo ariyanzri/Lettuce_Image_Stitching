@@ -4680,115 +4680,115 @@ def main(scan_date):
 
 
 
-server_core = {'coge':23,'laplace.cs.arizona.edu':12,'ariyan':4}
-server_core_max = {'coge':50,'laplace.cs.arizona.edu':35,'ariyan':4}
+# server_core = {'coge':23,'laplace.cs.arizona.edu':12,'ariyan':4}
+# server_core_max = {'coge':50,'laplace.cs.arizona.edu':35,'ariyan':4}
 
-server = socket.gethostname()
-if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
-	no_of_cores_to_use = 5
-	no_of_cores_to_use_max = 15
-else:
-	no_of_cores_to_use = server_core[server]
-	no_of_cores_to_use_max = server_core_max[server]
-
-
-# -----------------------------------------------------------------------------------------------------------------------------------
-# ------------------------------------------------------- Settings ------------------------------------------------------------------
-# -----------------------------------------------------------------------------------------------------------------------------------
+# server = socket.gethostname()
+# if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
+# 	no_of_cores_to_use = 5
+# 	no_of_cores_to_use_max = 15
+# else:
+# 	no_of_cores_to_use = server_core[server]
+# 	no_of_cores_to_use_max = server_core_max[server]
 
 
-SCALE = 0.2
-
-PATCH_SIZE = (int(3296*SCALE),int(2472*SCALE))
-LID_SIZE_AT_SCALE = (400*SCALE,600*SCALE)
-PATCH_SIZE_GPS = (-1,-1)
-GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
-HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
-
-PERCENTAGE_OF_GOOD_MATCHES = 0.5
-MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
-MINIMUM_NUMBER_OF_MATCHES = 15
-RANSAC_MAX_ITER = 1000
-RANSAC_ERROR_THRESHOLD = 5
-PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
-OVERLAP_DISCARD_RATIO = 0.05
-TRANSFORMATION_SCALE_DISCARD_THRESHOLD = 0.03
-TRANSFORMATION_ANGLE_DISCARD_THRESHOLD = 4
+# # -----------------------------------------------------------------------------------------------------------------------------------
+# # ------------------------------------------------------- Settings ------------------------------------------------------------------
+# # -----------------------------------------------------------------------------------------------------------------------------------
 
 
-LETTUCE_AREA_THRESHOLD = 5000
-CONTOUR_MATCHING_MIN_MATCH = 2
+# SCALE = 0.2
 
-ORTHO_SCALE = 0.05
-REDUCTION_FACTOR = ORTHO_SCALE/SCALE
+# PATCH_SIZE = (int(3296*SCALE),int(2472*SCALE))
+# LID_SIZE_AT_SCALE = (400*SCALE,600*SCALE)
+# PATCH_SIZE_GPS = (-1,-1)
+# GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
+# HEIGHT_RATIO_FOR_ROW_SEPARATION = 0.1
+
+# PERCENTAGE_OF_GOOD_MATCHES = 0.5
+# MINIMUM_PERCENTAGE_OF_INLIERS = 0.1
+# MINIMUM_NUMBER_OF_MATCHES = 15
+# RANSAC_MAX_ITER = 1000
+# RANSAC_ERROR_THRESHOLD = 5
+# PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES = 0.8
+# OVERLAP_DISCARD_RATIO = 0.05
+# TRANSFORMATION_SCALE_DISCARD_THRESHOLD = 0.03
+# TRANSFORMATION_ANGLE_DISCARD_THRESHOLD = 4
 
 
-OPEN_MORPH_LID_SIZE = 40
-CLOSE_MORPH_LID_SIZE = 220
+# LETTUCE_AREA_THRESHOLD = 5000
+# CONTOUR_MATCHING_MIN_MATCH = 2
 
-GPS_ERROR_Y = 0.000001
-GPS_ERROR_X = 0.000002
-
-FFT_PARALLEL_CORES_TO_USE = 20
+# ORTHO_SCALE = 0.05
+# REDUCTION_FACTOR = ORTHO_SCALE/SCALE
 
 
-number_of_rows_in_groups = 10
-groups_to_use = slice(0,None)
-patches_to_use = slice(0,None)
+# OPEN_MORPH_LID_SIZE = 40
+# CLOSE_MORPH_LID_SIZE = 220
+
+# GPS_ERROR_Y = 0.000001
+# GPS_ERROR_X = 0.000002
+
+# FFT_PARALLEL_CORES_TO_USE = 20
+
 
 # number_of_rows_in_groups = 10
 # groups_to_use = slice(0,None)
-# patches_to_use = slice(0,10)
+# patches_to_use = slice(0,None)
+
+# # number_of_rows_in_groups = 10
+# # groups_to_use = slice(0,None)
+# # patches_to_use = slice(0,10)
 
 
-inside_radius_lettuce_matching_threshold = 200*SCALE
-discard_right_flag = True
+# inside_radius_lettuce_matching_threshold = 200*SCALE
+# discard_right_flag = True
 
-override_sifts = True
+# override_sifts = True
 
-# method = 'MST'
-method = 'MSTLid'
-# method = 'Hybrid'
-# method = 'HybridMST'
-# method = 'Merge'
-# method = 'AllNeighbor'
-# method = 'Rowbyrow'
-# method = 'UAVmatching'
-# method = 'Old_method'
+# # method = 'MST'
+# method = 'MSTLid'
+# # method = 'Hybrid'
+# # method = 'HybridMST'
+# # method = 'Merge'
+# # method = 'AllNeighbor'
+# # method = 'Rowbyrow'
+# # method = 'UAVmatching'
+# # method = 'Old_method'
 
 
-# scan_date = '2020-02-18'
-scan_date = '2020-01-08'
-# scan_date = '2020-05-18'
-# scan_date = '2020-05-19'
-# scan_date = '2020-06-02'
-# scan_date = '2020-06-03'
-# scan_date = '2020-06-05_20m_05mEW_10mNS'
-# scan_date = '2020-06-05_35m_05mEW_10mNS'
-# scan_date = '2020-06-05_35m_05mEW_125mNS'
-# scan_date = '2020-06-05_35m_0875mEW_10mNS'
-# scan_date = '2020-06-05_35m_0875mEW_125mNS'
-# scan_date = '2020-06-05_hardware_north'
-# scan_date = '2020-06-05_hardware_south'
-# scan_date = 'hardware_f6,7_summer_shade'
-# scan_date = 'hardware_f6,7_summer_suntest061620'
-# scan_date = 'software_f6,7_summer_shade'
+# # scan_date = '2020-02-18'
+# scan_date = '2020-01-08'
+# # scan_date = '2020-05-18'
+# # scan_date = '2020-05-19'
+# # scan_date = '2020-06-02'
+# # scan_date = '2020-06-03'
+# # scan_date = '2020-06-05_20m_05mEW_10mNS'
+# # scan_date = '2020-06-05_35m_05mEW_10mNS'
+# # scan_date = '2020-06-05_35m_05mEW_125mNS'
+# # scan_date = '2020-06-05_35m_0875mEW_10mNS'
+# # scan_date = '2020-06-05_35m_0875mEW_125mNS'
+# # scan_date = '2020-06-05_hardware_north'
+# # scan_date = '2020-06-05_hardware_south'
+# # scan_date = 'hardware_f6,7_summer_shade'
+# # scan_date = 'hardware_f6,7_summer_suntest061620'
+# # scan_date = 'software_f6,7_summer_shade'
 
-# -----------------------------------------------------------------------------------------------------------------------------------
-# -----------------------------------------------------------------------------------------------------------------------------------
-# -----------------------------------------------------------------------------------------------------------------------------------
+# # -----------------------------------------------------------------------------------------------------------------------------------
+# # -----------------------------------------------------------------------------------------------------------------------------------
+# # -----------------------------------------------------------------------------------------------------------------------------------
 
-original = sys.stdout
+# original = sys.stdout
 
-if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
-	sys.stdout = open('log.txt', 'w+')
+# if server not in ['coge','laplace.cs.arizona.edu','ariyan']:
+# 	sys.stdout = open('log.txt', 'w+')
 
-start_time = datetime.datetime.now()
+# start_time = datetime.datetime.now()
 
-main(scan_date)
+# main(scan_date)
 
-end_time = datetime.datetime.now()
+# end_time = datetime.datetime.now()
 
-report_time(start_time,end_time)
+# report_time(start_time,end_time)
 
-sys.stdout = original
+# sys.stdout = original
