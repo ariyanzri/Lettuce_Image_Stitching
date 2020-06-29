@@ -94,7 +94,7 @@ def histogram_equalization(img):
 
 def load_preprocess_image(address,hist_eq=False):
 	img = cv2.imread(address)
-	img = cv2.resize(img,(PATCH_SIZE[1],PATCH_SIZE[0]))
+	img = cv2.resize(img,(settings.PATCH_SIZE[1],settings.PATCH_SIZE[0]))
 	if hist_eq:
 		img = histogram_equalization(img)
 	img = img.astype('uint8')
@@ -168,7 +168,7 @@ def get_good_matches(desc1,desc2):
 
 		good = []
 		for m in matches:
-			if len(m)>=2 and m[0].distance <= PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
+			if len(m)>=2 and m[0].distance <= settings.PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
 				good.append(m)
 				
 		matches = np.asarray(good)
@@ -209,7 +209,7 @@ def get_translation_from_single_matches(x1,y1,x2,y2):
 
 # 		distance = math.sqrt((translated_p1[0]-p2[0])**2 + (translated_p1[1]-p2[1])**2)
 
-# 		if distance>RANSAC_ERROR_THRESHOLD:
+# 		if distance>settings.RANSAC_ERROR_THRESHOLD:
 # 			error+=1
 
 # 	return error
@@ -221,8 +221,8 @@ def calculate_error_for_translation(T,P1,P2):
 	squared_diff = squared_diff[:,0:2]
 	distances = np.sqrt(np.sum(squared_diff,axis=1))
 	thresholded_distances = distances.copy()
-	thresholded_distances[thresholded_distances<=RANSAC_ERROR_THRESHOLD] = 0
-	thresholded_distances[thresholded_distances>RANSAC_ERROR_THRESHOLD] = 1
+	thresholded_distances[thresholded_distances<=settings.RANSAC_ERROR_THRESHOLD] = 0
+	thresholded_distances[thresholded_distances>settings.RANSAC_ERROR_THRESHOLD] = 1
 
 	return np.sum(thresholded_distances)
 
@@ -237,7 +237,7 @@ def ransac_parallel(i,matches,kp1,kp2,return_dict):
 
 def find_translation(matches,kp1,kp2):
 	
-	# max_possible_sampel = min(len(matches),RANSAC_MAX_ITER)
+	# max_possible_sampel = min(len(matches),settings.RANSAC_MAX_ITER)
 
 	# samples_indices = random.sample(range(0,len(matches)),max_possible_sampel)
 	# manager = multiprocessing.Manager()
@@ -286,7 +286,7 @@ def find_translation(matches,kp1,kp2):
 	diff_x = diff[:,0]
 	diff_y = diff[:,1]
 
-	# max_possible_sampel = min(len(matches),RANSAC_MAX_ITER)
+	# max_possible_sampel = min(len(matches),settings.RANSAC_MAX_ITER)
 	# samples_indices = random.sample(range(0,len(matches)),max_possible_sampel)
 	# min_T = None
 	# min_error = sys.maxsize
@@ -352,9 +352,9 @@ def find_homography(matches,kp1,kp2,ov_2_on_1,ov_1_on_2):
 def get_dissimilarity_on_overlaps(p1,p2,H):
 
 	p1_ul = [0,0,1]
-	p1_ur = [PATCH_SIZE[1],0,1]
-	p1_ll = [0,PATCH_SIZE[0],1]
-	p1_lr = [PATCH_SIZE[1],PATCH_SIZE[0],1]
+	p1_ur = [settings.PATCH_SIZE[1],0,1]
+	p1_ll = [0,settings.PATCH_SIZE[0],1]
+	p1_lr = [settings.PATCH_SIZE[1],settings.PATCH_SIZE[0],1]
 
 	p1_ul_new = H.dot(p1_ul).astype(int)
 	p1_ur_new = H.dot(p1_ur).astype(int)
@@ -363,49 +363,49 @@ def get_dissimilarity_on_overlaps(p1,p2,H):
 	
 	p1_x1 = 0
 	p1_y1 = 0
-	p1_x2 = PATCH_SIZE[1]
-	p1_y2 = PATCH_SIZE[0]
+	p1_x2 = settings.PATCH_SIZE[1]
+	p1_y2 = settings.PATCH_SIZE[0]
 
 	p2_x1 = 0
 	p2_y1 = 0
-	p2_x2 = PATCH_SIZE[1]
-	p2_y2 = PATCH_SIZE[0]
+	p2_x2 = settings.PATCH_SIZE[1]
+	p2_y2 = settings.PATCH_SIZE[0]
 
 	flag = False
 
-	if p1_ul_new[0]>=0 and p1_ul_new[0]<PATCH_SIZE[1] and p1_ul_new[1]>=0 and p1_ul_new[1]<PATCH_SIZE[0]:
+	if p1_ul_new[0]>=0 and p1_ul_new[0]<settings.PATCH_SIZE[1] and p1_ul_new[1]>=0 and p1_ul_new[1]<settings.PATCH_SIZE[0]:
 		p2_x1 = p1_ul_new[0]
 		p2_y1 = p1_ul_new[1]
 
-		p1_x2 = PATCH_SIZE[1] - p1_ul_new[0]
-		p1_y2 = PATCH_SIZE[0] - p1_ul_new[1]
+		p1_x2 = settings.PATCH_SIZE[1] - p1_ul_new[0]
+		p1_y2 = settings.PATCH_SIZE[0] - p1_ul_new[1]
 
 		flag = True
 
-	if p1_ur_new[0]>=0 and p1_ur_new[0]<PATCH_SIZE[1] and p1_ur_new[1]>=0 and p1_ur_new[1]<PATCH_SIZE[0]:
+	if p1_ur_new[0]>=0 and p1_ur_new[0]<settings.PATCH_SIZE[1] and p1_ur_new[1]>=0 and p1_ur_new[1]<settings.PATCH_SIZE[0]:
 		p2_x2 = p1_ur_new[0]
 		p2_y1 = p1_ur_new[1]
 
-		p1_x1 = PATCH_SIZE[1] - p1_ur_new[0]
-		p1_y2 = PATCH_SIZE[0] - p1_ur_new[1]
+		p1_x1 = settings.PATCH_SIZE[1] - p1_ur_new[0]
+		p1_y2 = settings.PATCH_SIZE[0] - p1_ur_new[1]
 
 		flag = True
 
-	if p1_ll_new[0]>=0 and p1_ll_new[0]<PATCH_SIZE[1] and p1_ll_new[1]>=0 and p1_ll_new[1]<PATCH_SIZE[0]:
+	if p1_ll_new[0]>=0 and p1_ll_new[0]<settings.PATCH_SIZE[1] and p1_ll_new[1]>=0 and p1_ll_new[1]<settings.PATCH_SIZE[0]:
 		p2_x1 = p1_ll_new[0]
 		p2_y2 = p1_ll_new[1]
 
-		p1_x2 = PATCH_SIZE[1] - p1_ll_new[0]
-		p1_y1 = PATCH_SIZE[0] - p1_ll_new[1]
+		p1_x2 = settings.PATCH_SIZE[1] - p1_ll_new[0]
+		p1_y1 = settings.PATCH_SIZE[0] - p1_ll_new[1]
 
 		flag = True
 
-	if p1_lr_new[0]>=0 and p1_lr_new[0]<PATCH_SIZE[1] and p1_lr_new[1]>=0 and p1_lr_new[1]<PATCH_SIZE[0]:
+	if p1_lr_new[0]>=0 and p1_lr_new[0]<settings.PATCH_SIZE[1] and p1_lr_new[1]>=0 and p1_lr_new[1]<settings.PATCH_SIZE[0]:
 		p2_x2 = p1_lr_new[0]
 		p2_y2 = p1_lr_new[1]
 
-		p1_x1 = PATCH_SIZE[1] - p1_lr_new[0]
-		p1_y1 = PATCH_SIZE[0] - p1_lr_new[1]
+		p1_x1 = settings.PATCH_SIZE[1] - p1_lr_new[0]
+		p1_y1 = settings.PATCH_SIZE[0] - p1_lr_new[1]
 
 		flag = True
 
@@ -531,8 +531,8 @@ def get_new_GPS_Coords(p1,p2,H):
 	diff_x = -c1[0]
 	diff_y = -c1[1]
 
-	gps_scale_x = (PATCH_SIZE_GPS[0])/(PATCH_SIZE[1])
-	gps_scale_y = -(PATCH_SIZE_GPS[1])/(PATCH_SIZE[0])
+	gps_scale_x = (settings.PATCH_SIZE_GPS[0])/(settings.PATCH_SIZE[1])
+	gps_scale_y = -(settings.PATCH_SIZE_GPS[1])/(settings.PATCH_SIZE[0])
 
 	diff_x = diff_x*gps_scale_x
 	diff_y = diff_y*gps_scale_y
@@ -559,8 +559,8 @@ def get_new_GPS_Coords_for_groups(p1,p2,H):
 	diff_x = -c1[0]
 	diff_y = -c1[1]
 
-	gps_scale_x = (PATCH_SIZE_GPS[0])/(PATCH_SIZE[1])
-	gps_scale_y = -(PATCH_SIZE_GPS[1])/(PATCH_SIZE[0])
+	gps_scale_x = (settings.PATCH_SIZE_GPS[0])/(settings.PATCH_SIZE[1])
+	gps_scale_y = -(settings.PATCH_SIZE_GPS[1])/(settings.PATCH_SIZE[0])
 
 	diff_x = diff_x*gps_scale_x
 	diff_y = diff_y*gps_scale_y
@@ -606,12 +606,12 @@ def get_good_matches_based_on_GPS_error(desc1,desc2,kp1,kp2,p1,p2,top_percent):
 		pp1 = kp1[m[0].queryIdx]
 		pp2 = kp2[m[0].trainIdx]
 
-		GPS_p1 = (p1.gps.UL_coord[0] + pp1[0]*GPS_TO_IMAGE_RATIO[0] , p1.gps.UL_coord[1] - pp1[1]*GPS_TO_IMAGE_RATIO[1])
-		GPS_p2 = (p2.gps.UL_coord[0] + pp2[0]*GPS_TO_IMAGE_RATIO[0] , p2.gps.UL_coord[1] - pp2[1]*GPS_TO_IMAGE_RATIO[1])
+		GPS_p1 = (p1.gps.UL_coord[0] + pp1[0]*settings.GPS_TO_IMAGE_RATIO[0] , p1.gps.UL_coord[1] - pp1[1]*settings.GPS_TO_IMAGE_RATIO[1])
+		GPS_p2 = (p2.gps.UL_coord[0] + pp2[0]*settings.GPS_TO_IMAGE_RATIO[0] , p2.gps.UL_coord[1] - pp2[1]*settings.GPS_TO_IMAGE_RATIO[1])
 
 		diff = (abs(GPS_p2[0]-GPS_p1[0]),abs(GPS_p2[1]-GPS_p1[1]))
 
-		if diff[0]<GPS_ERROR_X and diff[1]<GPS_ERROR_Y and m[0].distance <= PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
+		if diff[0]<settings.GPS_ERROR_X and diff[1]<settings.GPS_ERROR_Y and m[0].distance <= settings.PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
 			good.append(m)
 		
 	if top_percent:
@@ -619,7 +619,7 @@ def get_good_matches_based_on_GPS_error(desc1,desc2,kp1,kp2,p1,p2,top_percent):
 
 		good = []
 
-		number_of_good_matches = int(math.floor(len(sorted_matches)*PERCENTAGE_OF_GOOD_MATCHES))
+		number_of_good_matches = int(math.floor(len(sorted_matches)*settings.PERCENTAGE_OF_GOOD_MATCHES))
 		good = sorted_matches[0:number_of_good_matches]
 
 	matches = np.asarray(good)
@@ -639,19 +639,19 @@ def get_top_percentage_matches(desc1,desc2,kp1,kp2):
 	good = []
 	for m in matches:
 
-		if m[0].distance < PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
+		if m[0].distance < settings.PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
 			good.append(m)
 
 	sorted_matches = sorted(good, key=lambda x: x[0].distance)
 
 	good = []
 
-	# if len(sorted_matches)>NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION:
-	# 	good += sorted_matches[0:NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION]
+	# if len(sorted_matches)>settings.NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION:
+	# 	good += sorted_matches[0:settings.NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION]
 	# else:
 	# 	good += sorted_matches
 
-	number_of_good_matches = int(math.floor(len(sorted_matches)*PERCENTAGE_OF_GOOD_MATCHES))
+	number_of_good_matches = int(math.floor(len(sorted_matches)*settings.PERCENTAGE_OF_GOOD_MATCHES))
 	good = sorted_matches[0:number_of_good_matches]
 
 	matches = np.asarray(good)
@@ -665,15 +665,15 @@ def get_top_n_matches(desc1,desc2,kp1,kp2,n):
 	good = []
 	for m in matches:
 		
-		if 	m[0].distance < PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
+		if 	m[0].distance < settings.PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
 			good.append(m)
 
 	sorted_matches = sorted(good, key=lambda x: x[0].distance)
 
 	good = []
 
-	# if len(sorted_matches)>NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION:
-	# 	good += sorted_matches[0:NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION]
+	# if len(sorted_matches)>settings.NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION:
+	# 	good += sorted_matches[0:settings.NUMBER_OF_GOOD_MATCHES_FOR_GROUP_WISE_CORRECTION]
 	# else:
 	# 	good += sorted_matches
 
@@ -805,7 +805,7 @@ def get_name_of_patches_with_lids(lids,use_not_corrected=False):
 			coord = GPS_Coordinate(upper_left,upper_right,lower_left,lower_right,center)
 			
 			for l in lids:
-				if coord.is_coord_inside(lids[l]) or coord.is_point_near(lids[l],2*PATCH_SIZE_GPS[0]):
+				if coord.is_coord_inside(lids[l]) or coord.is_point_near(lids[l],2*settings.PATCH_SIZE_GPS[0]):
 					patches_names_with_lid.append((l,filename,coord))
 
 	return patches_names_with_lid
@@ -881,7 +881,7 @@ def get_unique_lists(xs,ys):
 def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=10):
 	# global patch_folder
 	img = cv2.imread('{0}/{1}'.format(settings.patch_folder,img_name))
-	img = cv2.resize(img,(int(img.shape[1]*SCALE),int(img.shape[0]*SCALE)))
+	img = cv2.resize(img,(int(img.shape[1]*settings.SCALE),int(img.shape[0]*settings.SCALE)))
 	rgb_img = img.copy()
 
 	# img[:,:,1:3] = 0
@@ -906,10 +906,10 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	# cv2.imshow('a',img)
 	# cv2.waitKey(0)
 
-	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(OPEN_MORPH_LID_SIZE*SCALE), int(OPEN_MORPH_LID_SIZE*SCALE)))
+	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.OPEN_MORPH_LID_SIZE*settings.SCALE), int(settings.OPEN_MORPH_LID_SIZE*settings.SCALE)))
 	img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
 
-	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(CLOSE_MORPH_LID_SIZE*SCALE), int(CLOSE_MORPH_LID_SIZE*SCALE)))
+	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.CLOSE_MORPH_LID_SIZE*settings.SCALE), int(settings.CLOSE_MORPH_LID_SIZE*settings.SCALE)))
 	img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
 	
@@ -951,7 +951,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 
 	# cv2.imwrite('tmp-{0}-{1}.jpg'.format(x,y),rgb_img)
 
-	if r >= LID_SIZE_AT_SCALE[0] and r <= LID_SIZE_AT_SCALE[1]:
+	if r >= settings.LID_SIZE_AT_SCALE[0] and r <= settings.LID_SIZE_AT_SCALE[1]:
 		return x,y,r,l,pname,coord
 	else:
 		return -1,-1,-1,-1,-1,-1
@@ -988,7 +988,7 @@ def calculate_error_of_correction(use_not_corrected=False):
 	for l_marker,p_name,coord in lid_patch_names:
 		args_list.append((p_name,l_marker,p_name,coord))
 
-	processes = MyPool(no_of_cores_to_use)
+	processes = MyPool(settings.no_of_cores_to_use)
 
 	results = processes.map(get_lid_in_patch_helper,args_list)
 	processes.close()
@@ -1012,12 +1012,12 @@ def calculate_error_of_correction(use_not_corrected=False):
 			# ratio_x = (point[0] - patch.gps.UL_coord[0])/(patch.gps.UR_coord[0]-patch.gps.UL_coord[0])
 			# ratio_y = (patch.gps.UL_coord[1] - point[1])/(patch.gps.UL_coord[1]-patch.gps.LL_coord[1])
 
-			# cv2.circle(output,(int(ratio_x*PATCH_SIZE[1]),int(ratio_y*PATCH_SIZE[0])),20,(0,0,255),thickness=-1)
+			# cv2.circle(output,(int(ratio_x*settings.PATCH_SIZE[1]),int(ratio_y*settings.PATCH_SIZE[0])),20,(0,0,255),thickness=-1)
 			
 			# ratio_x = (old_lid[0] - patch.gps.UL_coord[0])/(patch.gps.UR_coord[0]-patch.gps.UL_coord[0])
 			# ratio_y = (patch.gps.UL_coord[1] - old_lid[1])/(patch.gps.UL_coord[1]-patch.gps.LL_coord[1])
 
-			# cv2.circle(output,(int(ratio_x*PATCH_SIZE[1]),int(ratio_y*PATCH_SIZE[0])),20,(0,255,0),thickness=-1)
+			# cv2.circle(output,(int(ratio_x*settings.PATCH_SIZE[1]),int(ratio_y*settings.PATCH_SIZE[0])),20,(0,255,0),thickness=-1)
 
 			# cv2.imwrite('{0}-{1}.jpg'.format(patch.name,d),output)
 
@@ -1038,7 +1038,7 @@ def find_all_neighbors(patches,patch):
 			overlap1 = patch.get_overlap_rectangle(p)
 			overlap2 = p.get_overlap_rectangle(patch)
 			
-			if overlap1[2]-overlap1[0]<PATCH_SIZE[1]/5 and overlap1[3]-overlap1[1]<PATCH_SIZE[0]/5:
+			if overlap1[2]-overlap1[0]<settings.PATCH_SIZE[1]/5 and overlap1[3]-overlap1[1]<settings.PATCH_SIZE[0]/5:
 				continue
 
 			neighbors.append(p)
@@ -1066,7 +1066,7 @@ def draw_together(patches,return_flag=False):
 			right=p.gps.UR_coord[0]
 
 
-	super_patch_size = (int(math.ceil((up-down)/GPS_TO_IMAGE_RATIO[1]))+100,int(math.ceil((right-left)/GPS_TO_IMAGE_RATIO[0]))+100,3)
+	super_patch_size = (int(math.ceil((up-down)/settings.GPS_TO_IMAGE_RATIO[1]))+100,int(math.ceil((right-left)/settings.GPS_TO_IMAGE_RATIO[0]))+100,3)
 	UL = (left,up)
 
 	result = np.zeros(super_patch_size)
@@ -1077,10 +1077,10 @@ def draw_together(patches,return_flag=False):
 		x_diff = p.gps.UL_coord[0] - UL[0]
 		y_diff = UL[1] - p.gps.UL_coord[1]
 		
-		st_x = int(math.ceil(x_diff/GPS_TO_IMAGE_RATIO[0]))
-		st_y = int(math.ceil(y_diff/GPS_TO_IMAGE_RATIO[1]))
+		st_x = int(math.ceil(x_diff/settings.GPS_TO_IMAGE_RATIO[0]))
+		st_y = int(math.ceil(y_diff/settings.GPS_TO_IMAGE_RATIO[1]))
 		
-		result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img
+		result[st_y:st_y+settings.PATCH_SIZE[0],st_x:st_x+settings.PATCH_SIZE[1],:] = p.rgb_img
 
 		p.delete_img()
 
@@ -1116,7 +1116,7 @@ def merge_all_neighbors(corrected_neighbors,patch):
 			right=p.gps.UR_coord[0]
 
 
-	super_patch_size = (int(math.ceil((up-down)/GPS_TO_IMAGE_RATIO[1]))+100,int(math.ceil((right-left)/GPS_TO_IMAGE_RATIO[0]))+100,3)
+	super_patch_size = (int(math.ceil((up-down)/settings.GPS_TO_IMAGE_RATIO[1]))+100,int(math.ceil((right-left)/settings.GPS_TO_IMAGE_RATIO[0]))+100,3)
 	UL = (left,up)
 
 	result = np.zeros(super_patch_size)
@@ -1134,10 +1134,10 @@ def merge_all_neighbors(corrected_neighbors,patch):
 		x_diff = p.gps.UL_coord[0] - UL[0]
 		y_diff = UL[1] - p.gps.UL_coord[1]
 		
-		st_x = int(math.ceil(x_diff/GPS_TO_IMAGE_RATIO[0]))
-		st_y = int(math.ceil(y_diff/GPS_TO_IMAGE_RATIO[1]))
+		st_x = int(math.ceil(x_diff/settings.GPS_TO_IMAGE_RATIO[0]))
+		st_y = int(math.ceil(y_diff/settings.GPS_TO_IMAGE_RATIO[1]))
 		
-		# result[st_y:st_y+PATCH_SIZE[0],st_x:st_x+PATCH_SIZE[1],:] = p.rgb_img
+		# result[st_y:st_y+settings.PATCH_SIZE[0],st_x:st_x+settings.PATCH_SIZE[1],:] = p.rgb_img
 		for i,k in enumerate(kp):
 			total_kp.append((k[0]+st_x,k[1]+st_y))
 			total_desc.append(desc[i,:])
@@ -1150,7 +1150,7 @@ def merge_all_neighbors(corrected_neighbors,patch):
 	# result = np.array(result).astype('uint8')
 	# result = cv2.resize(result,(int(result.shape[1]/5),int(result.shape[0]/5)))
 	# img = patch.rgb_img.copy()
-	# img = cv2.resize(img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
+	# img = cv2.resize(img,(int(settings.PATCH_SIZE[1]/5),int(settings.PATCH_SIZE[0]/5)))
 	# cv2.imshow('figmain',img)
 	# cv2.imshow('fig',result)
 	# cv2.waitKey(0)
@@ -1165,8 +1165,8 @@ def get_new_GPS_Coords_all_neighbors(p1,UL,H):
 	diff_x = -c1[0]
 	diff_y = -c1[1]
 
-	gps_scale_x = (PATCH_SIZE_GPS[0])/(PATCH_SIZE[1])
-	gps_scale_y = -(PATCH_SIZE_GPS[1])/(PATCH_SIZE[0])
+	gps_scale_x = (settings.PATCH_SIZE_GPS[0])/(settings.PATCH_SIZE[1])
+	gps_scale_y = -(settings.PATCH_SIZE_GPS[1])/(settings.PATCH_SIZE[0])
 
 	diff_x = diff_x*gps_scale_x
 	diff_y = diff_y*gps_scale_y
@@ -1403,7 +1403,7 @@ def correct_patch_group_all_corrected_neighbors(group_id,patches):
 
 		coord = get_new_GPS_Coords_all_neighbors(patch,UL_merged,H)
 
-		if (perc_in<MINIMUM_PERCENTAGE_OF_INLIERS or len(matches)<MINIMUM_NUMBER_OF_MATCHES):
+		if (perc_in<settings.MINIMUM_PERCENTAGE_OF_INLIERS or len(matches)<settings.MINIMUM_NUMBER_OF_MATCHES):
 			if patch.previously_checked == False:
 
 				patch.previously_checked = True
@@ -1462,7 +1462,7 @@ def parallel_patch_creator(patch):
 
 	patch.load_img(True)
 	img = patch.rgb_img
-	kp,desc = detect_SIFT_key_points(img,0,0,PATCH_SIZE[1],PATCH_SIZE[0])
+	kp,desc = detect_SIFT_key_points(img,0,0,settings.PATCH_SIZE[1],settings.PATCH_SIZE[0])
 
 	kp_tmp = [(p.pt[0], p.pt[1]) for p in kp]
 	pickle.dump((kp_tmp,desc), open('{0}/{1}_SIFT.data'.format(settings.SIFT_folder,patch.name.replace('.tif','')), "wb"))
@@ -1510,7 +1510,7 @@ def read_all_data():
 
 			if settings.PATCH_SIZE_GPS[0] == -1:
 				settings.PATCH_SIZE_GPS = (patch.gps.UR_coord[0]-patch.gps.UL_coord[0],patch.gps.UL_coord[1]-patch.gps.LL_coord[1])
-				settings.GPS_TO_IMAGE_RATIO = (settings.PATCH_SIZE_GPS[0]/PATCH_SIZE[1],settings.PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
+				settings.GPS_TO_IMAGE_RATIO = (settings.PATCH_SIZE_GPS[0]/settings.PATCH_SIZE[1],settings.PATCH_SIZE_GPS[1]/settings.PATCH_SIZE[0])
 
 			patches.append(patch)
 
@@ -1628,8 +1628,8 @@ def get_gps_diff_from_H(p1,p2,H):
 	diff_x = -c1[0]
 	diff_y = -c1[1]
 
-	gps_scale_x = (PATCH_SIZE_GPS[0])/(PATCH_SIZE[1])
-	gps_scale_y = -(PATCH_SIZE_GPS[1])/(PATCH_SIZE[0])
+	gps_scale_x = (settings.PATCH_SIZE_GPS[0])/(settings.PATCH_SIZE[1])
+	gps_scale_y = -(settings.PATCH_SIZE_GPS[1])/(settings.PATCH_SIZE[0])
 
 	diff_x = diff_x*gps_scale_x
 	diff_y = diff_y*gps_scale_y
@@ -1754,7 +1754,7 @@ def hybrid_method_UAV_lettuce_matching_step(patches,gid,percetage_matched=0.75):
 
 		total_matched,total_contours = p.correct_based_on_contours_and_lettuce_heads(settings.lettuce_coords)
 
-		if total_matched <CONTOUR_MATCHING_MIN_MATCH or total_matched/total_contours <percetage_matched:
+		if total_matched <settings.CONTOUR_MATCHING_MIN_MATCH or total_matched/total_contours <percetage_matched:
 			not_corrected.append(p)
 		else:
 			print('Group ID {0}: patch {1} corrected with {2} number of matches ({3}).'.format(gid,p.name,total_matched,total_matched/total_contours))
@@ -1839,14 +1839,14 @@ def hybrid_method_sift_correction_step(corrected,not_corrected,gid,starting_step
 			number_of_iterations_without_change+=1
 			continue
 
-		if params.percentage_inliers<MINIMUM_PERCENTAGE_OF_INLIERS:
+		if params.percentage_inliers<settings.MINIMUM_PERCENTAGE_OF_INLIERS:
 			print('Group ID {0}: ERROR- patch {1} Percentage Inliers < 10 Percente. will be pushed back.'.format(gid,p1.name))
 			sys.stdout.flush()
 			can_be_corrected_patches.insert(0,p1)
 			number_of_iterations_without_change+=1
 			continue
 
-		if params.num_matches<MINIMUM_NUMBER_OF_MATCHES and number_of_iterations_without_change<len(can_be_corrected_patches):
+		if params.num_matches<settings.MINIMUM_NUMBER_OF_MATCHES and number_of_iterations_without_change<len(can_be_corrected_patches):
 			print('Group ID {0}: ERROR- patch {1} NUM Matches < 40. will be pushed back.'.format(gid,p1.name))
 			sys.stdout.flush()
 			can_be_corrected_patches.insert(0,p1)
@@ -1947,10 +1947,10 @@ def ortho_generation_sub_function(p,UL):
 	x_diff = p.gps.UL_coord[0] - UL[0]
 	y_diff = UL[1] - p.gps.UL_coord[1]
 	
-	st_x = int(REDUCTION_FACTOR*x_diff/GPS_TO_IMAGE_RATIO[0])
-	st_y = int(REDUCTION_FACTOR*y_diff/GPS_TO_IMAGE_RATIO[1])
+	st_x = int(settings.REDUCTION_FACTOR*x_diff/settings.GPS_TO_IMAGE_RATIO[0])
+	st_y = int(settings.REDUCTION_FACTOR*y_diff/settings.GPS_TO_IMAGE_RATIO[1])
 	
-	new_size = (int(PATCH_SIZE[0]*REDUCTION_FACTOR),int(PATCH_SIZE[1]*REDUCTION_FACTOR))
+	new_size = (int(settings.PATCH_SIZE[0]*settings.REDUCTION_FACTOR),int(settings.PATCH_SIZE[1]*settings.REDUCTION_FACTOR))
 
 	tmpimg = cv2.resize(p.rgb_img,(new_size[1],new_size[0]))
 
@@ -1993,10 +1993,10 @@ class GPS_Coordinate:
 			return False
 
 	def is_coord_in_GPS_error_proximity(self,coord):
-		if coord[0]>=self.UL_coord[0] and coord[0]<=self.UR_coord[0] and (abs(coord[1]-self.LL_coord[1])<GPS_ERROR_Y or abs(coord[1]-self.UL_coord[1])<GPS_ERROR_Y):
+		if coord[0]>=self.UL_coord[0] and coord[0]<=self.UR_coord[0] and (abs(coord[1]-self.LL_coord[1])<settings.GPS_ERROR_Y or abs(coord[1]-self.UL_coord[1])<settings.GPS_ERROR_Y):
 			return True
 
-		if coord[1]<=self.UL_coord[1] and coord[1]>=self.LL_coord[1] and (abs(coord[0]-self.LL_coord[0])<GPS_ERROR_X or abs(coord[0]-self.LR_coord[0])<GPS_ERROR_X):
+		if coord[1]<=self.UL_coord[1] and coord[1]>=self.LL_coord[1] and (abs(coord[0]-self.LL_coord[0])<settings.GPS_ERROR_X or abs(coord[0]-self.LR_coord[0])<settings.GPS_ERROR_X):
 			return True
 
 		return False
@@ -2256,8 +2256,8 @@ class Patch:
 		gc.collect()
 
 	def convert_image_to_GPS_coordinate(self,point):
-		x_ratio = point[0]*GPS_TO_IMAGE_RATIO[0]
-		y_ratio = point[1]*GPS_TO_IMAGE_RATIO[1]
+		x_ratio = point[0]*settings.GPS_TO_IMAGE_RATIO[0]
+		y_ratio = point[1]*settings.GPS_TO_IMAGE_RATIO[1]
 
 		return (self.gps.UL_coord[0]+x_ratio,self.gps.UL_coord[1]-y_ratio)
 
@@ -2280,47 +2280,47 @@ class Patch:
 	def get_overlap_rectangle(self,patch,increase_size=True):
 		p1_x = 0
 		p1_y = 0
-		p2_x = PATCH_SIZE[1]
-		p2_y = PATCH_SIZE[0]
+		p2_x = settings.PATCH_SIZE[1]
+		p2_y = settings.PATCH_SIZE[0]
 
 		detect_overlap = False
 
 		if patch.gps.UL_coord[1]>=self.gps.LL_coord[1] and patch.gps.UL_coord[1]<=self.gps.UL_coord[1]:
 			detect_overlap = True
-			p1_y = int(math.ceil(((patch.gps.UL_coord[1]-self.gps.UL_coord[1]) / (self.gps.LL_coord[1]-self.gps.UL_coord[1])*PATCH_SIZE[0])))
+			p1_y = int(math.ceil(((patch.gps.UL_coord[1]-self.gps.UL_coord[1]) / (self.gps.LL_coord[1]-self.gps.UL_coord[1])*settings.PATCH_SIZE[0])))
 		
 		if patch.gps.LL_coord[1]>=self.gps.LL_coord[1] and patch.gps.LL_coord[1]<=self.gps.UL_coord[1]:
 			detect_overlap = True
-			p2_y = int(math.ceil(((patch.gps.LR_coord[1]-self.gps.UL_coord[1]) / (self.gps.LL_coord[1]-self.gps.UL_coord[1])*PATCH_SIZE[0])))
+			p2_y = int(math.ceil(((patch.gps.LR_coord[1]-self.gps.UL_coord[1]) / (self.gps.LL_coord[1]-self.gps.UL_coord[1])*settings.PATCH_SIZE[0])))
 
 		if patch.gps.UR_coord[0]<=self.gps.UR_coord[0] and patch.gps.UR_coord[0]>=self.gps.UL_coord[0]:
 			detect_overlap = True
-			p2_x = int(math.ceil(((patch.gps.UR_coord[0]-self.gps.UL_coord[0]) / (self.gps.UR_coord[0]-self.gps.UL_coord[0])*PATCH_SIZE[1])))
+			p2_x = int(math.ceil(((patch.gps.UR_coord[0]-self.gps.UL_coord[0]) / (self.gps.UR_coord[0]-self.gps.UL_coord[0])*settings.PATCH_SIZE[1])))
 			
 		if patch.gps.UL_coord[0]<=self.gps.UR_coord[0] and patch.gps.UL_coord[0]>=self.gps.UL_coord[0]:
 			detect_overlap = True
-			p1_x = int(math.ceil(((patch.gps.LL_coord[0]-self.gps.UL_coord[0]) / (self.gps.UR_coord[0]-self.gps.UL_coord[0])*PATCH_SIZE[1])))
+			p1_x = int(math.ceil(((patch.gps.LL_coord[0]-self.gps.UL_coord[0]) / (self.gps.UR_coord[0]-self.gps.UL_coord[0])*settings.PATCH_SIZE[1])))
 			
 		if patch.gps.is_coord_inside(self.gps.UL_coord) and patch.gps.is_coord_inside(self.gps.UR_coord) and \
 		patch.gps.is_coord_inside(self.gps.LL_coord) and patch.gps.is_coord_inside(self.gps.LR_coord):
 			p1_x = 0
 			p1_y = 0
-			p2_x = PATCH_SIZE[1]
-			p2_y = PATCH_SIZE[0]
+			p2_x = settings.PATCH_SIZE[1]
+			p2_y = settings.PATCH_SIZE[0]
 			detect_overlap = True
 
 		if increase_size:
-			if p1_x>0+PATCH_SIZE[1]/10:
-				p1_x-=PATCH_SIZE[1]/10
+			if p1_x>0+settings.PATCH_SIZE[1]/10:
+				p1_x-=settings.PATCH_SIZE[1]/10
 
-			if p2_x<9*PATCH_SIZE[1]/10:
-				p2_x+=PATCH_SIZE[1]/10
+			if p2_x<9*settings.PATCH_SIZE[1]/10:
+				p2_x+=settings.PATCH_SIZE[1]/10
 
-			if p1_y>0+PATCH_SIZE[0]/10:
-				p1_y-=PATCH_SIZE[0]/10
+			if p1_y>0+settings.PATCH_SIZE[0]/10:
+				p1_y-=settings.PATCH_SIZE[0]/10
 
-			if p2_y<9*PATCH_SIZE[0]/10:
-				p2_y+=PATCH_SIZE[0]/10
+			if p2_y<9*settings.PATCH_SIZE[0]/10:
+				p2_y+=settings.PATCH_SIZE[0]/10
 
 		if detect_overlap == False:
 			return 0,0,0,0
@@ -2331,29 +2331,29 @@ class Patch:
 		
 		p1_x1 = 0
 		p1_y1 = 0
-		p1_x2 = PATCH_SIZE[1]
-		p1_y2 = PATCH_SIZE[0]
+		p1_x2 = settings.PATCH_SIZE[1]
+		p1_y2 = settings.PATCH_SIZE[0]
 
 		p2_x1 = 0
 		p2_y1 = 0
-		p2_x2 = PATCH_SIZE[1]
-		p2_y2 = PATCH_SIZE[0]
+		p2_x2 = settings.PATCH_SIZE[1]
+		p2_y2 = settings.PATCH_SIZE[0]
 
 		if patch.gps.UL_coord[1]>=self.gps.LL_coord[1] and patch.gps.UL_coord[1]<=self.gps.UL_coord[1]:
-			p1_y1 = int(math.ceil((self.gps.UL_coord[1]-patch.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1]))
-			p2_y2 = PATCH_SIZE[0]-p1_y1
+			p1_y1 = int(math.ceil((self.gps.UL_coord[1]-patch.gps.UL_coord[1])/settings.GPS_TO_IMAGE_RATIO[1]))
+			p2_y2 = settings.PATCH_SIZE[0]-p1_y1
 		
 		if patch.gps.LL_coord[1]>=self.gps.LL_coord[1] and patch.gps.LL_coord[1]<=self.gps.UL_coord[1]:
-			p1_y2 = int(math.ceil((self.gps.UL_coord[1]-patch.gps.LL_coord[1])/GPS_TO_IMAGE_RATIO[1]))
-			p2_y1 = PATCH_SIZE[0]-p1_y2
+			p1_y2 = int(math.ceil((self.gps.UL_coord[1]-patch.gps.LL_coord[1])/settings.GPS_TO_IMAGE_RATIO[1]))
+			p2_y1 = settings.PATCH_SIZE[0]-p1_y2
 
 		if patch.gps.UR_coord[0]<=self.gps.UR_coord[0] and patch.gps.UR_coord[0]>=self.gps.UL_coord[0]:
-			p1_x2 = int(math.ceil((patch.gps.UR_coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0]))
-			p2_x1 = PATCH_SIZE[1]-p1_x2
+			p1_x2 = int(math.ceil((patch.gps.UR_coord[0]-self.gps.UL_coord[0])/settings.GPS_TO_IMAGE_RATIO[0]))
+			p2_x1 = settings.PATCH_SIZE[1]-p1_x2
 
 		if patch.gps.UL_coord[0]<=self.gps.UR_coord[0] and patch.gps.UL_coord[0]>=self.gps.UL_coord[0]:
-			p1_x1 = int(math.ceil((patch.gps.UL_coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0]))
-			p2_x2 = PATCH_SIZE[1]-p1_x1
+			p1_x1 = int(math.ceil((patch.gps.UL_coord[0]-self.gps.UL_coord[0])/settings.GPS_TO_IMAGE_RATIO[0]))
+			p2_x2 = settings.PATCH_SIZE[1]-p1_x1
 
 		return (p1_x1,p1_y1,p1_x2,p1_y2),(p2_x1,p2_y1,p2_x2,p2_y2)
 
@@ -2381,7 +2381,7 @@ class Patch:
 	def get_pairwise_transformation_info(self,neighbor):
 		overlap1,overlap2 = neighbor.get_overlap_rectangles(self)
 		
-		if overlap1[2]-overlap1[0]<PATCH_SIZE[1]*OVERLAP_DISCARD_RATIO and overlap1[3]-overlap1[1]<PATCH_SIZE[0]*OVERLAP_DISCARD_RATIO:
+		if overlap1[2]-overlap1[0]<settings.PATCH_SIZE[1]*settings.OVERLAP_DISCARD_RATIO and overlap1[3]-overlap1[1]<settings.PATCH_SIZE[0]*settings.OVERLAP_DISCARD_RATIO:
 			# print('overlap low.')
 			return None
 
@@ -2414,7 +2414,7 @@ class Patch:
 		percentage_inliers = round(percentage_inliers*100,2)
 
 
-		if abs(scale-1) > TRANSFORMATION_SCALE_DISCARD_THRESHOLD or abs(theta-0)>TRANSFORMATION_ANGLE_DISCARD_THRESHOLD:
+		if abs(scale-1) > settings.TRANSFORMATION_SCALE_DISCARD_THRESHOLD or abs(theta-0)>settings.TRANSFORMATION_ANGLE_DISCARD_THRESHOLD:
 			
 			return Neighbor_Parameters(overlap2,overlap1,H,num_matches,percentage_inliers,2,scale,theta)
 
@@ -2457,11 +2457,11 @@ class Patch:
 		return magnitude_spectrum.astype('uint8')
 
 	def correct_GPS_based_on_point(self,point_in_img,point_in_GPS):
-		ratio_x = point_in_img[0]/PATCH_SIZE[1]
-		ratio_y = point_in_img[1]/PATCH_SIZE[0]
+		ratio_x = point_in_img[0]/settings.PATCH_SIZE[1]
+		ratio_y = point_in_img[1]/settings.PATCH_SIZE[0]
 
-		diff_x_GPS = PATCH_SIZE_GPS[0]*ratio_x
-		diff_y_GPS = PATCH_SIZE_GPS[1]*ratio_y
+		diff_x_GPS = settings.PATCH_SIZE_GPS[0]*ratio_x
+		diff_y_GPS = settings.PATCH_SIZE_GPS[1]*ratio_y
 
 		old_GPS_point = (self.gps.UL_coord[0]+diff_x_GPS,self.gps.UL_coord[1]-diff_y_GPS)
 
@@ -2480,8 +2480,8 @@ class Patch:
 
 	def correct_based_on_neighbors(self,neighbors):
 
-		list_jitter_x = np.arange(-GPS_ERROR_X, GPS_ERROR_X, 0.0000001)
-		list_jitter_y = np.arange(-GPS_ERROR_Y, GPS_ERROR_Y, 0.0000001)
+		list_jitter_x = np.arange(-settings.GPS_ERROR_X, settings.GPS_ERROR_X, 0.0000001)
+		list_jitter_y = np.arange(-settings.GPS_ERROR_Y, settings.GPS_ERROR_Y, 0.0000001)
 
 		self.load_img()
 		for n in neighbors:
@@ -2496,7 +2496,7 @@ class Patch:
 				
 				args_list.append((self,neighbors,jx,jy))
 
-		process = MyPool(FFT_PARALLEL_CORES_TO_USE)
+		process = MyPool(settings.FFT_PARALLEL_CORES_TO_USE)
 		result = process.map(jitter_and_calculate_fft_helper,args_list)
 
 		self.delete_img()
@@ -2590,7 +2590,7 @@ class Patch:
 		# cv2.imshow('ffg',img)
 		# cv2.waitKey(0)
 
-		MB_size = int(17*SCALE) if int(17*SCALE) % 2 == 1 else int(17*SCALE)+1
+		MB_size = int(17*settings.SCALE) if int(17*settings.SCALE) % 2 == 1 else int(17*settings.SCALE)+1
 
 		img  = cv2.medianBlur(img,MB_size)
 
@@ -2638,7 +2638,7 @@ class Patch:
 			cY = int(M["m01"] / M["m00"])
 
 			if cX<=settings.inside_radius_lettuce_matching_threshold or cY<=settings.inside_radius_lettuce_matching_threshold or \
-			abs(PATCH_SIZE[1]-cX)<settings.inside_radius_lettuce_matching_threshold or abs(PATCH_SIZE[0]-cY)<settings.inside_radius_lettuce_matching_threshold:
+			abs(settings.PATCH_SIZE[1]-cX)<settings.inside_radius_lettuce_matching_threshold or abs(settings.PATCH_SIZE[0]-cY)<settings.inside_radius_lettuce_matching_threshold:
 				continue
 
 			if areas[i]>threshold:
@@ -2674,8 +2674,8 @@ class Patch:
 		# for coord in list_lettuce_heads:
 		# 	if self.gps.is_coord_inside(coord):
 
-		# 		pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
-		# 		pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
+		# 		pX = int(abs(coord[0]-self.gps.UL_coord[0])/settings.GPS_TO_IMAGE_RATIO[0])
+		# 		pY = int(abs(coord[1]-self.gps.UL_coord[1])/settings.GPS_TO_IMAGE_RATIO[1])
 		# 		cv2.circle(self.rgb_img, (pX, pY), 20, (0, 0, 255 ), -1)
 			
 		# cv2.namedWindow('fig',cv2.WINDOW_NORMAL)
@@ -2751,7 +2751,7 @@ class Patch:
 			c2 = m[1]
 			T = get_translation_from_single_matches(c1[0],c1[1],c2[0],c2[1])
 			
-			if abs(T[0,2])>=GPS_ERROR_X/GPS_TO_IMAGE_RATIO[0] or abs(T[1,2])>=GPS_ERROR_Y/GPS_TO_IMAGE_RATIO[1]:
+			if abs(T[0,2])>=settings.GPS_ERROR_X/settings.GPS_TO_IMAGE_RATIO[0] or abs(T[1,2])>=settings.GPS_ERROR_Y/settings.GPS_TO_IMAGE_RATIO[1]:
 					continue
 
 			mean_error = calculate_remaining_contour_matches_error(matches,T)
@@ -2795,8 +2795,8 @@ class Patch:
 		for coord in list_lettuce_heads:
 			if self.gps.is_coord_inside(coord) or self.gps.is_coord_in_GPS_error_proximity(coord):
 
-				pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
-				pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
+				pX = int(abs(coord[0]-self.gps.UL_coord[0])/settings.GPS_TO_IMAGE_RATIO[0])
+				pY = int(abs(coord[1]-self.gps.UL_coord[1])/settings.GPS_TO_IMAGE_RATIO[1])
 				inside_lettuce_heads.append((pX,pY))
 
 		# ---------------- DRAW -----------------------
@@ -2827,7 +2827,7 @@ class Patch:
 
 				T = get_translation_from_single_matches(c[0],c[1],l[0],l[1])
 
-				if abs(T[0,2])>GPS_ERROR_X/GPS_TO_IMAGE_RATIO[0] or abs(T[1,2])>GPS_ERROR_Y/GPS_TO_IMAGE_RATIO[1]:
+				if abs(T[0,2])>settings.GPS_ERROR_X/settings.GPS_TO_IMAGE_RATIO[0] or abs(T[1,2])>settings.GPS_ERROR_Y/settings.GPS_TO_IMAGE_RATIO[1]:
 					continue
 
 				# mean_error = calculate_average_min_distance_lettuce_heads(contour_centers,inside_lettuce_heads,T)
@@ -2856,8 +2856,8 @@ class Patch:
 		# for coord in list_lettuce_heads:
 		# 	if self.gps.is_coord_inside(coord):
 
-		# 		pX = int(abs(coord[0]-self.gps.UL_coord[0])/GPS_TO_IMAGE_RATIO[0])
-		# 		pY = int(abs(coord[1]-self.gps.UL_coord[1])/GPS_TO_IMAGE_RATIO[1])
+		# 		pX = int(abs(coord[0]-self.gps.UL_coord[0])/settings.GPS_TO_IMAGE_RATIO[0])
+		# 		pY = int(abs(coord[1]-self.gps.UL_coord[1])/settings.GPS_TO_IMAGE_RATIO[1])
 		# 		inside_lettuce_heads.append((pX,pY))
 
 		# for l in inside_lettuce_heads:
@@ -2872,8 +2872,8 @@ class Patch:
 		return best_matched,len(contour_centers)
 
 	def move_GPS_based_on_lettuce(self,T):
-		diff_x = -T[0,2]*GPS_TO_IMAGE_RATIO[0]
-		diff_y = T[1,2]*GPS_TO_IMAGE_RATIO[1]
+		diff_x = -T[0,2]*settings.GPS_TO_IMAGE_RATIO[0]
+		diff_y = T[1,2]*settings.GPS_TO_IMAGE_RATIO[1]
 		diff = (diff_x,diff_y)
 
 		new_UL = (self.gps.UL_coord[0]-diff[0],self.gps.UL_coord[1]-diff[1])
@@ -3301,7 +3301,7 @@ class Group:
 		# 		patch.gps = patch.correct_based_on_neighbors(neighbors)
 
 				# patch.load_img()
-				# main = cv2.resize(patch.rgb_img,(int(PATCH_SIZE[1]/5),int(PATCH_SIZE[0]/5)))
+				# main = cv2.resize(patch.rgb_img,(int(settings.PATCH_SIZE[1]/5),int(settings.PATCH_SIZE[0]/5)))
 				# cv2.imshow('main',main)
 
 				# draw_together(neighbors+[patch])
@@ -3699,11 +3699,11 @@ class Field:
 		for p, l, x, y in self.detected_lid_patches:
 			point_in_GPS = lids[l]
 
-			ratio_x = x/PATCH_SIZE[1]
-			ratio_y = y/PATCH_SIZE[0]
+			ratio_x = x/settings.PATCH_SIZE[1]
+			ratio_y = y/settings.PATCH_SIZE[0]
 
-			diff_x_GPS = PATCH_SIZE_GPS[0]*ratio_x
-			diff_y_GPS = PATCH_SIZE_GPS[1]*ratio_y
+			diff_x_GPS = settings.PATCH_SIZE_GPS[0]*ratio_x
+			diff_y_GPS = settings.PATCH_SIZE_GPS[1]*ratio_y
 
 			old_GPS_point = (p.gps.UL_coord[0]+diff_x_GPS,p.gps.UL_coord[1]-diff_y_GPS)
 
@@ -3869,7 +3869,7 @@ class Field:
 			for patch in group.patches:
 				args_list.append(patch)
 		
-		processes = multiprocessing.Pool(no_of_cores_to_use_max)
+		processes = multiprocessing.Pool(settings.no_of_cores_to_use_max)
 		processes.map(parallel_patch_creator,args_list)
 		processes.close()
 
@@ -4044,7 +4044,7 @@ class Field:
 			if p.gps.UR_coord[0]>=right:
 				right=p.gps.UR_coord[0]
 
-		super_patch_size = (int(math.ceil((up-down)*REDUCTION_FACTOR/GPS_TO_IMAGE_RATIO[1]))+100,int(math.ceil((right-left)*REDUCTION_FACTOR/GPS_TO_IMAGE_RATIO[0]))+100,3)
+		super_patch_size = (int(math.ceil((up-down)*settings.REDUCTION_FACTOR/settings.GPS_TO_IMAGE_RATIO[1]))+100,int(math.ceil((right-left)*settings.REDUCTION_FACTOR/settings.GPS_TO_IMAGE_RATIO[0]))+100,3)
 		UL = (left,up)
 
 		result = np.zeros(super_patch_size)
@@ -4055,10 +4055,10 @@ class Field:
 		# 	x_diff = p.gps.UL_coord[0] - UL[0]
 		# 	y_diff = UL[1] - p.gps.UL_coord[1]
 			
-		# 	st_x = int(REDUCTION_FACTOR*x_diff/GPS_TO_IMAGE_RATIO[0])
-		# 	st_y = int(REDUCTION_FACTOR*y_diff/GPS_TO_IMAGE_RATIO[1])
+		# 	st_x = int(settings.REDUCTION_FACTOR*x_diff/settings.GPS_TO_IMAGE_RATIO[0])
+		# 	st_y = int(settings.REDUCTION_FACTOR*y_diff/settings.GPS_TO_IMAGE_RATIO[1])
 			
-		# 	new_size = (int(PATCH_SIZE[0]*REDUCTION_FACTOR),int(PATCH_SIZE[1]*REDUCTION_FACTOR))
+		# 	new_size = (int(settings.PATCH_SIZE[0]*settings.REDUCTION_FACTOR),int(settings.PATCH_SIZE[1]*settings.REDUCTION_FACTOR))
 
 		# 	tmpimg = cv2.resize(p.rgb_img,(new_size[1],new_size[0]))
 
@@ -4143,7 +4143,7 @@ class Field:
 		for s in scales:
 			settings.SCALE = s
 			settings.PATCH_SIZE = (int(3296*settings.SCALE), int(2472*settings.SCALE))
-			settings.GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/settings.PATCH_SIZE[1],PATCH_SIZE_GPS[1]/settings.PATCH_SIZE[0])
+			settings.GPS_TO_IMAGE_RATIO = (settings.PATCH_SIZE_GPS[0]/settings.PATCH_SIZE[1],settings.PATCH_SIZE_GPS[1]/settings.PATCH_SIZE[0])
 
 			all_patches = []
 			for g in self.groups:
@@ -4202,13 +4202,13 @@ def calculate_scale_effect_inside(p1,p2):
 		pp1 = kp1[m[0].queryIdx].pt
 		pp2 = kp2[m[0].trainIdx].pt
 
-		GPS_p1 = (p1.gps.UL_coord[0] + pp1[0]*GPS_TO_IMAGE_RATIO[0] , p1.gps.UL_coord[1] - pp1[1]*GPS_TO_IMAGE_RATIO[1])
-		GPS_p2 = (p2.gps.UL_coord[0] + pp2[0]*GPS_TO_IMAGE_RATIO[0] , p2.gps.UL_coord[1] - pp2[1]*GPS_TO_IMAGE_RATIO[1])
+		GPS_p1 = (p1.gps.UL_coord[0] + pp1[0]*settings.GPS_TO_IMAGE_RATIO[0] , p1.gps.UL_coord[1] - pp1[1]*settings.GPS_TO_IMAGE_RATIO[1])
+		GPS_p2 = (p2.gps.UL_coord[0] + pp2[0]*settings.GPS_TO_IMAGE_RATIO[0] , p2.gps.UL_coord[1] - pp2[1]*settings.GPS_TO_IMAGE_RATIO[1])
 
 		diff = (abs(GPS_p2[0]-GPS_p1[0]),abs(GPS_p2[1]-GPS_p1[1]))
 		
 
-		if diff[0]<GPS_ERROR_X and diff[1]<GPS_ERROR_Y:
+		if diff[0]<settings.GPS_ERROR_X and diff[1]<settings.GPS_ERROR_Y:
 			good_count+=1
 		else:
 			bad_count+=1
@@ -4469,14 +4469,14 @@ def test_function():
 				# print(pp1)
 				# print(pp2)
 				
-				GPS_p1 = (p1.gps.UL_coord[0] + pp1[0]*GPS_TO_IMAGE_RATIO[0] , p1.gps.UL_coord[1] - pp1[1]*GPS_TO_IMAGE_RATIO[1])
-				GPS_p2 = (p2.gps.UL_coord[0] + pp2[0]*GPS_TO_IMAGE_RATIO[0] , p2.gps.UL_coord[1] - pp2[1]*GPS_TO_IMAGE_RATIO[1])
+				GPS_p1 = (p1.gps.UL_coord[0] + pp1[0]*settings.GPS_TO_IMAGE_RATIO[0] , p1.gps.UL_coord[1] - pp1[1]*settings.GPS_TO_IMAGE_RATIO[1])
+				GPS_p2 = (p2.gps.UL_coord[0] + pp2[0]*settings.GPS_TO_IMAGE_RATIO[0] , p2.gps.UL_coord[1] - pp2[1]*settings.GPS_TO_IMAGE_RATIO[1])
 
 				diff = (abs(GPS_p2[0]-GPS_p1[0]),abs(GPS_p2[1]-GPS_p1[1]))
 				# print(m[0].distance,m[1].distance)
 				
 
-				if diff[0]<GPS_ERROR_X and diff[1]<GPS_ERROR_Y:
+				if diff[0]<settings.GPS_ERROR_X and diff[1]<settings.GPS_ERROR_Y:
 					c = (0,255,0)
 					good_count+=1
 				else:
@@ -4484,7 +4484,7 @@ def test_function():
 					bad_count+=1
 					# print(diff)
 				
-				cv2.line(img3,(int(pp1[0]),int(pp1[1])),(int(pp2[0]+PATCH_SIZE[1]),int(pp2[1])),c,5)
+				cv2.line(img3,(int(pp1[0]),int(pp1[1])),(int(pp2[0]+settings.PATCH_SIZE[1]),int(pp2[1])),c,5)
 			
 			if (good_count+bad_count) <=7:
 				continue
@@ -4494,7 +4494,7 @@ def test_function():
 			cv2.imshow('fig3',img3)
 			cv2.waitKey(0)
 
-	print(SCALE,statistics.mean(dd),statistics.stdev(dd))
+	print(settings.SCALE,statistics.mean(dd),statistics.stdev(dd))
 
 
 # def main(scan_date):
