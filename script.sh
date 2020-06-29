@@ -23,7 +23,7 @@ fi
 #    exit 1
 #fi
 
-cp /app/$Home_dir/.irods/.irodsEnv ~/.irods/.
+cp /app/$Home_dir/.irods/irods_environment.json ~/.irods/.
 
 # Initializing iRods
 /app/usr/local/bin/iinit $Pass
