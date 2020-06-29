@@ -26,7 +26,7 @@ fi
 cp /app/$Home_dir/.irods/irods_environment.json ~/.irods/.
 
 # Initializing iRods
-/app/usr/local/bin/iinit $Pass
+/app/usr/bin/iinit $Pass
 
 
 # Creating directories
