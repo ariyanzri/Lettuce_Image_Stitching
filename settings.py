@@ -59,4 +59,4 @@ def initialize_settings(scan_date,config_file,local_address):
 		correction_log_file = '/app/{0}/{1}-rgb/logs/log_{2}_at_{3}.csv'.format(local_address,scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
 		lettuce_heads_coordinates_file = '/app/{0}/{1}-rgb/season10_ind_lettuce_2020-05-27.csv'.format(local_address,scan_date)
 		scane_date_stng = scan_date
-
+		lettuce_coords = None

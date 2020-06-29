@@ -20,9 +20,8 @@ from Block_wise_GPS_correction import *
 import settings
 
 def main(scan_date):
-	global lettuce_coords
 
-	lettuce_coords = read_lettuce_heads_coordinates()
+	settings.lettuce_coords = read_lettuce_heads_coordinates()
 
 	field = Field()
 	
@@ -69,7 +68,7 @@ print('Geo-correction started. Log is being saved in {0}'.format(local_address))
 original = sys.stdout
 sys.stdout = open('/app/{0}/{1}-rgb/{2}.txt'.format(local_address,scan_date,'geo_correction_output'), 'w')
 
-initialize_settings(scan_date,config_file,local_address)
+settings.initialize_settings(scan_date,config_file,local_address)
 main(scan_date)
 
 end_time = datetime.datetime.now()
