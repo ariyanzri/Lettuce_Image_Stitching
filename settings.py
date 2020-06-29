@@ -1,3 +1,4 @@
+import datetime
 
 def initialize_settings(scan_date,config_file,local_address):
 	global method,no_of_cores_to_use,no_of_cores_to_use_max,SCALE,PATCH_SIZE,LID_SIZE_AT_SCALE,PATCH_SIZE_GPS,\
