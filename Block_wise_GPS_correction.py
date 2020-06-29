@@ -770,7 +770,7 @@ def get_lids():
 	return lids
 
 def get_name_of_patches_with_lids(lids,use_not_corrected=False):
-	# global CORRECTED_coordinates_file,coordinates_file,discard_right_flag
+	# global CORRECTED_coordinates_file,coordinates_file,use_camera
 
 	patches_names_with_lid = []
 
@@ -793,7 +793,9 @@ def get_name_of_patches_with_lids(lids,use_not_corrected=False):
 
 			filename = features[0]
 
-			if settings.discard_right_flag and '_right' in filename:
+			if settings.use_camera == 'Left' and '_right' in filename:
+				continue
+			if settings.use_camera == 'Right' and '_left' in filename:
 				continue
 
 			upper_left = (float(features[1]),float(features[2]))
@@ -3782,7 +3784,7 @@ class Field:
 		return groups[settings.groups_to_use]
 
 	def get_rows(self,use_corrected=False):
-		# global coordinates_file, CORRECTED_coordinates_file, patches_to_use, discard_right_flag,PATCH_SIZE_GPS
+		# global coordinates_file, CORRECTED_coordinates_file, patches_to_use, use_camera,PATCH_SIZE_GPS
 
 		center_of_rows = []
 		patches = []
@@ -3806,7 +3808,10 @@ class Field:
 				features = l.split(',')
 
 				filename = features[0]
-				if settings.discard_right_flag and '_right' in filename:
+				
+				if settings.use_camera == 'Left' and '_right' in filename:
+					continue
+				if settings.use_camera == 'Right' and '_left' in filename:
 					continue
 
 				upper_left = (float(features[1]),float(features[2]))
@@ -4333,7 +4338,7 @@ def print_settings():
 	print('- Methodology Settings ')
 	print('\t * Current Method: {0}'.format(settings.method))
 	print('\t * Scan Name/Date: {0}'.format(settings.scan_date_stng))
-	print('\t * Discard right images: {0}'.format(settings.discard_right_flag))
+	print('\t * Use camera: {0}'.format(settings.use_camera))
 	print('\t * Override SIFT files: {0}'.format(settings.override_sifts))
 
 	print('- Basic Settings ')
@@ -4499,7 +4504,7 @@ def test_function():
 
 # def main(scan_date):
 # 	global server
-# 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path,lettuce_heads_coordinates_file,lettuce_coords,method,correction_log_file,discard_right_flag,SCALE,PATCH_SIZE,GPS_TO_IMAGE_RATIO
+# 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,row_save_path,field_image_path,lettuce_heads_coordinates_file,lettuce_coords,method,correction_log_file,use_camera,SCALE,PATCH_SIZE,GPS_TO_IMAGE_RATIO
 
 # 	if server == 'coge':
 # 		settings.patch_folder = '/storage/ariyanzarei/{0}-rgb/bin2tif_out'.format(scan_date)
@@ -4661,7 +4666,7 @@ def test_function():
 		
 # 	else:
 # 		# HPC
-# 		discard_right_flag = False
+# 		use_camera = Both
 
 # 		print_settings()
 		
@@ -4745,7 +4750,7 @@ def test_function():
 
 
 # inside_radius_lettuce_matching_threshold = 200*SCALE
-# discard_right_flag = True
+# use_camera = Left
 
 # override_sifts = True
 

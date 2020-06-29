@@ -69,6 +69,8 @@ original = sys.stdout
 sys.stdout = open('/app/{0}/{1}-rgb/{2}.txt'.format(local_address,scan_date,'geo_correction_output'), 'w')
 
 settings.initialize_settings(scan_date,config_file,local_address)
+
+print_settings()
 main(scan_date)
 
 end_time = datetime.datetime.now()

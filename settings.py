@@ -6,7 +6,7 @@ def initialize_settings(scan_date,config_file,local_address):
 	MINIMUM_NUMBER_OF_MATCHES,RANSAC_MAX_ITER,RANSAC_ERROR_THRESHOLD,PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES,\
 	OVERLAP_DISCARD_RATIO,TRANSFORMATION_SCALE_DISCARD_THRESHOLD,TRANSFORMATION_ANGLE_DISCARD_THRESHOLD,\
 	LETTUCE_AREA_THRESHOLD,CONTOUR_MATCHING_MIN_MATCH,ORTHO_SCALE,REDUCTION_FACTOR,OPEN_MORPH_LID_SIZE,\
-	CLOSE_MORPH_LID_SIZE,GPS_ERROR_Y,GPS_ERROR_X,FFT_PARALLEL_CORES_TO_USE,discard_right_flag,override_sifts,\
+	CLOSE_MORPH_LID_SIZE,GPS_ERROR_Y,GPS_ERROR_X,FFT_PARALLEL_CORES_TO_USE,use_camera,override_sifts,\
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng
@@ -41,7 +41,7 @@ def initialize_settings(scan_date,config_file,local_address):
 		GPS_ERROR_Y = float(lines[19].split(':')[1])
 		GPS_ERROR_X = float(lines[20].split(':')[1])
 		FFT_PARALLEL_CORES_TO_USE = int(lines[21].split(':')[1])
-		discard_right_flag = bool(lines[22].split(':')[1])
+		use_camera = bool(lines[22].split(':')[1])
 		override_sifts = bool(lines[23].split(':')[1])
 		inside_radius_lettuce_matching_threshold = 200*SCALE
 		number_of_rows_in_groups = int(lines[24].split(':')[1])
