@@ -17,7 +17,7 @@ from heapq import heappush, heappop, heapify
 from collections import OrderedDict,Counter
 
 from Block_wise_GPS_correction import *
-from settings import *
+import settings
 
 def main(scan_date):
 	global lettuce_coords
@@ -30,7 +30,7 @@ def main(scan_date):
 
 	# old_lid_base_error = field.calculate_lid_based_error()
 
-	old_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+	old_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
 
 	field.create_patches_SIFT_files()
 	
@@ -44,7 +44,7 @@ def main(scan_date):
 
 
 	# new_lid_base_error = field.calculate_lid_based_error()
-	new_RMSE = get_approximate_random_RMSE_overlap(field,10,no_of_cores_to_use_max)
+	new_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
 
 	print('------------------ ERROR MEASUREMENT ------------------ ')
 
