@@ -23,10 +23,10 @@ fi
 #    exit 1
 #fi
 
-cp /app/$Home_dir/.irods/irods_environment.json ~/.irods/.
+cp /app/$Home_dir/.irods/.irodsEnv ~/.irods/.
 
 # Initializing iRods
-/app/usr/bin/iinit $Pass
+/app/usr/local/bin/iinit $Pass
 
 
 # Creating directories
@@ -38,10 +38,10 @@ mkdir logs
 
 
 # Downloading files from iRods
-/app/usr/bin/iget -rKVP /iplant/home/emmanuelgonzalez/gantry_test_outputs/2020-06-16_test_scans/$Scan_date\_coordinates.csv
-/app/usr/bin/iget -rKVP /iplant/home/emmanuelgonzalez/gantry_test_outputs/2020-06-16_test_scans/$Scan_date.tar.gz
-/app/usr/bin/iget -rKVP /iplant/home/ariyanzarei/metadata/lids.txt
-/app/usr/bin/iget -rKVP /iplant/home/ariyanzarei/metadata/season10_ind_lettuce_2020-05-27.csv
+/app/usr/local/bin/iget -rKVP /iplant/home/emmanuelgonzalez/gantry_test_outputs/2020-06-16_test_scans/$Scan_date\_coordinates.csv
+/app/usr/local/bin/iget -rKVP /iplant/home/emmanuelgonzalez/gantry_test_outputs/2020-06-16_test_scans/$Scan_date.tar.gz
+/app/usr/local/bin/iget -rKVP /iplant/home/ariyanzarei/metadata/lids.txt
+/app/usr/local/bin/iget -rKVP /iplant/home/ariyanzarei/metadata/season10_ind_lettuce_2020-05-27.csv
 
 # Untarring
 tar -xvf $Scan_date.tar.gz
