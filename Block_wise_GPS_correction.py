@@ -3779,17 +3779,18 @@ class Field:
 
 		if is_single_group:
 
-			new_rows = []
-			for r in rows:
-				if len(new_rows)>5:
-					break
+			# new_rows = []
+			# for r in rows:
+			# 	if len(new_rows)>5:
+			# 		break
 
-				new_rows.append(r[0:10])
+			# 	new_rows.append(r[0:10])
 
-			# groups.append(Group(0,rows))
-			groups.append(Group(0,new_rows,is_single_group=True))
+			groups.append(Group(0,rows,is_single_group=True))
+			# groups.append(Group(0,new_rows,is_single_group=True))
 
-			print('Field initialized with SINGLE group of {0} rows each.'.format(len(new_rows)))
+			# print('Field initialized with SINGLE group of {0} rows each.'.format(len(new_rows)))
+			print('Field initialized with SINGLE group of {0} rows each.'.format(len(rows)))
 
 		else:
 
