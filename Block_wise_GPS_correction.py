@@ -3787,7 +3787,7 @@ class Field:
 				new_rows.append(r[0:10])
 
 			# groups.append(Group(0,rows))
-			groups.append(Group(0,new_rows))
+			groups.append(Group(0,new_rows,is_single_group=True))
 
 			print('Field initialized with SINGLE group of {0} rows each.'.format(len(new_rows)))
 
