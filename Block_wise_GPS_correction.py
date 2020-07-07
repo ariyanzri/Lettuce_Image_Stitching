@@ -3063,7 +3063,7 @@ class Row:
 				
 
 class Group:
-	def __init__(self,gid,rows):
+	def __init__(self,gid,rows,is_single_group=False):
 		self.group_id = gid
 		self.patches = []
 
@@ -3074,7 +3074,8 @@ class Group:
 			self.patches += new_row
 
 		self.rows = new_rows
-		self.corrected_patches = []		
+		self.corrected_patches = []	
+		self.is_field_single_group = is_single_group	
 
 	def update_lid_patches(self,lid_patches):
 		lids = get_lids()
@@ -3149,39 +3150,48 @@ class Group:
 				
 			a.neighbors = new_neighbors
 
-		# ---- parallel
 
-		# remove_neighbors = []
-		# args = []
+	def get_patch_by_name(self,name_patch):
+		for p in self.patches:
+			if p.name == name_patch:
+				return p
 
-		# for p in self.patches:
+		return None
 
-		# 	for n in self.patches:
+	def pre_calculate_internal_neighbors_and_transformation_parameters_parallel(self):
+		remove_neighbors = []
+		args = []
 
-		# 		if n != p and (p.has_overlap(n) or n.has_overlap(p)):
+		for p in self.patches:
 
-		# 			args.append((p,n))
+			for n in self.patches:
 
-		# processes = MyPool(settings.no_of_cores_to_use_max)
+				if n != p and (p.has_overlap(n) or n.has_overlap(p)):
 
-		# results = processes.map(get_pairwise_params_parallel_helper,args)
-		# processes.close()
+					args.append((p,n))
 
-		# for nbp,p,n in results:
-		# 	if nbp is None:
-		# 		remove_neighbors.append((n,p))
-		# 	else:
-		# 		p.neighbors.append((n,nbp))
+		processes = MyPool(settings.no_of_cores_to_use_max)
 
-		# for a,b in remove_neighbors:
-		# 	new_neighbors = []
+		results = processes.map(get_pairwise_params_parallel_helper,args)
+		processes.close()
 
-		# 	for n in a.neighbors:
-		# 		if b != n[0]:
-		# 			new_neighbors.append(n)
+		for nbp,p,n in results:
+			p_main = self.get_patch_by_name(p.name)
+			n_main = self.get_patch_by_name(n.name)
+
+			if nbp is None:
+				remove_neighbors.append((n_main,p_main))
+			else:
+				p_main.neighbors.append((n_main,nbp))
+
+		for a,b in remove_neighbors:
+			new_neighbors = []
+
+			for n in a.neighbors:
+				if b != n[0]:
+					new_neighbors.append(n)
 				
-		# 	a.neighbors = new_neighbors
-
+			a.neighbors = new_neighbors
 
 
 	def correct_row_by_row(self):
@@ -3413,7 +3423,10 @@ class Group:
 
 			self.load_all_patches_SIFT_points()
 
-			self.pre_calculate_internal_neighbors_and_transformation_parameters()
+			if self.is_field_single_group:
+				self.pre_calculate_internal_neighbors_and_transformation_parameters_parallel()
+			else:
+				self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
 			connected_patches = self.connected_component_patches()
 
@@ -3620,10 +3633,10 @@ class Group:
 		# sys.stdout.flush()
 
 class Field:
-	def __init__(self,correct_lid_patches=True,use_corrected=False):
+	def __init__(self,is_single_group=False,correct_lid_patches=True,use_corrected=False):
 		# global coordinates_file
 
-		self.groups = self.initialize_field(use_corrected)
+		self.groups = self.initialize_field(use_corrected,is_single_group)
 		self.detected_lid_patches = []
 		self.detect_lid_patches()
 
@@ -3737,7 +3750,7 @@ class Field:
 		settings.PATCH_SIZE_GPS = (p.gps.UR_coord[0]-p.gps.UL_coord[0],p.gps.UL_coord[1]-p.gps.LL_coord[1])
 		settings.GPS_TO_IMAGE_RATIO = (settings.PATCH_SIZE_GPS[0]/settings.PATCH_SIZE[1],settings.PATCH_SIZE_GPS[1]/settings.PATCH_SIZE[0])
 
-	def initialize_field(self,use_corrected):
+	def initialize_field(self,use_corrected,is_single_group):
 		# global coordinates_file, number_of_rows_in_groups, groups_to_use
 
 		rows = self.get_rows(use_corrected)
@@ -3764,22 +3777,38 @@ class Field:
 		# 	start = end - 1
 		# 	end = start + settings.number_of_rows_in_groups -1
 
-		tmp = []
+		if is_single_group:
 
-		while len(rows)>0:
+			new_rows = []
+			for r in rows:
+				if len(new_rows)>5:
+					break
 
-			r = rows[0]
-			tmp.append(r)
-			rows = rows[1:]
-			if len(tmp) == settings.number_of_rows_in_groups:
+				new_rows.append(r[0:10])
+
+			# groups.append(Group(0,rows))
+			groups.append(Group(0,new_rows))
+
+			print('Field initialized with SINGLE group of {0} rows each.'.format(len(new_rows)))
+
+		else:
+
+			tmp = []
+
+			while len(rows)>0:
+
+				r = rows[0]
+				tmp.append(r)
+				rows = rows[1:]
+				if len(tmp) == settings.number_of_rows_in_groups:
+					groups.append(Group(len(groups),tmp))
+					tmp = tmp[-1:]
+
+			if len(tmp) > 0:
 				groups.append(Group(len(groups),tmp))
-				tmp = tmp[-1:]
 
-		if len(tmp) > 0:
-			groups.append(Group(len(groups),tmp))
-
-		print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),settings.number_of_rows_in_groups))
-		sys.stdout.flush()
+			print('Field initialized with {0} groups of {1} rows each.'.format(len(groups),settings.number_of_rows_in_groups))
+			sys.stdout.flush()
 
 		return groups[settings.groups_to_use]
 

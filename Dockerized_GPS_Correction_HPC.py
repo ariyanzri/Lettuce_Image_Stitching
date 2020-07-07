@@ -24,7 +24,7 @@ def main(scan_date):
 
 	settings.lettuce_coords = read_lettuce_heads_coordinates()
 
-	field = Field()
+	field = Field(is_single_group=settings.is_single_group)
 	
 	field.save_plot()
 

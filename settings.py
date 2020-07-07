@@ -9,7 +9,7 @@ def initialize_settings(scan_date,config_file,local_address):
 	CLOSE_MORPH_LID_SIZE,GPS_ERROR_Y,GPS_ERROR_X,FFT_PARALLEL_CORES_TO_USE,use_camera,override_sifts,\
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
-	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng
+	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -47,6 +47,7 @@ def initialize_settings(scan_date,config_file,local_address):
 		number_of_rows_in_groups = int(lines[24].split(':')[1])
 		groups_to_use = slice(0,None)
 		patches_to_use = slice(0,None)
+		is_single_group = bool(lines[25].split(':')[1])
 
 		patch_folder = '{0}/{1}-rgb/bin2tif_out'.format(local_address,scan_date)
 		SIFT_folder = '{0}/{1}-rgb/SIFT'.format(local_address,scan_date)
@@ -71,7 +72,7 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,uav_add,bi
 	CLOSE_MORPH_LID_SIZE,GPS_ERROR_Y,GPS_ERROR_X,FFT_PARALLEL_CORES_TO_USE,use_camera,override_sifts,\
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
 	field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
-	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng
+	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -109,6 +110,7 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,uav_add,bi
 		number_of_rows_in_groups = int(lines[24].split(':')[1])
 		groups_to_use = slice(0,None)
 		patches_to_use = slice(0,None)
+		is_single_group = bool(lines[25].split(':')[1])
 
 		patch_folder = '{0}'.format(bin2tif_address)
 		SIFT_folder = '{0}/{1}/SIFT'.format(destination,scan_date)

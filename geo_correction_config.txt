@@ -1,4 +1,4 @@
-METHOD:MST
+METHOD:MSTLid
 NO_CORES:5
 NO_CORES_MAX:15
 SCALE:0.2
@@ -23,3 +23,4 @@ FFT_PARALLEL_CORES_TO_USE:20
 use_camera:Both
 override_sifts:True
 number_of_rows_in_groups:10
+is_single_group:True
