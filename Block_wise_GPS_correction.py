@@ -3170,7 +3170,7 @@ class Group:
 
 					args.append((p,n))
 
-		processes = MyPool(settings.no_of_cores_to_use_max)
+		processes = MyPool(settings.no_of_cores_to_use)
 
 		results = processes.map(get_pairwise_params_parallel_helper,args)
 		processes.close()
