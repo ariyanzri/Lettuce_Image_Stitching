@@ -2278,8 +2278,8 @@ class Global_Optimizer:
 
 				coef = 1
 				
-				row_x = - coef*template[self.image_name_to_index_dict[p.name],:] + coef*template[self.image_name_to_index_dict[n.name],:]
-				row_y = - coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + coef*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
+				row_x = coef*template[self.image_name_to_index_dict[p.name],:] - coef*template[self.image_name_to_index_dict[n.name],:]
+				row_y = coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] - coef*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
 
 				A.append(row_x)
 				b.append(coef*diff[0])
