@@ -560,8 +560,8 @@ def get_translation_in_GPS_coordinate_system(H):
 	diff_x = -c1[0]
 	diff_y = -c1[1]
 
-	gps_scale_x = (settings.PATCH_SIZE_GPS[0])/(settings.PATCH_SIZE[1])
-	gps_scale_y = -(settings.PATCH_SIZE_GPS[1])/(settings.PATCH_SIZE[0])
+	gps_scale_x = -(settings.PATCH_SIZE_GPS[0])/(settings.PATCH_SIZE[1])
+	gps_scale_y = (settings.PATCH_SIZE_GPS[1])/(settings.PATCH_SIZE[0])
 
 	diff_x = diff_x*gps_scale_x
 	diff_y = diff_y*gps_scale_y
