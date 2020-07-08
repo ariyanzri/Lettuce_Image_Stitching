@@ -557,8 +557,8 @@ def get_translation_in_GPS_coordinate_system(H):
 	
 	c1 = H.dot(c1).astype(int)
 
-	diff_x = -c1[0]
-	diff_y = -c1[1]
+	diff_x = -c1[1]
+	diff_y = -c1[0]
 
 	gps_scale_x = (settings.PATCH_SIZE_GPS[0])/(settings.PATCH_SIZE[1])
 	gps_scale_y = -(settings.PATCH_SIZE_GPS[1])/(settings.PATCH_SIZE[0])
