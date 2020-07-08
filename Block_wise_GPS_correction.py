@@ -1989,6 +1989,20 @@ def get_pairwise_params_parallel(p,n):
 def get_pairwise_params_parallel_helper(args):
 	return get_pairwise_params_parallel(*args)
 
+def calculate_new_GPS_based_on_new_UL(new_UL,patch):
+
+	diff_UL = (patch.gps.UL_coord[0]-new_UL[0],patch.gps.UL_coord[1]-new_UL[1])
+
+	new_UR = (patch.gps.UR_coord[0]-diff_UL[0],patch.gps.UR_coord[1]-diff_UL[1])
+	new_LL = (patch.gps.LL_coord[0]-diff_UL[0],patch.gps.LL_coord[1]-diff_UL[1])
+	new_LR = (patch.gps.LR_coord[0]-diff_UL[0],patch.gps.LR_coord[1]-diff_UL[1])
+	new_center = (patch.gps.Center[0]-diff_UL[0],patch.gps.Center[1]-diff_UL[1])
+
+	new_coords = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+
+	return new_coords
+
+
 class GPS_Coordinate:
 	
 	def __init__(self,UL_coord,UR_coord,LL_coord,LR_coord,Center):
@@ -2239,9 +2253,11 @@ class Global_Optimizer:
 
 		X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
 
-		print(A)
-		print(b)
-		print(X)
+		for p in self.patches:
+			i = self.image_name_to_index_dict[p.name]
+
+			new_UL = (X[i],self.number_of_images + X[i])
+			p.gps = calculate_new_GPS_based_on_new_UL(new_UL,p)
 
 
 
@@ -3528,6 +3544,8 @@ class Group:
 
 			opt = Global_Optimizer(self.patches)
 			opt.transformation_diff_only_least_squares()
+
+			string_res = get_corrected_string(self.patches)
 			
 		elif settings.method == 'Hybrid':
 			
