@@ -1992,7 +1992,7 @@ def get_pairwise_params_parallel_helper(args):
 
 def calculate_new_GPS_based_on_new_UL(new_UL,patch):
 
-	diff_UL = (-patch.gps.UL_coord[0]+new_UL[0],patch.gps.UL_coord[1]-new_UL[1])
+	diff_UL = (patch.gps.UL_coord[0]-new_UL[0],patch.gps.UL_coord[1]-new_UL[1])
 
 	new_UR = (patch.gps.UR_coord[0]-diff_UL[0],patch.gps.UR_coord[1]-diff_UL[1])
 	new_LL = (patch.gps.LL_coord[0]-diff_UL[0],patch.gps.LL_coord[1]-diff_UL[1])
