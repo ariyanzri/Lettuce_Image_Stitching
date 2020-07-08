@@ -2239,14 +2239,16 @@ class Global_Optimizer:
 
 				diff = get_translation_in_GPS_coordinate_system(params.H)
 
-				row_x =  template[self.image_name_to_index_dict[p.name],:] - template[self.image_name_to_index_dict[n.name],:]
-				row_y =  template[self.number_of_images + self.image_name_to_index_dict[p.name],:] - template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
+				coef = 1-params.dissimilarity
+
+				row_x = - coef*template[self.image_name_to_index_dict[p.name],:] + coef*template[self.image_name_to_index_dict[n.name],:]
+				row_y = - coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + coef*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
 
 				A.append(row_x)
-				b.append(diff[0])
+				b.append(coef*diff[0])
 
 				A.append(row_y)
-				b.append(diff[1])
+				b.append(coef*diff[1])
 
 		A=np.array(A)
 		b=np.array(b)
@@ -3540,6 +3542,9 @@ class Group:
 
 			if self.is_field_single_group:
 				self.pre_calculate_internal_neighbors_and_transformation_parameters_parallel()
+				print('All transformations have been successfully estimated.')
+				sys.stdout.flush()
+
 			else:
 				self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
