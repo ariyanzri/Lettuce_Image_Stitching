@@ -2275,9 +2275,9 @@ class Global_Optimizer:
 			for n,params in p.neighbors:
 
 				diff = get_translation_in_GPS_coordinate_system(params.H)
-				print(diff)
-				print(p.name)
-				print(n.name)
+				# print(diff)
+				# print(p.name)
+				# print(n.name)
 
 				# coef = 1000*(1-params.dissimilarity)
 				coef = 1
