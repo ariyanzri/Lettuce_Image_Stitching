@@ -2283,13 +2283,13 @@ class Global_Optimizer:
 
 				A.append(row_x)
 				b.append(coef*diff[0])
-				LB.append(p.gps.UL_coord[0]-settings.GPS_ERROR_X)
-				UB.append(p.gps.UL_coord[0]+settings.GPS_ERROR_X)
+				LB.append([p.gps.UL_coord[0]-settings.GPS_ERROR_X])
+				UB.append([p.gps.UL_coord[0]+settings.GPS_ERROR_X])
 
 				A.append(row_y)
 				b.append(coef*diff[1])
-				LB.append(p.gps.UL_coord[1]-settings.GPS_ERROR_Y)
-				UB.append(p.gps.UL_coord[1]+settings.GPS_ERROR_Y)
+				LB.append([p.gps.UL_coord[1]-settings.GPS_ERROR_Y])
+				UB.append([p.gps.UL_coord[1]+settings.GPS_ERROR_Y])
 
 		A=np.array(A)
 		b=np.array(b)
@@ -2297,6 +2297,8 @@ class Global_Optimizer:
 		LB=np.array(LB)
 
 		# X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
+		
+		print(UB.shape)
 		X = lsq_linear(A, b, bounds=(LB, UB))
 		print(X)
 
