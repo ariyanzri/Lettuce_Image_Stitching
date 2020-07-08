@@ -550,6 +550,23 @@ def get_new_GPS_Coords(p1,p2,H):
 
 	return new_coords
 
+def get_translation_in_GPS_coordinate_system(H):
+
+	c1 = [0,0,1]
+	
+	c1 = H.dot(c1).astype(int)
+
+	diff_x = -c1[0]
+	diff_y = -c1[1]
+
+	gps_scale_x = (settings.PATCH_SIZE_GPS[0])/(settings.PATCH_SIZE[1])
+	gps_scale_y = -(settings.PATCH_SIZE_GPS[1])/(settings.PATCH_SIZE[0])
+
+	diff_x = diff_x*gps_scale_x
+	diff_y = diff_y*gps_scale_y
+
+	return (diff_x,diff_y)
+
 def get_new_GPS_Coords_for_groups(p1,p2,H):
 
 	c1 = [0,0,1]
@@ -2185,6 +2202,50 @@ class Graph():
 		string_corrected = get_corrected_string(patches)
 		return string_corrected
 
+class Global_Optimizer:
+
+	def __init__(self,patches):
+		self.number_of_images = len(patches)
+		self.image_name_to_index_dict = {}
+		self.index_to_image_name_dict = {}
+		self.patches = patches
+
+		for i,p in enumerate(patches):
+			self.image_name_to_index_dict[p.name] = i
+			self.index_to_image_name_dict[i] = p.name
+
+	def transformation_diff_only_least_squares(self):
+		template = np.eye(2*self.number_of_images)
+
+		A = []
+		b = []
+
+		for p in self.patches:
+			for n,params in p.neighbors:
+
+				diff = get_translation_in_GPS_coordinate_system(params.H)
+
+				row_x = template[self.image_name_to_index_dict[p.name],:] - template[self.image_name_to_index_dict[n.name],:]
+				row_y = template[self.number_of_images + self.image_name_to_index_dict[p.name],:] - template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
+
+				A.append(row_x)
+				b.append(diff[0])
+
+				A.append(row_y)
+				b.append(diff[1])
+
+		A=np.array(A)
+		b=np.array(b)
+
+		X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
+
+		print(A)
+		print(b)
+		print(X)
+
+
+
+
 class Neighbor_Parameters:
 	def __init__(self,o_p,o_n,h,nm,pi,d,scale,theta):
 
@@ -3456,6 +3517,18 @@ class Group:
 				if lp not in connected_patches:
 					print('\t{0}'.format(lp.name))
 
+		elif settings.method == 'GlobalOpt1':
+
+			self.load_all_patches_SIFT_points()
+
+			if self.is_field_single_group:
+				self.pre_calculate_internal_neighbors_and_transformation_parameters_parallel()
+			else:
+				self.pre_calculate_internal_neighbors_and_transformation_parameters()
+
+			opt = Global_Optimizer(self.patches)
+			opt.transformation_diff_only_least_squares()
+			
 		elif settings.method == 'Hybrid':
 			
 			self.load_all_patches_SIFT_points()
@@ -3779,18 +3852,24 @@ class Field:
 
 		if is_single_group:
 
-			# new_rows = []
+			new_rows = []
+
 			# for r in rows:
 			# 	if len(new_rows)>5:
 			# 		break
 
 			# 	new_rows.append(r[0:10])
 
-			groups.append(Group(0,rows,is_single_group=True))
+			rows_tmp = rows[settings.groups_to_use]
+			
+			for r in rows_tmp:
+				new_rows.append(r[settings.patches_to_use])
+
+			groups.append(Group(0,new_rows,is_single_group=True))
 			# groups.append(Group(0,new_rows,is_single_group=True))
 
 			# print('Field initialized with SINGLE group of {0} rows each.'.format(len(new_rows)))
-			print('Field initialized with SINGLE group of {0} rows each.'.format(len(rows)))
+			print('Field initialized with SINGLE group of {0} rows each.'.format(len(new_rows)))
 
 		else:
 
