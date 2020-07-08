@@ -2240,7 +2240,7 @@ class Global_Optimizer:
 				diff = get_translation_in_GPS_coordinate_system(params.H)
 
 				coef = 1
-
+				
 				row_x = - coef*template[self.image_name_to_index_dict[p.name],:] + coef*template[self.image_name_to_index_dict[n.name],:]
 				row_y = - coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + coef*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
 
@@ -2258,7 +2258,7 @@ class Global_Optimizer:
 		for p in self.patches:
 			i = self.image_name_to_index_dict[p.name]
 
-			new_UL = (X[self.number_of_images+i],X[i])
+			new_UL = (X[i], X[self.number_of_images+i])
 			
 			p.gps = calculate_new_GPS_based_on_new_UL(new_UL,p)
 
