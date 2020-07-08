@@ -23,6 +23,7 @@ import datetime
 from Customized_myltiprocessing import MyPool
 from heapq import heappush, heappop, heapify
 from collections import OrderedDict,Counter
+from scipy.optimize import lsq_linear
 
 # from PIL import Image
 # from PIL.TiffTags import TAGS
@@ -2240,7 +2241,7 @@ class Global_Optimizer:
 				diff = get_translation_in_GPS_coordinate_system(params.H)
 
 				coef = 1
-				
+
 				row_x = - coef*template[self.image_name_to_index_dict[p.name],:] + coef*template[self.image_name_to_index_dict[n.name],:]
 				row_y = - coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + coef*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
 
@@ -2254,6 +2255,50 @@ class Global_Optimizer:
 		b=np.array(b)
 
 		X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
+
+		for p in self.patches:
+			i = self.image_name_to_index_dict[p.name]
+
+			new_UL = (X[i], X[self.number_of_images+i])
+			
+			p.gps = calculate_new_GPS_based_on_new_UL(new_UL,p)
+
+	def bounded_variables_least_squares(self):
+		template = np.eye(2*self.number_of_images)
+
+		A = []
+		b = []
+		UB = []
+		LB = []
+
+		for p in self.patches:
+			for n,params in p.neighbors:
+
+				diff = get_translation_in_GPS_coordinate_system(params.H)
+
+				coef = 1
+				
+				row_x = - coef*template[self.image_name_to_index_dict[p.name],:] + coef*template[self.image_name_to_index_dict[n.name],:]
+				row_y = - coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + coef*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
+
+				A.append(row_x)
+				b.append(coef*diff[0])
+				LB.append(p.gps.UL_coord[0]-settings.GPS_ERROR_X)
+				UB.append(p.gps.UL_coord[0]+settings.GPS_ERROR_X)
+
+				A.append(row_y)
+				b.append(coef*diff[1])
+				LB.append(p.gps.UL_coord[1]-settings.GPS_ERROR_Y)
+				UB.append(p.gps.UL_coord[1]+settings.GPS_ERROR_Y)
+
+		A=np.array(A)
+		b=np.array(b)
+		UB=np.array(UB)
+		LB=np.array(LB)
+
+		# X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
+		X = lsq_linear(A, b, bounds=(LB, UB))
+		print(X)
 
 		for p in self.patches:
 			i = self.image_name_to_index_dict[p.name]
@@ -3549,7 +3594,8 @@ class Group:
 				self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
 			opt = Global_Optimizer(self.patches)
-			opt.transformation_diff_only_least_squares()
+			# opt.transformation_diff_only_least_squares()
+			opt.bounded_variables_least_squares()
 
 			string_res = get_corrected_string(self.patches)
 
