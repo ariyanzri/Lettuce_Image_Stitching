@@ -2239,8 +2239,8 @@ class Global_Optimizer:
 
 				diff = get_translation_in_GPS_coordinate_system(params.H)
 
-				row_x = - template[self.image_name_to_index_dict[p.name],:] + template[self.image_name_to_index_dict[n.name],:]
-				row_y = - template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
+				row_x =  template[self.image_name_to_index_dict[p.name],:] - template[self.image_name_to_index_dict[n.name],:]
+				row_y =  template[self.number_of_images + self.image_name_to_index_dict[p.name],:] - template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
 
 				A.append(row_x)
 				b.append(diff[0])
