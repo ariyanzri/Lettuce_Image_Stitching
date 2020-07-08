@@ -557,8 +557,8 @@ def get_translation_in_GPS_coordinate_system(H):
 	
 	c1 = H.dot(c1).astype(int)
 
-	diff_x = -c1[1]
-	diff_y = -c1[0]
+	diff_x = -c1[0]
+	diff_y = -c1[1]
 
 	gps_scale_x = (settings.PATCH_SIZE_GPS[0])/(settings.PATCH_SIZE[1])
 	gps_scale_y = -(settings.PATCH_SIZE_GPS[1])/(settings.PATCH_SIZE[0])
@@ -2300,7 +2300,7 @@ class Global_Optimizer:
 
 		# X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
 		
-		res = lsq_linear(A, b)
+		res = lsq_linear(A, b, bounds=(LB,UB))
 		X = res.x
 
 		for p in self.patches:
