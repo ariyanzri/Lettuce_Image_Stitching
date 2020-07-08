@@ -2268,8 +2268,8 @@ class Global_Optimizer:
 
 		A = []
 		b = []
-		UB = []
-		LB = []
+		UB = np.zeros(2*self.number_of_images)
+		LB = np.zeros(2*self.number_of_images)
 
 		for p in self.patches:
 			for n,params in p.neighbors:
@@ -2283,13 +2283,15 @@ class Global_Optimizer:
 
 				A.append(row_x)
 				b.append(coef*diff[0])
-				LB.append([p.gps.UL_coord[0]-settings.GPS_ERROR_X])
-				UB.append([p.gps.UL_coord[0]+settings.GPS_ERROR_X])
+				
 
 				A.append(row_y)
 				b.append(coef*diff[1])
-				LB.append([p.gps.UL_coord[1]-settings.GPS_ERROR_Y])
-				UB.append([p.gps.UL_coord[1]+settings.GPS_ERROR_Y])
+
+			LB[self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[0]-settings.GPS_ERROR_X
+			UB[self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[0]+settings.GPS_ERROR_X
+			LB[self.number_of_images + self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[1]-settings.GPS_ERROR_Y
+			UB[self.number_of_images + self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[1]+settings.GPS_ERROR_Y
 
 		A=np.array(A)
 		b=np.array(b)
@@ -2298,7 +2300,6 @@ class Global_Optimizer:
 
 		# X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
 		
-		print(UB.shape)
 		X = lsq_linear(A, b, bounds=(LB, UB))
 		print(X)
 
