@@ -2239,10 +2239,10 @@ class Global_Optimizer:
 
 				diff = get_translation_in_GPS_coordinate_system(params.H)
 
-				coef = params.percentage_inliers
-
-				row_x =  coef*template[self.image_name_to_index_dict[p.name],:] - coef*template[self.image_name_to_index_dict[n.name],:]
-				row_y =  coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] - coef*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
+				coef = 1
+				
+				row_x = - coef*template[self.image_name_to_index_dict[p.name],:] + coef*template[self.image_name_to_index_dict[n.name],:]
+				row_y = - coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + coef*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
 
 				A.append(row_x)
 				b.append(coef*diff[0])
