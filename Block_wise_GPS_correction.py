@@ -2257,6 +2257,7 @@ class Global_Optimizer:
 			i = self.image_name_to_index_dict[p.name]
 
 			new_UL = (X[i],self.number_of_images + X[i])
+			print(new_UL)
 			p.gps = calculate_new_GPS_based_on_new_UL(new_UL,p)
 
 
