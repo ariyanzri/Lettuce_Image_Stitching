@@ -2256,8 +2256,8 @@ class Global_Optimizer:
 		for p in self.patches:
 			i = self.image_name_to_index_dict[p.name]
 
-			new_UL = (X[i],self.number_of_images + X[i])
-			print(new_UL)
+			new_UL = (X[i], X[self.number_of_images+i])
+			
 			p.gps = calculate_new_GPS_based_on_new_UL(new_UL,p)
 
 
