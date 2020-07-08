@@ -2276,7 +2276,7 @@ class Global_Optimizer:
 
 				diff = get_translation_in_GPS_coordinate_system(params.H)
 
-				coef = 100*(1-params.dissimilarity)
+				coef = 1000*(1-params.dissimilarity)
 				
 				row_x = - coef*template[self.image_name_to_index_dict[p.name],:] + coef*template[self.image_name_to_index_dict[n.name],:]
 				row_y = - coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + coef*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
