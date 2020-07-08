@@ -1992,7 +1992,7 @@ def get_pairwise_params_parallel_helper(args):
 
 def calculate_new_GPS_based_on_new_UL(new_UL,patch):
 
-	diff_UL = (patch.gps.UL_coord[0]-new_UL[0],patch.gps.UL_coord[1]-new_UL[1])
+	diff_UL = (-patch.gps.UL_coord[0]+new_UL[0],patch.gps.UL_coord[1]-new_UL[1])
 
 	new_UR = (patch.gps.UR_coord[0]-diff_UL[0],patch.gps.UR_coord[1]-diff_UL[1])
 	new_LL = (patch.gps.LL_coord[0]-diff_UL[0],patch.gps.LL_coord[1]-diff_UL[1])
@@ -2278,8 +2278,8 @@ class Global_Optimizer:
 
 				coef = 1
 				
-				row_x = coef*template[self.image_name_to_index_dict[p.name],:] - coef*template[self.image_name_to_index_dict[n.name],:]
-				row_y = coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] - coef*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
+				row_x = - coef*template[self.image_name_to_index_dict[p.name],:] + coef*template[self.image_name_to_index_dict[n.name],:]
+				row_y = - coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + coef*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
 
 				A.append(row_x)
 				b.append(coef*diff[0])
