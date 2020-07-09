@@ -3302,7 +3302,7 @@ class Group:
 
 					args.append((p,n))
 
-		processes = MyPool(settings.no_of_cores_to_use)
+		processes = MyPool(int((settings.no_of_cores_to_use_max+settings.no_of_cores_to_use)/2))
 
 		results = processes.map(get_pairwise_params_parallel_helper,args)
 		processes.close()
@@ -3588,7 +3588,7 @@ class Group:
 				if lp not in connected_patches:
 					print('\t{0}'.format(lp.name))
 
-		elif settings.method == 'GlobalOpt1':
+		elif settings.method == 'GlobalOpt':
 
 			self.load_all_patches_SIFT_points()
 
