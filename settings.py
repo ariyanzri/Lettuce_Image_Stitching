@@ -41,7 +41,7 @@ def initialize_settings(scan_date,config_file,local_address):
 		GPS_ERROR_Y = float(lines[19].split(':')[1])
 		GPS_ERROR_X = float(lines[20].split(':')[1])
 		FFT_PARALLEL_CORES_TO_USE = int(lines[21].split(':')[1])
-		use_camera = bool(lines[22].split(':')[1])
+		use_camera = lines[22].split(':')[1]
 		override_sifts = bool(lines[23].split(':')[1])
 		inside_radius_lettuce_matching_threshold = 200*SCALE
 		number_of_rows_in_groups = int(lines[24].split(':')[1])
@@ -104,7 +104,7 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,uav_add,bi
 		GPS_ERROR_Y = float(lines[19].split(':')[1])
 		GPS_ERROR_X = float(lines[20].split(':')[1])
 		FFT_PARALLEL_CORES_TO_USE = int(lines[21].split(':')[1])
-		use_camera = bool(lines[22].split(':')[1])
+		use_camera = lines[22].split(':')[1]
 		override_sifts = bool(lines[23].split(':')[1])
 		inside_radius_lettuce_matching_threshold = 200*SCALE
 		number_of_rows_in_groups = int(lines[24].split(':')[1])
@@ -166,7 +166,7 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 		GPS_ERROR_Y = float(lines[19].split(':')[1])
 		GPS_ERROR_X = float(lines[20].split(':')[1])
 		FFT_PARALLEL_CORES_TO_USE = int(lines[21].split(':')[1])
-		use_camera = bool(lines[22].split(':')[1])
+		use_camera = lines[22].split(':')[1]
 		override_sifts = bool(lines[23].split(':')[1])
 		inside_radius_lettuce_matching_threshold = 200*SCALE
 		number_of_rows_in_groups = int(lines[24].split(':')[1])
