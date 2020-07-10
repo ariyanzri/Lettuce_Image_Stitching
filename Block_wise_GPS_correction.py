@@ -3302,7 +3302,7 @@ class Group:
 
 					args.append((p,n))
 
-		processes = MyPool(int((settings.no_of_cores_to_use_max+settings.no_of_cores_to_use)/2))
+		processes = MyPool(settings.no_of_cores_to_use_max)
 
 		results = processes.map(get_pairwise_params_parallel_helper,args)
 		processes.close()
