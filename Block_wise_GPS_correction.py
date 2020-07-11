@@ -2279,7 +2279,7 @@ class Global_Optimizer:
 				# print(p.name)
 				# print(n.name)
 
-				coef = 2*(1-params.dissimilarity)
+				coef = 10*(1-params.dissimilarity)**2
 				# coef = 1
 				
 				row_x = - coef*template[self.image_name_to_index_dict[p.name],:] + coef*template[self.image_name_to_index_dict[n.name],:]
