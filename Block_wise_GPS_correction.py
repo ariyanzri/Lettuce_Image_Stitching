@@ -2273,14 +2273,16 @@ class Global_Optimizer:
 
 		for p in self.patches:
 			for n,params in p.neighbors:
+				if params.dissimilarity>=0.4:
+					continue
 
 				diff = get_translation_in_GPS_coordinate_system(params.H)
 				# print(diff)
 				# print(p.name)
 				# print(n.name)
 
-				coef = 10*(1-params.dissimilarity)**2
-				# coef = 1
+				# coef = 10*(1-params.dissimilarity)**2
+				coef = 1
 				
 				row_x = - coef*template[self.image_name_to_index_dict[p.name],:] + coef*template[self.image_name_to_index_dict[n.name],:]
 				row_y = - coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + coef*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
