@@ -2273,7 +2273,11 @@ class Global_Optimizer:
 
 		for p in self.patches:
 			for n,params in p.neighbors:
-				if params.dissimilarity>=0.4:
+
+				if params.dissimilarity>=0.5:
+					print(params.dissimilarity)
+					print(params.percentage_inliers)
+					
 					continue
 
 				diff = get_translation_in_GPS_coordinate_system(params.H)
