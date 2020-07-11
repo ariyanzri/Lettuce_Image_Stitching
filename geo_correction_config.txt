@@ -1,6 +1,6 @@
 METHOD:GlobalOpt
-NO_CORES:23
-NO_CORES_MAX:50
+NO_CORES:5
+NO_CORES_MAX:15
 SCALE:0.2
 HEIGHT_RATIO_FOR_ROW_SEPARATION:0.1
 PERCENTAGE_OF_GOOD_MATCHES:0.5
@@ -21,6 +21,6 @@ GPS_ERROR_Y:0.000004
 GPS_ERROR_X:0.000008
 FFT_PARALLEL_CORES_TO_USE:20
 use_camera:Left
-override_sifts:False
+override_sifts:True
 number_of_rows_in_groups:10
 is_single_group:True
