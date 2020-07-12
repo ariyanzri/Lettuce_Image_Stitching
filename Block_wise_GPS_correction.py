@@ -2303,8 +2303,8 @@ class Global_Optimizer:
 				# print(p.name)
 				# print(n.name)
 
-				coef = 10*(1-params.dissimilarity)
-				# coef = 1
+				# coef = 10*(1-params.dissimilarity)
+				coef = 1
 				# coef = int(math.sqrt(params.percentage_inliers*params.num_matches))
 				
 				row_x = - coef*template[self.image_name_to_index_dict[p.name],:] + coef*template[self.image_name_to_index_dict[n.name],:]
