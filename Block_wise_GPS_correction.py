@@ -1984,7 +1984,14 @@ def ortho_generation_sub_function_helper(args):
 
 
 def get_pairwise_params_parallel(p,n):
+	p.load_SIFT_points()
+	n.load_SIFT_points()
+
 	neighbor_param = p.get_pairwise_transformation_info(n)
+	
+	p.delete_SIFT_points()
+	n.delete_SIFT_points()
+	
 	return neighbor_param,p,n
 
 def get_pairwise_params_parallel_helper(args):
@@ -3605,7 +3612,7 @@ class Group:
 
 		elif settings.method == 'GlobalOpt':
 
-			self.load_all_patches_SIFT_points()
+			# self.load_all_patches_SIFT_points()
 
 			if self.is_field_single_group:
 				self.pre_calculate_internal_neighbors_and_transformation_parameters_parallel()
@@ -3620,6 +3627,8 @@ class Group:
 			opt.bounded_variables_least_squares()
 
 			string_res = get_corrected_string(self.patches)
+			
+			self.delete_all_patches_SIFT_points()
 
 		elif settings.method == 'Hybrid':
 			
