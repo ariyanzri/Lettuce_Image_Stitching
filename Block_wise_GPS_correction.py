@@ -2289,7 +2289,7 @@ class Global_Optimizer:
 
 				# coef = 10*(1-params.dissimilarity)**2
 				# coef = 1
-				coef = int(math.sqrt(params.percentage_inliers*num_matches))
+				coef = int(math.sqrt(params.percentage_inliers*params.num_matches))
 				
 				row_x = - coef*template[self.image_name_to_index_dict[p.name],:] + coef*template[self.image_name_to_index_dict[n.name],:]
 				row_y = - coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + coef*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
