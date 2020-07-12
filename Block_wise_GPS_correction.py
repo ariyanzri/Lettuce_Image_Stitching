@@ -2319,7 +2319,7 @@ class Global_Optimizer:
 				A.append(row_y)
 				b.append(coef*diff[1])
 
-			coef = (1/0.000002)
+			coef = (1/0.00002)
 
 			row_x = coef*template[self.image_name_to_index_dict[p.name],:]
 			row_y = coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:]
