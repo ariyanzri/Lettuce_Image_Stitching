@@ -1991,7 +1991,7 @@ def get_pairwise_params_parallel(p,n):
 	
 	p.delete_SIFT_points()
 	n.delete_SIFT_points()
-	
+
 	return neighbor_param,p,n
 
 def get_pairwise_params_parallel_helper(args):
@@ -2319,10 +2319,13 @@ class Global_Optimizer:
 			LB[self.number_of_images + self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[1]-settings.GPS_ERROR_Y
 			UB[self.number_of_images + self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[1]+settings.GPS_ERROR_Y
 
+		print('Number of Rules = {0}'.format(len(A)))
+
 		A=np.array(A)
 		b=np.array(b)
 		UB=np.array(UB)
 		LB=np.array(LB)
+
 
 		# X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
 		
@@ -2384,7 +2387,7 @@ class Patch:
 	def load_SIFT_points(self):
 		# global SIFT_folder
 
-		if len(self.SIFT_kp_locations) == 0:
+		if self.SIFT_kp_locations is None or len(self.SIFT_kp_locations) == 0:
 			(kp_tmp,desc_tmp) = pickle.load(open('{0}/{1}_SIFT.data'.format(settings.SIFT_folder,self.name.replace('.tif','')), "rb"))
 			self.SIFT_kp_locations = kp_tmp.copy()
 			self.SIFT_kp_desc = desc_tmp.copy()
