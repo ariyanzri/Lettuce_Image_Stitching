@@ -2286,13 +2286,16 @@ class Global_Optimizer:
 					# coef = 0.001
 					continue
 
+				if params.dissimilarity>=0.4:
+					continue
+
 				diff = get_translation_in_GPS_coordinate_system(params.H)
 				# print(diff)
 				# print(p.name)
 				# print(n.name)
 
-				coef = 10*(1-params.dissimilarity)
-				# coef = 1
+				# coef = 10*(1-params.dissimilarity)
+				coef = 1
 				# coef = int(math.sqrt(params.percentage_inliers*params.num_matches))
 				
 				row_x = - coef*template[self.image_name_to_index_dict[p.name],:] + coef*template[self.image_name_to_index_dict[n.name],:]
@@ -2320,7 +2323,7 @@ class Global_Optimizer:
 
 		# X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
 		
-		res = lsq_linear(A, b, bounds=(LB,UB))
+		res = lsq_linear(A, b, bounds=(LB,UB),max_iter=len(self.patches))
 		X = res.x
 
 		print(res.status,res.message,res.success)

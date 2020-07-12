@@ -42,12 +42,12 @@ def initialize_settings(scan_date,config_file,local_address):
 		GPS_ERROR_X = float(lines[20].split(':')[1])
 		FFT_PARALLEL_CORES_TO_USE = int(lines[21].split(':')[1])
 		use_camera = lines[22].split(':')[1]
-		override_sifts = bool(lines[23].split(':')[1])
+		override_sifts = (True if lines[23].split(':')[1] == 'true' or lines[23].split(':')[1] == 'True' else False)
 		inside_radius_lettuce_matching_threshold = 200*SCALE
 		number_of_rows_in_groups = int(lines[24].split(':')[1])
 		groups_to_use = slice(0,None)
 		patches_to_use = slice(0,None)
-		is_single_group = bool(lines[25].split(':')[1])
+		is_single_group = (True if lines[25].split(':')[1] == 'true' or lines[25].split(':')[1] == 'True' else False)
 
 		patch_folder = '{0}/{1}-rgb/bin2tif_out'.format(local_address,scan_date)
 		SIFT_folder = '{0}/{1}-rgb/SIFT'.format(local_address,scan_date)
@@ -105,12 +105,12 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,uav_add,bi
 		GPS_ERROR_X = float(lines[20].split(':')[1])
 		FFT_PARALLEL_CORES_TO_USE = int(lines[21].split(':')[1])
 		use_camera = lines[22].split(':')[1]
-		override_sifts = bool(lines[23].split(':')[1])
+		override_sifts = (True if lines[23].split(':')[1] == 'true' or lines[23].split(':')[1] == 'True' else False)
 		inside_radius_lettuce_matching_threshold = 200*SCALE
 		number_of_rows_in_groups = int(lines[24].split(':')[1])
 		groups_to_use = slice(0,None)
 		patches_to_use = slice(0,None)
-		is_single_group = bool(lines[25].split(':')[1])
+		is_single_group = (True if lines[25].split(':')[1] == 'true' or lines[25].split(':')[1] == 'True' else False)
 
 		patch_folder = '{0}'.format(bin2tif_address)
 		SIFT_folder = '{0}/{1}/SIFT'.format(destination,scan_date)
@@ -167,12 +167,12 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 		GPS_ERROR_X = float(lines[20].split(':')[1])
 		FFT_PARALLEL_CORES_TO_USE = int(lines[21].split(':')[1])
 		use_camera = lines[22].split(':')[1]
-		override_sifts = bool(lines[23].split(':')[1])
+		override_sifts = (True if lines[23].split(':')[1] == 'true' or lines[23].split(':')[1] == 'True' else False)
 		inside_radius_lettuce_matching_threshold = 200*SCALE
 		number_of_rows_in_groups = int(lines[24].split(':')[1])
 		groups_to_use = slice(0,rows_n)
 		patches_to_use = slice(0,patch_n)
-		is_single_group = bool(lines[25].split(':')[1])
+		is_single_group = (True if lines[25].split(':')[1] == 'true' or lines[25].split(':')[1] == 'True' else False)
 
 		patch_folder = '{0}/{1}-rgb/bin2tif_out'.format(local_address,scan_date)
 		SIFT_folder = '{0}/{1}-rgb/SIFT'.format(local_address,scan_date)
