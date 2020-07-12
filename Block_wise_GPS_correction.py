@@ -2332,8 +2332,8 @@ class Global_Optimizer:
 
 		# X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
 		
-		# res = lsq_linear(A, b, bounds=(LB,UB),max_iter=len(self.patches),verbose=2)
-		res = lsq_linear(A, b,max_iter=len(self.patches),verbose=2)
+		res = lsq_linear(A, b, bounds=(LB,UB),max_iter=len(self.patches),verbose=2)
+		# res = lsq_linear(A, b,max_iter=len(self.patches),verbose=2)
 
 		X = res.x
 
