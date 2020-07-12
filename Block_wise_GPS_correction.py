@@ -2304,8 +2304,8 @@ class Global_Optimizer:
 				# print(p.name)
 				# print(n.name)
 
-				# coef = 10*(1-params.dissimilarity)
-				coef = (1/0.000002)*(1-params.dissimilarity)
+				coef = 5*(0.4-params.dissimilarity)
+				# coef = (1/0.000002)*(1-params.dissimilarity)
 				# coef = 1
 				# coef = int(math.sqrt(params.percentage_inliers*params.num_matches))
 				
@@ -2331,8 +2331,8 @@ class Global_Optimizer:
 			# A.append(row_y)
 			# b.append(coef*p.gps.UL_coord[1])
 
-			LB[self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[0]-10*settings.GPS_ERROR_X
-			UB[self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[0]+10*settings.GPS_ERROR_X
+			LB[self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[0]-settings.GPS_ERROR_X
+			UB[self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[0]+settings.GPS_ERROR_X
 			LB[self.number_of_images + self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[1]-settings.GPS_ERROR_Y
 			UB[self.number_of_images + self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[1]+settings.GPS_ERROR_Y
 
