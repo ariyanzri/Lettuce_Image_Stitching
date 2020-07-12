@@ -2294,8 +2294,8 @@ class Global_Optimizer:
 				# print(p.name)
 				# print(n.name)
 
-				# coef = 10*(1-params.dissimilarity)
-				coef = 1
+				coef = 10*(1-params.dissimilarity)
+				# coef = 1
 				# coef = int(math.sqrt(params.percentage_inliers*params.num_matches))
 				
 				row_x = - coef*template[self.image_name_to_index_dict[p.name],:] + coef*template[self.image_name_to_index_dict[n.name],:]
@@ -2323,7 +2323,7 @@ class Global_Optimizer:
 
 		# X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
 		
-		res = lsq_linear(A, b, bounds=(LB,UB),max_iter=len(self.patches))
+		res = lsq_linear(A, b, bounds=(LB,UB),max_iter=len(self.patches),verbose=2)
 		X = res.x
 
 		print(res.status,res.message,res.success)
@@ -4213,20 +4213,22 @@ class Field:
 		print('Internally correction is finished.')
 		sys.stdout.flush()
 
-		previous_group = None
+		if not settings.is_single_group:
 
-		for group in self.groups:
-			
-			if previous_group is None:
-				# group.load_all_patches_SIFT_points()				
+			previous_group = None
+
+			for group in self.groups:
+				
+				if previous_group is None:
+					# group.load_all_patches_SIFT_points()				
+					previous_group = group
+					continue
+
+				# group.load_all_patches_SIFT_points()
+				group.correct_self_based_on_previous_group(previous_group)
+				# previous_group.delete_all_patches_SIFT_points()
+
 				previous_group = group
-				continue
-
-			# group.load_all_patches_SIFT_points()
-			group.correct_self_based_on_previous_group(previous_group)
-			# previous_group.delete_all_patches_SIFT_points()
-
-			previous_group = group
 
 		print('Field fully corrected.')
 		sys.stdout.flush()
