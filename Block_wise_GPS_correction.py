@@ -2304,7 +2304,8 @@ class Global_Optimizer:
 				# print(n.name)
 
 				# coef = 10*(1-params.dissimilarity)
-				coef = 1
+				coef = (1/0.000002)*(1-params.dissimilarity)
+				# coef = 1
 				# coef = int(math.sqrt(params.percentage_inliers*params.num_matches))
 				
 				row_x = - coef*template[self.image_name_to_index_dict[p.name],:] + coef*template[self.image_name_to_index_dict[n.name],:]
@@ -3622,7 +3623,6 @@ class Group:
 
 		elif settings.method == 'GlobalOpt':
 
-			self.load_all_patches_SIFT_points()
 
 			if self.is_field_single_group:
 				self.pre_calculate_internal_neighbors_and_transformation_parameters_parallel()
@@ -3630,6 +3630,7 @@ class Group:
 				sys.stdout.flush()
 
 			else:
+				self.load_all_patches_SIFT_points()
 				self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
 			opt = Global_Optimizer(self.patches)
