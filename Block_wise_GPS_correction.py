@@ -2286,12 +2286,12 @@ class Global_Optimizer:
 				if abs(params.scale-1) > settings.TRANSFORMATION_SCALE_DISCARD_THRESHOLD or abs(params.degrees-0)>settings.TRANSFORMATION_ANGLE_DISCARD_THRESHOLD:
 					# print(params.scale,params.degrees)
 					coef = 0.01
-					continue
+					# continue
 
 				if params.dissimilarity >=0.4:
 					# print(params.dissimilarity)
 					coef = 0.1
-					continue
+					# continue
 
 
 
