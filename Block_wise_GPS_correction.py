@@ -2319,6 +2319,18 @@ class Global_Optimizer:
 				A.append(row_y)
 				b.append(coef*diff[1])
 
+			coef = (1/0.000002)
+
+			row_x = coef*template[self.image_name_to_index_dict[p.name],:]
+			row_y = coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:]
+
+			A.append(row_x)
+			b.append(coef*p.gps.UL_coord[0])
+			
+
+			A.append(row_y)
+			b.append(coef*p.gps.UL_coord[1])
+
 			LB[self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[0]-settings.GPS_ERROR_X
 			UB[self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[0]+settings.GPS_ERROR_X
 			LB[self.number_of_images + self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[1]-settings.GPS_ERROR_Y
