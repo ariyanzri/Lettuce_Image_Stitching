@@ -3287,7 +3287,11 @@ class Group:
 
 		for p in self.patches:
 
+			p.load_SIFT_points()
+
 			for n in self.patches:
+
+				n.load_SIFT_points()
 
 				if n != p and (p.has_overlap(n) or n.has_overlap(p)):
 
@@ -3299,6 +3303,10 @@ class Group:
 						continue
 					
 					p.neighbors.append((n,neighbor_param))
+
+				n.delete_SIFT_points()
+
+			p.delete_SIFT_points()
 
 			if print_flg:
 				print('GROPU ID: {0} - Calculated Transformation and error values for {1} neighbors of {2}'.format(self.group_id,len(p.neighbors),p.name))
