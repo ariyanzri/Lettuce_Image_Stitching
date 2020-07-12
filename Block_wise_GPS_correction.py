@@ -24,6 +24,7 @@ from Customized_myltiprocessing import MyPool
 from heapq import heappush, heappop, heapify
 from collections import OrderedDict,Counter
 from scipy.optimize import lsq_linear
+from scipy.sparse.linalg import lsqr
 
 # from PIL import Image
 # from PIL.TiffTags import TAGS
@@ -2333,12 +2334,13 @@ class Global_Optimizer:
 
 		# X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
 		
-		res = lsq_linear(A, b, bounds=(LB,UB),max_iter=len(self.patches),verbose=2)
+		# res = lsq_linear(A, b, bounds=(LB,UB),max_iter=len(self.patches),verbose=2)
 		# res = lsq_linear(A, b,max_iter=len(self.patches),verbose=2)
+		# X = res.x
+		# print(res.status,res.message,res.success)
 
-		X = res.x
+		X = lsqr(A,b)[0]
 
-		print(res.status,res.message,res.success)
 
 		for p in self.patches:
 			i = self.image_name_to_index_dict[p.name]
