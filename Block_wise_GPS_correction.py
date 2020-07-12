@@ -2294,7 +2294,7 @@ class Global_Optimizer:
 				# print(p.name)
 				# print(n.name)
 
-				coef = 100*(1-params.dissimilarity)**2
+				coef = 1000000*(1-params.dissimilarity)**2
 				# coef = 1
 				# coef = int(math.sqrt(params.percentage_inliers*params.num_matches))
 				
