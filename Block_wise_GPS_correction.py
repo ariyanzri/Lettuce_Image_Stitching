@@ -2275,9 +2275,11 @@ class Global_Optimizer:
 			for n,params in p.neighbors:
 
 				if abs(params.scale-1) > settings.TRANSFORMATION_SCALE_DISCARD_THRESHOLD or abs(params.degrees-0)>settings.TRANSFORMATION_ANGLE_DISCARD_THRESHOLD:
+					print(params.scale,params.degrees)
 					continue
 
 				if params.dissimilarity >=0.4:
+					print(params.dissimilarity)
 					continue
 
 
@@ -2287,9 +2289,9 @@ class Global_Optimizer:
 				# print(p.name)
 				# print(n.name)
 
-				# coef = 10*(1-params.dissimilarity)**2
+				coef = 10*(1-params.dissimilarity)**2
 				# coef = 1
-				coef = int(math.sqrt(params.percentage_inliers*params.num_matches))
+				# coef = int(math.sqrt(params.percentage_inliers*params.num_matches))
 				
 				row_x = - coef*template[self.image_name_to_index_dict[p.name],:] + coef*template[self.image_name_to_index_dict[n.name],:]
 				row_y = - coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + coef*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
