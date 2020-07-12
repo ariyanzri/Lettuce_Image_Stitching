@@ -2274,12 +2274,16 @@ class Global_Optimizer:
 		for p in self.patches:
 			for n,params in p.neighbors:
 
+				coef = 1
+
 				if abs(params.scale-1) > settings.TRANSFORMATION_SCALE_DISCARD_THRESHOLD or abs(params.degrees-0)>settings.TRANSFORMATION_ANGLE_DISCARD_THRESHOLD:
-					print(params.scale,params.degrees)
+					# print(params.scale,params.degrees)
+					coef = 0.01
 					continue
 
 				if params.dissimilarity >=0.4:
-					print(params.dissimilarity)
+					# print(params.dissimilarity)
+					coef = 0.1
 					continue
 
 
@@ -2289,7 +2293,7 @@ class Global_Optimizer:
 				# print(p.name)
 				# print(n.name)
 
-				coef = 10*(1-params.dissimilarity)**2
+				# coef = 10*(1-params.dissimilarity)**2
 				# coef = 1
 				# coef = int(math.sqrt(params.percentage_inliers*params.num_matches))
 				
