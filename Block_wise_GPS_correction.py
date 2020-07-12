@@ -2303,7 +2303,7 @@ class Global_Optimizer:
 				# print(p.name)
 				# print(n.name)
 
-				coef = 1000000*(1-params.dissimilarity)**2
+				coef = 10*(1-params.dissimilarity)
 				# coef = 1
 				# coef = int(math.sqrt(params.percentage_inliers*params.num_matches))
 				
@@ -2332,7 +2332,9 @@ class Global_Optimizer:
 
 		# X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
 		
-		res = lsq_linear(A, b, bounds=(LB,UB),max_iter=len(self.patches),verbose=2)
+		# res = lsq_linear(A, b, bounds=(LB,UB),max_iter=len(self.patches),verbose=2)
+		res = lsq_linear(A, b,max_iter=len(self.patches),verbose=2)
+
 		X = res.x
 
 		print(res.status,res.message,res.success)
@@ -3631,8 +3633,8 @@ class Group:
 				self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
 			opt = Global_Optimizer(self.patches)
-			opt.transformation_diff_only_least_squares()
-			# opt.bounded_variables_least_squares()
+			# opt.transformation_diff_only_least_squares()
+			opt.bounded_variables_least_squares()
 
 			string_res = get_corrected_string(self.patches)
 			
