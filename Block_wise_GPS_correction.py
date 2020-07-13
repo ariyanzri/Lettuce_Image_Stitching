@@ -2319,17 +2319,17 @@ class Global_Optimizer:
 				A.append(row_y)
 				b.append(coef*diff[1])
 
-			# coef = 0.5
+			coef = 1/0.002
 
-			# row_x = coef*template[self.image_name_to_index_dict[p.name],:]
-			# row_y = coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:]
+			row_x = coef*template[self.image_name_to_index_dict[p.name],:]
+			row_y = coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:]
 
-			# A.append(row_x)
-			# b.append(coef*p.gps.UL_coord[0])
+			A.append(row_x)
+			b.append(coef*p.gps.UL_coord[0])
 			
 
-			# A.append(row_y)
-			# b.append(coef*p.gps.UL_coord[1])
+			A.append(row_y)
+			b.append(coef*p.gps.UL_coord[1])
 
 			LB[self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[0]-settings.GPS_ERROR_X
 			UB[self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[0]+settings.GPS_ERROR_X
@@ -2346,12 +2346,12 @@ class Global_Optimizer:
 
 		# X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
 		
-		res = lsq_linear(A, b, bounds=(LB,UB),max_iter=len(self.patches),verbose=2)
+		# res = lsq_linear(A, b, bounds=(LB,UB),max_iter=len(self.patches),verbose=2)
 		# res = lsq_linear(A, b,max_iter=len(self.patches),verbose=2)
-		X = res.x
-		print(res.status,res.message,res.success)
+		# X = res.x
+		# print(res.status,res.message,res.success)
 
-		# X = lsqr(A,b)[0]
+		X = lsqr(A,b)[0]
 
 
 		for p in self.patches:
