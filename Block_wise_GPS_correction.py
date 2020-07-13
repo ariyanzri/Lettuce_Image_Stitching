@@ -2374,7 +2374,7 @@ class Neighbor_Parameters:
 		self.degrees = theta
 		self.scale = scale
 
-	def get_string(p,n):
+	def get_string(self,p,n):
 		diff = get_translation_in_GPS_coordinate_system(self.H)
 
 		return '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10}'.format(p.name,n.name,self.H[0,2],self.H[1,2],diff[0],diff[1],self.num_matches,self.percentage_inliers,self.dissimilarity,self.degrees,self.scale)
@@ -3773,7 +3773,7 @@ class Group:
 		sys.stdout.flush()
 
 		self.save_transformations()
-		
+
 		return string_res
 
 
