@@ -3570,6 +3570,17 @@ class Group:
 
 		return list_connected_patches
 
+	def save_transformations(self):
+
+		string_res = ''
+
+		for p in self.patches:
+			for n,params in p.neighbors:
+				string_res+='{0},{1}\n'.format(self.group_id,params.get_string(p,n))
+
+		with open('{0}/{1}'.format(settings.field_image_path,'transformations.csv'),"a+") as f:
+			f.write(string_res)
+
 	def correct_internally(self):
 
 		# global lettuce_coords,no_of_cores_to_use,method,CONTOUR_MATCHING_MIN_MATCH
@@ -3761,6 +3772,8 @@ class Group:
 		print('Group {0} was corrected internally. '.format(self.group_id))
 		sys.stdout.flush()
 
+		self.save_transformations()
+		
 		return string_res
 
 
@@ -4415,24 +4428,6 @@ class Field:
 			result = [r for r in result if r!=-1]
 
 			print('{0},{1},{2}'.format(settings.SCALE,statistics.mean(result),statistics.stdev(result)))
-
-	def save_transformations(self):
-
-		string_res = 'p,n,H0,H1,diff_x,diff_y,num_matches,percentage_inliers,dissimilarity,degree,scale\n'
-
-		all_patches = []
-
-		for group in self.groups:
-
-			all_patches+=[p for p in group.patches if (p not in all_patches)]
-
-		for p in all_patches:
-			for n,params in p.neighbors:
-				string_res+='{0}\n'.format(params.get_string(p,n))
-
-		with open('{0}/{1}'.format(settings.field_image_path,'transformations.csv'),"w+") as f:
-			f.write(string_res)
-
 
 
 
