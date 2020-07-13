@@ -2374,6 +2374,11 @@ class Neighbor_Parameters:
 		self.degrees = theta
 		self.scale = scale
 
+	def get_string(p,n):
+		diff = get_translation_in_GPS_coordinate_system(self.H)
+
+		return '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10}'.format(p.name,n.name,self.H[0,2],self.H[1,2],diff[0],diff[1],self.num_matches,self.percentage_inliers,self.dissimilarity,self.degrees,self.scale)
+
 
 class Patch:
 	
@@ -4413,7 +4418,7 @@ class Field:
 
 	def save_transformations(self):
 
-		string_res = ''
+		string_res = 'p,n,H0,H1,diff_x,diff_y,num_matches,percentage_inliers,dissimilarity,degree,scale\n'
 
 		all_patches = []
 
@@ -4423,9 +4428,12 @@ class Field:
 
 		for p in all_patches:
 			for n,params in p.neighbors:
-				string_res+='{0}\n'.format(params.get_string())
+				string_res+='{0}\n'.format(params.get_string(p,n))
 
-		
+		with open('{0}/{1}'.format(settings.field_image_path,'transformations.csv'),"w+") as f:
+			f.write(string_res)
+
+
 
 
 def calculate_scale_effect_inside(p1,p2):
