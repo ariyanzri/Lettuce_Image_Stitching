@@ -2319,17 +2319,17 @@ class Global_Optimizer:
 				A.append(row_y)
 				b.append(coef*diff[1])
 
-			coef = 1/0.002
+			# coef = 0.5
 
-			row_x = coef*template[self.image_name_to_index_dict[p.name],:]
-			row_y = coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:]
+			# row_x = coef*template[self.image_name_to_index_dict[p.name],:]
+			# row_y = coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:]
 
-			A.append(row_x)
-			b.append(coef*p.gps.UL_coord[0])
+			# A.append(row_x)
+			# b.append(coef*p.gps.UL_coord[0])
 			
 
-			A.append(row_y)
-			b.append(coef*p.gps.UL_coord[1])
+			# A.append(row_y)
+			# b.append(coef*p.gps.UL_coord[1])
 
 			LB[self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[0]-settings.GPS_ERROR_X
 			UB[self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[0]+settings.GPS_ERROR_X
@@ -2346,12 +2346,12 @@ class Global_Optimizer:
 
 		# X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
 		
-		# res = lsq_linear(A, b, bounds=(LB,UB),max_iter=len(self.patches),verbose=2)
+		res = lsq_linear(A, b, bounds=(LB,UB),max_iter=len(self.patches),verbose=2)
 		# res = lsq_linear(A, b,max_iter=len(self.patches),verbose=2)
-		# X = res.x
-		# print(res.status,res.message,res.success)
+		X = res.x
+		print(res.status,res.message,res.success)
 
-		X = lsqr(A,b)[0]
+		# X = lsqr(A,b)[0]
 
 
 		for p in self.patches:
@@ -2360,8 +2360,6 @@ class Global_Optimizer:
 			new_UL = (X[i], X[self.number_of_images+i])
 			
 			p.gps = calculate_new_GPS_based_on_new_UL(new_UL,p)
-
-
 
 
 class Neighbor_Parameters:
@@ -4412,6 +4410,23 @@ class Field:
 			result = [r for r in result if r!=-1]
 
 			print('{0},{1},{2}'.format(settings.SCALE,statistics.mean(result),statistics.stdev(result)))
+
+	def save_transformations(self):
+
+		string_res = ''
+
+		all_patches = []
+
+		for group in self.groups:
+
+			all_patches+=[p for p in group.patches if (p not in all_patches)]
+
+		for p in all_patches:
+			for n,params in p.neighbors:
+				string_res+='{0}\n'.format(params.get_string())
+
+		
+
 
 def calculate_scale_effect_inside(p1,p2):
 	overlap_1,overlap_2 = p1.get_overlap_rectangles(p2)
