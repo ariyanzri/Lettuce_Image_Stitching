@@ -42,6 +42,7 @@ def main(scan_date):
 
 	field.save_new_coordinate()
 
+	field.save_new_coordinate()
 
 	# new_lid_base_error = field.calculate_lid_based_error()
 	new_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
