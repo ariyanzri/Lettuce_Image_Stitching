@@ -4268,27 +4268,27 @@ class Field:
 		initial_UL_GPS = {}
 
 		with open(settings.coordinates_file) as f:
-		lines = f.read()
-		lines = lines.replace('"','')
+			lines = f.read()
+			lines = lines.replace('"','')
 
-		for l in lines.split('\n'):
-			if l == '':
-				break
-			if l == 'Filename,Upper left,Lower left,Upper right,Lower right,Center' or l == 'name,upperleft,lowerleft,uperright,lowerright,center':
-				continue
+			for l in lines.split('\n'):
+				if l == '':
+					break
+				if l == 'Filename,Upper left,Lower left,Upper right,Lower right,Center' or l == 'name,upperleft,lowerleft,uperright,lowerright,center':
+					continue
 
-			features = l.split(',')
+				features = l.split(',')
 
-			filename = features[0]
+				filename = features[0]
 
-			if settings.use_camera == 'Left' and '_right' in filename:
-				continue
-			if settings.use_camera == 'Right' and '_left' in filename:
-				continue
+				if settings.use_camera == 'Left' and '_right' in filename:
+					continue
+				if settings.use_camera == 'Right' and '_left' in filename:
+					continue
 
-			upper_left = (float(features[1]),float(features[2]))
-			
-			initial_UL_GPS[filename] = upper_left
+				upper_left = (float(features[1]),float(features[2]))
+				
+				initial_UL_GPS[filename] = upper_left
 
 		errors = []
 
