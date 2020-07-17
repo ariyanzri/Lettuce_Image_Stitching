@@ -4309,7 +4309,7 @@ class Field:
 
 		for error in errors:
 	
-			string_res+='{0},{1}\n'.format(error[0],error[1]0)
+			string_res+='{0},{1}\n'.format(error[0],error[1])
 
 		with open('{0}/{1}'.format(settings.field_image_path,'transformations_errors.csv'),"w+") as f:
 			f.write(string_res)
