@@ -4295,17 +4295,17 @@ class Field:
 		for p in all_patches:
 			
 			final_diff_vector = (p.gps.UL_coord[0]-initial_UL_GPS[p.name][0],p.gps.UL_coord[1]-initial_UL_GPS[p.name][1])
- 			
- 			for n,params in p.neighbors:
 
- 				transformation_diff_vector = (params.diff_x,params.diff_y)
+			for n,params in p.neighbors:
 
- 				error = [final_diff_vector[0]-transformation_diff_vector[0],final_diff_vector[1]-transformation_diff_vector[1]]
- 				errors.append(error)
+				transformation_diff_vector = (params.diff_x,params.diff_y)
+
+				error = [final_diff_vector[0]-transformation_diff_vector[0],final_diff_vector[1]-transformation_diff_vector[1]]
+				errors.append(error)
 
 
 
- 		string_res = ''
+		string_res = ''
 
 		for error in errors:
 	
