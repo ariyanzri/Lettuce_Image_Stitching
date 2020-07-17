@@ -3669,6 +3669,22 @@ class Group:
 			
 			self.delete_all_patches_SIFT_points()
 
+		elif settings.method == 'TransformationOnly':
+
+
+			if self.is_field_single_group:
+				self.pre_calculate_internal_neighbors_and_transformation_parameters_parallel()
+				print('All transformations have been successfully estimated.')
+				sys.stdout.flush()
+
+			else:
+				self.load_all_patches_SIFT_points()
+				self.pre_calculate_internal_neighbors_and_transformation_parameters()
+
+			string_res = get_corrected_string(self.patches)
+			
+			self.delete_all_patches_SIFT_points()
+
 		elif settings.method == 'Hybrid':
 			
 			self.load_all_patches_SIFT_points()
@@ -4248,6 +4264,109 @@ class Field:
 						
 		# 				patch.gps = result_dict[patch.name]
 
+	def calculate_transformation_error(self,all_patches):
+		initial_UL_GPS = {}
+
+		with open(settings.coordinates_file) as f:
+		lines = f.read()
+		lines = lines.replace('"','')
+
+		for l in lines.split('\n'):
+			if l == '':
+				break
+			if l == 'Filename,Upper left,Lower left,Upper right,Lower right,Center' or l == 'name,upperleft,lowerleft,uperright,lowerright,center':
+				continue
+
+			features = l.split(',')
+
+			filename = features[0]
+
+			if settings.use_camera == 'Left' and '_right' in filename:
+				continue
+			if settings.use_camera == 'Right' and '_left' in filename:
+				continue
+
+			upper_left = (float(features[1]),float(features[2]))
+			
+			initial_UL_GPS[filename] = upper_left
+
+		errors = []
+
+		for p in all_patches:
+			
+			final_diff_vector = (p.gps.UL_coord[0]-initial_UL_GPS[p.name][0],p.gps.UL_coord[1]-initial_UL_GPS[p.name][1])
+ 			
+ 			for n,params in p.neighbors:
+
+ 				transformation_diff_vector = (params.diff_x,params.diff_y)
+
+ 				error = [final_diff_vector[0]-transformation_diff_vector[0],final_diff_vector[1]-transformation_diff_vector[1]]
+ 				errors.append(error)
+
+
+
+ 		string_res = ''
+
+		for error in errors:
+	
+			string_res+='{0},{1}\n'.format(error[0],error[1]0)
+
+		with open('{0}/{1}'.format(settings.field_image_path,'transformations_errors.csv'),"w+") as f:
+			f.write(string_res)
+			
+
+	def whole_field_global_opt(self):
+
+		all_patches = {}
+		all_patches_list = []
+
+		for g in self.groups:
+			for p in g.patches:
+				all_patches[p.name] = p
+				all_patches_list.append(p)
+
+		with open('{0}/{1}'.format(settings.field_image_path,'transformations.csv'),"r") as f:
+			lines = f.read()
+
+			for l in lines.split('\n'):
+				
+				if l == '':
+					break
+				
+				features = l.split(',')
+
+				p_name = features[1]
+				n_name = features[2]
+				H_0 = float(features[3])
+				H_1 = float(features[4])
+				H = np.array([[1,0,H_0],[0,1,H_1],[0,0,1]]).astype('float')
+
+				diffx = float(features[5])
+				diffy = float(features[6])
+
+
+				num_matches = int(features[7])
+				perc_in = float(features[8])
+				dissimilarity = float(features[9])
+				deg = float(features[10])
+				scale = float(features[11])
+
+				p = all_patches[p_name]
+				n = all_patches[n_name]
+
+				neighbor_param = Neighbor_Parameters(None,None,H,num_matches,perc_in,dissimilarity,scale,deg)
+				neighbor_param.diff_x = diffx
+				neighbor_param.diff_y = diffy
+
+				p.neighbors.append((n,neighbor_param))
+
+
+		opt = Global_Optimizer(all_patches_list)
+			
+		opt.bounded_variables_least_squares()
+
+		self.calculate_transformation_error(all_patches_list)
+
 	def correct_field(self):
 		
 		self.correct_groups_internally()
@@ -4255,7 +4374,11 @@ class Field:
 		print('Internally correction is finished.')
 		sys.stdout.flush()
 
-		if not settings.is_single_group:
+		if settings.method == "TransformationOnly":
+			
+			self.whole_field_global_opt()
+
+		elif not settings.is_single_group:
 
 			previous_group = None
 
