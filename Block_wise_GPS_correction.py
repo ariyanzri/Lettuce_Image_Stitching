@@ -3671,7 +3671,6 @@ class Group:
 
 		elif settings.method == 'TransformationOnly':
 
-
 			if self.is_field_single_group:
 				self.pre_calculate_internal_neighbors_and_transformation_parameters_parallel()
 				print('All transformations have been successfully estimated.')
@@ -4323,7 +4322,9 @@ class Field:
 		for g in self.groups:
 			for p in g.patches:
 				all_patches[p.name] = p
-				all_patches_list.append(p)
+
+		for p in all_patches:
+			all_patches_list.append(all_patches[p])
 
 		with open('{0}/{1}'.format(settings.field_image_path,'transformations.csv'),"r") as f:
 			lines = f.read()
