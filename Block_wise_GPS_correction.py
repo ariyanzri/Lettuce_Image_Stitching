@@ -4452,7 +4452,10 @@ class Field:
 		for p in all_patches:
 			args.append((p,UL))
 
-		processes = MyPool(settings.no_of_cores_to_use_max)
+		print(len(args))
+		print(up,down,left,right)
+		
+		processes = multiprocessing.Pool(settings.no_of_cores_to_use_max)
 		results_parallel = processes.map(ortho_generation_sub_function_helper,args)
 		processes.close()
 

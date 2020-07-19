@@ -37,9 +37,9 @@ def main(scan_date):
 
 	field.correct_field()
 
-	field.draw_and_save_field(is_old=False)
-
 	field.save_new_coordinate()
+
+	field.draw_and_save_field(is_old=False)
 
 
 	# new_lid_base_error = field.calculate_lid_based_error()
@@ -64,7 +64,7 @@ config_file = sys.argv[2]
 local_address = sys.argv[3]
 
 
-settings.initialize_settings_test(scan_date,config_file,local_address,2,10)
+settings.initialize_settings_test(scan_date,config_file,local_address,3,15)
 
 print_settings()
 main(scan_date)
