@@ -2640,6 +2640,34 @@ class Patch:
 
 		return magnitude_spectrum.astype('uint8')
 
+	def get_diff_based_on_lid_points(self,point_in_img,point_in_GPS):
+
+		ratio_x = point_in_img[0]/settings.PATCH_SIZE[1]
+		ratio_y = point_in_img[1]/settings.PATCH_SIZE[0]
+
+		diff_x_GPS = settings.PATCH_SIZE_GPS[0]*ratio_x
+		diff_y_GPS = settings.PATCH_SIZE_GPS[1]*ratio_y
+
+		old_GPS_point = (self.gps.UL_coord[0]+diff_x_GPS,self.gps.UL_coord[1]-diff_y_GPS)
+
+		diff_GPS_after_correction = (old_GPS_point[0]-point_in_GPS[0],old_GPS_point[1]-point_in_GPS[1])
+
+		return diff_GPS_after_correction
+
+
+	def correct_GPS_based_on_diff(self,diff_GPS_after_correction):
+
+		new_UR = (self.gps.UR_coord[0]-diff_GPS_after_correction[0],self.gps.UR_coord[1]-diff_GPS_after_correction[1])
+		new_UL = (self.gps.UL_coord[0]-diff_GPS_after_correction[0],self.gps.UL_coord[1]-diff_GPS_after_correction[1])
+		new_LL = (self.gps.LL_coord[0]-diff_GPS_after_correction[0],self.gps.LL_coord[1]-diff_GPS_after_correction[1])
+		new_LR = (self.gps.LR_coord[0]-diff_GPS_after_correction[0],self.gps.LR_coord[1]-diff_GPS_after_correction[1])
+		new_center = (self.gps.Center[0]-diff_GPS_after_correction[0],self.gps.Center[1]-diff_GPS_after_correction[1])
+
+		new_coords = GPS_Coordinate(new_UL,new_UR,new_LL,new_LR,new_center)
+
+		self.gps = new_coords
+
+
 	def correct_GPS_based_on_point(self,point_in_img,point_in_GPS):
 		ratio_x = point_in_img[0]/settings.PATCH_SIZE[1]
 		ratio_y = point_in_img[1]/settings.PATCH_SIZE[0]
@@ -4264,6 +4292,7 @@ class Field:
 		# 				patch.gps = result_dict[patch.name]
 
 	def calculate_transformation_error(self,all_patches):
+
 		initial_UL_GPS = {}
 
 		with open(settings.coordinates_file) as f:
@@ -4314,8 +4343,7 @@ class Field:
 			f.write(string_res)
 			
 
-	def whole_field_global_opt(self):
-
+	def get_transformations(self):
 		all_patches = {}
 		all_patches_list = []
 
@@ -4361,23 +4389,49 @@ class Field:
 
 				p.neighbors.append((n,neighbor_param))
 
+		return all_patches,all_patches_list
+
+
+	def whole_field_global_opt(self,all_patches_list):
 
 		opt = Global_Optimizer(all_patches_list)
 			
 		opt.bounded_variables_least_squares()
 
-		self.calculate_transformation_error(all_patches_list)
+	def shift_after_correction_based_on_lids(self):
+		average_diff_x = 0
+		average_diff_y = 0
+
+		for p,l,x,y in self.detected_lid_patches:
+
+			old_lid = lids[l]
+			diff = p.get_diff_based_on_lid_points((x,y),old_lid)
+
+			average_diff_x += diff[0]
+			average_diff_y += diff[1]
+
+		average_diff_x = average_diff_x/len(self.detected_lid_patches)
+		average_diff_y = average_diff_y/len(self.detected_lid_patches)
+		
+		all_patches = []
+		for group in self.groups:
+			all_patches+=[p for p in group.patches if (p not in all_patches)]
+
+		for p in all_patches:
+			p.correct_GPS_based_on_diff((average_diff_x,average_diff_y))
+
 
 	def correct_field(self):
 		
 		self.correct_groups_internally()
+		all_patches, all_patches_list = self.get_transformations()
 
 		print('Internally correction is finished.')
 		sys.stdout.flush()
 
 		if settings.method == "TransformationOnly":
 			
-			self.whole_field_global_opt()
+			self.whole_field_global_opt(all_patches_list)
 
 		elif not settings.is_single_group:
 
@@ -4395,6 +4449,9 @@ class Field:
 				# previous_group.delete_all_patches_SIFT_points()
 
 				previous_group = group
+
+		self.shift_after_correction_based_on_lids()
+		self.calculate_transformation_error(all_patches_list)
 
 		print('Field fully corrected.')
 		sys.stdout.flush()
