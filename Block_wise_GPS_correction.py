@@ -4401,7 +4401,8 @@ class Field:
 	def shift_after_correction_based_on_lids(self):
 		average_diff_x = 0
 		average_diff_y = 0
-
+		lids = get_lids()
+		
 		for p,l,x,y in self.detected_lid_patches:
 
 			old_lid = lids[l]
