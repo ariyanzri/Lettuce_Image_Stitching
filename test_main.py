@@ -21,6 +21,8 @@ import settings
 
 def main(scan_date):
 
+	sys.setrecursionlimit(10**6)
+	
 	settings.lettuce_coords = read_lettuce_heads_coordinates()
 
 	field = Field(is_single_group=settings.is_single_group)
