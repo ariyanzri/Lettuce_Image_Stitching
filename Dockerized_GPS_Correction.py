@@ -25,11 +25,11 @@ def main(scan_date):
 
 	settings.lettuce_coords = read_lettuce_heads_coordinates()
 
-	field = Field(is_single_group=settings.is_single_group)
+	field = Field(is_single_group=settings.is_single_group,correct_lid_patches=False)
 	
 	field.save_plot()
 
-	# old_lid_base_error = field.calculate_lid_based_error()
+	old_lid_base_error = field.calculate_lid_based_error()
 
 	old_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
 
@@ -43,17 +43,17 @@ def main(scan_date):
 
 	field.save_new_coordinate()
 
-	# new_lid_base_error = field.calculate_lid_based_error()
+	new_lid_base_error = field.calculate_lid_based_error()
 	new_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
 
 	print('------------------ ERROR MEASUREMENT ------------------ ')
 
 
-	# print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+	print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
 	print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
 	
 
-	# print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+	print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
 	print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 
