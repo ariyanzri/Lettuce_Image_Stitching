@@ -22,5 +22,5 @@ GPS_ERROR_X:0.00008
 FFT_PARALLEL_CORES_TO_USE:20
 use_camera:Left
 override_sifts:False
-number_of_rows_in_groups:4
+number_of_rows_in_groups:10
 is_single_group:True
