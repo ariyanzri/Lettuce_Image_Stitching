@@ -2243,30 +2243,41 @@ class Global_Optimizer:
 		A = []
 		b = []
 
+		transformation_coef_x = 1/(5.11*1e-6) 
+		transformation_coef_y = 1/(6.61*1e-6) 
+		GPS_coef_x = 1/(4.61*1e-6) 
+		GPS_coef_y = 1/(6.21*1e-6)
+
 		for p in self.patches:
 			for n,params in p.neighbors:
 
 				diff = get_translation_in_GPS_coordinate_system(params.H)
 
 				if abs(params.scale-1) > settings.TRANSFORMATION_SCALE_DISCARD_THRESHOLD or abs(params.degrees-0)>settings.TRANSFORMATION_ANGLE_DISCARD_THRESHOLD:
-					# print(params.scale,params.degrees)
-					# coef = 0.001
 					continue
 
 				if params.dissimilarity>=0.4:
 					continue
 				
-				coef = 1
-				# coef = 10*(1-params.dissimilarity)
-
-				row_x = - coef*template[self.image_name_to_index_dict[p.name],:] + coef*template[self.image_name_to_index_dict[n.name],:]
-				row_y = - coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + coef*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
+				row_x = - transformation_coef_x*template[self.image_name_to_index_dict[p.name],:] + transformation_coef_x*template[self.image_name_to_index_dict[n.name],:]
+				row_y = - transformation_coef_y*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + transformation_coef_y*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
 
 				A.append(row_x)
-				b.append(coef*diff[0])
+				b.append(transformation_coef_x*diff[0])
 
 				A.append(row_y)
-				b.append(coef*diff[1])
+				b.append(transformation_coef_y*diff[1])
+
+
+			row_x = GPS_coef_x*template[self.image_name_to_index_dict[p.name],:]
+			row_y = GPS_coef_y*template[self.number_of_images + self.image_name_to_index_dict[p.name],:]
+
+			A.append(row_x)
+			b.append(GPS_coef_x*p.gps.UL_coord[0])
+			
+
+			A.append(row_y)
+			b.append(GPS_coef_y*p.gps.UL_coord[1])
 
 		A=np.array(A)
 		b=np.array(b)
@@ -3690,8 +3701,8 @@ class Group:
 				self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
 			opt = Global_Optimizer(self.patches)
-			# opt.transformation_diff_only_least_squares()
-			opt.bounded_variables_least_squares()
+			opt.transformation_diff_only_least_squares()
+			# opt.bounded_variables_least_squares()
 
 			string_res = get_corrected_string(self.patches)
 			
