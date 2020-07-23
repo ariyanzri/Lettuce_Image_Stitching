@@ -4410,6 +4410,10 @@ class Field:
 		opt.bounded_variables_least_squares()
 
 	def shift_after_correction_based_on_lids(self):
+		
+		if len(self.detected_lid_patches) == 0:
+			return 
+			
 		average_diff_x = 0
 		average_diff_y = 0
 		lids = get_lids()
