@@ -3701,8 +3701,8 @@ class Group:
 				self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
 			opt = Global_Optimizer(self.patches)
-			opt.transformation_diff_only_least_squares()
-			# opt.bounded_variables_least_squares()
+			# opt.transformation_diff_only_least_squares()
+			opt.bounded_variables_least_squares()
 
 			string_res = get_corrected_string(self.patches)
 			
@@ -3904,6 +3904,9 @@ class Group:
 class Field:
 	def __init__(self,is_single_group=False,correct_lid_patches=True,use_corrected=False):
 		# global coordinates_file
+
+		if os.path.isfile('{0}/{1}'.format(settings.field_image_path,'transformations.csv')):
+			os.remove('{0}/{1}'.format(settings.field_image_path,'transformations.csv'))
 
 		self.groups = self.initialize_field(use_corrected,is_single_group)
 		self.detected_lid_patches = []
@@ -4525,8 +4528,8 @@ class Field:
 		for p in all_patches:
 			args.append((p,UL))
 
-		print(len(args))
-		print(up,down,left,right)
+		# print(len(args))
+		# print(up,down,left,right)
 		
 		processes = multiprocessing.Pool(settings.no_of_cores_to_use_max)
 		results_parallel = processes.map(ortho_generation_sub_function_helper,args)
