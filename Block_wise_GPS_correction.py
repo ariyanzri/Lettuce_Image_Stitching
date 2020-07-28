@@ -2243,10 +2243,10 @@ class Global_Optimizer:
 		A = []
 		b = []
 
-		transformation_coef_x = 1/(5.11*1e-6) 
-		transformation_coef_y = 1/(6.61*1e-6) 
-		GPS_coef_x = 1/(4.61*1e-6) 
-		GPS_coef_y = 1/(6.21*1e-6)
+		transformation_coef_x = 1/(9.32*1e-6) 
+		transformation_coef_y = 1/(10.56*1e-6) 
+		GPS_coef_x = 1/(9.02*1e-6) 
+		GPS_coef_y = 1/(10.48*1e-6)
 
 		for p in self.patches:
 			for n,params in p.neighbors:
