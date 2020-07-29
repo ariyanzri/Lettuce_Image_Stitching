@@ -2237,6 +2237,72 @@ class Global_Optimizer:
 			self.image_name_to_index_dict[p.name] = i
 			self.index_to_image_name_dict[i] = p.name
 
+	def transformation_diff_only_least_squares_with_lids(self,corrected_patches):
+		template = np.eye(2*self.number_of_images)
+
+		A = []
+		b = []
+
+		transformation_coef_x = 1/(9.32*1e-6) 
+		transformation_coef_y = 1/(10.56*1e-6) 
+		GPS_coef_x = 1/(9.02*1e-6) 
+		GPS_coef_y = 1/(10.48*1e-6)
+		GPS_lids = 1/(1e-12)
+
+		for p in self.patches:
+			for n,params in p.neighbors:
+
+				diff = get_translation_in_GPS_coordinate_system(params.H)
+
+				if abs(params.scale-1) > settings.TRANSFORMATION_SCALE_DISCARD_THRESHOLD or abs(params.degrees-0)>settings.TRANSFORMATION_ANGLE_DISCARD_THRESHOLD:
+					continue
+
+				if params.dissimilarity>=0.4:
+					continue
+				
+				row_x = - transformation_coef_x*template[self.image_name_to_index_dict[p.name],:] + transformation_coef_x*template[self.image_name_to_index_dict[n.name],:]
+				row_y = - transformation_coef_y*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + transformation_coef_y*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
+
+				A.append(row_x)
+				b.append(transformation_coef_x*diff[0])
+
+				A.append(row_y)
+				b.append(transformation_coef_y*diff[1])
+
+
+			if p in corrected_patches:
+				row_x = GPS_lids*template[self.image_name_to_index_dict[p.name],:]
+				row_y = GPS_lids*template[self.number_of_images + self.image_name_to_index_dict[p.name],:]
+
+				A.append(row_x)
+				b.append(GPS_lids*p.gps.UL_coord[0])
+				
+
+				A.append(row_y)
+				b.append(GPS_lids*p.gps.UL_coord[1])
+			else:
+				row_x = GPS_coef_x*template[self.image_name_to_index_dict[p.name],:]
+				row_y = GPS_coef_y*template[self.number_of_images + self.image_name_to_index_dict[p.name],:]
+
+				A.append(row_x)
+				b.append(GPS_coef_x*p.gps.UL_coord[0])
+				
+
+				A.append(row_y)
+				b.append(GPS_coef_y*p.gps.UL_coord[1])
+
+		A=np.array(A)
+		b=np.array(b)
+
+		X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
+
+		for p in self.patches:
+			i = self.image_name_to_index_dict[p.name]
+
+			new_UL = (X[i], X[self.number_of_images+i])
+			
+			p.gps = calculate_new_GPS_based_on_new_UL(new_UL,p)
+
 	def transformation_diff_only_least_squares(self):
 		template = np.eye(2*self.number_of_images)
 
@@ -4410,7 +4476,13 @@ class Field:
 
 		opt = Global_Optimizer(all_patches_list)
 			
-		opt.bounded_variables_least_squares()
+		# opt.bounded_variables_least_squares()
+		corrected_patches = []
+
+		for p,l,x,y in self.detected_lid_patches:
+			corrected_patches.append(p)
+
+		opt.transformation_diff_only_least_squares_with_lids(corrected_patches)
 
 	def shift_after_correction_based_on_lids(self):
 		
