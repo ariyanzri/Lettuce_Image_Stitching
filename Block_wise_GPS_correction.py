@@ -2247,7 +2247,7 @@ class Global_Optimizer:
 		transformation_coef_y = 1/(10.56*1e-6) 
 		GPS_coef_x = 1/(9.02*1e-6) 
 		GPS_coef_y = 1/(10.48*1e-6)
-		GPS_lids = 1/(1e-12)
+		GPS_lids = 1/(1e-9)
 
 		for p in self.patches:
 			for n,params in p.neighbors:
@@ -4318,32 +4318,47 @@ class Field:
 	def correct_groups_internally(self):
 		# global no_of_cores_to_use
 
-		args_list = []
-
-		for group in self.groups:
-
-			args_list.append((group,1))
-
-		processes = MyPool(int(settings.no_of_cores_to_use))
-		result = processes.map(correct_groups_internally_helper,args_list)
-		processes.close()
-
-		for r in result:
-			
-			string_res = r[0]
-
-			gid = r[1]
-			result_dict = get_result_dict_from_strings(string_res)
+		if len(self.groups) > 1:
+			args_list = []
 
 			for group in self.groups:
+
+				args_list.append((group,1))
+
+			processes = MyPool(int(settings.no_of_cores_to_use))
+			result = processes.map(correct_groups_internally_helper,args_list)
+			processes.close()
+
+			for r in result:
 				
-				if group.group_id == gid:
+				string_res = r[0]
 
-					for patch in group.patches:
-						
-						if patch.name in result_dict:
+				gid = r[1]
+				result_dict = get_result_dict_from_strings(string_res)
 
-							patch.gps = result_dict[patch.name]
+				for group in self.groups:
+					
+					if group.group_id == gid:
+
+						for patch in group.patches:
+							
+							if patch.name in result_dict:
+
+								patch.gps = result_dict[patch.name]
+
+		else:
+
+			g = self.groups[0]
+
+			string_res = g.correct_internally()
+			result_dict = get_result_dict_from_strings(string_res)
+
+			for patch in g.patches:
+							
+				if patch.name in result_dict:
+
+					patch.gps = result_dict[patch.name]
+
 
 		# manager = multiprocessing.Manager()
 		# return_dict = manager.dict()

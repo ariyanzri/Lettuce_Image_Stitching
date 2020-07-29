@@ -24,3 +24,4 @@ use_camera:Left
 override_sifts:True
 number_of_rows_in_groups:10
 is_single_group:False
+Initial_Size:3296,2472

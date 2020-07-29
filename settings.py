@@ -14,11 +14,13 @@ def initialize_settings(scan_date,config_file,local_address):
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
 
+		size_init = int(lines[26].split(':')[1].split(',')[0]),int(lines[26].split(':')[1].split(',')[1])
+
 		method = lines[0].split(':')[1]
 		no_of_cores_to_use = int(lines[1].split(':')[1])
 		no_of_cores_to_use_max = int(lines[2].split(':')[1])
 		SCALE = float(lines[3].split(':')[1])
-		PATCH_SIZE = (int(3296*SCALE),int(2472*SCALE))
+		PATCH_SIZE = (int(size_init[0]*SCALE),int(size_init[1]*SCALE))
 		LID_SIZE_AT_SCALE = (400*SCALE,600*SCALE)
 		PATCH_SIZE_GPS = (-1,-1)
 		GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
@@ -77,11 +79,13 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,uav_add,bi
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
 
+		size_init = int(lines[26].split(':')[1].split(',')[0]),int(lines[26].split(':')[1].split(',')[1])
+
 		method = lines[0].split(':')[1]
 		no_of_cores_to_use = int(lines[1].split(':')[1])
 		no_of_cores_to_use_max = int(lines[2].split(':')[1])
 		SCALE = float(lines[3].split(':')[1])
-		PATCH_SIZE = (int(3296*SCALE),int(2472*SCALE))
+		PATCH_SIZE = (int(size_init[0]*SCALE),int(size_init[1]*SCALE))
 		LID_SIZE_AT_SCALE = (400*SCALE,600*SCALE)
 		PATCH_SIZE_GPS = (-1,-1)
 		GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
@@ -139,11 +143,13 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
 
+		size_init = int(lines[26].split(':')[1].split(',')[0]),int(lines[26].split(':')[1].split(',')[1])
+
 		method = lines[0].split(':')[1]
 		no_of_cores_to_use = int(lines[1].split(':')[1])
 		no_of_cores_to_use_max = int(lines[2].split(':')[1])
 		SCALE = float(lines[3].split(':')[1])
-		PATCH_SIZE = (int(3296*SCALE),int(2472*SCALE))
+		PATCH_SIZE = (int(size_init[0]*SCALE),int(size_init[1]*SCALE))
 		LID_SIZE_AT_SCALE = (400*SCALE,600*SCALE)
 		PATCH_SIZE_GPS = (-1,-1)
 		GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
