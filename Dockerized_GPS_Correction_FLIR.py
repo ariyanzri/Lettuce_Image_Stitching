@@ -31,23 +31,23 @@ def main(scan_date):
 	
 	old_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
 
-	# field.create_patches_SIFT_files()
+	field.create_patches_SIFT_files()
 	
 	field.draw_and_save_field(is_old=True)
 
-	# field.correct_field()
+	field.correct_field()
 
-	# field.draw_and_save_field(is_old=False)
+	field.draw_and_save_field(is_old=False)
 
-	# field.save_new_coordinate()
+	field.save_new_coordinate()
 
-	# new_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
+	new_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
 
-	# print('------------------ ERROR MEASUREMENT ------------------ ')
+	print('------------------ ERROR MEASUREMENT ------------------ ')
 
-	# print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+	print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
 	
-	# print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
+	print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 
 
