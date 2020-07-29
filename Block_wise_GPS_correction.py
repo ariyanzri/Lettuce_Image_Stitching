@@ -105,7 +105,12 @@ def load_preprocess_image(address,hist_eq=False):
 			img = histogram_equalization(img)
 		img = img.astype('uint8')
 		img_g = img.copy()
-		img = np.expand_dims(img, axis=-1)
+		
+		img = np.zeros((img_g.shape[0],img_g.shape[1],3))
+		img[:,:,0] = img_g
+		img[:,:,1] = img_g
+		img[:,:,2] = img_g
+		
 	else:
 		img = cv2.imread(address)
 		img = cv2.resize(img,(settings.PATCH_SIZE[1],settings.PATCH_SIZE[0]))
