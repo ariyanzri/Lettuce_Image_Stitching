@@ -110,6 +110,9 @@ def load_preprocess_image(address,hist_eq=False):
 		img[:,:,0] = img_g
 		img[:,:,1] = img_g
 		img[:,:,2] = img_g
+
+		cv2.imshow('g',img)
+		cv2.waitKey(0)
 		
 	else:
 		img = cv2.imread(address)
