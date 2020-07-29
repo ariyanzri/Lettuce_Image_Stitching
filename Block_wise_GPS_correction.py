@@ -110,10 +110,12 @@ def load_preprocess_image(address,hist_eq=False):
 		img[:,:,0] = img_g
 		img[:,:,1] = img_g
 		img[:,:,2] = img_g
+		img = img.astype('uint8')
 
 		cv2.imshow('g',img)
+		cv2.imshow('b',img_g)
 		cv2.waitKey(0)
-		
+
 	else:
 		img = cv2.imread(address)
 		img = cv2.resize(img,(settings.PATCH_SIZE[1],settings.PATCH_SIZE[0]))
