@@ -29,25 +29,27 @@ def main(scan_date):
 	
 	field.save_plot()
 
-	old_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
-
-	field.create_patches_SIFT_files()
+	load_preprocess_image('{0}/{1}'.format(settings.patch_folder,field.groups[0].patches[0].name))
 	
-	field.draw_and_save_field(is_old=True)
+	# old_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
 
-	field.correct_field()
-
-	field.draw_and_save_field(is_old=False)
-
-	field.save_new_coordinate()
-
-	new_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
-
-	print('------------------ ERROR MEASUREMENT ------------------ ')
-
-	print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+	# field.create_patches_SIFT_files()
 	
-	print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
+	# field.draw_and_save_field(is_old=True)
+
+	# field.correct_field()
+
+	# field.draw_and_save_field(is_old=False)
+
+	# field.save_new_coordinate()
+
+	# new_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
+
+	# print('------------------ ERROR MEASUREMENT ------------------ ')
+
+	# print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+	
+	# print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 
 
