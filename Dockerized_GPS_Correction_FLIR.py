@@ -28,14 +28,12 @@ def main(scan_date):
 	field = Field(is_single_group=settings.is_single_group)
 	
 	field.save_plot()
-
-	load_preprocess_image('{0}/{1}'.format(settings.patch_folder,field.groups[0].patches[0].name))
 	
-	# old_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
+	old_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
 
 	# field.create_patches_SIFT_files()
 	
-	# field.draw_and_save_field(is_old=True)
+	field.draw_and_save_field(is_old=True)
 
 	# field.correct_field()
 
