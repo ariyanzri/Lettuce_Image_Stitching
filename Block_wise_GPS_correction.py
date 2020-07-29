@@ -95,12 +95,24 @@ def histogram_equalization(img):
 
 
 def load_preprocess_image(address,hist_eq=False):
-	img = cv2.imread(address)
-	img = cv2.resize(img,(settings.PATCH_SIZE[1],settings.PATCH_SIZE[0]))
-	if hist_eq:
-		img = histogram_equalization(img)
-	img = img.astype('uint8')
-	img_g = convert_to_gray(img)
+	
+	if settings.is_flir:
+		img = cv2.imread(address,cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
+		img = cv2.normalize(img, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
+
+		img = cv2.resize(img,(settings.PATCH_SIZE[1],settings.PATCH_SIZE[0]))
+		if hist_eq:
+			img = histogram_equalization(img)
+		img = img.astype('uint8')
+		img_g = img.copy()
+	else:
+		img = cv2.imread(address)
+		img = cv2.resize(img,(settings.PATCH_SIZE[1],settings.PATCH_SIZE[0]))
+		if hist_eq:
+			img = histogram_equalization(img)
+		img = img.astype('uint8')
+		img_g = convert_to_gray(img)
+
 	# if hist_eq:
 	# 	img_g = histogram_equalization(img_g)
 
