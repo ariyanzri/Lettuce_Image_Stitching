@@ -4579,7 +4579,7 @@ class Field:
 				previous_group = group
 
 		self.shift_after_correction_based_on_lids()
-		self.calculate_transformation_error(all_patches_list)
+		# self.calculate_transformation_error(all_patches_list)
 
 		print('Field fully corrected.')
 		sys.stdout.flush()
