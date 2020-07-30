@@ -4470,9 +4470,6 @@ class Field:
 			for p in g.patches:
 				all_patches[p.name] = p
 
-		for p in all_patches:
-			all_patches_list.append(all_patches[p])
-
 		with open('{0}/{1}'.format(settings.field_image_path,'transformations.csv'),"r") as f:
 			lines = f.read()
 
@@ -4507,6 +4504,9 @@ class Field:
 				neighbor_param.diff_y = diffy
 
 				p.neighbors.append((n,neighbor_param))
+
+		for p in all_patches:
+			all_patches_list.append(all_patches[p])
 
 		return all_patches,all_patches_list
 
