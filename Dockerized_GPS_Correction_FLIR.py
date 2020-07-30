@@ -37,9 +37,9 @@ def main(scan_date):
 
 	field.correct_field()
 
-	field.draw_and_save_field(is_old=False)
-
 	field.save_new_coordinate()
+
+	field.draw_and_save_field(is_old=False)
 
 	new_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
 

@@ -2472,6 +2472,8 @@ class Neighbor_Parameters:
 		self.dissimilarity = d
 		self.degrees = theta
 		self.scale = scale
+		self.diff_x = 0
+		self.diff_y = 0
 
 	def get_string(self,p,n):
 		diff = get_translation_in_GPS_coordinate_system(self.H)
@@ -4579,7 +4581,7 @@ class Field:
 				previous_group = group
 
 		self.shift_after_correction_based_on_lids()
-		# self.calculate_transformation_error(all_patches_list)
+		self.calculate_transformation_error(all_patches_list)
 
 		print('Field fully corrected.')
 		sys.stdout.flush()
