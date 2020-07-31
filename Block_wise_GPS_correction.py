@@ -2316,7 +2316,9 @@ class Global_Optimizer:
 		A=np.array(A)
 		b=np.array(b)
 
-		X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
+		# X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
+		res = lsq_linear(A, b, max_iter=len(self.patches),verbose=2)
+		X = res.x
 
 		for p in self.patches:
 			i = self.image_name_to_index_dict[p.name]

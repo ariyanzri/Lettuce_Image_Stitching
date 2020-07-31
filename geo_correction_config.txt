@@ -1,4 +1,4 @@
-METHOD:GlobalOpt
+METHOD:TransformationOnly
 NO_CORES:3
 NO_CORES_MAX:13
 SCALE:0.2
@@ -23,5 +23,5 @@ FFT_PARALLEL_CORES_TO_USE:20
 use_camera:Left
 override_sifts:True
 number_of_rows_in_groups:10
-is_single_group:False
+is_single_group:True
 Initial_Size:3296,2472
