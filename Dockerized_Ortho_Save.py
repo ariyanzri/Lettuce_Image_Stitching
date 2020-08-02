@@ -26,34 +26,9 @@ def main(scan_date):
 	
 	settings.lettuce_coords = read_lettuce_heads_coordinates()
 
-	field = Field(is_single_group=settings.is_single_group)
+	field_new = Field(is_single_group=settings.is_single_group,use_corrected=True)
+	field_new.draw_and_save_field(is_old=False)
 	
-	field.save_plot()
-
-	old_lid_base_error = field.calculate_lid_based_error()
-
-	old_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
-
-	field.create_patches_SIFT_files()
-	
-	field.draw_and_save_field(is_old=True)
-
-	field.correct_field()
-
-	field.save_new_coordinate()
-
-	new_lid_base_error = field.calculate_lid_based_error()
-	new_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
-
-	print('------------------ ERROR MEASUREMENT ------------------ ')
-
-
-	print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
-	print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
-	
-
-	print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
-	print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 def get_args():
 
@@ -82,19 +57,9 @@ uav_lettuce_address = args.uav_lettuce_address
 bin2tiff_address = args.bin_2tif
 gps_coord_file = args.gps_coord
 
-os.mkdir('{0}/{1}'.format(destination,scan_date))
-os.mkdir('{0}/{1}/SIFT'.format(destination,scan_date))
-os.mkdir('{0}/{1}/logs'.format(destination,scan_date))
-
-print('Geo-correction started. Log is being saved in {0}'.format(destination))
-
-original = sys.stdout
-
-sys.stdout = open('{0}/{1}/{2}.txt'.format(destination,scan_date,'geo_correction_output'), 'w')
 
 settings.initialize_settings_HPC(scan_date,config_file,destination,lid_file_address,uav_lettuce_address,bin2tiff_address,gps_coord_file)
 
-print_settings()
 main(scan_date)
 
 end_time = datetime.datetime.now()
