@@ -39,6 +39,8 @@ def main(scan_date):
 
 	field.correct_field()
 
+	field.draw_and_save_field(is_old=False)
+
 	field.save_new_coordinate()
 
 	# new_lid_base_error = field.calculate_lid_based_error()
@@ -54,12 +56,6 @@ def main(scan_date):
 	# print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
 	print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
-def final_ortho_save():
-
-	gc.collect()
-
-	field_new = Field(is_single_group=settings.is_single_group,use_corrected=True)
-	field_new.draw_and_save_field(is_old=False)
 
 start_time = datetime.datetime.now()
 
@@ -76,7 +72,6 @@ settings.initialize_settings(scan_date,config_file,local_address)
 
 print_settings()
 main(scan_date)
-final_ortho_save()
 
 end_time = datetime.datetime.now()
 
