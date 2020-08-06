@@ -2265,8 +2265,8 @@ class Global_Optimizer:
 		A = []
 		b = []
 
-		transformation_coef_x = 1/(9.32*1e-7) 
-		transformation_coef_y = 1/(10.56*1e-7) 
+		transformation_coef_x = 1/(9.32*1e-8) 
+		transformation_coef_y = 1/(10.56*1e-8) 
 		GPS_coef_x = 1/(9.02*1e-6)
 		GPS_coef_y = 1/(10.48*1e-6)
 		
