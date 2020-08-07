@@ -4558,7 +4558,7 @@ class Field:
 
 		opt.transformation_diff_only_least_squares_with_lids(corrected_patches)
 
-		self.get_overlap_averages(all_patches_list)
+		# self.get_overlap_averages(all_patches_list)
 
 	def shift_after_correction_based_on_lids(self):
 		
