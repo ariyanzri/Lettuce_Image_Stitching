@@ -3733,12 +3733,16 @@ class Group:
 		average_y = 0
 		count = 0
 
-		for p in self.patches:
-			for n,params in p.neighbors:
-				average_x += params.overlap_on_patch[2]-params.overlap_on_patch[0]
-				average_y += params.overlap_on_patch[3]-params.overlap_on_patch[1]
-				
-				count+=1
+		for i,r in enumerate(self.rows):
+			if i == 0:
+				continue
+
+			for p in r:
+				for p2 in self.rows[i-1]:
+					if p.has_overlap(p2) or p2.has_overlap(p):
+						overlap = p2.get_overlap_rectangle(p)
+						average_y += overlap[3]-overlap[1]
+						count+=1
 
 		average_x/=count
 		average_y/=count
