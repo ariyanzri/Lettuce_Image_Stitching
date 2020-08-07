@@ -31,6 +31,8 @@ def main(scan_date):
 	for group in field.groups:
 		all_patches+=[p for p in group.patches if (p not in all_patches)]
 
+	print(len(all_patches))
+	print(field.groups)
 	field.get_overlap_averages(all_patches)
 	# field.save_plot()
 
