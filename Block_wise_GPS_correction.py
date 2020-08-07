@@ -3741,11 +3741,8 @@ class Group:
 				for p2 in self.rows[i-1]:
 					if p.has_overlap(p2) or p2.has_overlap(p):
 						overlap = p2.get_overlap_rectangle(p)
-						print(overlap)
 						average_y += overlap[3]-overlap[1]
 						count+=1
-
-		print(settings.PATCH_SIZE)
 
 		average_x/=count
 		average_y/=count
