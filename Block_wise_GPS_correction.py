@@ -3727,6 +3727,24 @@ class Group:
 		with open('{0}/{1}'.format(settings.field_image_path,'transformations.csv'),"a+") as f:
 			f.write(string_res)
 
+	def get_overlap_averages(self):
+
+		average_x = 0
+		average_y = 0
+		count = 0
+
+		for p in self.patches:
+			for n,params in p.neighbors:
+				average_x += params.overlap_on_patch[2]-params.overlap_on_patch[0]
+				average_y += params.overlap_on_patch[3]-params.overlap_on_patch[1]
+				
+				count+=1
+
+		average_x/=count
+		average_y/=count
+
+		print('Average percentage overlap (Horizontal, Vertical): ({0}%,{1}%) '.format(average_x/settings.PATCH_SIZE[1],average_y/settings.PATCH_SIZE[0]))
+
 	def correct_internally(self):
 
 		# global lettuce_coords,no_of_cores_to_use,method,CONTOUR_MATCHING_MIN_MATCH
@@ -3933,6 +3951,7 @@ class Group:
 		print('Group {0} was corrected internally. '.format(self.group_id))
 		sys.stdout.flush()
 
+		self.get_overlap_averages()
 		self.save_transformations()
 
 		return string_res
@@ -4526,24 +4545,6 @@ class Field:
 			all_patches_list.append(all_patches[p])
 
 		return all_patches,all_patches_list
-
-	def get_overlap_averages(self,patches):
-
-		average_x = 0
-		average_y = 0
-		count = 0
-
-		for p in patches:
-			for n,params in p.neighbors:
-				average_x += params.overlap_on_patch[2]-params.overlap_on_patch[0]
-				average_y += params.overlap_on_patch[3]-params.overlap_on_patch[1]
-				
-				count+=1
-
-		average_x/=count
-		average_y/=count
-
-		print('Average percentage overlap (Horizontal, Vertical): ({0}%,{1}%) '.format(average_x/settings.PATCH_SIZE[1],average_y/settings.PATCH_SIZE[0]))
 				
 
 	def whole_field_global_opt(self,all_patches_list):
@@ -4558,7 +4559,6 @@ class Field:
 
 		opt.transformation_diff_only_least_squares_with_lids(corrected_patches)
 
-		# self.get_overlap_averages(all_patches_list)
 
 	def shift_after_correction_based_on_lids(self):
 		
