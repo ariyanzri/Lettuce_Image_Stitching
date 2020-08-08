@@ -45,7 +45,7 @@ def main(scan_date):
 
 	field.draw_and_save_field(is_old=False)
 
-	new_lid_base_error = field.calculate_lid_based_error()
+	# new_lid_base_error = field.calculate_lid_based_error()
 	new_RMSE = get_approximate_random_RMSE_overlap(field,20,settings.no_of_cores_to_use_max)
 
 	print('------------------ ERROR MEASUREMENT ------------------ ')
