@@ -2265,8 +2265,8 @@ class Global_Optimizer:
 		A = []
 		b = []
 
-		transformation_coef_x = 1/(9.32*1e-6) 
-		transformation_coef_y = 1/(10.56*1e-6) 
+		transformation_coef_x = 1/(9.32*1e-7) 
+		transformation_coef_y = 1/(10.56*1e-7) 
 		GPS_coef_x = 1/(9.02*1e-6)
 		GPS_coef_y = 1/(10.48*1e-6)
 		
@@ -2285,8 +2285,8 @@ class Global_Optimizer:
 				if params.dissimilarity>=0.4:
 					continue
 				
-				transformation_coef_x=10*(1-params.dissimilarity)*(1/(9.32*1e-6))
-				transformation_coef_y=10*(1-params.dissimilarity)*(1/(10.56*1e-6))
+				# transformation_coef_x=10*(1-params.dissimilarity)*(1/(9.32*1e-6))
+				# transformation_coef_y=10*(1-params.dissimilarity)*(1/(10.56*1e-6))
 
 				row_x = - transformation_coef_x*template[self.image_name_to_index_dict[p.name],:] + transformation_coef_x*template[self.image_name_to_index_dict[n.name],:]
 				row_y = - transformation_coef_y*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + transformation_coef_y*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
@@ -4318,6 +4318,31 @@ class Field:
 		processes = multiprocessing.Pool(settings.no_of_cores_to_use_max)
 		processes.map(parallel_patch_creator,args_list)
 		processes.close()
+
+
+	def calculate_overlaps_based_on_GPS(self):
+
+		list_all_overlaps = []
+
+		for g in self.groups:
+
+			prev_r = None
+
+			for r in g.rows:
+				
+				if prev_r is None:
+					prev_r = r
+					continue
+
+				for p_top in r:
+					for p_bottom in prev_r:
+
+						if p_top.has_overlap(p_bottom) or p_bottom.has_overlap(p_top):
+
+							overlap_perc = (p_bottom.gps.UL_coord[1]-p_top.gps.LL_coord[1])/settings.PATCH_SIZE_GPS[1]
+							list_all_overlaps.append(overlap_perc)
+
+		print(statistics.mean(list_all_overlaps),statistics.stdev(list_all_overlaps))
 
 
 	def save_plot(self,show_possible_lids=True):
