@@ -4729,6 +4729,10 @@ class Field:
 		for st_y,st_y2,st_x,st_x2,tmpimg in results_parallel:
 			result[st_y:st_y2,st_x:st_x2,:] = tmpimg
 
+		lids = get_lids()
+		for l in lids:
+			cv2.circle(result,(lids[l][0],lids[l][1]),20,(0,0,255),-1)
+
 		# result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
 		
 		if is_old:

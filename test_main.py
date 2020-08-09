@@ -27,7 +27,7 @@ def main(scan_date):
 
 	field = Field(is_single_group=settings.is_single_group)
 	
-	field.calculate_overlaps_based_on_GPS()
+	# field.calculate_overlaps_based_on_GPS()
 	
 	# field.save_plot()
 
@@ -37,7 +37,7 @@ def main(scan_date):
 
 	# field.create_patches_SIFT_files()
 	
-	# # field.draw_and_save_field(is_old=True)
+	field.draw_and_save_field(is_old=True)
 
 	# field.correct_field()
 
