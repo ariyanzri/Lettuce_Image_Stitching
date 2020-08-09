@@ -4731,7 +4731,7 @@ class Field:
 
 		lids = get_lids()
 		for l in lids:
-			cv2.circle(result,(lids[l][0],lids[l][1]),20,(0,0,255),-1)
+			cv2.circle(result,(int((lids[l][0]-UL[0])/settings.GPS_TO_IMAGE_RATIO[0]),int((UL[1]-lids[l][1])/settings.GPS_TO_IMAGE_RATIO[1])),20,(0,0,255),-1)
 
 		# result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
 		
