@@ -4334,12 +4334,16 @@ class Field:
 					prev_r = r
 					continue
 
-				for p_top in prev_r:
-					for p_bottom in r:
+				for p_top in r:
+					for p_bottom in prev_r:
 
 						if p_top.has_overlap(p_bottom) or p_bottom.has_overlap(p_top):
 
-							overlap_perc = (p_bottom.gps.UL_coord[1]-p_top.gps.LL_coord[1])/settings.PATCH_SIZE_GPS[1]
+							if p_top.gps.UL_coord[1]>p_bottom.gps.UL_coord[1]:
+								overlap_perc = (p_bottom.gps.UL_coord[1]-p_top.gps.LL_coord[1])/settings.PATCH_SIZE_GPS[1]
+							else:
+								overlap_perc = (p_top.gps.UL_coord[1]-p_bottom.gps.LL_coord[1])/settings.PATCH_SIZE_GPS[1]
+								
 							list_all_overlaps.append(overlap_perc)
 
 		print(statistics.mean(list_all_overlaps),statistics.stdev(list_all_overlaps))
