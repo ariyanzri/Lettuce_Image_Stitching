@@ -4334,8 +4334,8 @@ class Field:
 					prev_r = r
 					continue
 
-				for p_top in r:
-					for p_bottom in prev_r:
+				for p_top in prev_r:
+					for p_bottom in r:
 
 						if p_top.has_overlap(p_bottom) or p_bottom.has_overlap(p_top):
 
