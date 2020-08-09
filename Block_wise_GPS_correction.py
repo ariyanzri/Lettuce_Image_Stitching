@@ -4343,8 +4343,10 @@ class Field:
 								overlap_perc = (p_bottom.gps.UL_coord[1]-p_top.gps.LL_coord[1])/settings.PATCH_SIZE_GPS[1]
 							else:
 								overlap_perc = (p_top.gps.UL_coord[1]-p_bottom.gps.LL_coord[1])/settings.PATCH_SIZE_GPS[1]
-								
+
 							list_all_overlaps.append(overlap_perc)
+
+				prev_r = r
 
 		print(statistics.mean(list_all_overlaps),statistics.stdev(list_all_overlaps))
 
