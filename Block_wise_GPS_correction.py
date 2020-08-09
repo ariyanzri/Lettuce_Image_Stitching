@@ -4349,6 +4349,11 @@ class Field:
 				prev_r = r
 
 		print(statistics.mean(list_all_overlaps),statistics.stdev(list_all_overlaps))
+		import matplotlib.pyplot as plt
+		plt.ylabel('Frequency')
+		plt.xlabel('Overlap')
+		plt.hist(list_all_overlaps,bins=50,color='blue')
+		plt.savefig('{0}/fig.png'.format(settings.field_image_path))
 
 
 	def save_plot(self,show_possible_lids=True):
