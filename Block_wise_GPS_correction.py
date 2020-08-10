@@ -4729,11 +4729,11 @@ class Field:
 		for st_y,st_y2,st_x,st_x2,tmpimg in results_parallel:
 			result[st_y:st_y2,st_x:st_x2,:] = tmpimg
 
-		# lids = get_lids()
-		# for l in lids:
-		# 	cv2.circle(result,(int((lids[l][0]-UL[0])/settings.GPS_TO_IMAGE_RATIO[0]),int((UL[1]-lids[l][1])/settings.GPS_TO_IMAGE_RATIO[1])),20,(0,0,255),-1)
+		lids = get_lids()
+		for l in lids:
+			cv2.circle(result,(int((lids[l][0]-UL[0])/settings.GPS_TO_IMAGE_RATIO[0]),int((UL[1]-lids[l][1])/settings.GPS_TO_IMAGE_RATIO[1])),100,(0,255,0),-1)
 
-		# result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
+		result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
 		
 		if is_old:
 			cv2.imwrite(settings.field_image_path+'/old_field.bmp',result)
