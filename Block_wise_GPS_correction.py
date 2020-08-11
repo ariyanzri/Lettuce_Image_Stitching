@@ -2265,8 +2265,8 @@ class Global_Optimizer:
 		A = []
 		b = []
 
-		transformation_coef_x = 1/(9.32*1e-7) 
-		transformation_coef_y = 1/(10.56*1e-7) 
+		transformation_coef_x = 1/(9.32*1e-6) 
+		transformation_coef_y = 1/(10.56*1e-6) 
 		GPS_coef_x = 1/(9.02*1e-6)
 		GPS_coef_y = 1/(10.48*1e-6)
 		
@@ -4733,7 +4733,7 @@ class Field:
 		for l in lids:
 			cv2.circle(result,(int((lids[l][0]-UL[0])/settings.GPS_TO_IMAGE_RATIO[0]),int((UL[1]-lids[l][1])/settings.GPS_TO_IMAGE_RATIO[1])),100,(0,255,0),-1)
 
-		result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
+		# result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
 		
 		if is_old:
 			cv2.imwrite(settings.field_image_path+'/old_field.bmp',result)
