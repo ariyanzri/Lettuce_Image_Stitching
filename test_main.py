@@ -65,8 +65,8 @@ def save_ortho():
 	field_new = Field(is_single_group=settings.is_single_group,use_corrected=True)
 	field_new.draw_and_save_field(is_old=False)
 
-# settings.plot_npy_file = '/home/ariyan/Desktop/plt.npy'
-# visualize_plot()
+settings.plot_npy_file = '/home/ariyan/Desktop/plt.npy'
+visualize_plot()
 
 start_time = datetime.datetime.now()
 
@@ -79,7 +79,7 @@ settings.initialize_settings_test(scan_date,config_file,local_address,None,None)
 
 print_settings()
 main(scan_date)
-save_ortho()
+# save_ortho()
 
 end_time = datetime.datetime.now()
 

@@ -936,6 +936,8 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 
+	cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),img)
+
 	# img = adjust_gamma(img,2.5)
 	
 
@@ -945,7 +947,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	
 	(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
 
-
+	cv2.imwrite('/storage/ariyanzarei/{0}_2.jpg'.format(img_name.split('.')[0]),img)
 	# cv2.namedWindow('a',cv2.WINDOW_NORMAL)
 	# cv2.resizeWindow('a',500,500)
 	# cv2.imshow('a',img)
@@ -954,9 +956,12 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.OPEN_MORPH_LID_SIZE*settings.SCALE), int(settings.OPEN_MORPH_LID_SIZE*settings.SCALE)))
 	img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
 
+	cv2.imwrite('/storage/ariyanzarei/{0}_3.jpg'.format(img_name.split('.')[0]),img)
+
 	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.CLOSE_MORPH_LID_SIZE*settings.SCALE), int(settings.CLOSE_MORPH_LID_SIZE*settings.SCALE)))
 	img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
+	cv2.imwrite('/storage/ariyanzarei/{0}_4.jpg'.format(img_name.split('.')[0]),img)
 	
 	# cv2.imshow('a',img)
 	# cv2.waitKey(0)
