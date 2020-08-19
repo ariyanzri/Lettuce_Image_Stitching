@@ -531,6 +531,8 @@ def visualize_plot():
 		elif d[2] == 2:
 			c.append('blue')
 		elif d[2] == 4:
+			c.append('orange')
+		elif d[2] == 5:
 			c.append('black')
 		else:
 			c.append('yellow')
@@ -4360,6 +4362,7 @@ class Field:
 		# global plot_npy_file
 
 		lid_patches = self.get_patches_with_possible_lids()
+		detected_lid_p = [p for p,l,x,y in self.detected_lid_patches]
 
 		# result = []
 		# color = 0
@@ -4410,7 +4413,10 @@ class Field:
 
 					if show_possible_lids:
 						if p in [lp[0] for lp in lid_patches]:
-							result.append([p.gps.Center[0],p.gps.Center[1],4])
+							if p in detected_lid_p:
+								result.append([p.gps.Center[0],p.gps.Center[1],5])
+							else:
+								result.append([p.gps.Center[0],p.gps.Center[1],4])
 						else:
 							result.append([p.gps.Center[0],p.gps.Center[1],color])	
 					else:
