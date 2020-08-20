@@ -25,3 +25,4 @@ override_sifts:True
 number_of_rows_in_groups:10
 is_single_group:True
 Initial_Size:3296,2472
+LID_SIZE_MIN_MAX:200,400
