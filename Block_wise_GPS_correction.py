@@ -1017,14 +1017,16 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 
 	# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.LID_SIZE_AT_SCALE[0]*0.8), int(settings.LID_SIZE_AT_SCALE[0]*0.8)))
 
-	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.OPEN_MORPH_LID_SIZE*settings.SCALE), int(settings.OPEN_MORPH_LID_SIZE*settings.SCALE)))
-	img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+	# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.OPEN_MORPH_LID_SIZE*settings.SCALE), int(settings.OPEN_MORPH_LID_SIZE*settings.SCALE)))
+	# img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
 
-	# cv2.imwrite('/storage/ariyanzarei/{0}_3.jpg'.format(img_name.split('.')[0]),img)
+	# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.CLOSE_MORPH_LID_SIZE*settings.SCALE), int(settings.CLOSE_MORPH_LID_SIZE*settings.SCALE)))
+	# img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
-
+		
 	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.CLOSE_MORPH_LID_SIZE*settings.SCALE), int(settings.CLOSE_MORPH_LID_SIZE*settings.SCALE)))
 	img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
+
 
 	cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),img)
 	
