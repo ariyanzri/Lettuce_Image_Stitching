@@ -977,7 +977,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 
-	MB_size = int(17*settings.SCALE) if int(17*settings.SCALE) % 2 == 1 else int(17*settings.SCALE)+1
+	MB_size = int(57*settings.SCALE) if int(57*settings.SCALE) % 2 == 1 else int(57*settings.SCALE)+1
 	img  = cv2.medianBlur(img,MB_size)
 	img = cv2.Canny(img,100,200)
 
