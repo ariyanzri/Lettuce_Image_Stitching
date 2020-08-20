@@ -920,6 +920,47 @@ def get_unique_lists(xs,ys):
 
 	return xs[ind],ys[ind]
 
+# def get_lid_in_patch_with_SIFT(img,img_SIFT,img_name):
+
+# 	overlap1 = (0,0,settings.PATCH_SIZE[1],settings.PATCH_SIZE[0])
+# 	overlap2 = (0,0,settings.PATCH_SIZE[1],settings.PATCH_SIZE[0])
+
+# 	kp,desc = detect_SIFT_key_points(img,0,0,settings.PATCH_SIZE[1],settings.PATCH_SIZE[0])
+# 	kp_S,desc_S = detect_SIFT_key_points(img_SIFT,0,0,settings.PATCH_SIZE[1],settings.PATCH_SIZE[0])
+
+# 	matches = get_top_percentage_matches(desc_S,desc,kp_S,kp)
+
+# 	if matches is None or len(matches) == 0:
+# 		return None
+
+# 	num_matches = len(matches)
+
+# 	H,percentage_inliers,scale,theta = find_homography(matches,kp_S,kp,overlap1,overlap2)
+
+# 	print(percentage_inliers,num_matches)
+# 	print(H)
+
+# 	result = np.zeros((img.shape[0],img.shape[1]*2,3))
+# 	result[:,0:img.shape[1],:] = img
+# 	result[:,img.shape[1]:img.shape[1]*2,:] = img_SIFT
+
+# 	i=0
+# 	for m in matches[:,0]:
+# 		if i>100:
+# 			break
+# 		point_1 = kp[m.queryIdx]
+# 		point_2 = kp_S[m.trainIdx]
+# 		point_1 = (int(point_1[0]),int(point_1[1]))
+# 		point_2 = (int(point_2[0])+p1.size[1],int(point_2[1]))
+# 		cv2.line(result,point_1,point_2,(0,0,255),2)
+# 		cv2.circle(result,point_1,10,(0,255,0),thickness=-1)
+# 		cv2.circle(result,point_2,10,(255,0,0),thickness=-1)
+# 		i+=1
+
+# 	# result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
+# 	cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),result)
+
+
 def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=10):
 	# global patch_folder
 	if settings.is_flir:
@@ -935,7 +976,22 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 		img = histogram_equalization(img)
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-	# cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),img)
+
+	circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.2, settings.LID_SIZE_AT_SCALE[0]*0.7)
+	
+	if circles is not None:
+		
+		circles = np.round(circles[0, :]).astype("int")
+		
+		for (x, y, r) in circles:
+			cv2.circle(rgb_img, (x, y), r, (0, 255, 0), 4)
+	
+	return -1,-1,-1,-1,-1,-1
+
+
+	# get_lid_in_patch_with_SIFT(img,cv2.imread('/home/ariyanzarei/lid_image.jpg'),img_name)	
+
+	cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),rgb_img)
 
 	# img = adjust_gamma(img,2.5)
 	
@@ -1001,9 +1057,6 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	# cv2.imwrite('tmp-{0}-{1}.jpg'.format(x,y),rgb_img)
 
 	if r >= settings.LID_SIZE_AT_SCALE[0] and r <= settings.LID_SIZE_AT_SCALE[1]:
-		img = cv2.imread('{0}/{1}'.format(settings.patch_folder,img_name))
-		cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),img)
-		print(r)
 		return x,y,r,l,pname,coord
 	else:
 		return -1,-1,-1,-1,-1,-1
