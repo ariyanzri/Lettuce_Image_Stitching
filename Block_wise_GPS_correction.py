@@ -2340,8 +2340,8 @@ class Global_Optimizer:
 		A = []
 		b = []
 
-		transformation_coef_x = 1/(9.32*1e-7) 
-		transformation_coef_y = 1/(10.56*1e-7) 
+		transformation_coef_x = 1/(9.32*1e-6) 
+		transformation_coef_y = 1/(10.56*1e-6) 
 		GPS_coef_x = 1/(9.02*1e-6)
 		GPS_coef_y = 1/(10.48*1e-6)
 		
@@ -2360,8 +2360,8 @@ class Global_Optimizer:
 				if params.dissimilarity>=0.4:
 					continue
 				
-				# transformation_coef_x=10*(1-params.dissimilarity)*(1/(9.32*1e-6))
-				# transformation_coef_y=10*(1-params.dissimilarity)*(1/(10.56*1e-6))
+				transformation_coef_x=10**(10*(1-params.dissimilarity))*(1/(9.32*1e-6))
+				transformation_coef_y=10**(10*(1-params.dissimilarity))*(1/(10.56*1e-6))
 
 				row_x = - transformation_coef_x*template[self.image_name_to_index_dict[p.name],:] + transformation_coef_x*template[self.image_name_to_index_dict[n.name],:]
 				row_y = - transformation_coef_y*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + transformation_coef_y*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
