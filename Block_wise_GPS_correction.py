@@ -977,21 +977,25 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 
-	circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.2, settings.LID_SIZE_AT_SCALE[0]*0.7)
+	MB_size = int(17*settings.SCALE) if int(17*settings.SCALE) % 2 == 1 else int(17*settings.SCALE)+1
+	img  = cv2.medianBlur(img,MB_size)
+	img = cv2.Canny(img,100,200)
+
+	# circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.2, settings.LID_SIZE_AT_SCALE[0]*0.7)
 	
-	if circles is not None:
+	# if circles is not None:
 		
-		circles = np.round(circles[0, :]).astype("int")
+	# 	circles = np.round(circles[0, :]).astype("int")
 		
-		for (x, y, r) in circles:
-			cv2.circle(rgb_img, (x, y), r, (0, 255, 0), 4)
+	# 	for (x, y, r) in circles:
+	# 		cv2.circle(rgb_img, (x, y), r, (0, 255, 0), 4)
 	
 
 	# get_lid_in_patch_with_SIFT(img,cv2.imread('/home/ariyanzarei/lid_image.jpg'),img_name)	
 
-	cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),rgb_img)
+	cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),img)
 	return -1,-1,-1,-1,-1,-1
-	
+
 	# img = adjust_gamma(img,2.5)
 	
 
