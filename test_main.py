@@ -41,7 +41,7 @@ def main(scan_date):
 
 	field.save_new_coordinate()
 
-	# field.draw_and_save_field(is_old=False)
+	field.draw_and_save_field(is_old=False)
 
 	new_lid_base_error = field.calculate_lid_based_error()
 	new_RMSE = get_approximate_random_RMSE_overlap(field,20,settings.no_of_cores_to_use_max)
@@ -78,8 +78,8 @@ local_address = sys.argv[3]
 settings.initialize_settings_test(scan_date,config_file,local_address,None,None)
 
 print_settings()
-# main(scan_date)
-save_ortho()
+main(scan_date)
+# save_ortho()
 
 end_time = datetime.datetime.now()
 

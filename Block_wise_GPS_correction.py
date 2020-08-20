@@ -4745,6 +4745,12 @@ class Field:
 		print('Field fully corrected.')
 		sys.stdout.flush()
 
+		for g in self.groups:
+			g.delete_all_patches_images()
+			g.delete_all_patches_SIFT_points()
+
+		gc.collect()
+
 	def draw_and_save_field(self,is_old=False):
 		# global patch_folder, field_image_path, no_of_cores_to_use_max
 
@@ -4821,6 +4827,12 @@ class Field:
 
 		print('Field successfully printed.')
 		sys.stdout.flush()
+
+		for g in self.groups:
+			g.delete_all_patches_images()
+			g.delete_all_patches_SIFT_points()
+
+		gc.collect()
 
 	def save_new_coordinate(self):
 		# global CORRECTED_coordinates_file
