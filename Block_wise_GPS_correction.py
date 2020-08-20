@@ -920,6 +920,9 @@ def get_unique_lists(xs,ys):
 
 	return xs[ind],ys[ind]
 
+# def get_lid_in_patch_with_SIFT(img,img_SIFT,):
+
+
 def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=10):
 	# global patch_folder
 	if settings.is_flir:
@@ -933,15 +936,12 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 		img = cv2.resize(img,(int(img.shape[1]*settings.SCALE),int(img.shape[0]*settings.SCALE)))
 		rgb_img = img.copy()
 		img = histogram_equalization(img)
-		img_tmp = cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-		cv2.imwrite('/storage/ariyanzarei/{0}_4.jpg'.format(img_name.split('.')[0]),img_tmp[:,:,1])
-		return -1,-1,-1,-1,-1,-1
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 
 
 
-	# cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),img)
+	cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),img)
 
 	# img = adjust_gamma(img,2.5)
 	
