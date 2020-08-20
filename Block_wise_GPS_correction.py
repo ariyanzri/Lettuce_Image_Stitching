@@ -2620,7 +2620,7 @@ class Patch:
 		gc.collect()
 
 
-	def load_img(self,hist_eq=True):
+	def load_img(self,hist_eq=False):
 		# global patch_folder
 
 		if self.rgb_img is None:
