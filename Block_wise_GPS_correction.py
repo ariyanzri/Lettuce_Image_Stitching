@@ -2342,10 +2342,10 @@ class Global_Optimizer:
 
 		transformation_coef_x = 1/(9.32*1e-6) 
 		transformation_coef_y = 1/(10.56*1e-6) 
-		GPS_coef_x = 1/(9.02*1e-6)
-		GPS_coef_y = 1/(10.48*1e-6)
-		# GPS_coef_x = 1/(4.02*1e-5)
-		# GPS_coef_y = 1/(5.48*1e-5)
+		# GPS_coef_x = 1/(9.02*1e-6)
+		# GPS_coef_y = 1/(10.48*1e-6)
+		GPS_coef_x = 1/(4.02*1e-5)
+		GPS_coef_y = 1/(5.48*1e-5)
 		
 		GPS_lids = 1/(1e-9)
 		# GPS_lids = 1/(9.02*1e-6) 
@@ -2359,7 +2359,7 @@ class Global_Optimizer:
 				if abs(params.scale-1) > settings.TRANSFORMATION_SCALE_DISCARD_THRESHOLD or abs(params.degrees-0)>settings.TRANSFORMATION_ANGLE_DISCARD_THRESHOLD:
 					continue
 
-				if params.dissimilarity>=0.4 and params.percentage_inliers<40:
+				if params.dissimilarity>=0.4 and params.percentage_inliers<60:
 					continue
 				
 				# transformation_coef_x=10**(10*(1-params.dissimilarity))
