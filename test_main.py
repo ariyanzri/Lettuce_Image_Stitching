@@ -56,8 +56,6 @@ def main(scan_date):
 	print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
 	print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
-	field_new = Field(is_single_group=settings.is_single_group,use_corrected=True)
-	field_new.draw_and_save_field(is_old=False)
 
 def save_ortho():
 	gc.collect()
