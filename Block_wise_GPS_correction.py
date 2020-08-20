@@ -2359,7 +2359,7 @@ class Global_Optimizer:
 				if abs(params.scale-1) > settings.TRANSFORMATION_SCALE_DISCARD_THRESHOLD or abs(params.degrees-0)>settings.TRANSFORMATION_ANGLE_DISCARD_THRESHOLD:
 					continue
 
-				if params.dissimilarity>=0.6:
+				if params.dissimilarity>=0.4 and params.percentage_inliers<60:
 					continue
 				
 				# transformation_coef_x=10**(10*(1-params.dissimilarity))
