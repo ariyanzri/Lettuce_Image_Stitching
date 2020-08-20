@@ -2360,8 +2360,8 @@ class Global_Optimizer:
 				if params.dissimilarity>=0.4:
 					continue
 				
-				transformation_coef_x=10**(10*(1-params.dissimilarity))*(1/(9.32*1e-6))
-				transformation_coef_y=10**(10*(1-params.dissimilarity))*(1/(10.56*1e-6))
+				transformation_coef_x=10**(10*(1-params.dissimilarity))
+				transformation_coef_y=10**(10*(1-params.dissimilarity))
 
 				row_x = - transformation_coef_x*template[self.image_name_to_index_dict[p.name],:] + transformation_coef_x*template[self.image_name_to_index_dict[n.name],:]
 				row_y = - transformation_coef_y*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + transformation_coef_y*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
