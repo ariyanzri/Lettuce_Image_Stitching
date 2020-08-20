@@ -973,8 +973,8 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 		img = cv2.imread('{0}/{1}'.format(settings.patch_folder,img_name))
 		img = cv2.resize(img,(int(img.shape[1]*settings.SCALE),int(img.shape[0]*settings.SCALE)))
 		rgb_img = img.copy()
-		img = histogram_equalization(img)
-		img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+		# img = histogram_equalization(img)
+		img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)[:,:,0]
 
 
 	MB_size = int(47*settings.SCALE) if int(47*settings.SCALE) % 2 == 1 else int(47*settings.SCALE)+1
