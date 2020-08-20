@@ -996,8 +996,8 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 
 	# get_lid_in_patch_with_SIFT(img,cv2.imread('/home/ariyanzarei/lid_image.jpg'),img_name)	
 
-	cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),img)
-	return -1,-1,-1,-1,-1,-1
+	# cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),img)
+	# return -1,-1,-1,-1,-1,-1
 
 	# img = adjust_gamma(img,2.5)
 	
