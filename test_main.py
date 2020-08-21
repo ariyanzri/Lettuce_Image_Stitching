@@ -21,7 +21,7 @@ import settings
 
 def main(scan_date):
 
-	sys.setrecursionlimit(10**6)
+	sys.setrecursionlimit(10**8)
 	
 	settings.lettuce_coords = read_lettuce_heads_coordinates()
 
@@ -76,8 +76,8 @@ local_address = sys.argv[3]
 settings.initialize_settings_test(scan_date,config_file,local_address,None,None)
 
 print_settings()
-main(scan_date)
-# save_ortho()
+# main(scan_date)
+save_ortho()
 
 end_time = datetime.datetime.now()
 
