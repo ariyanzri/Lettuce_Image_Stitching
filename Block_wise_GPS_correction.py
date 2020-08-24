@@ -2619,7 +2619,7 @@ class Patch:
 		self.SIFT_kp_locations = None
 		self.SIFT_kp_desc = None
 
-		gc.collect()
+		# gc.collect()
 
 
 	def load_img(self,hist_eq=True):
@@ -2635,7 +2635,7 @@ class Patch:
 		self.rgb_img = None
 		self.gray_img = None
 
-		gc.collect()
+		# gc.collect()
 
 	def convert_image_to_GPS_coordinate(self,point):
 		x_ratio = point[0]*settings.GPS_TO_IMAGE_RATIO[0]
@@ -3517,12 +3517,16 @@ class Group:
 		print('SIFT for all patches in group {0} deleted.'.format(self.group_id))
 		sys.stdout.flush()
 
+		gc.collect()
+
 	def delete_all_patches_images(self):
 		for p in self.patches:
 			p.delete_img()
 
 		print('Images for all patches in group {0} deleted.'.format(self.group_id))
 		sys.stdout.flush()
+
+		gc.collect()
 
 	def pre_calculate_internal_neighbors_and_transformation_parameters(self,print_flg=True):
 		# global no_of_cores_to_use_max
@@ -4809,9 +4813,10 @@ class Field:
 		# print(len(args))
 		# print(up,down,left,right)
 		
-		processes = multiprocessing.Pool(settings.no_of_cores_to_use_max)
+		processes = MyPool(settings.no_of_cores_to_use_max)
 		results_parallel = processes.map(ortho_generation_sub_function_helper,args)
 		processes.close()
+		processes.join()
 
 		for st_y,st_y2,st_x,st_x2,tmpimg in results_parallel:
 			result[st_y:st_y2,st_x:st_x2,:] = tmpimg
@@ -5052,7 +5057,8 @@ def get_approximate_random_RMSE_overlap(field,sample_no_per_group,core_to_use):
 	processes = MyPool(int(core_to_use))
 	results = processes.map(get_RMSE_error_function_helper,args_list)
 	processes.close()
-				
+	processes.join()
+	
 	return np.array(results)
 
 		
