@@ -21,7 +21,7 @@ import settings
 
 def main(scan_date):
 
-	sys.setrecursionlimit(10**8)
+	sys.setrecursionlimit(10**16)
 	
 	settings.lettuce_coords = read_lettuce_heads_coordinates()
 
@@ -59,6 +59,9 @@ def main(scan_date):
 
 def save_ortho():
 	gc.collect()
+
+	field = Field(is_single_group=settings.is_single_group,use_corrected=False)
+	field.draw_and_save_field(is_old=True)
 
 	field_new = Field(is_single_group=settings.is_single_group,use_corrected=True)
 	field_new.draw_and_save_field(is_old=False)
