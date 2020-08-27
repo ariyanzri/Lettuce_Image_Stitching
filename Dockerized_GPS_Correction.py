@@ -21,7 +21,7 @@ import settings
 
 def main(scan_date):
 
-	sys.setrecursionlimit(10**6)
+	sys.setrecursionlimit(10**8)
 
 	settings.lettuce_coords = read_lettuce_heads_coordinates()
 
@@ -35,7 +35,7 @@ def main(scan_date):
 
 	field.create_patches_SIFT_files()
 	
-	field.draw_and_save_field(is_old=True)
+	# field.draw_and_save_field(is_old=True)
 
 	field.correct_field()
 
@@ -61,6 +61,9 @@ def ortho_save():
 	
 	gc.collect()
 
+	field = Field(is_single_group=settings.is_single_group,use_corrected=False)
+	field.draw_and_save_field(is_old=True)
+
 	field_new = Field(is_single_group=settings.is_single_group,use_corrected=True)
 	field_new.draw_and_save_field(is_old=False)
 
@@ -78,8 +81,8 @@ sys.stdout = open('{0}/{1}-rgb/{2}.txt'.format(local_address,scan_date,'geo_corr
 settings.initialize_settings(scan_date,config_file,local_address)
 
 print_settings()
-# main(scan_date)
-ortho_save()
+main(scan_date)
+# ortho_save()
 
 end_time = datetime.datetime.now()
 
