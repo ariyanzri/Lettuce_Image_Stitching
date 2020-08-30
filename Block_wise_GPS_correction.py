@@ -4193,7 +4193,10 @@ class Field:
 
 		# print(distances)
 
-		return statistics.mean(distances),statistics.stdev(distances)
+		if len(distances) == 0:
+			return 0,0
+		else:
+			return statistics.mean(distances),statistics.stdev(distances)
 
 	def move_initial_based_on_lids(self):
 		
