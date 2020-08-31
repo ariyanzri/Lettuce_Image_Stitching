@@ -996,8 +996,8 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	(thresh, blue_channel) = cv2.threshold(blue_channel, t, 255, cv2.THRESH_BINARY)
 
 
-	img = np.logical_and(np.logical_and(red_channel,green_channel),blue_channel)
-	
+	img = np.logical_and(np.logical_and(red_channel,green_channel),blue_channel).astype('uint8')
+
 	# MB_size = int(77*settings.SCALE) if int(77*settings.SCALE) % 2 == 1 else int(77*settings.SCALE)+1
 	# img  = cv2.medianBlur(img,MB_size)
 	# img = 255-img
