@@ -997,15 +997,16 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 
 	# get_lid_in_patch_with_SIFT(img,cv2.imread('/home/ariyanzarei/lid_image.jpg'),img_name)	
 
-	cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
+	
 	# return -1,-1,-1,-1,-1,-1
 
 	# img = adjust_gamma(img,2.5)
 	
 
-	# max_intensity = np.amax(img)
+	max_intensity = np.amax(img)
 	
-	t = 240
+	# t = 240
+	t=max_intensity-30
 	
 	(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
 
@@ -1027,7 +1028,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.LID_SIZE_AT_SCALE[0]), int(settings.LID_SIZE_AT_SCALE[0])))
 	img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
-
+	cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
 	# cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),img)
 	
 	# cv2.imshow('a',img)
