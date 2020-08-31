@@ -982,7 +982,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	upper_white = np.array([0,0,255], dtype=np.uint8)
 
 	mask = cv2.inRange(hsv, lower_white, upper_white)
-	img = cv2.bitwise_and(frame,frame, mask= mask).astype('uint8')
+	img = cv2.bitwise_and(img,img, mask= mask).astype('uint8')
 
 	# MB_size = int(77*settings.SCALE) if int(77*settings.SCALE) % 2 == 1 else int(77*settings.SCALE)+1
 	# img  = cv2.medianBlur(img,MB_size)
