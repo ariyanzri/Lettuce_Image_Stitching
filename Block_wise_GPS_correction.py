@@ -1008,7 +1008,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	
 
 	# t = 240
-	t = max_intensity-10
+	t = max_intensity-30
 	
 	(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
 
