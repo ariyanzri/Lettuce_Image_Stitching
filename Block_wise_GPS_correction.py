@@ -978,8 +978,8 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 
 
 	MB_size = int(77*settings.SCALE) if int(77*settings.SCALE) % 2 == 1 else int(77*settings.SCALE)+1
-	img  = cv2.medianBlur(img,MB_size)
-	img = 255-img
+	# img  = cv2.medianBlur(img,MB_size)
+	# img = 255-img
 
 	# img = histogram_equalization(img)
 
