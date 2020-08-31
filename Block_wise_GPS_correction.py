@@ -978,8 +978,8 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 
 	hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-	lower_white = np.array([0,0,0], dtype=np.uint8)
-	upper_white = np.array([0,0,255], dtype=np.uint8)
+	lower_white = np.array([0,0,200], dtype=np.uint8)
+	upper_white = np.array([5,5,255], dtype=np.uint8)
 
 	mask = cv2.inRange(hsv, lower_white, upper_white)
 	img = cv2.bitwise_and(img,img, mask= mask).astype('uint8')
