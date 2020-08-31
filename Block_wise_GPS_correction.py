@@ -984,15 +984,15 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	blue_channel = img[:,:,0]
 
 	max_intensity = np.amax(red_channel)
-	t = max_intensity-30
+	t = max_intensity-50
 	(thresh, red_channel) = cv2.threshold(red_channel, t, 255, cv2.THRESH_BINARY)
 
 	max_intensity = np.amax(green_channel)
-	t = max_intensity-30
+	t = max_intensity-50
 	(thresh, green_channel) = cv2.threshold(green_channel, t, 255, cv2.THRESH_BINARY)
 
 	max_intensity = np.amax(blue_channel)
-	t = max_intensity-30
+	t = max_intensity-50
 	(thresh, blue_channel) = cv2.threshold(blue_channel, t, 255, cv2.THRESH_BINARY)
 
 
