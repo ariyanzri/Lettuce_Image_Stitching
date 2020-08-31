@@ -974,12 +974,33 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 		img = cv2.resize(img,(int(img.shape[1]*settings.SCALE),int(img.shape[0]*settings.SCALE)))
 		rgb_img = img.copy()
 		# img = histogram_equalization(img)
-		img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)[:,:,1]
+		# img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)[:,:,1]
 
 
-	MB_size = int(77*settings.SCALE) if int(77*settings.SCALE) % 2 == 1 else int(77*settings.SCALE)+1
-	img  = cv2.medianBlur(img,MB_size)
-	img = 255-img
+	# test
+
+	red_channel = img[:,:,2]
+	green_channel = img[:,:,1]
+	blue_channel = img[:,:,0]
+
+	max_intensity = np.amax(red_channel)
+	t = max_intensity-30
+	(thresh, red_channel) = cv2.threshold(red_channel, t, 255, cv2.THRESH_BINARY)
+
+	max_intensity = np.amax(green_channel)
+	t = max_intensity-30
+	(thresh, green_channel) = cv2.threshold(green_channel, t, 255, cv2.THRESH_BINARY)
+
+	max_intensity = np.amax(blue_channel)
+	t = max_intensity-30
+	(thresh, blue_channel) = cv2.threshold(blue_channel, t, 255, cv2.THRESH_BINARY)
+
+
+	img = np.logical_and(np.logical_and(red_channel,green_channel),blue_channel)
+	
+	# MB_size = int(77*settings.SCALE) if int(77*settings.SCALE) % 2 == 1 else int(77*settings.SCALE)+1
+	# img  = cv2.medianBlur(img,MB_size)
+	# img = 255-img
 
 	# img = histogram_equalization(img)
 
@@ -1003,14 +1024,14 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	# img = adjust_gamma(img,2.5)
 	
 
-	max_intensity = np.amax(img)
+	# max_intensity = np.amax(img)
 	
 	
 
-	# t = 240
-	t = max_intensity-30
+	# # t = 240
+	# t = max_intensity-30
 	
-	(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
+	# (thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
 
 	cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
 	# cv2.namedWindow('a',cv2.WINDOW_NORMAL)
