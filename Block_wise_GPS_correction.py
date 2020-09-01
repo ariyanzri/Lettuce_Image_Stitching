@@ -962,7 +962,7 @@ def get_unique_lists(xs,ys):
 
 
 def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=10):
-	# global patch_folder
+
 	if settings.is_flir:
 		img = cv2.imread('{0}/{1}'.format(settings.patch_folder,img_name),cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
 		img = cv2.normalize(img, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
@@ -4173,7 +4173,8 @@ class Field:
 			for p in g.patches:
 
 				for l in lids:
-					if (p.gps.is_coord_inside(lids[l]) or p.gps.is_point_near(lids[l],2*settings.PATCH_SIZE_GPS[0])) and (p not in [ptch[0] for ptch in lid_patches]):
+					# if (p.gps.is_coord_inside(lids[l]) or p.gps.is_point_near(lids[l],2*settings.PATCH_SIZE_GPS[0])) and (p not in [ptch[0] for ptch in lid_patches]):
+					if p.gps.is_coord_inside(lids[l]) and (p not in [ptch[0] for ptch in lid_patches]):
 						lid_patches.append((p,l))
 
 		return lid_patches
