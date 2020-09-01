@@ -1090,12 +1090,16 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 
 	circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.2, settings.LID_SIZE_AT_SCALE[0])
 	
+	x=0 
+	y=0
+	r=0
+
 	if circles is not None and len(circles) == 1:
 		
 		circles = np.round(circles[0, :]).astype("int")
 		
 		print(circles)
-		
+
 		x=circles[0] 
 		y=circles[1]
 		r=circles[2]
