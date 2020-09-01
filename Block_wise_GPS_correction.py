@@ -986,11 +986,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 			mask = np.zeros(settings.PATCH_SIZE)
 			mask[top_left[1]:bottom_right[1],top_left[0]:bottom_right[0]] = 1
 
-			img_tmp = img.copy()
-			img_tmp[mask==0]=0
-
-			cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img_tmp)
-			
+			img[mask==0]=0			
 
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)[:,:,1]
 
@@ -1025,7 +1021,9 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 
 	# max_intensity = np.amax(img)
 	
-	t = 240
+	# t = 240
+	t = np.quantile(img,np.array([0.9]))
+
 	
 	(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
 
@@ -1048,7 +1046,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
 
-	# cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),img)
+	cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
 	
 	# cv2.imshow('a',img)
 	# cv2.waitKey(0)
