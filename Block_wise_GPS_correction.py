@@ -986,7 +986,8 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 			mask = np.zeros(settings.PATCH_SIZE)
 			mask[top_left[1]:bottom_right[1],top_left[0]:bottom_right[0]] = 1
 
-			img[mask==0]=0			
+			img[mask==0]=0
+			img = histogram_equalization(img)			
 
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)[:,:,1]
 
@@ -1028,7 +1029,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
 
 	# cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
-	
+
 	# cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),img)
 	# cv2.namedWindow('a',cv2.WINDOW_NORMAL)
 	# cv2.resizeWindow('a',500,500)
