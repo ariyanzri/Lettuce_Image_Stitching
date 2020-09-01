@@ -66,8 +66,8 @@ def save_ortho():
 	field_new = Field(is_single_group=settings.is_single_group,use_corrected=True)
 	field_new.draw_and_save_field(is_old=False)
 
-settings.plot_npy_file = '/home/ariyan/Desktop/plt.npy'
-visualize_plot()
+# settings.plot_npy_file = '/home/ariyan/Desktop/plt.npy'
+# visualize_plot()
 
 start_time = datetime.datetime.now()
 
