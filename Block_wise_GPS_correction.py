@@ -1094,8 +1094,9 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	y=0
 	r=0
 
-	if circles is not None and len(circles) == 1:
+	if circles is not None and:
 		
+		print(len(circles))
 		circles = np.round(circles[0, :]).astype("int")
 		
 		print(circles)
