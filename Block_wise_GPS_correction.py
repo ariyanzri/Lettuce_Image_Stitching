@@ -1027,7 +1027,6 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	
 	# t = 240
 	t = np.quantile(img[mask==1],np.array([0.9]))
-	print(t)
 	
 	(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
 
