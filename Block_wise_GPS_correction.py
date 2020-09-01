@@ -975,19 +975,6 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 		rgb_img = img.copy()
 		# img = histogram_equalization(img)
 
-		green_channel = img[:,:,1].copy()
-		red_channel = img[:,:,2].copy()
-		blue_channel = img[:,:,0].copy()
-
-		img_g = green_channel-0.61*blue_channel-0.39*red_channel
-
-		img_g = cv2.normalize(img_g, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
-		
-		cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img_g)
-
-		img_g[img_g>=130] = 255
-		img_g[img_g<130] = 0
-		
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)[:,:,1]
 
 
@@ -1025,7 +1012,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	
 	(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
 
-	# cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),img)
+	cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
 	# cv2.namedWindow('a',cv2.WINDOW_NORMAL)
 	# cv2.resizeWindow('a',500,500)
 	# cv2.imshow('a',img)
