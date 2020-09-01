@@ -987,7 +987,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 			mask[top_left[1]:bottom_right[1],top_left[0]:bottom_right[0]] = 1
 
 			img[mask==0]=0
-			img = histogram_equalization(img)			
+			img[mask==0] = histogram_equalization(img[mask[==0]])
 
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)[:,:,1]
 
