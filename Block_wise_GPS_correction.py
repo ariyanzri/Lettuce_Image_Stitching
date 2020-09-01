@@ -997,7 +997,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	# img = 255-img
 	img[mask==1] = 255-img[mask==1]
 
-	cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
+	
 	
 	# img = histogram_equalization(img)
 
@@ -1029,6 +1029,8 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	
 	(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
 
+	cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
+	
 	# cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
 
 	# cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),img)
