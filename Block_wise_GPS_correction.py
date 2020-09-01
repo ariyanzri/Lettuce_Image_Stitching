@@ -973,8 +973,21 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 		img = cv2.imread('{0}/{1}'.format(settings.patch_folder,img_name))
 		img = cv2.resize(img,(int(img.shape[1]*settings.SCALE),int(img.shape[0]*settings.SCALE)))
 		rgb_img = img.copy()
-		cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
 		# img = histogram_equalization(img)
+
+		green_channel = img[:,:,1].copy()
+		red_channel = img[:,:,2].copy()
+		blue_channel = img[:,:,0].copy()
+
+		img_g = green_channel-0.61*blue_channel-0.39*red_channel
+
+		img_g = cv2.normalize(img_g, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
+		
+		cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img_g)
+
+		img_g[img_g>=130] = 255
+		img_g[img_g<130] = 0
+		
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)[:,:,1]
 
 
@@ -982,6 +995,8 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	img  = cv2.medianBlur(img,MB_size)
 	img = 255-img
 
+	# cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
+	
 	# img = histogram_equalization(img)
 
 	# img = cv2.Canny(img,190,200)
