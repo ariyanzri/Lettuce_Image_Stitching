@@ -989,15 +989,13 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 			img[mask==0]=0
 			img[mask==1] = histogram_equalization(img[mask==1])
 
-			cv2.putText(img, str(max_val), (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA) 
-			
-			cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
+			# cv2.putText(img, str(max_val), (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA) 
 
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)[:,:,1]
 
 
-	MB_size = int(77*settings.SCALE) if int(77*settings.SCALE) % 2 == 1 else int(77*settings.SCALE)+1
-	img  = cv2.medianBlur(img,MB_size)
+	# MB_size = int(77*settings.SCALE) if int(77*settings.SCALE) % 2 == 1 else int(77*settings.SCALE)+1
+	# img  = cv2.medianBlur(img,MB_size)
 	# img = 255-img
 	img[mask==1] = 255-img[mask==1]
 
@@ -1055,7 +1053,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.LID_SIZE_AT_SCALE[0]), int(settings.LID_SIZE_AT_SCALE[0])))
 	img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
-
+	cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
 	
 	
 	# cv2.imshow('a',img)
