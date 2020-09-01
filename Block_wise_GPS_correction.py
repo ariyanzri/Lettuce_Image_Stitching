@@ -975,6 +975,23 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 		rgb_img = img.copy()
 		# img = histogram_equalization(img)
 
+		if settings.use_temp_matching:
+			lid_img = cv2.imread(settings.temp_lid_image_address,0)
+			gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+
+			result=cv2.matchTemplate(gray,lid_img,cv2.TM_CCOEFF)
+			sin_val, max_val, min_loc, max_loc=cv2.minMaxLoc(result)
+			top_left=max_loc
+			bottom_right=(top_left[0]+int(1.5*settings.LID_SIZE_AT_SCALE[1]),top_left[1]+int(1.5*settings.LID_SIZE_AT_SCALE[1]))
+			mask = np.zeros(settings.PATCH_SIZE)
+			mask[top_left[1]:bottom_right[1],top_left[0]:bottom_right[0]] = 1
+
+			img_tmp = img.copy()
+			img_tmp[mask==0]=0
+
+			cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img_tmp)
+			
+
 		img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)[:,:,1]
 
 
@@ -1007,14 +1024,12 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	
 
 	# max_intensity = np.amax(img)
-	q = np.quantile(img,np.array([0.8]))
-	print(q)
-	# t = 240
-	t = q
+	
+	t = 240
 	
 	(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
 
-	cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
+	# cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),img)
 	# cv2.namedWindow('a',cv2.WINDOW_NORMAL)
 	# cv2.resizeWindow('a',500,500)
 	# cv2.imshow('a',img)

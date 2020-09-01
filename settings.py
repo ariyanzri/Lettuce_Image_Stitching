@@ -142,7 +142,8 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 	CLOSE_MORPH_LID_SIZE,GPS_ERROR_Y,GPS_ERROR_X,FFT_PARALLEL_CORES_TO_USE,use_camera,override_sifts,\
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
-	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir
+	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
+	use_temp_matching,temp_lid_image_address
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -185,6 +186,9 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 		patches_to_use = slice(0,patch_n)
 		is_single_group = (True if lines[25].split(':')[1] == 'true' or lines[25].split(':')[1] == 'True' else False)
 		is_flir = False
+
+		use_temp_matching = True
+		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
 
 		patch_folder = '{0}/{1}-rgb/bin2tif_out'.format(local_address,scan_date)
 		SIFT_folder = '{0}/{1}-rgb/SIFT'.format(local_address,scan_date)
