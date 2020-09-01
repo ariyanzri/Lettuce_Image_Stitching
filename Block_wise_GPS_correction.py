@@ -1049,8 +1049,8 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	# img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
 
-	# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.LID_SIZE_AT_SCALE[0]), int(settings.LID_SIZE_AT_SCALE[0])))
-	# img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
+	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.LID_SIZE_AT_SCALE[0]), int(settings.LID_SIZE_AT_SCALE[0])))
+	img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
 
 	
 	
@@ -1059,31 +1059,48 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	# cv2.waitKey(0)
 	
 
+	# -----
 
-	shp = np.shape(img)
+	# shp = np.shape(img)
 
-	img, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+	# img, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 	
-	new_contours = []
+	# new_contours = []
 
-	for c in contours:
-		for p in c:
-			new_contours.append([p[0][0],p[0][1]])
+	# for c in contours:
+	# 	for p in c:
+	# 		new_contours.append([p[0][0],p[0][1]])
 	
-	new_contours = np.array(new_contours)
+	# new_contours = np.array(new_contours)
 
-	if np.shape(new_contours)[0]<ransac_min_num_fit:
-		return -1,-1,-1,-1,-1,-1
+	# if np.shape(new_contours)[0]<ransac_min_num_fit:
+	# 	return -1,-1,-1,-1,-1,-1
 
-	xs = np.array(new_contours[:,0])
-	ys = np.array(new_contours[:,1])
+	# xs = np.array(new_contours[:,0])
+	# ys = np.array(new_contours[:,1])
 
-	xs,ys = get_unique_lists(xs,ys)
+	# xs,ys = get_unique_lists(xs,ys)
 
-	if np.shape(xs)[0]<ransac_min_num_fit:
-		return -1,-1,-1,-1,-1,-1
+	# if np.shape(xs)[0]<ransac_min_num_fit:
+	# 	return -1,-1,-1,-1,-1,-1
 
-	x,y,r = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
+	# x,y,r = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
+
+	# -----------
+
+	circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.2, settings.LID_SIZE_AT_SCALE[0])
+	
+	if circles is not None and len(circles) == 1:
+		
+		circles = np.round(circles[0, :]).astype("int")
+		
+		print(circles)
+		
+		x=circles[0] 
+		y=circles[1]
+		r=circles[2]
+
+	# ------------
 	
 	# print(x,y)
 	# print(r)
