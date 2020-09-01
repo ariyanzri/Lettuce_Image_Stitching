@@ -995,7 +995,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	img  = cv2.medianBlur(img,MB_size)
 	img = 255-img
 
-	# cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
+	cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
 	
 	# img = histogram_equalization(img)
 
@@ -1027,7 +1027,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	
 	(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
 
-	cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
+	# cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
 	
 	# cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),img)
 	# cv2.namedWindow('a',cv2.WINDOW_NORMAL)
