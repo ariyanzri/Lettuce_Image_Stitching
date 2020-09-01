@@ -910,7 +910,7 @@ def ransac(xs,ys,iterations,number_of_points):
 			best_y = y
 			best_r = r
 
-	return best_x,best_y,best_r
+	return best_x,best_y,best_r,err
 
 def get_unique_lists(xs,ys):
 	tmp, ind1 = np.unique(xs,return_index=True)
@@ -1061,52 +1061,33 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 
 	# -----
 
-	# shp = np.shape(img)
+	shp = np.shape(img)
 
-	# img, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+	img, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
 	
-	# new_contours = []
+	new_contours = []
 
-	# for c in contours:
-	# 	for p in c:
-	# 		new_contours.append([p[0][0],p[0][1]])
+	for c in contours:
+		for p in c:
+			new_contours.append([p[0][0],p[0][1]])
 	
-	# new_contours = np.array(new_contours)
+	new_contours = np.array(new_contours)
 
-	# if np.shape(new_contours)[0]<ransac_min_num_fit:
-	# 	return -1,-1,-1,-1,-1,-1
+	if np.shape(new_contours)[0]<ransac_min_num_fit:
+		return -1,-1,-1,-1,-1,-1
 
-	# xs = np.array(new_contours[:,0])
-	# ys = np.array(new_contours[:,1])
+	xs = np.array(new_contours[:,0])
+	ys = np.array(new_contours[:,1])
 
-	# xs,ys = get_unique_lists(xs,ys)
+	xs,ys = get_unique_lists(xs,ys)
 
-	# if np.shape(xs)[0]<ransac_min_num_fit:
-	# 	return -1,-1,-1,-1,-1,-1
+	if np.shape(xs)[0]<ransac_min_num_fit:
+		return -1,-1,-1,-1,-1,-1
 
-	# x,y,r = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
+	x,y,r,err = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
 
-	# -----------
+	print(err)
 
-	circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.2, settings.LID_SIZE_AT_SCALE[0])
-	
-	x=0 
-	y=0
-	r=0
-
-	if circles is not None:
-		
-		print(len(circles))
-		circles = np.round(circles[0, :]).astype("int")
-		
-		print(circles)
-
-		x=circles[0] 
-		y=circles[1]
-		r=circles[2]
-
-	# ------------
-	
 	# print(x,y)
 	# print(r)
 	# cv2.circle(rgb_img,(x,y),r,(0,255,0),thickness=5)
@@ -1118,6 +1099,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 	if r >= settings.LID_SIZE_AT_SCALE[0] and r <= settings.LID_SIZE_AT_SCALE[1]:
 		# cv2.circle(rgb_img,(x,y),r,(0,255,0),thickness=5)
 		# cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),rgb_img)
+		cv2.putText(img, str(err), (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA) 
 		cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
 		return x,y,r,l,pname,coord
 	else:
