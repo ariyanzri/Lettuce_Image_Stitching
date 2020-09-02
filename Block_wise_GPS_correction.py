@@ -969,6 +969,50 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 		img = cv2.resize(img,(int(img.shape[1]*settings.SCALE),int(img.shape[0]*settings.SCALE)))
 		rgb_img = img.copy()
 		img = histogram_equalization(img)
+
+		MB_size = int(77*settings.SCALE) if int(77*settings.SCALE) % 2 == 1 else int(77*settings.SCALE)+1
+		img  = cv2.medianBlur(img,MB_size)
+		img = 255-img
+
+		t = 240			
+		(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
+
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.LID_SIZE_AT_SCALE[0]), int(settings.LID_SIZE_AT_SCALE[0])))
+		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
+
+		shp = np.shape(img)
+
+		img, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+		
+		new_contours = []
+
+		for c in contours:
+			for p in c:
+				new_contours.append([p[0][0],p[0][1]])
+		
+		new_contours = np.array(new_contours)
+
+		if np.shape(new_contours)[0]<ransac_min_num_fit:
+			return -1,-1,-1,-1,-1,-1
+
+		xs = np.array(new_contours[:,0])
+		ys = np.array(new_contours[:,1])
+
+		xs,ys = get_unique_lists(xs,ys)
+
+		if np.shape(xs)[0]<ransac_min_num_fit:
+			return -1,-1,-1,-1,-1,-1
+
+		x,y,r,err = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
+
+
+		if and r >= settings.LID_SIZE_AT_SCALE[0] and r <= settings.LID_SIZE_AT_SCALE[1]:
+			
+			# cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
+			return x,y,r,l,pname,coord
+		else:
+			return -1,-1,-1,-1,-1,-1
+			
 	else:
 		img = cv2.imread('{0}/{1}'.format(settings.patch_folder,img_name))
 		img = cv2.resize(img,(int(img.shape[1]*settings.SCALE),int(img.shape[0]*settings.SCALE)))
@@ -976,6 +1020,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 		# img = histogram_equalization(img)
 
 		if settings.use_temp_matching:
+
 			lid_img = cv2.imread(settings.temp_lid_image_address,0)
 			gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 
@@ -989,126 +1034,96 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 			img[mask==0]=0
 			img[mask==1] = histogram_equalization(img[mask==1])
 
-			# cv2.putText(img, str(max_val), (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA) 
+			img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)[:,:,1]
 
-		img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)[:,:,1]
+			img[mask==1] = 255-img[mask==1]
+
+			t = np.quantile(img[mask==1],np.array([0.9]))
+			
+			(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
+
+			kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.LID_SIZE_AT_SCALE[0]), int(settings.LID_SIZE_AT_SCALE[0])))
+			img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
+
+			shp = np.shape(img)
+
+			img, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+			
+			new_contours = []
+
+			for c in contours:
+				for p in c:
+					new_contours.append([p[0][0],p[0][1]])
+			
+			new_contours = np.array(new_contours)
+
+			if np.shape(new_contours)[0]<ransac_min_num_fit:
+				return -1,-1,-1,-1,-1,-1
+
+			xs = np.array(new_contours[:,0])
+			ys = np.array(new_contours[:,1])
+
+			xs,ys = get_unique_lists(xs,ys)
+
+			if np.shape(xs)[0]<ransac_min_num_fit:
+				return -1,-1,-1,-1,-1,-1
+
+			x,y,r,err = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
+
+			if err <=settings.circle_error and r >= settings.LID_SIZE_AT_SCALE[0] and r <= settings.LID_SIZE_AT_SCALE[1]:
+				# cv2.putText(img, str(err), (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA) 
+				# cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
+				return x,y,r,l,pname,coord
+			else:
+				return -1,-1,-1,-1,-1,-1
+
+		else:
+
+			img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)[:,:,1]
+
+			MB_size = int(77*settings.SCALE) if int(77*settings.SCALE) % 2 == 1 else int(77*settings.SCALE)+1
+			img  = cv2.medianBlur(img,MB_size)
+			img = 255-img
+
+			t = 240			
+			(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
+
+			kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.LID_SIZE_AT_SCALE[0]), int(settings.LID_SIZE_AT_SCALE[0])))
+			img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
+
+			shp = np.shape(img)
+
+			img, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+			
+			new_contours = []
+
+			for c in contours:
+				for p in c:
+					new_contours.append([p[0][0],p[0][1]])
+			
+			new_contours = np.array(new_contours)
+
+			if np.shape(new_contours)[0]<ransac_min_num_fit:
+				return -1,-1,-1,-1,-1,-1
+
+			xs = np.array(new_contours[:,0])
+			ys = np.array(new_contours[:,1])
+
+			xs,ys = get_unique_lists(xs,ys)
+
+			if np.shape(xs)[0]<ransac_min_num_fit:
+				return -1,-1,-1,-1,-1,-1
+
+			x,y,r,err = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
 
 
-	# MB_size = int(77*settings.SCALE) if int(77*settings.SCALE) % 2 == 1 else int(77*settings.SCALE)+1
-	# img  = cv2.medianBlur(img,MB_size)
-	# img = 255-img
-	img[mask==1] = 255-img[mask==1]
+			if and r >= settings.LID_SIZE_AT_SCALE[0] and r <= settings.LID_SIZE_AT_SCALE[1]:
+				
+				# cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
+				return x,y,r,l,pname,coord
+			else:
+				return -1,-1,-1,-1,-1,-1
 
-	
-	
-	# img = histogram_equalization(img)
-
-	# img = cv2.Canny(img,190,200)
-
-	# circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1.2, settings.LID_SIZE_AT_SCALE[0])
-	
-	# if circles is not None:
-		
-	# 	circles = np.round(circles[0, :]).astype("int")
-		
-	# 	for (x, y, r) in circles:
-	# 		cv2.circle(rgb_img, (x, y), r, (0, 255, 0), 4)
-	
-
-	# get_lid_in_patch_with_SIFT(img,cv2.imread('/home/ariyanzarei/lid_image.jpg'),img_name)	
-
-	
-	# return -1,-1,-1,-1,-1,-1
-
-	# img = adjust_gamma(img,2.5)
-	
-
-	# max_intensity = np.amax(img)
-	
-	# t = 240
-	t = np.quantile(img[mask==1],np.array([0.9]))
-	
-	(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
-
-	
-
-	# cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
-
-	# cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),img)
-	# cv2.namedWindow('a',cv2.WINDOW_NORMAL)
-	# cv2.resizeWindow('a',500,500)
-	# cv2.imshow('a',img)
-	# cv2.waitKey(0)
-
-	# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.LID_SIZE_AT_SCALE[0]*0.8), int(settings.LID_SIZE_AT_SCALE[0]*0.8)))
-
-	# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.OPEN_MORPH_LID_SIZE*settings.SCALE), int(settings.OPEN_MORPH_LID_SIZE*settings.SCALE)))
-	# img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
-
-	# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.CLOSE_MORPH_LID_SIZE*settings.SCALE), int(settings.CLOSE_MORPH_LID_SIZE*settings.SCALE)))
-	# img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
-
-
-	kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.LID_SIZE_AT_SCALE[0]), int(settings.LID_SIZE_AT_SCALE[0])))
-	img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
-
-	
-	
-	
-	# cv2.imshow('a',img)
-	# cv2.waitKey(0)
-	
-
-	# -----
-
-	shp = np.shape(img)
-
-	img, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-	
-	new_contours = []
-
-	for c in contours:
-		for p in c:
-			new_contours.append([p[0][0],p[0][1]])
-	
-	new_contours = np.array(new_contours)
-
-	if np.shape(new_contours)[0]<ransac_min_num_fit:
-		return -1,-1,-1,-1,-1,-1
-
-	xs = np.array(new_contours[:,0])
-	ys = np.array(new_contours[:,1])
-
-	xs,ys = get_unique_lists(xs,ys)
-
-	if np.shape(xs)[0]<ransac_min_num_fit:
-		return -1,-1,-1,-1,-1,-1
-
-	x,y,r,err = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
-
-	
-
-	# print(x,y)
-	# print(r)
-	# cv2.circle(rgb_img,(x,y),r,(0,255,0),thickness=5)
-	# cv2.imshow('a',rgb_img)
-	# cv2.waitKey(0)
-
-	# cv2.imwrite('tmp-{0}-{1}.jpg'.format(x,y),rgb_img)
-
-	if r >= settings.LID_SIZE_AT_SCALE[0] and r <= settings.LID_SIZE_AT_SCALE[1]:
-		# cv2.circle(rgb_img,(x,y),r,(0,255,0),thickness=5)
-		# cv2.imwrite('/storage/ariyanzarei/{0}_1.jpg'.format(img_name.split('.')[0]),rgb_img)
-		cv2.putText(img, str(err), (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA) 
-		cv2.imwrite('/storage/ariyanzarei/test/{0}_1.jpg'.format(img_name.split('.')[0]),img)
-		return x,y,r,l,pname,coord
-	else:
-		return -1,-1,-1,-1,-1,-1
-
-	# if x >= 0 and x < shp[1] and y >= 0 and y < shp[0] and r >= 400 and r <= 500:
-	# 	return x,y,r,l,pname,coord
-	# else:
-	# 	return -1,-1,-1,-1,-1,-1
 
 def get_lid_in_patch_helper(args):
 	return get_lid_in_patch(*args)

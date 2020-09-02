@@ -143,7 +143,7 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
-	use_temp_matching,temp_lid_image_address
+	use_temp_matching,temp_lid_image_address,circle_error
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -187,8 +187,9 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 		is_single_group = (True if lines[25].split(':')[1] == 'true' or lines[25].split(':')[1] == 'True' else False)
 		is_flir = False
 
-		use_temp_matching = True
+		use_temp_matching = False
 		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
+		circle_error = 30
 
 		patch_folder = '{0}/{1}-rgb/bin2tif_out'.format(local_address,scan_date)
 		SIFT_folder = '{0}/{1}-rgb/SIFT'.format(local_address,scan_date)
