@@ -187,7 +187,7 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 		is_single_group = (True if lines[25].split(':')[1] == 'true' or lines[25].split(':')[1] == 'True' else False)
 		is_flir = False
 
-		use_temp_matching = False
+		use_temp_matching = True
 		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
 		circle_error = 30
 
