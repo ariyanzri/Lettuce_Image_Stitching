@@ -29,32 +29,32 @@ def main(scan_date):
 
 	field.save_plot()
 
-	# old_lid_base_error = field.calculate_lid_based_error()
+	old_lid_base_error = field.calculate_lid_based_error()
 
-	# old_RMSE = get_approximate_random_RMSE_overlap(field,20,settings.no_of_cores_to_use_max)
+	old_RMSE = get_approximate_random_RMSE_overlap(field,20,settings.no_of_cores_to_use_max)
 
-	# field.create_patches_SIFT_files()
+	field.create_patches_SIFT_files()
 	
-	# # field.draw_and_save_field(is_old=True)
+	# field.draw_and_save_field(is_old=True)
 
-	# field.correct_field()
+	field.correct_field()
 
-	# field.save_new_coordinate()
+	field.save_new_coordinate()
 
-	# # field.draw_and_save_field(is_old=False)
+	# field.draw_and_save_field(is_old=False)
 
-	# new_lid_base_error = field.calculate_lid_based_error()
-	# new_RMSE = get_approximate_random_RMSE_overlap(field,20,settings.no_of_cores_to_use_max)
+	new_lid_base_error = field.calculate_lid_based_error()
+	new_RMSE = get_approximate_random_RMSE_overlap(field,20,settings.no_of_cores_to_use_max)
 
-	# print('------------------ ERROR MEASUREMENT ------------------ ')
+	print('------------------ ERROR MEASUREMENT ------------------ ')
 
 
-	# print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
-	# print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
+	print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+	print('OLD SI: {0}'.format(np.mean(old_RMSE[:,3])))
 	
 
-	# print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
-	# print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
+	print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+	print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
 
 def save_ortho():
@@ -80,7 +80,7 @@ settings.initialize_settings_test(scan_date,config_file,local_address,None,None)
 
 print_settings()
 main(scan_date)
-# save_ortho()
+save_ortho()
 
 end_time = datetime.datetime.now()
 
