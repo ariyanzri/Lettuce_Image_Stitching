@@ -10,13 +10,14 @@ def initialize_settings(scan_date,config_file,local_address):
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
-	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number
+	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
+	TRANSFORMATION_ERR,GPS_ERROR,LID_ERR_STD
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
 
-		size_init = int(lines[26].split(':')[1].split(',')[0]),int(lines[26].split(':')[1].split(',')[1])
-		LID_SIZE = int(lines[27].split(':')[1].split(',')[0]),int(lines[27].split(':')[1].split(',')[1])
+		size_init = int(lines[24].split(':')[1].split(',')[0]),int(lines[24].split(':')[1].split(',')[1])
+		LID_SIZE = int(lines[25].split(':')[1].split(',')[0]),int(lines[25].split(':')[1].split(',')[1])
 		
 		method = lines[0].split(':')[1]
 		no_of_cores_to_use = int(lines[1].split(':')[1])
@@ -42,22 +43,23 @@ def initialize_settings(scan_date,config_file,local_address):
 		REDUCTION_FACTOR = ORTHO_SCALE/SCALE
 		OPEN_MORPH_LID_SIZE = int(lines[17].split(':')[1])
 		CLOSE_MORPH_LID_SIZE = int(lines[18].split(':')[1])
-		GPS_ERROR_Y = float(lines[19].split(':')[1])
-		GPS_ERROR_X = float(lines[20].split(':')[1])
-		FFT_PARALLEL_CORES_TO_USE = int(lines[21].split(':')[1])
-		use_camera = lines[22].split(':')[1]
-		override_sifts = (True if lines[23].split(':')[1] == 'true' or lines[23].split(':')[1] == 'True' else False)
+		
+
+		FFT_PARALLEL_CORES_TO_USE = int(lines[19].split(':')[1])
+		use_camera = lines[20].split(':')[1]
+		override_sifts = (True if lines[21].split(':')[1] == 'true' or lines[21].split(':')[1] == 'True' else False)
 		inside_radius_lettuce_matching_threshold = 200*SCALE
-		number_of_rows_in_groups = int(lines[24].split(':')[1])
+		number_of_rows_in_groups = int(lines[22].split(':')[1])
 		groups_to_use = slice(0,None)
 		patches_to_use = slice(0,None)
-		is_single_group = (True if lines[25].split(':')[1] == 'true' or lines[25].split(':')[1] == 'True' else False)
+		is_single_group = (True if lines[23].split(':')[1] == 'true' or lines[23].split(':')[1] == 'True' else False)
 		is_flir = False
-
-		use_temp_matching = (True if lines[28].split(':')[1] == 'true' or lines[28].split(':')[1] == 'True' else False)
-		circle_error = int(lines[29].split(':')[1])
-		
-		lid_search_surrounding_patch_number = int(lines[30].split(':')[1])
+		use_temp_matching = (True if lines[26].split(':')[1] == 'true' or lines[26].split(':')[1] == 'True' else False)
+		circle_error = int(lines[27].split(':')[1])
+		lid_search_surrounding_patch_number = int(lines[28].split(':')[1])
+		TRANSFORMATION_ERR = float(lines[29].split(':')[1].split(',')[0]),float(lines[29].split(':')[1].split(',')[1])
+		GPS_ERROR = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
+		LID_ERR_STD = float(lines[31].split(':')[1])
 
 		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
 
@@ -85,14 +87,15 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,uav_add,bi
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
 	field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
-	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number
+	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
+	TRANSFORMATION_ERR,GPS_ERROR,LID_ERR_STD
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
 
-		size_init = int(lines[26].split(':')[1].split(',')[0]),int(lines[26].split(':')[1].split(',')[1])
-		LID_SIZE = int(lines[27].split(':')[1].split(',')[0]),int(lines[27].split(':')[1].split(',')[1])
-
+		size_init = int(lines[24].split(':')[1].split(',')[0]),int(lines[24].split(':')[1].split(',')[1])
+		LID_SIZE = int(lines[25].split(':')[1].split(',')[0]),int(lines[25].split(':')[1].split(',')[1])
+		
 		method = lines[0].split(':')[1]
 		no_of_cores_to_use = int(lines[1].split(':')[1])
 		no_of_cores_to_use_max = int(lines[2].split(':')[1])
@@ -117,22 +120,23 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,uav_add,bi
 		REDUCTION_FACTOR = ORTHO_SCALE/SCALE
 		OPEN_MORPH_LID_SIZE = int(lines[17].split(':')[1])
 		CLOSE_MORPH_LID_SIZE = int(lines[18].split(':')[1])
-		GPS_ERROR_Y = float(lines[19].split(':')[1])
-		GPS_ERROR_X = float(lines[20].split(':')[1])
-		FFT_PARALLEL_CORES_TO_USE = int(lines[21].split(':')[1])
-		use_camera = lines[22].split(':')[1]
-		override_sifts = (True if lines[23].split(':')[1] == 'true' or lines[23].split(':')[1] == 'True' else False)
+		
+
+		FFT_PARALLEL_CORES_TO_USE = int(lines[19].split(':')[1])
+		use_camera = lines[20].split(':')[1]
+		override_sifts = (True if lines[21].split(':')[1] == 'true' or lines[21].split(':')[1] == 'True' else False)
 		inside_radius_lettuce_matching_threshold = 200*SCALE
-		number_of_rows_in_groups = int(lines[24].split(':')[1])
+		number_of_rows_in_groups = int(lines[22].split(':')[1])
 		groups_to_use = slice(0,None)
 		patches_to_use = slice(0,None)
-		is_single_group = (True if lines[25].split(':')[1] == 'true' or lines[25].split(':')[1] == 'True' else False)
+		is_single_group = (True if lines[23].split(':')[1] == 'true' or lines[23].split(':')[1] == 'True' else False)
 		is_flir = False
-
-		use_temp_matching = (True if lines[28].split(':')[1] == 'true' or lines[28].split(':')[1] == 'True' else False)
-		circle_error = int(lines[29].split(':')[1])
-		
-		lid_search_surrounding_patch_number = int(lines[30].split(':')[1])
+		use_temp_matching = (True if lines[26].split(':')[1] == 'true' or lines[26].split(':')[1] == 'True' else False)
+		circle_error = int(lines[27].split(':')[1])
+		lid_search_surrounding_patch_number = int(lines[28].split(':')[1])
+		TRANSFORMATION_ERR = float(lines[29].split(':')[1].split(',')[0]),float(lines[29].split(':')[1].split(',')[1])
+		GPS_ERROR = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
+		LID_ERR_STD = float(lines[31].split(':')[1].split(',')[0]),float(lines[31].split(':')[1].split(',')[1])
 
 		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
 
@@ -159,14 +163,15 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
-	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number
+	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
+	TRANSFORMATION_ERR,GPS_ERROR,LID_ERR_STD
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
 
-		size_init = int(lines[26].split(':')[1].split(',')[0]),int(lines[26].split(':')[1].split(',')[1])
-		LID_SIZE = int(lines[27].split(':')[1].split(',')[0]),int(lines[27].split(':')[1].split(',')[1])
-
+		size_init = int(lines[24].split(':')[1].split(',')[0]),int(lines[24].split(':')[1].split(',')[1])
+		LID_SIZE = int(lines[25].split(':')[1].split(',')[0]),int(lines[25].split(':')[1].split(',')[1])
+		
 		method = lines[0].split(':')[1]
 		no_of_cores_to_use = int(lines[1].split(':')[1])
 		no_of_cores_to_use_max = int(lines[2].split(':')[1])
@@ -191,22 +196,23 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 		REDUCTION_FACTOR = ORTHO_SCALE/SCALE
 		OPEN_MORPH_LID_SIZE = int(lines[17].split(':')[1])
 		CLOSE_MORPH_LID_SIZE = int(lines[18].split(':')[1])
-		GPS_ERROR_Y = float(lines[19].split(':')[1])
-		GPS_ERROR_X = float(lines[20].split(':')[1])
-		FFT_PARALLEL_CORES_TO_USE = int(lines[21].split(':')[1])
-		use_camera = lines[22].split(':')[1]
-		override_sifts = (True if lines[23].split(':')[1] == 'true' or lines[23].split(':')[1] == 'True' else False)
-		inside_radius_lettuce_matching_threshold = 200*SCALE
-		number_of_rows_in_groups = int(lines[24].split(':')[1])
-		groups_to_use = slice(0,rows_n)
-		patches_to_use = slice(0,patch_n)
-		is_single_group = (True if lines[25].split(':')[1] == 'true' or lines[25].split(':')[1] == 'True' else False)
-		is_flir = False
-
-		use_temp_matching = (True if lines[28].split(':')[1] == 'true' or lines[28].split(':')[1] == 'True' else False)
-		circle_error = int(lines[29].split(':')[1])
 		
-		lid_search_surrounding_patch_number = int(lines[30].split(':')[1])
+
+		FFT_PARALLEL_CORES_TO_USE = int(lines[19].split(':')[1])
+		use_camera = lines[20].split(':')[1]
+		override_sifts = (True if lines[21].split(':')[1] == 'true' or lines[21].split(':')[1] == 'True' else False)
+		inside_radius_lettuce_matching_threshold = 200*SCALE
+		number_of_rows_in_groups = int(lines[22].split(':')[1])
+		groups_to_use = slice(0,None)
+		patches_to_use = slice(0,None)
+		is_single_group = (True if lines[23].split(':')[1] == 'true' or lines[23].split(':')[1] == 'True' else False)
+		is_flir = False
+		use_temp_matching = (True if lines[26].split(':')[1] == 'true' or lines[26].split(':')[1] == 'True' else False)
+		circle_error = int(lines[27].split(':')[1])
+		lid_search_surrounding_patch_number = int(lines[28].split(':')[1])
+		TRANSFORMATION_ERR = float(lines[29].split(':')[1].split(',')[0]),float(lines[29].split(':')[1].split(',')[1])
+		GPS_ERROR = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
+		LID_ERR_STD = float(lines[31].split(':')[1].split(',')[0]),float(lines[31].split(':')[1].split(',')[1])
 
 		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
 		
@@ -234,14 +240,15 @@ def initialize_settings_FLIR(scan_date,config_file,local_address):
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
-	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number
+	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
+	TRANSFORMATION_ERR,GPS_ERROR,LID_ERR_STD
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
 
-		size_init = int(lines[26].split(':')[1].split(',')[0]),int(lines[26].split(':')[1].split(',')[1])
-		LID_SIZE = int(lines[27].split(':')[1].split(',')[0]),int(lines[27].split(':')[1].split(',')[1])
-
+		size_init = int(lines[24].split(':')[1].split(',')[0]),int(lines[24].split(':')[1].split(',')[1])
+		LID_SIZE = int(lines[25].split(':')[1].split(',')[0]),int(lines[25].split(':')[1].split(',')[1])
+		
 		method = lines[0].split(':')[1]
 		no_of_cores_to_use = int(lines[1].split(':')[1])
 		no_of_cores_to_use_max = int(lines[2].split(':')[1])
@@ -266,22 +273,23 @@ def initialize_settings_FLIR(scan_date,config_file,local_address):
 		REDUCTION_FACTOR = ORTHO_SCALE/SCALE
 		OPEN_MORPH_LID_SIZE = int(lines[17].split(':')[1])
 		CLOSE_MORPH_LID_SIZE = int(lines[18].split(':')[1])
-		GPS_ERROR_Y = float(lines[19].split(':')[1])
-		GPS_ERROR_X = float(lines[20].split(':')[1])
-		FFT_PARALLEL_CORES_TO_USE = int(lines[21].split(':')[1])
-		use_camera = lines[22].split(':')[1]
-		override_sifts = (True if lines[23].split(':')[1] == 'true' or lines[23].split(':')[1] == 'True' else False)
+		
+
+		FFT_PARALLEL_CORES_TO_USE = int(lines[19].split(':')[1])
+		use_camera = lines[20].split(':')[1]
+		override_sifts = (True if lines[21].split(':')[1] == 'true' or lines[21].split(':')[1] == 'True' else False)
 		inside_radius_lettuce_matching_threshold = 200*SCALE
-		number_of_rows_in_groups = int(lines[24].split(':')[1])
+		number_of_rows_in_groups = int(lines[22].split(':')[1])
 		groups_to_use = slice(0,None)
 		patches_to_use = slice(0,None)
-		is_single_group = (True if lines[25].split(':')[1] == 'true' or lines[25].split(':')[1] == 'True' else False)
+		is_single_group = (True if lines[23].split(':')[1] == 'true' or lines[23].split(':')[1] == 'True' else False)
 		is_flir = True
-
-		use_temp_matching = (True if lines[28].split(':')[1] == 'true' or lines[28].split(':')[1] == 'True' else False)
-		circle_error = int(lines[29].split(':')[1])
-
-		lid_search_surrounding_patch_number = int(lines[30].split(':')[1])
+		use_temp_matching = (True if lines[26].split(':')[1] == 'true' or lines[26].split(':')[1] == 'True' else False)
+		circle_error = int(lines[27].split(':')[1])
+		lid_search_surrounding_patch_number = int(lines[28].split(':')[1])
+		TRANSFORMATION_ERR = float(lines[29].split(':')[1].split(',')[0]),float(lines[29].split(':')[1].split(',')[1])
+		GPS_ERROR = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
+		LID_ERR_STD = float(lines[31].split(':')[1].split(',')[0]),float(lines[31].split(':')[1].split(',')[1])
 
 		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
 
