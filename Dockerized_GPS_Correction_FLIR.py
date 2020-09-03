@@ -65,7 +65,7 @@ sys.stdout = open('{0}/{1}_out/{2}.txt'.format(local_address,scan_date,'geo_corr
 settings.initialize_settings_FLIR(scan_date,config_file,local_address)
 
 print_settings()
-# main(scan_date)
+main(scan_date)
 
 end_time = datetime.datetime.now()
 
