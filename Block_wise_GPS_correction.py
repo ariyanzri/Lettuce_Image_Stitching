@@ -5174,7 +5174,9 @@ def print_settings():
 	# print('\t * Open and Closing SE diameters: {0},{1}'.format(settings.OPEN_MORPH_LID_SIZE,settings.CLOSE_MORPH_LID_SIZE))
 
 	for l in settings.lines:
-		print('{0}'.format(l.upper()))
+		n = l.split(':')[0]
+		v = l.split(':')[1]
+		print('{0}: \t\t'.format(n.upper(),v))
 
 	print('--------------------------------------------------------------------------')
 
