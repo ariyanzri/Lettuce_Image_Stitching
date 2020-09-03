@@ -60,7 +60,7 @@ local_address = sys.argv[3]
 print('Geo-correction started. Log is being saved in {0}'.format(local_address))
 
 original = sys.stdout
-sys.stdout = open('{0}/{1}_out/{2}.txt'.format(local_address,scan_date,'geo_correction_output'), 'w+')
+sys.stdout = open('{0}/{1}-rgb/{2}.txt'.format(local_address,scan_date,'geo_correction_output'), 'w+')
 
 settings.initialize_settings_FLIR(scan_date,config_file,local_address)
 
