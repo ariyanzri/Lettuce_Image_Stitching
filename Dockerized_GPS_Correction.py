@@ -81,8 +81,8 @@ sys.stdout = open('{0}/{1}-rgb/{2}.txt'.format(local_address,scan_date,'geo_corr
 settings.initialize_settings(scan_date,config_file,local_address)
 
 print_settings()
-main(scan_date)
-ortho_save()
+# main(scan_date)
+# ortho_save()
 
 end_time = datetime.datetime.now()
 

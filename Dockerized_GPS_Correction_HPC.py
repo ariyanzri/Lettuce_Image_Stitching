@@ -22,7 +22,7 @@ import settings
 
 def main(scan_date):
 
-	sys.setrecursionlimit(10**6)
+	sys.setrecursionlimit(10**8)
 	
 	settings.lettuce_coords = read_lettuce_heads_coordinates()
 
@@ -95,7 +95,7 @@ sys.stdout = open('{0}/{1}/{2}.txt'.format(destination,scan_date,'geo_correction
 settings.initialize_settings_HPC(scan_date,config_file,destination,lid_file_address,uav_lettuce_address,bin2tiff_address,gps_coord_file)
 
 print_settings()
-main(scan_date)
+# main(scan_date)
 
 end_time = datetime.datetime.now()
 
