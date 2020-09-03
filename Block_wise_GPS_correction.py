@@ -2788,6 +2788,33 @@ class Patch:
 			p1_x1 = int(math.ceil((patch.gps.UL_coord[0]-self.gps.UL_coord[0])/settings.GPS_TO_IMAGE_RATIO[0]))
 			p2_x2 = settings.PATCH_SIZE[1]-p1_x1
 
+		if increase_size:
+			if p1_x1>0+settings.PATCH_SIZE[1]/10:
+				p1_x1-=settings.PATCH_SIZE[1]/10
+
+			if p1_x2<9*settings.PATCH_SIZE[1]/10:
+				p1_x2+=settings.PATCH_SIZE[1]/10
+
+			if p1_y1>0+settings.PATCH_SIZE[0]/10:
+				p1_y1-=settings.PATCH_SIZE[0]/10
+
+			if p1_y2<9*settings.PATCH_SIZE[0]/10:
+				p1_y2+=settings.PATCH_SIZE[0]/10
+
+
+
+			if p2_x1>0+settings.PATCH_SIZE[1]/10:
+				p2_x1-=settings.PATCH_SIZE[1]/10
+
+			if p2_x2<9*settings.PATCH_SIZE[1]/10:
+				p2_x2+=settings.PATCH_SIZE[1]/10
+
+			if p2_y1>0+settings.PATCH_SIZE[0]/10:
+				p2_y1-=settings.PATCH_SIZE[0]/10
+
+			if p2_y2<9*settings.PATCH_SIZE[0]/10:
+				p2_y2+=settings.PATCH_SIZE[0]/10
+
 		return (p1_x1,p1_y1,p1_x2,p1_y2),(p2_x1,p2_y1,p2_x2,p2_y2)
 
 
