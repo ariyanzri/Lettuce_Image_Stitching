@@ -2390,11 +2390,11 @@ class Global_Optimizer:
 
 		# transformation_coef_x = 1/(9.91*1e-6) 
 		# transformation_coef_y = 1/(12.51*1e-6)
-		transformation_coef_x = 1/settings.TRANSFORMATION_ERR[0] 
-		transformation_coef_y = 1/settings.TRANSFORMATION_ERR[1]
+		transformation_coef_x = 1/settings.TRANSFORMATION_ERR_STD[0] 
+		transformation_coef_y = 1/settings.TRANSFORMATION_ERR_STD[1]
 
-		GPS_coef_x = 1/settings.GPS_ERROR[0]
-		GPS_coef_y = 1/settings.GPS_ERROR[1]
+		GPS_coef_x = 1/settings.GPS_ERROR_STD[0]
+		GPS_coef_y = 1/settings.GPS_ERROR_STD[1]
 		# GPS_coef_x = 1/(4.02*1e-5)
 		# GPS_coef_y = 1/(5.48*1e-5)
 		
