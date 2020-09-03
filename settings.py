@@ -138,7 +138,7 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,uav_add,bi
 		GPS_ERROR_STD = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
 		LID_ERR_STD = float(lines[31].split(':')[1])
 
-		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
+		temp_lid_image_address = '{0}/{1}/lid_temp.png'.format(destination,scan_date)
 
 		patch_folder = '{0}'.format(bin2tif_address)
 		SIFT_folder = '{0}/{1}/SIFT'.format(destination,scan_date)
