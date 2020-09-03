@@ -6,12 +6,12 @@ def initialize_settings(scan_date,config_file,local_address):
 	MINIMUM_NUMBER_OF_MATCHES,RANSAC_MAX_ITER,RANSAC_ERROR_THRESHOLD,PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES,\
 	OVERLAP_DISCARD_RATIO,TRANSFORMATION_SCALE_DISCARD_THRESHOLD,TRANSFORMATION_ANGLE_DISCARD_THRESHOLD,\
 	LETTUCE_AREA_THRESHOLD,CONTOUR_MATCHING_MIN_MATCH,ORTHO_SCALE,REDUCTION_FACTOR,OPEN_MORPH_LID_SIZE,\
-	CLOSE_MORPH_LID_SIZE,GPS_ERROR_Y,GPS_ERROR_X,FFT_PARALLEL_CORES_TO_USE,use_camera,override_sifts,\
+	CLOSE_MORPH_LID_SIZE,FFT_PARALLEL_CORES_TO_USE,use_camera,override_sifts,\
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
 	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR,GPS_ERROR,LID_ERR_STD
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -57,8 +57,8 @@ def initialize_settings(scan_date,config_file,local_address):
 		use_temp_matching = (True if lines[26].split(':')[1] == 'true' or lines[26].split(':')[1] == 'True' else False)
 		circle_error = int(lines[27].split(':')[1])
 		lid_search_surrounding_patch_number = int(lines[28].split(':')[1])
-		TRANSFORMATION_ERR = float(lines[29].split(':')[1].split(',')[0]),float(lines[29].split(':')[1].split(',')[1])
-		GPS_ERROR = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
+		TRANSFORMATION_ERR_STD = float(lines[29].split(':')[1].split(',')[0]),float(lines[29].split(':')[1].split(',')[1])
+		GPS_ERROR_STD = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
 		LID_ERR_STD = float(lines[31].split(':')[1])
 
 		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
@@ -83,12 +83,12 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,uav_add,bi
 	MINIMUM_NUMBER_OF_MATCHES,RANSAC_MAX_ITER,RANSAC_ERROR_THRESHOLD,PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES,\
 	OVERLAP_DISCARD_RATIO,TRANSFORMATION_SCALE_DISCARD_THRESHOLD,TRANSFORMATION_ANGLE_DISCARD_THRESHOLD,\
 	LETTUCE_AREA_THRESHOLD,CONTOUR_MATCHING_MIN_MATCH,ORTHO_SCALE,REDUCTION_FACTOR,OPEN_MORPH_LID_SIZE,\
-	CLOSE_MORPH_LID_SIZE,GPS_ERROR_Y,GPS_ERROR_X,FFT_PARALLEL_CORES_TO_USE,use_camera,override_sifts,\
+	CLOSE_MORPH_LID_SIZE,FFT_PARALLEL_CORES_TO_USE,use_camera,override_sifts,\
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
 	field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
 	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR,GPS_ERROR,LID_ERR_STD
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -134,8 +134,8 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,uav_add,bi
 		use_temp_matching = (True if lines[26].split(':')[1] == 'true' or lines[26].split(':')[1] == 'True' else False)
 		circle_error = int(lines[27].split(':')[1])
 		lid_search_surrounding_patch_number = int(lines[28].split(':')[1])
-		TRANSFORMATION_ERR = float(lines[29].split(':')[1].split(',')[0]),float(lines[29].split(':')[1].split(',')[1])
-		GPS_ERROR = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
+		TRANSFORMATION_ERR_STD = float(lines[29].split(':')[1].split(',')[0]),float(lines[29].split(':')[1].split(',')[1])
+		GPS_ERROR_STD = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
 		LID_ERR_STD = float(lines[31].split(':')[1].split(',')[0]),float(lines[31].split(':')[1].split(',')[1])
 
 		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
@@ -159,12 +159,12 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 	MINIMUM_NUMBER_OF_MATCHES,RANSAC_MAX_ITER,RANSAC_ERROR_THRESHOLD,PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES,\
 	OVERLAP_DISCARD_RATIO,TRANSFORMATION_SCALE_DISCARD_THRESHOLD,TRANSFORMATION_ANGLE_DISCARD_THRESHOLD,\
 	LETTUCE_AREA_THRESHOLD,CONTOUR_MATCHING_MIN_MATCH,ORTHO_SCALE,REDUCTION_FACTOR,OPEN_MORPH_LID_SIZE,\
-	CLOSE_MORPH_LID_SIZE,GPS_ERROR_Y,GPS_ERROR_X,FFT_PARALLEL_CORES_TO_USE,use_camera,override_sifts,\
+	CLOSE_MORPH_LID_SIZE,FFT_PARALLEL_CORES_TO_USE,use_camera,override_sifts,\
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
 	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR,GPS_ERROR,LID_ERR_STD
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -210,8 +210,8 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 		use_temp_matching = (True if lines[26].split(':')[1] == 'true' or lines[26].split(':')[1] == 'True' else False)
 		circle_error = int(lines[27].split(':')[1])
 		lid_search_surrounding_patch_number = int(lines[28].split(':')[1])
-		TRANSFORMATION_ERR = float(lines[29].split(':')[1].split(',')[0]),float(lines[29].split(':')[1].split(',')[1])
-		GPS_ERROR = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
+		TRANSFORMATION_ERR_STD = float(lines[29].split(':')[1].split(',')[0]),float(lines[29].split(':')[1].split(',')[1])
+		GPS_ERROR_STD = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
 		LID_ERR_STD = float(lines[31].split(':')[1].split(',')[0]),float(lines[31].split(':')[1].split(',')[1])
 
 		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
@@ -236,12 +236,12 @@ def initialize_settings_FLIR(scan_date,config_file,local_address):
 	MINIMUM_NUMBER_OF_MATCHES,RANSAC_MAX_ITER,RANSAC_ERROR_THRESHOLD,PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES,\
 	OVERLAP_DISCARD_RATIO,TRANSFORMATION_SCALE_DISCARD_THRESHOLD,TRANSFORMATION_ANGLE_DISCARD_THRESHOLD,\
 	LETTUCE_AREA_THRESHOLD,CONTOUR_MATCHING_MIN_MATCH,ORTHO_SCALE,REDUCTION_FACTOR,OPEN_MORPH_LID_SIZE,\
-	CLOSE_MORPH_LID_SIZE,GPS_ERROR_Y,GPS_ERROR_X,FFT_PARALLEL_CORES_TO_USE,use_camera,override_sifts,\
+	CLOSE_MORPH_LID_SIZE,FFT_PARALLEL_CORES_TO_USE,use_camera,override_sifts,\
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
 	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR,GPS_ERROR,LID_ERR_STD
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -287,8 +287,8 @@ def initialize_settings_FLIR(scan_date,config_file,local_address):
 		use_temp_matching = (True if lines[26].split(':')[1] == 'true' or lines[26].split(':')[1] == 'True' else False)
 		circle_error = int(lines[27].split(':')[1])
 		lid_search_surrounding_patch_number = int(lines[28].split(':')[1])
-		TRANSFORMATION_ERR = float(lines[29].split(':')[1].split(',')[0]),float(lines[29].split(':')[1].split(',')[1])
-		GPS_ERROR = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
+		TRANSFORMATION_ERR_STD = float(lines[29].split(':')[1].split(',')[0]),float(lines[29].split(':')[1].split(',')[1])
+		GPS_ERROR_STD = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
 		LID_ERR_STD = float(lines[31].split(':')[1].split(',')[0]),float(lines[31].split(':')[1].split(',')[1])
 
 		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
