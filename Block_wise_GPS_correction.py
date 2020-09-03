@@ -651,7 +651,7 @@ def get_good_matches_based_on_GPS_error(desc1,desc2,kp1,kp2,p1,p2,top_percent):
 
 		diff = (abs(GPS_p2[0]-GPS_p1[0]),abs(GPS_p2[1]-GPS_p1[1]))
 
-		if diff[0]<settings.GPS_ERROR_X and diff[1]<settings.GPS_ERROR_Y and m[0].distance <= settings.PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
+		if diff[0]<settings.GPS_ERROR_STD[0] and diff[1]<settings.GPS_ERROR_STD[1] and m[0].distance <= settings.PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES*m[1].distance:
 			good.append(m)
 		
 	if top_percent:
@@ -2177,10 +2177,10 @@ class GPS_Coordinate:
 			return False
 
 	def is_coord_in_GPS_error_proximity(self,coord):
-		if coord[0]>=self.UL_coord[0] and coord[0]<=self.UR_coord[0] and (abs(coord[1]-self.LL_coord[1])<settings.GPS_ERROR_Y or abs(coord[1]-self.UL_coord[1])<settings.GPS_ERROR_Y):
+		if coord[0]>=self.UL_coord[0] and coord[0]<=self.UR_coord[0] and (abs(coord[1]-self.LL_coord[1])<settings.GPS_ERROR_STD[1] or abs(coord[1]-self.UL_coord[1])<settings.GPS_ERROR_STD[1]):
 			return True
 
-		if coord[1]<=self.UL_coord[1] and coord[1]>=self.LL_coord[1] and (abs(coord[0]-self.LL_coord[0])<settings.GPS_ERROR_X or abs(coord[0]-self.LR_coord[0])<settings.GPS_ERROR_X):
+		if coord[1]<=self.UL_coord[1] and coord[1]>=self.LL_coord[1] and (abs(coord[0]-self.LL_coord[0])<settings.GPS_ERROR_STD[0] or abs(coord[0]-self.LR_coord[0])<settings.GPS_ERROR_STD[0]):
 			return True
 
 		return False
@@ -2578,10 +2578,10 @@ class Global_Optimizer:
 			# A.append(row_y)
 			# b.append(coef*p.gps.UL_coord[1])
 
-			LB[self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[0]-settings.GPS_ERROR_X
-			UB[self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[0]+settings.GPS_ERROR_X
-			LB[self.number_of_images + self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[1]-settings.GPS_ERROR_Y
-			UB[self.number_of_images + self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[1]+settings.GPS_ERROR_Y
+			LB[self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[0]-settings.GPS_ERROR_STD[0]
+			UB[self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[0]+settings.GPS_ERROR_STD[0]
+			LB[self.number_of_images + self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[1]-settings.GPS_ERROR_STD[1]
+			UB[self.number_of_images + self.image_name_to_index_dict[p.name]] = p.gps.UL_coord[1]+settings.GPS_ERROR_STD[1]
 
 		print('Number of Rules = {0}'.format(len(A)))
 
@@ -2941,8 +2941,8 @@ class Patch:
 
 	def correct_based_on_neighbors(self,neighbors):
 
-		list_jitter_x = np.arange(-settings.GPS_ERROR_X, settings.GPS_ERROR_X, 0.0000001)
-		list_jitter_y = np.arange(-settings.GPS_ERROR_Y, settings.GPS_ERROR_Y, 0.0000001)
+		list_jitter_x = np.arange(-settings.GPS_ERROR_STD[0], settings.GPS_ERROR_STD[0], 0.0000001)
+		list_jitter_y = np.arange(-settings.GPS_ERROR_STD[1], settings.GPS_ERROR_STD[1], 0.0000001)
 
 		self.load_img()
 		for n in neighbors:
@@ -3212,7 +3212,7 @@ class Patch:
 			c2 = m[1]
 			T = get_translation_from_single_matches(c1[0],c1[1],c2[0],c2[1])
 			
-			if abs(T[0,2])>=settings.GPS_ERROR_X/settings.GPS_TO_IMAGE_RATIO[0] or abs(T[1,2])>=settings.GPS_ERROR_Y/settings.GPS_TO_IMAGE_RATIO[1]:
+			if abs(T[0,2])>=settings.GPS_ERROR_STD[0]/settings.GPS_TO_IMAGE_RATIO[0] or abs(T[1,2])>=settings.GPS_ERROR_STD[1]/settings.GPS_TO_IMAGE_RATIO[1]:
 					continue
 
 			mean_error = calculate_remaining_contour_matches_error(matches,T)
@@ -3288,7 +3288,7 @@ class Patch:
 
 				T = get_translation_from_single_matches(c[0],c[1],l[0],l[1])
 
-				if abs(T[0,2])>settings.GPS_ERROR_X/settings.GPS_TO_IMAGE_RATIO[0] or abs(T[1,2])>settings.GPS_ERROR_Y/settings.GPS_TO_IMAGE_RATIO[1]:
+				if abs(T[0,2])>settings.GPS_ERROR_STD[0]/settings.GPS_TO_IMAGE_RATIO[0] or abs(T[1,2])>settings.GPS_ERROR_STD[1]/settings.GPS_TO_IMAGE_RATIO[1]:
 					continue
 
 				# mean_error = calculate_average_min_distance_lettuce_heads(contour_centers,inside_lettuce_heads,T)
@@ -5019,7 +5019,7 @@ def calculate_scale_effect_inside(p1,p2):
 		diff = (abs(GPS_p2[0]-GPS_p1[0]),abs(GPS_p2[1]-GPS_p1[1]))
 		
 
-		if diff[0]<settings.GPS_ERROR_X and diff[1]<settings.GPS_ERROR_Y:
+		if diff[0]<settings.GPS_ERROR_STD[0] and diff[1]<settings.GPS_ERROR_STD[1]:
 			good_count+=1
 		else:
 			bad_count+=1
@@ -5139,39 +5139,42 @@ def print_settings():
 
 	print('-------------------------------- SETTINGS --------------------------------')
 
-	# print('- Current Server : {0}'.format(server))
-	print('- Correction Log File : {0}'.format(settings.correction_log_file))
+	# print('- Correction Log File : {0}'.format(settings.correction_log_file))
 	
-	print('- Methodology Settings ')
-	print('\t * Current Method: {0}'.format(settings.method))
-	print('\t * Scan Name/Date: {0}'.format(settings.scan_date_stng))
-	print('\t * Use camera: {0}'.format(settings.use_camera))
-	print('\t * Override SIFT files: {0}'.format(settings.override_sifts))
+	# print('- Methodology Settings ')
+	# print('\t * Current Method: {0}'.format(settings.method))
+	# print('\t * Scan Name/Date: {0}'.format(settings.scan_date_stng))
+	# print('\t * Use camera: {0}'.format(settings.use_camera))
+	# print('\t * Override SIFT files: {0}'.format(settings.override_sifts))
 
-	print('- Basic Settings ')
-	print('\t * Scale of Images: {0}'.format(settings.SCALE))
-	print('\t * Image Size in pixels (rows/y,columns/x): {0}'.format(settings.PATCH_SIZE))
-	print('\t * Image Size in GPS (x,y): {0}'.format(settings.PATCH_SIZE_GPS))
-	print('\t * Heigh ratio used in row seperation: {0}'.format(settings.HEIGHT_RATIO_FOR_ROW_SEPARATION))
-	print('\t * Lid radious at current scale (min,max): {0}'.format(settings.LID_SIZE_AT_SCALE))
+	# print('- Basic Settings ')
+	# print('\t * Scale of Images: {0}'.format(settings.SCALE))
+	# print('\t * Image Size in pixels (rows/y,columns/x): {0}'.format(settings.PATCH_SIZE))
+	# print('\t * Image Size in GPS (x,y): {0}'.format(settings.PATCH_SIZE_GPS))
+	# print('\t * Heigh ratio used in row seperation: {0}'.format(settings.HEIGHT_RATIO_FOR_ROW_SEPARATION))
+	# print('\t * Lid radious at current scale (min,max): {0}'.format(settings.LID_SIZE_AT_SCALE))
 	
-	print('- Transformation, SIFT and RANSAC Settings ')
-	print('\t * Percentage of top matches to take: {0}'.format(settings.PERCENTAGE_OF_GOOD_MATCHES))
-	print('\t * Minimum acceptable percentage of inliers: {0}'.format(settings.MINIMUM_PERCENTAGE_OF_INLIERS))
-	print('\t * Minimum acceptable number of matches: {0}'.format(settings.MINIMUM_NUMBER_OF_MATCHES))
-	print('\t * RANSAC max iterations: {0}'.format(settings.RANSAC_MAX_ITER))
-	print('\t * Percentage of second to first match distance: {0}'.format(settings.PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES))
-	print('\t * Minimum ratio for overlap: {0}'.format(settings.OVERLAP_DISCARD_RATIO))
-	print('\t * Minimum number of plants to match in contours matching: {0}'.format(settings.CONTOUR_MATCHING_MIN_MATCH))
-	print('\t * GPS Error (x,y): {0},{1}'.format(settings.GPS_ERROR_X,settings.GPS_ERROR_Y))
-	print('\t * Minimum lettuce radious at scale for considering OK: {0}'.format(settings.inside_radius_lettuce_matching_threshold))
+	# print('- Transformation, SIFT and RANSAC Settings ')
+	# print('\t * Percentage of top matches to take: {0}'.format(settings.PERCENTAGE_OF_GOOD_MATCHES))
+	# print('\t * Minimum acceptable percentage of inliers: {0}'.format(settings.MINIMUM_PERCENTAGE_OF_INLIERS))
+	# print('\t * Minimum acceptable number of matches: {0}'.format(settings.MINIMUM_NUMBER_OF_MATCHES))
+	# print('\t * RANSAC max iterations: {0}'.format(settings.RANSAC_MAX_ITER))
+	# print('\t * Percentage of second to first match distance: {0}'.format(settings.PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES))
+	# print('\t * Minimum ratio for overlap: {0}'.format(settings.OVERLAP_DISCARD_RATIO))
+	# print('\t * Minimum number of plants to match in contours matching: {0}'.format(settings.CONTOUR_MATCHING_MIN_MATCH))
+	# print('\t * Minimum lettuce radious at scale for considering OK: {0}'.format(settings.inside_radius_lettuce_matching_threshold))
 
-	print('- Orthomosaic Settings ')
-	print('\t * Final Scale of the ortho: {0}'.format(settings.ORTHO_SCALE))
-	print('\t * Number of rows in each group: {0}'.format(settings.number_of_rows_in_groups))
+	# print('- Optimization Settings ')
 
-	print('- Lid detection Settings ')
-	print('\t * Open and Closing SE diameters: {0},{1}'.format(settings.OPEN_MORPH_LID_SIZE,settings.CLOSE_MORPH_LID_SIZE))
+	# print('- Orthomosaic Settings ')
+	# print('\t * Final Scale of the ortho: {0}'.format(settings.ORTHO_SCALE))
+	# print('\t * Number of rows in each group: {0}'.format(settings.number_of_rows_in_groups))
+
+	# print('- Lid detection Settings ')
+	# print('\t * Open and Closing SE diameters: {0},{1}'.format(settings.OPEN_MORPH_LID_SIZE,settings.CLOSE_MORPH_LID_SIZE))
+
+	for l in settings.lines:
+		print('{0}'.format(l.upper()))
 
 	print('--------------------------------------------------------------------------')
 
@@ -5288,7 +5291,7 @@ def test_function():
 				# print(m[0].distance,m[1].distance)
 				
 
-				if diff[0]<settings.GPS_ERROR_X and diff[1]<settings.GPS_ERROR_Y:
+				if diff[0]<settings.GPS_ERROR_STD[0] and diff[1]<settings.GPS_ERROR_STD[1]:
 					c = (0,255,0)
 					good_count+=1
 				else:
@@ -5541,8 +5544,8 @@ def test_function():
 # OPEN_MORPH_LID_SIZE = 40
 # CLOSE_MORPH_LID_SIZE = 220
 
-# GPS_ERROR_Y = 0.000001
-# GPS_ERROR_X = 0.000002
+# GPS_ERROR_STD[1] = 0.000001
+# GPS_ERROR_STD[0] = 0.000002
 
 # FFT_PARALLEL_CORES_TO_USE = 20
 
