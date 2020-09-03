@@ -5177,7 +5177,7 @@ def print_settings():
 		if l != '':
 			n = l.split(':')[0]
 			v = l.split(':')[1]
-			print('{0}: \t\t {1}'.format(n.upper(),v))
+			print('{0}: {1}'.format(n.upper(),v))
 
 	print('--------------------------------------------------------------------------')
 
