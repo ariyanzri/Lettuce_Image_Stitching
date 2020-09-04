@@ -4194,10 +4194,10 @@ class Group:
 		# sys.stdout.flush()
 
 class Field:
-	def __init__(self,is_single_group=False,correct_lid_patches=True,use_corrected=False):
+	def __init__(self,is_single_group=False,correct_lid_patches=True,use_corrected=False,remove_transformations=True):
 		# global coordinates_file
 
-		if os.path.isfile('{0}/{1}'.format(settings.field_image_path,'transformations.csv')):
+		if remove_transformations and os.path.isfile('{0}/{1}'.format(settings.field_image_path,'transformations.csv')):
 			os.remove('{0}/{1}'.format(settings.field_image_path,'transformations.csv'))
 
 		self.groups = self.initialize_field(use_corrected,is_single_group)

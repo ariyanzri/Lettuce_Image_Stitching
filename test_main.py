@@ -60,10 +60,10 @@ def main(scan_date):
 def save_ortho():
 	gc.collect()
 
-	field = Field(is_single_group=settings.is_single_group,use_corrected=False)
+	field = Field(is_single_group=settings.is_single_group,use_corrected=False,remove_transformations=False)
 	field.draw_and_save_field(is_old=True)
 
-	field_new = Field(is_single_group=settings.is_single_group,use_corrected=True)
+	field_new = Field(is_single_group=settings.is_single_group,use_corrected=True,remove_transformations=False)
 	field_new.draw_and_save_field(is_old=False)
 
 # settings.plot_npy_file = '/home/ariyan/Desktop/plt.npy'
