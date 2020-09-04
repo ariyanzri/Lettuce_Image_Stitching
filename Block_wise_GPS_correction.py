@@ -2452,19 +2452,19 @@ class Global_Optimizer:
 
 		# X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
 		
-		X = np.transpose(A)
-		gc.collect()
-		X = np.matmul(X,A)
-		gc.collect()
-		X = np.linalg.inv(X)
-		gc.collect()
-		X = np.matmul(X,np.transpose(A))
-		gc.collect()
-		X = np.matmul(X,b)
-		gc.collect()
+		# X = np.transpose(A)
+		# gc.collect()
+		# X = np.matmul(X,A)
+		# gc.collect()
+		# X = np.linalg.inv(X)
+		# gc.collect()
+		# X = np.matmul(X,np.transpose(A))
+		# gc.collect()
+		# X = np.matmul(X,b)
+		# gc.collect()
 
-		# res = lsq_linear(A, b, max_iter=len(self.patches),verbose=2)
-		# X = res.x
+		res = lsq_linear(A, b, max_iter=len(self.patches),verbose=2)
+		X = res.x
 
 		for p in self.patches:
 			i = self.image_name_to_index_dict[p.name]
