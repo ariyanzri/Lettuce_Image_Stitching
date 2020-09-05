@@ -203,7 +203,7 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 		override_sifts = (True if lines[21].split(':')[1] == 'true' or lines[21].split(':')[1] == 'True' else False)
 		inside_radius_lettuce_matching_threshold = 200*SCALE
 		number_of_rows_in_groups = int(lines[22].split(':')[1])
-		groups_to_use = slice(0,None)
+		groups_to_use = slice(0,rows_n)
 		patches_to_use = slice(0,None)
 		is_single_group = (True if lines[23].split(':')[1] == 'true' or lines[23].split(':')[1] == 'True' else False)
 		is_flir = False
