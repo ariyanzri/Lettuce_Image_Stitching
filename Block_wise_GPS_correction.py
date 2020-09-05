@@ -4289,7 +4289,7 @@ class Field:
 
 		# print(distances)
 
-		if len(distances) == 0:
+		if len(distances) <=1:
 			return 0,0
 		else:
 			return statistics.mean(distances),statistics.stdev(distances)
@@ -4805,7 +4805,7 @@ class Field:
 			corrected_patches.append(p)
 
 		row_dict = self.get_row_dict()
-		opt.transformation_diff_only_least_squares_with_lids(corrected_patches,row_dict)
+		opt.transformation_diff_only_least_squares_with_lids(corrected_patches,None)
 
 
 	def shift_after_correction_based_on_lids(self):
