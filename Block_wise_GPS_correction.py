@@ -2455,7 +2455,7 @@ class Global_Optimizer:
 
 			for r in row_dict:
 
-				row_y = np.zeros((1,2*self.number_of_images))
+				row_y = [0]*(2*self.number_of_images)
 
 				first_element = row_dict[r][0].gps.UL_coord[1]
 
