@@ -2379,7 +2379,7 @@ class Global_Optimizer:
 			self.image_name_to_index_dict[p.name] = i
 			self.index_to_image_name_dict[i] = p.name
 
-	def transformation_diff_only_least_squares_with_lids(self,corrected_patches):
+	def transformation_diff_only_least_squares_with_lids(self,corrected_patches,row_dict):
 		template = np.eye(2*self.number_of_images)
 
 		A = []
@@ -2401,6 +2401,7 @@ class Global_Optimizer:
 		GPS_lids = 1/settings.LID_ERR_STD
 		# GPS_lids = 1/(9.02*1e-6) 
 
+		Row_coef = 1/9e-5
 
 		for p in self.patches:
 			for n,params in p.neighbors:
@@ -2446,6 +2447,26 @@ class Global_Optimizer:
 
 				A.append(row_y)
 				b.append(GPS_coef_y*p.gps.UL_coord[1])
+
+
+		# row fixating
+
+		if row_dict is not None:
+
+			for r in row_dict:
+
+				row_y = np.zeros((1,2*self.number_of_images))
+
+				first_element = row_dict[r][0].gps.UL_coord[1]
+
+				for p in row_dict[r]:
+
+					row_y += Row_coef*template[self.number_of_images + self.image_name_to_index_dict[p.name]]
+
+				A.append(row_y)
+				b.append(Row_coef*p.gps.UL_coord[1]*len(row_dict[r]))
+
+		# ------------
 
 		A=np.array(A)
 		b=np.array(b)
@@ -4755,7 +4776,23 @@ class Field:
 			all_patches_list.append(all_patches[p])
 
 		return all_patches,all_patches_list
+	
+	def get_row_dict(self):
+
+		row_id = 0
+		row_dict = {}
+
+		for group in self.groups:
+			for row in group.rows:
 				
+				row_id+=1
+				row_dict[row_id] = []
+
+				for p in row:
+					row_dict[row_id].append(p) 
+
+		return row_dict
+
 
 	def whole_field_global_opt(self,all_patches_list):
 
@@ -4767,7 +4804,8 @@ class Field:
 		for p,l,x,y in self.detected_lid_patches:
 			corrected_patches.append(p)
 
-		opt.transformation_diff_only_least_squares_with_lids(corrected_patches)
+		row_dict = self.get_row_dict()
+		opt.transformation_diff_only_least_squares_with_lids(corrected_patches,None)
 
 
 	def shift_after_correction_based_on_lids(self):
