@@ -2461,10 +2461,10 @@ class Global_Optimizer:
 
 				for p in row_dict[r]:
 
-					row_y += Row_coef*template[self.number_of_images + self.image_name_to_index_dict[p.name]]
+					row_y = Row_coef*template[self.number_of_images + self.image_name_to_index_dict[p.name]] - Row_coef*template[self.number_of_images + self.image_name_to_index_dict[first_element.name]]
 
-				A.append(row_y)
-				b.append(Row_coef*first_element*len(row_dict[r]))
+					A.append(row_y)
+					b.append(0)
 
 		# ------------
 
