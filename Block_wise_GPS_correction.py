@@ -2463,6 +2463,7 @@ class Global_Optimizer:
 
 					row_y += Row_coef*template[self.number_of_images + self.image_name_to_index_dict[p.name]]
 
+				print(len(row_y))
 				A.append(row_y)
 				b.append(Row_coef*p.gps.UL_coord[1]*len(row_dict[r]))
 
