@@ -2448,7 +2448,6 @@ class Global_Optimizer:
 				A.append(row_y)
 				b.append(GPS_coef_y*p.gps.UL_coord[1])
 
-
 		# row fixating
 
 		if row_dict is not None:
