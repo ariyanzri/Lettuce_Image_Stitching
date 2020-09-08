@@ -2401,7 +2401,7 @@ class Global_Optimizer:
 		GPS_lids = 1/settings.LID_ERR_STD
 		# GPS_lids = 1/(9.02*1e-6) 
 
-		Row_coef = 1/9e-6
+		Row_coef = 1/9e-5
 
 		for p in self.patches:
 			for n,params in p.neighbors:
@@ -2445,8 +2445,8 @@ class Global_Optimizer:
 				b.append(GPS_coef_x*p.gps.UL_coord[0])
 				
 
-				# A.append(row_y)
-				# b.append(GPS_coef_y*p.gps.UL_coord[1])
+				A.append(row_y)
+				b.append(GPS_coef_y*p.gps.UL_coord[1])
 
 		# row fixating
 
