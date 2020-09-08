@@ -2437,16 +2437,16 @@ class Global_Optimizer:
 
 				A.append(row_y)
 				b.append(GPS_lids*p.gps.UL_coord[1])
-			else:
-				row_x = GPS_coef_x*template[self.image_name_to_index_dict[p.name],:]
-				row_y = GPS_coef_y*template[self.number_of_images + self.image_name_to_index_dict[p.name],:]
+			# else:
+			# 	row_x = GPS_coef_x*template[self.image_name_to_index_dict[p.name],:]
+			# 	row_y = GPS_coef_y*template[self.number_of_images + self.image_name_to_index_dict[p.name],:]
 
-				A.append(row_x)
-				b.append(GPS_coef_x*p.gps.UL_coord[0])
+			# 	A.append(row_x)
+			# 	b.append(GPS_coef_x*p.gps.UL_coord[0])
 				
 
-				A.append(row_y)
-				b.append(GPS_coef_y*p.gps.UL_coord[1])
+			# 	A.append(row_y)
+			# 	b.append(GPS_coef_y*p.gps.UL_coord[1])
 
 		# row fixating
 
@@ -4804,7 +4804,7 @@ class Field:
 			corrected_patches.append(p)
 
 		row_dict = self.get_row_dict()
-		opt.transformation_diff_only_least_squares_with_lids(corrected_patches,None)
+		opt.transformation_diff_only_least_squares_with_lids(corrected_patches,row_dict)
 
 
 	def shift_after_correction_based_on_lids(self):
