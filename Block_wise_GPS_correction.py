@@ -2443,8 +2443,8 @@ class Global_Optimizer:
 				b.append(GPS_coef_x*p.gps.UL_coord[0])
 				
 
-				# A.append(row_y)
-				# b.append(GPS_coef_y*p.gps.UL_coord[1])
+				A.append(row_y)
+				b.append(GPS_coef_y*p.gps.UL_coord[1])
 
 		# row fixating
 
@@ -2476,7 +2476,7 @@ class Global_Optimizer:
 					row_y = Row_coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] - Row_coef*template[self.number_of_images + self.image_name_to_index_dict[prev_p.name],:]
 
 					A.append(row_y)
-					b.append(0)
+					b.append(Row_coef*0.000001)
 
 					prev_p = p
 
@@ -4959,9 +4959,9 @@ class Field:
 		for st_y,st_y2,st_x,st_x2,tmpimg in results_parallel:
 			result[st_y:st_y2,st_x:st_x2,:] = tmpimg
 
-		lids = get_lids()
-		for l in lids:
-			cv2.circle(result,(int((lids[l][0]-UL[0])/settings.GPS_TO_IMAGE_RATIO[0]),int((UL[1]-lids[l][1])/settings.GPS_TO_IMAGE_RATIO[1])),100,(0,255,0),-1)
+		# lids = get_lids()
+		# for l in lids:
+		# 	cv2.circle(result,(int((lids[l][0]-UL[0])/settings.GPS_TO_IMAGE_RATIO[0]),int((UL[1]-lids[l][1])/settings.GPS_TO_IMAGE_RATIO[1])),100,(0,255,0),-1)
 
 		# result = cv2.resize(result,(int(result.shape[1]/10),int(result.shape[0]/10)))
 		
