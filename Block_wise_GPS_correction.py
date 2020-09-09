@@ -2414,8 +2414,12 @@ class Global_Optimizer:
 				if params.dissimilarity>=0.4 and params.percentage_inliers<60:
 					continue
 				
-				# transformation_coef_x=10**(10*(1-params.dissimilarity))
-				# transformation_coef_y=10**(10*(1-params.dissimilarity))
+				if params.percentage_inliers >= 90:
+					transformation_coef_x = 1/(settings.TRANSFORMATION_ERR_STD[0] *0.1)
+					transformation_coef_y = 1/(settings.TRANSFORMATION_ERR_STD[1] *0.1)
+				else:
+					transformation_coef_x = 1/settings.TRANSFORMATION_ERR_STD[0] 
+					transformation_coef_y = 1/settings.TRANSFORMATION_ERR_STD[1]
 
 				row_x = - transformation_coef_x*template[self.image_name_to_index_dict[p.name],:] + transformation_coef_x*template[self.image_name_to_index_dict[n.name],:]
 				row_y = - transformation_coef_y*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] + transformation_coef_y*template[self.number_of_images + self.image_name_to_index_dict[n.name],:]
