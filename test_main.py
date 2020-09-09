@@ -35,13 +35,13 @@ def main(scan_date):
 
 	field.create_patches_SIFT_files()
 	
-	# field.draw_and_save_field(is_old=True)
+	field.draw_and_save_field(is_old=True)
 
 	field.correct_field()
 
 	field.save_new_coordinate()
 
-	# field.draw_and_save_field(is_old=False)
+	field.draw_and_save_field(is_old=False)
 
 	new_lid_base_error = field.calculate_lid_based_error()
 	new_RMSE = get_approximate_random_RMSE_overlap(field,20,settings.no_of_cores_to_use_max)
@@ -80,7 +80,7 @@ settings.initialize_settings_test(scan_date,config_file,local_address,10,None)
 
 print_settings()
 main(scan_date)
-save_ortho()
+# save_ortho()
 
 end_time = datetime.datetime.now()
 
