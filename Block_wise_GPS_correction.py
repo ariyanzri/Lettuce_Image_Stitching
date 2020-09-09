@@ -2445,8 +2445,8 @@ class Global_Optimizer:
 				b.append(GPS_coef_x*p.gps.UL_coord[0])
 				
 
-				# A.append(row_y)
-				# b.append(GPS_coef_y*p.gps.UL_coord[1])
+				A.append(row_y)
+				b.append(GPS_coef_y*p.gps.UL_coord[1])
 
 		# row fixating
 
