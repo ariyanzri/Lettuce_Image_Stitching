@@ -2401,7 +2401,7 @@ class Global_Optimizer:
 		GPS_lids = 1/settings.LID_ERR_STD
 		# GPS_lids = 1/(9.02*1e-6) 
 
-		Row_coef = 1/9e-5
+		Row_coef = 1/9e-7
 
 		for p in self.patches:
 			for n,params in p.neighbors:
@@ -4804,7 +4804,7 @@ class Field:
 			corrected_patches.append(p)
 
 		row_dict = self.get_row_dict()
-		opt.transformation_diff_only_least_squares_with_lids(corrected_patches,None)
+		opt.transformation_diff_only_least_squares_with_lids(corrected_patches,row_dict)
 
 
 	def shift_after_correction_based_on_lids(self):
