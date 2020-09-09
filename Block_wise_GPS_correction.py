@@ -4390,6 +4390,8 @@ class Field:
 			# print('Field initialized with SINGLE group of {0} rows each.'.format(len(new_rows)))
 			print('Field initialized with SINGLE group of {0} rows each.'.format(len(new_rows)))
 
+			return groups
+			
 		else:
 
 			tmp = []
