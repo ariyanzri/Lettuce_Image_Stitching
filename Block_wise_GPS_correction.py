@@ -4821,7 +4821,7 @@ class Field:
 			corrected_patches.append(p)
 
 		row_dict = self.get_row_dict()
-		opt.transformation_diff_only_least_squares_with_lids(corrected_patches,None)
+		opt.transformation_diff_only_least_squares_with_lids(corrected_patches,row_dict)
 
 
 	def shift_after_correction_based_on_lids(self):
