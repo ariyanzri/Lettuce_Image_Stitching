@@ -85,5 +85,3 @@ save_ortho()
 end_time = datetime.datetime.now()
 
 report_time(start_time,end_time)
-
-
