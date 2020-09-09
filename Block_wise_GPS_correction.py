@@ -2401,7 +2401,7 @@ class Global_Optimizer:
 		GPS_lids = 1/settings.LID_ERR_STD
 		# GPS_lids = 1/(9.02*1e-6) 
 
-		Row_coef = 1/9e-7
+		Row_coef = 1/9e-8
 
 		for p in self.patches:
 			for n,params in p.neighbors:
