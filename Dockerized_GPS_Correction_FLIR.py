@@ -57,6 +57,10 @@ scan_date = sys.argv[1]
 config_file = sys.argv[2]
 local_address = sys.argv[3]
 
+os.mkdir('{0}/{1}_out'.format(local_address,scan_date))
+os.mkdir('{0}/{1}_out/SIFT'.format(local_address,scan_date))
+os.mkdir('{0}/{1}_out/logs'.format(local_address,scan_date))
+
 print('Geo-correction started. Log is being saved in {0}'.format(local_address))
 
 original = sys.stdout

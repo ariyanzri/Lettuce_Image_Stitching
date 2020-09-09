@@ -2443,25 +2443,42 @@ class Global_Optimizer:
 				b.append(GPS_coef_x*p.gps.UL_coord[0])
 				
 
-				A.append(row_y)
-				b.append(GPS_coef_y*p.gps.UL_coord[1])
+				# A.append(row_y)
+				# b.append(GPS_coef_y*p.gps.UL_coord[1])
 
 		# row fixating
 
 		if row_dict is not None:
 
+			# for r in row_dict:
+
+			# 	row_y = [0]*(2*self.number_of_images)
+
+			# 	first_element = row_dict[r][0]
+
+			# 	for p in row_dict[r]:
+
+			# 		row_y = Row_coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] - Row_coef*template[self.number_of_images + self.image_name_to_index_dict[first_element.name],:]
+
+			# 		A.append(row_y)
+			# 		b.append(0)
+
 			for r in row_dict:
 
-				row_y = [0]*(2*self.number_of_images)
-
-				first_element = row_dict[r][0]
+				prev_p = None
 
 				for p in row_dict[r]:
 
-					row_y = Row_coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] - Row_coef*template[self.number_of_images + self.image_name_to_index_dict[first_element.name],:]
+					if prev_p is None:
+						prev_p = p 
+						continue
+
+					row_y = Row_coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] - Row_coef*template[self.number_of_images + self.image_name_to_index_dict[prev_p.name],:]
 
 					A.append(row_y)
 					b.append(0)
+
+					prev_p = p
 
 		# ------------
 
@@ -2470,19 +2487,19 @@ class Global_Optimizer:
 
 		# X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
 		
-		X = np.transpose(A)
-		gc.collect()
-		X = np.matmul(X,A)
-		gc.collect()
-		X = np.linalg.inv(X)
-		gc.collect()
-		X = np.matmul(X,np.transpose(A))
-		gc.collect()
-		X = np.matmul(X,b)
-		gc.collect()
+		# X = np.transpose(A)
+		# gc.collect()
+		# X = np.matmul(X,A)
+		# gc.collect()
+		# X = np.linalg.inv(X)
+		# gc.collect()
+		# X = np.matmul(X,np.transpose(A))
+		# gc.collect()
+		# X = np.matmul(X,b)
+		# gc.collect()
 
-		# res = lsq_linear(A, b, max_iter=len(self.patches),verbose=2)
-		# X = res.x
+		res = lsq_linear(A, b, max_iter=len(self.patches),verbose=2)
+		X = res.x
 
 		for p in self.patches:
 			i = self.image_name_to_index_dict[p.name]
@@ -4889,6 +4906,8 @@ class Field:
 		down = all_patches[0].gps.LL_coord[1]
 		left = all_patches[0].gps.UL_coord[0]
 		right = all_patches[0].gps.UR_coord[0]
+
+		print('GPS boundries (up,down,left,right): ({0},{1},{2},{3})'.format(up,down,left,right))
 
 		for p in all_patches:
 			if p.gps.UL_coord[1]>=up:
