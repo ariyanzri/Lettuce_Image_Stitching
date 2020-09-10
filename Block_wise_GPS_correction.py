@@ -2476,7 +2476,7 @@ class Global_Optimizer:
 					row_y = Row_coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] - Row_coef*template[self.number_of_images + self.image_name_to_index_dict[prev_p.name],:]
 
 					A.append(row_y)
-					b.append(Row_coef*0.000001)
+					b.append(0)
 
 					prev_p = p
 
@@ -4821,7 +4821,7 @@ class Field:
 			corrected_patches.append(p)
 
 		row_dict = self.get_row_dict()
-		opt.transformation_diff_only_least_squares_with_lids(corrected_patches,row_dict)
+		opt.transformation_diff_only_least_squares_with_lids(corrected_patches,None)
 
 
 	def shift_after_correction_based_on_lids(self):
