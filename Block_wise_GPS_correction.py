@@ -4907,7 +4907,7 @@ class Field:
 		left = all_patches[0].gps.UL_coord[0]
 		right = all_patches[0].gps.UR_coord[0]
 
-		print('GPS boundries (up,down,left,right): ({0},{1},{2},{3})'.format(up,down,left,right))
+		print('GPS dimensions (width,height): ({0},{1})'.format(right-left,up-down))
 
 		for p in all_patches:
 			if p.gps.UL_coord[1]>=up:
