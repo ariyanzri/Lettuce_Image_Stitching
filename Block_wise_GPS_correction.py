@@ -4283,7 +4283,7 @@ class Field:
 				if patch not in [f[0] for f in final_list_patches]:
 					final_list_patches.append((patch,l,x,y))
 
-				print(r,r*settings.GPS_TO_IMAGE_RATIO)
+				print(r/settings.SCALE,(r/settings.SCALE)*settings.GPS_TO_IMAGE_RATIO[0])
 				print(patch.name)
 
 		print('Detected {0} lid patches in the field.'.format(len(final_list_patches)))
