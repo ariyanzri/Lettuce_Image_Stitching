@@ -2379,7 +2379,7 @@ class Global_Optimizer:
 			self.image_name_to_index_dict[p.name] = i
 			self.index_to_image_name_dict[i] = p.name
 
-	def transformation_diff_only_least_squares_with_lids(self,corrected_patches,row_dict):
+	def transformation_diff_only_least_squares_with_lids(self,corrected_patches):
 		template = np.eye(2*self.number_of_images)
 
 		A = []
@@ -2400,8 +2400,6 @@ class Global_Optimizer:
 		
 		GPS_lids = 1/settings.LID_ERR_STD
 		# GPS_lids = 1/(9.02*1e-6) 
-
-		Row_coef = 1/9e-8
 
 		for p in self.patches:
 			for n,params in p.neighbors:
@@ -2446,41 +2444,6 @@ class Global_Optimizer:
 				A.append(row_y)
 				b.append(GPS_coef_y*p.gps.UL_coord[1])
 
-		# row fixating
-
-		if row_dict is not None:
-
-			# for r in row_dict:
-
-			# 	row_y = [0]*(2*self.number_of_images)
-
-			# 	first_element = row_dict[r][0]
-
-			# 	for p in row_dict[r]:
-
-			# 		row_y = Row_coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] - Row_coef*template[self.number_of_images + self.image_name_to_index_dict[first_element.name],:]
-
-			# 		A.append(row_y)
-			# 		b.append(0)
-
-			for r in row_dict:
-
-				prev_p = None
-
-				for p in row_dict[r]:
-
-					if prev_p is None:
-						prev_p = p 
-						continue
-
-					row_y = Row_coef*template[self.number_of_images + self.image_name_to_index_dict[p.name],:] - Row_coef*template[self.number_of_images + self.image_name_to_index_dict[prev_p.name],:]
-
-					A.append(row_y)
-					b.append(0)
-
-					prev_p = p
-
-		# ------------
 
 		A=np.array(A)
 		b=np.array(b)
@@ -4283,8 +4246,8 @@ class Field:
 				if patch not in [f[0] for f in final_list_patches]:
 					final_list_patches.append((patch,l,x,y))
 
-				print(r/settings.SCALE,(r/settings.SCALE)*settings.GPS_TO_IMAGE_RATIO[0])
-				print(patch.name)
+				# print(r/settings.SCALE,(r/settings.SCALE)*settings.GPS_TO_IMAGE_RATIO[0])
+				# print(patch.name)
 
 		print('Detected {0} lid patches in the field.'.format(len(final_list_patches)))
 		sys.stdout.flush()
@@ -4795,23 +4758,6 @@ class Field:
 			all_patches_list.append(all_patches[p])
 
 		return all_patches,all_patches_list
-	
-	def get_row_dict(self):
-
-		row_id = 0
-		row_dict = {}
-
-		for group in self.groups:
-			for row in group.rows:
-				
-				row_id+=1
-				row_dict[row_id] = []
-
-				for p in row:
-					row_dict[row_id].append(p) 
-
-		return row_dict
-
 
 	def whole_field_global_opt(self,all_patches_list):
 
@@ -4823,8 +4769,7 @@ class Field:
 		for p,l,x,y in self.detected_lid_patches:
 			corrected_patches.append(p)
 
-		row_dict = self.get_row_dict()
-		opt.transformation_diff_only_least_squares_with_lids(corrected_patches,None)
+		opt.transformation_diff_only_least_squares_with_lids(corrected_patches)
 
 
 	def shift_after_correction_based_on_lids(self):
