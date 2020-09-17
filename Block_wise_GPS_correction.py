@@ -1023,8 +1023,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 
 			lid_img = cv2.imread(settings.temp_lid_image_address,0)
 			# print(lid_img.shape)
-			Height_Scale = (settings.PATCH_SIZE_GPS[0]/1.7999999997186933e-05,settings.PATCH_SIZE_GPS[1]/2.0499999997980467e-05)
-			settings.LID_SIZE_AT_SCALE = (settings.LID_SIZE_AT_SCALE[0]/Height_Scale[0],settings.LID_SIZE_AT_SCALE[1]/Height_Scale[0])
+			
 			lid_img = cv2.resize(lid_img,(int(lid_img.shape[1]*settings.SCALE/Height_Scale[0]),int(lid_img.shape[0]*settings.SCALE/Height_Scale[1])))
 			
 
