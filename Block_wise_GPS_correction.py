@@ -4221,7 +4221,7 @@ class Field:
 					# if p.gps.is_coord_inside(lids[l]) and (p not in [ptch[0] for ptch in lid_patches]):
 						lid_patches.append((p,l))
 
-						# print(p.name)
+						print(p.name)
 
 		return lid_patches
 
