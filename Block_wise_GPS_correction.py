@@ -1072,6 +1072,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 
 			if err <=settings.circle_error and r >= settings.LID_SIZE_AT_SCALE[0] and r <= settings.LID_SIZE_AT_SCALE[1]:
 				# cv2.putText(img, str(err), (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA) 
+				cv2.circle(rgb_img,(int(x),int(y)),r,(0,0,255),thickness=8)
 				cv2.imwrite('/storage/ariyanzarei/test/{0}.jpg'.format(img_name.split('.')[0]),rgb_img)
 				return x,y,r,l,pname,coord
 			else:
