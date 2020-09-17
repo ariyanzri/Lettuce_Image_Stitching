@@ -1027,7 +1027,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 			result=cv2.matchTemplate(gray,lid_img,cv2.TM_CCOEFF)
 			sin_val, max_val, min_loc, max_loc=cv2.minMaxLoc(result)
 			top_left=max_loc
-			bottom_right=(top_left[0]+int(1.5*settings.LID_SIZE_AT_SCALE[1]),top_left[1]+int(1.5*settings.LID_SIZE_AT_SCALE[1]))
+			bottom_right=(top_left[0]+int(settings.LID_SIZE_AT_SCALE[1]),top_left[1]+int(settings.LID_SIZE_AT_SCALE[1]))
 			
 			x = int(abs(top_left[0]+bottom_right[0])/2)
 			y = int(abs(top_left[1]+bottom_right[1])/2)
