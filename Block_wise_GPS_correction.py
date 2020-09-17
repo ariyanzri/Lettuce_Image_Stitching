@@ -1025,11 +1025,20 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 			# print(lid_img.shape)
 
 			lid_img = cv2.resize(lid_img,(int(lid_img.shape[1]*settings.SCALE/settings.Height_Scale),int(lid_img.shape[0]*settings.SCALE/settings.Height_Scale)))
-			H_lid_img = cv2.cvtColor(lid_img,cv2.COLOR_BGR2HSV)[:,:,1]
+			
+			HSV_lid_img = cv2.cvtColor(lid_img,cv2.COLOR_BGR2HSV)
+			Final_lid_img = np.zeros((HSV_lid_img.shape[0],HSV_lid_img.shape[1],2))
+			Final_lid_img[:,:,0] = HSV_lid_img[:,:,0]
+			Final_lid_img[:,:,1] = HSV_lid_img[:,:,1]
+			Final_lid_img = np.mean(Final_lid_img,axis=-1).astype('uint8')
 
-			H_img=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)[:,:,1]
+			HSV_img=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+			Final_img = np.zeros((HSV_img.shape[0],HSV_img.shape[1],2))
+			Final_img[:,:,0] = HSV_img[:,:,0]
+			Final_img[:,:,1] = HSV_img[:,:,1]
+			Final_img = np.mean(Final_img,axis=-1).astype('uint8')
 
-			result=cv2.matchTemplate(H_img,H_lid_img,cv2.TM_CCOEFF)
+			result=cv2.matchTemplate(Final_img,Final_lid_img,cv2.TM_CCOEFF)
 			sin_val, max_val, min_loc, max_loc=cv2.minMaxLoc(result)
 			top_left=max_loc
 			bottom_right=(top_left[0]+int(settings.LID_SIZE_AT_SCALE[1]*2),top_left[1]+int(settings.LID_SIZE_AT_SCALE[1]*2))
