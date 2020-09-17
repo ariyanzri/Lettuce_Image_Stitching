@@ -1021,14 +1021,15 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 
 		if settings.use_temp_matching:
 
-			lid_img = cv2.imread(settings.temp_lid_image_address,0)
+			lid_img = cv2.imread(settings.temp_lid_image_address)
 			# print(lid_img.shape)
 
 			lid_img = cv2.resize(lid_img,(int(lid_img.shape[1]*settings.SCALE/settings.Height_Scale),int(lid_img.shape[0]*settings.SCALE/settings.Height_Scale)))
-			
-			gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+			H_lid_img = cv2.cvtColor(lid_img,cv2.COLOR_BGR2HSV)[:,:,1]
 
-			result=cv2.matchTemplate(gray,lid_img,cv2.TM_CCOEFF)
+			H_img=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)[:,:,1]
+
+			result=cv2.matchTemplate(H_img,H_lid_img,cv2.TM_CCOEFF)
 			sin_val, max_val, min_loc, max_loc=cv2.minMaxLoc(result)
 			top_left=max_loc
 			bottom_right=(top_left[0]+int(settings.LID_SIZE_AT_SCALE[1]*2),top_left[1]+int(settings.LID_SIZE_AT_SCALE[1]*2))
