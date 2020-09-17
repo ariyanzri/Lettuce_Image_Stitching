@@ -4286,6 +4286,15 @@ class Field:
 
 		self.detected_lid_patches = final_list_patches
 
+	def save_lid_patches(self):
+
+		for p,l,x,y in self.detected_lid_patches:
+			p.load_img()
+			rgb_img = p.rgb_img.copy()
+
+			cv2.circle(rgb_img,(int(x),int(y)),int((settings.LID_SIZE_AT_SCALE[0]+settings.LID_SIZE_AT_SCALE[1])/2),(0,0,255),thickness=8)
+			cv2.imwrite('/storage/ariyanzarei/test/{0}.jpg'.format(img_name.split('.')[0]),rgb_img)
+
 	def calculate_lid_based_error(self):
 		distances = []
 
