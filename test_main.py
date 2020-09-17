@@ -27,10 +27,7 @@ def main(scan_date):
 
 	field = Field(is_single_group=settings.is_single_group)
 
-	# print(settings.PATCH_SIZE_GPS)
-	print(settings.PATCH_SIZE_GPS[0]/1.7999999997186933e-05,settings.PATCH_SIZE_GPS[1]/2.0499999997980467e-05)
-
-	# field.save_lid_patches()
+	field.save_lid_patches()
 
 	# field.save_plot()
 
