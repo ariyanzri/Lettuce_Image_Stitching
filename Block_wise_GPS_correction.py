@@ -4221,7 +4221,8 @@ class Field:
 					# if p.gps.is_coord_inside(lids[l]) and (p not in [ptch[0] for ptch in lid_patches]):
 						lid_patches.append((p,l))
 
-						print(p.name)
+						# print(p.name)
+						print('scp coge:{0}/{1} .'.format(settings.patch_folder,patch.name))
 
 		return lid_patches
 
