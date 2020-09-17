@@ -1034,6 +1034,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 			r = int(abs(top_left[0]-bottom_right[0])/2)
 
 			cv2.circle(rgb_img,(int(x),int(y)),r,(0,0,255),thickness=8)
+			cv2.putText(rgb_img, str(max_val), (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA) 
 			cv2.imwrite('/storage/ariyanzarei/test/{0}.jpg'.format(img_name.split('.')[0]),rgb_img)
 			return x,y,r,l,pname,coord
 
