@@ -4249,7 +4249,7 @@ class Field:
 					final_list_patches.append((patch,l,x,y))
 
 				# print(r/settings.SCALE,(r/settings.SCALE)*settings.GPS_TO_IMAGE_RATIO[0])
-				print(patch.name)
+				print('scp coge:/storage/ariyanzarei/season_11/2020-08-19/bin2tif_out/{0} .'.format(patch.name))
 
 		print('Detected {0} lid patches in the field.'.format(len(final_list_patches)))
 		sys.stdout.flush()
