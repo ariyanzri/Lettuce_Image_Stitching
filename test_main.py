@@ -27,7 +27,7 @@ def main(scan_date):
 
 	field = Field(is_single_group=settings.is_single_group)
 
-	print(settings.GPS_TO_IMAGE_RATIO)
+	print(settings.PATCH_SIZE_GPS[0]/3.6437246957868283e-08,settings.PATCH_SIZE_GPS[1]/3.110773899541801e-08)
 
 	# field.save_lid_patches()
 
