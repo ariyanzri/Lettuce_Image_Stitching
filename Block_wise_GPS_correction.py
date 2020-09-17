@@ -1037,11 +1037,11 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 			y = int(abs(top_left[1]+bottom_right[1])/2)
 			r = int(abs(top_left[0]-bottom_right[0])/2)
 
-			cv2.circle(rgb_img,(int(x),int(y)),r,(0,0,255),thickness=8)
-			# cv2.rectangle(rgb_img,top_left,bottom_right,(255,0,0),10)
-			cv2.putText(rgb_img, str(max_val), (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA) 
-			cv2.imwrite('/storage/ariyanzarei/test/{0}.jpg'.format(img_name.split('.')[0]),rgb_img)
-			return x,y,r,l,pname,coord
+			# cv2.circle(rgb_img,(int(x),int(y)),r,(0,0,255),thickness=8)
+			# # cv2.rectangle(rgb_img,top_left,bottom_right,(255,0,0),10)
+			# cv2.putText(rgb_img, str(max_val), (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA) 
+			# cv2.imwrite('/storage/ariyanzarei/test/{0}.jpg'.format(img_name.split('.')[0]),rgb_img)
+			return x,y,r,l,pname,coord,max_val
 
 			# lid_img = cv2.imread(settings.temp_lid_image_address,0)
 			# gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -4264,7 +4264,12 @@ class Field:
 
 		final_list_patches = []
 
-		for x,y,r,l,pn,crd in results:
+		if settings.use_temp_matching:
+			results_sorted = sorted(results, reverse=True, key=lambda tup: tup[6])
+			max_count_lids = max(len(results_sorted)/5,28)
+			results = [x,y,r,l,pn,crd for x,y,r,l,pn,crd,score in results_sorted[:max_count_lids]]
+
+		for x,y,r,l,pn,crd,score in results:
 			if r!=-1:
 				
 				patch = [p[0] for p in possible_patches if p[0].name == pn]
