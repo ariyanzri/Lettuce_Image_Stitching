@@ -4222,7 +4222,7 @@ class Field:
 						lid_patches.append((p,l))
 
 						# print(p.name)
-						print('scp coge:{0}/{1} .'.format(settings.patch_folder,patch.name))
+						print('scp coge:{0}/{1} .'.format(settings.patch_folder,p.name))
 
 		return lid_patches
 
