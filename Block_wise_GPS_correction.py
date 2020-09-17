@@ -1021,7 +1021,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 
 		if settings.use_temp_matching:
 
-			lid_img = cv2.imread(settings.temp_lid_image_address,0)
+			lid_img = cv2.imread(settings.temp_lid_image_address)
 			print(lid_img.shape)
 			lid_img = cv2.resize(lid_img,(int(lid_img.shape[1]*settings.SCALE),int(lid_img.shape[0]*settings.SCALE)))
 			
