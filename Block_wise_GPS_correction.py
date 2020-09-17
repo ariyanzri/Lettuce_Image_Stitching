@@ -4269,7 +4269,7 @@ class Field:
 			max_count_lids = max(int(len(results_sorted)/5),28)
 			results = [(x,y,r,l,pn,crd) for x,y,r,l,pn,crd,score in results_sorted[:max_count_lids]]
 
-		for x,y,r,l,pn,crd,score in results:
+		for x,y,r,l,pn,crd in results:
 			if r!=-1:
 				
 				patch = [p[0] for p in possible_patches if p[0].name == pn]
