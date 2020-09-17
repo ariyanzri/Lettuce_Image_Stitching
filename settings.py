@@ -11,7 +11,7 @@ def initialize_settings(scan_date,config_file,local_address):
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
 	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -24,8 +24,8 @@ def initialize_settings(scan_date,config_file,local_address):
 		no_of_cores_to_use_max = int(lines[2].split(':')[1])
 		SCALE = float(lines[3].split(':')[1])
 		PATCH_SIZE = (int(size_init[0]*SCALE),int(size_init[1]*SCALE))
-		Height_Scale = (PATCH_SIZE_GPS[0]/1.7999999997186933e-05+PATCH_SIZE_GPS[1]/2.0499999997980467e-05)/2
-		LID_SIZE_AT_SCALE = (LID_SIZE[0]*SCALE/Height_Scale,LID_SIZE[1]*SCALE/Height_Scale)
+		Height_Scale = (1.7999999997186933e-05,2.0499999997980467e-05)
+		LID_SIZE_AT_SCALE = (-1,-1)
 		PATCH_SIZE_GPS = (-1,-1)
 		GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 		HEIGHT_RATIO_FOR_ROW_SEPARATION = float(lines[4].split(':')[1])
@@ -89,7 +89,7 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,uav_add,bi
 	field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
 	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -102,8 +102,8 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,uav_add,bi
 		no_of_cores_to_use_max = int(lines[2].split(':')[1])
 		SCALE = float(lines[3].split(':')[1])
 		PATCH_SIZE = (int(size_init[0]*SCALE),int(size_init[1]*SCALE))
-		Height_Scale = (PATCH_SIZE_GPS[0]/1.7999999997186933e-05+PATCH_SIZE_GPS[1]/2.0499999997980467e-05)/2
-		LID_SIZE_AT_SCALE = (LID_SIZE[0]*SCALE/Height_Scale,LID_SIZE[1]*SCALE/Height_Scale)
+		Height_Scale = (1.7999999997186933e-05,2.0499999997980467e-05)
+		LID_SIZE_AT_SCALE = (-1,-1)
 		PATCH_SIZE_GPS = (-1,-1)
 		GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 		HEIGHT_RATIO_FOR_ROW_SEPARATION = float(lines[4].split(':')[1])
@@ -166,7 +166,7 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
 	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -179,8 +179,8 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 		no_of_cores_to_use_max = int(lines[2].split(':')[1])
 		SCALE = float(lines[3].split(':')[1])
 		PATCH_SIZE = (int(size_init[0]*SCALE),int(size_init[1]*SCALE))
-		Height_Scale = (PATCH_SIZE_GPS[0]/1.7999999997186933e-05+PATCH_SIZE_GPS[1]/2.0499999997980467e-05)/2
-		LID_SIZE_AT_SCALE = (LID_SIZE[0]*SCALE/Height_Scale,LID_SIZE[1]*SCALE/Height_Scale)
+		Height_Scale = (1.7999999997186933e-05,2.0499999997980467e-05)
+		LID_SIZE_AT_SCALE = (-1,-1)
 		PATCH_SIZE_GPS = (-1,-1)
 		GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 		HEIGHT_RATIO_FOR_ROW_SEPARATION = float(lines[4].split(':')[1])
@@ -244,7 +244,7 @@ def initialize_settings_FLIR(scan_date,config_file,local_address):
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
 	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -257,8 +257,8 @@ def initialize_settings_FLIR(scan_date,config_file,local_address):
 		no_of_cores_to_use_max = int(lines[2].split(':')[1])
 		SCALE = float(lines[3].split(':')[1])
 		PATCH_SIZE = (int(size_init[0]*SCALE),int(size_init[1]*SCALE))
-		Height_Scale = (PATCH_SIZE_GPS[0]/1.7999999997186933e-05+PATCH_SIZE_GPS[1]/2.0499999997980467e-05)/2
-		LID_SIZE_AT_SCALE = (LID_SIZE[0]*SCALE/Height_Scale,LID_SIZE[1]*SCALE/Height_Scale)
+		Height_Scale = (1.7999999997186933e-05,2.0499999997980467e-05)
+		LID_SIZE_AT_SCALE = (-1,-1)
 		PATCH_SIZE_GPS = (-1,-1)
 		GPS_TO_IMAGE_RATIO = (PATCH_SIZE_GPS[0]/PATCH_SIZE[1],PATCH_SIZE_GPS[1]/PATCH_SIZE[0])
 		HEIGHT_RATIO_FOR_ROW_SEPARATION = float(lines[4].split(':')[1])
