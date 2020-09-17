@@ -80,7 +80,7 @@ settings.initialize_settings_test(scan_date,config_file,local_address,None,None)
 
 print_settings()
 main(scan_date)
-save_ortho()
+# save_ortho()
 
 end_time = datetime.datetime.now()
 
