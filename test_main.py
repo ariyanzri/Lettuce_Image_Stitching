@@ -27,8 +27,10 @@ def main(scan_date):
 
 	field = Field(is_single_group=settings.is_single_group)
 
-	field.save_lid_patches()
-	
+	print(settings.GPS_TO_IMAGE_RATIO)
+
+	# field.save_lid_patches()
+
 	# field.save_plot()
 
 	# old_lid_base_error = field.calculate_lid_based_error()
