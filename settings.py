@@ -61,7 +61,7 @@ def initialize_settings(scan_date,config_file,local_address):
 		GPS_ERROR_STD = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
 		LID_ERR_STD = float(lines[31].split(':')[1])
 
-		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
+		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.tif'.format(local_address,scan_date)
 
 		patch_folder = '{0}/{1}-rgb/bin2tif_out'.format(local_address,scan_date)
 		SIFT_folder = '{0}/{1}-rgb/SIFT'.format(local_address,scan_date)
