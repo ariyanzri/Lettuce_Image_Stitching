@@ -11,7 +11,7 @@ def initialize_settings(scan_date,config_file,local_address):
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
 	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -89,7 +89,7 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,uav_add,bi
 	field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
 	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -166,7 +166,7 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
 	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -244,7 +244,7 @@ def initialize_settings_FLIR(scan_date,config_file,local_address):
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
 	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
