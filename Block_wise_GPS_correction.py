@@ -1029,9 +1029,9 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 			top_left=max_loc
 			bottom_right=(top_left[0]+int(1.5*settings.LID_SIZE_AT_SCALE[1]),top_left[1]+int(1.5*settings.LID_SIZE_AT_SCALE[1]))
 			
-			x = abs(top_left[0]+bottom_right[0])/2
-			y = abs(top_left[1]+bottom_right[1])/2
-			r = abs(top_left[0]-bottom_right[0])/2
+			x = int(abs(top_left[0]+bottom_right[0])/2)
+			y = int(abs(top_left[1]+bottom_right[1])/2)
+			r = int(abs(top_left[0]-bottom_right[0])/2)
 
 			cv2.circle(rgb_img,(int(x),int(y)),r,(0,0,255),thickness=8)
 			cv2.imwrite('/storage/ariyanzarei/test/{0}.jpg'.format(img_name.split('.')[0]),rgb_img)
