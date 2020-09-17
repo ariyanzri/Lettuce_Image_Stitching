@@ -4219,7 +4219,7 @@ class Field:
 					# if p.gps.is_coord_inside(lids[l]) and (p not in [ptch[0] for ptch in lid_patches]):
 						lid_patches.append((p,l))
 
-						print(p.name)
+						# print(p.name)
 
 		return lid_patches
 
@@ -4249,7 +4249,7 @@ class Field:
 					final_list_patches.append((patch,l,x,y))
 
 				# print(r/settings.SCALE,(r/settings.SCALE)*settings.GPS_TO_IMAGE_RATIO[0])
-				# print(patch.name)
+				print(patch.name)
 
 		print('Detected {0} lid patches in the field.'.format(len(final_list_patches)))
 		sys.stdout.flush()
