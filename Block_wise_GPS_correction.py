@@ -4244,7 +4244,7 @@ class Field:
 						lid_patches.append((p,l))
 
 						# print(p.name)
-						print('scp coge:{0}/{1} .'.format(settings.patch_folder,p.name))
+						# print('scp coge:{0}/{1} .'.format(settings.patch_folder,p.name))
 
 		return lid_patches
 
@@ -4267,7 +4267,7 @@ class Field:
 		if settings.use_temp_matching:
 			results_sorted = sorted(results, reverse=True, key=lambda tup: tup[6])
 			max_count_lids = max(len(results_sorted)/5,28)
-			results = [x,y,r,l,pn,crd for x,y,r,l,pn,crd,score in results_sorted[:max_count_lids]]
+			results = [(x,y,r,l,pn,crd) for x,y,r,l,pn,crd,score in results_sorted[:max_count_lids]]
 
 		for x,y,r,l,pn,crd,score in results:
 			if r!=-1:
