@@ -40,6 +40,7 @@ def get_args():
 	parser.add_argument('-c','--config_file', type=str, help='the name of the config file to use.')
 	parser.add_argument('-l','--lid_address', type=str, help='the address of the lid file.')
 	parser.add_argument('-u','--uav_lettuce_address', type=str, help='the address of the uav lettuce coordinates file.')
+	parser.add_argument('-r','--repository_address', type=str, help='the address of the geocorrection repository.')
 
 	args = parser.parse_args()
 
@@ -56,9 +57,9 @@ lid_file_address = args.lid_address
 uav_lettuce_address = args.uav_lettuce_address
 bin2tiff_address = args.bin_2tif
 gps_coord_file = args.gps_coord
+repository_address = args.repository_address
 
-
-settings.initialize_settings_HPC(scan_date,config_file,destination,lid_file_address,uav_lettuce_address,bin2tiff_address,gps_coord_file)
+settings.initialize_settings_HPC(scan_date,config_file,destination,lid_file_address,uav_lettuce_address,bin2tiff_address,gps_coord_file,repository_address)
 
 main(scan_date)
 
