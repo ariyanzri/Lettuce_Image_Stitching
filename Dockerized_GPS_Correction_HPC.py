@@ -32,7 +32,7 @@ def main(scan_date):
 
 	old_lid_base_error = field.calculate_lid_based_error()
 
-	old_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
+	old_RMSE = get_approximate_random_RMSE_overlap(field,40,settings.no_of_cores_to_use_max)
 
 	field.create_patches_SIFT_files()
 	
@@ -43,7 +43,7 @@ def main(scan_date):
 	field.save_new_coordinate()
 
 	new_lid_base_error = field.calculate_lid_based_error()
-	new_RMSE = get_approximate_random_RMSE_overlap(field,10,settings.no_of_cores_to_use_max)
+	new_RMSE = get_approximate_random_RMSE_overlap(field,40,settings.no_of_cores_to_use_max)
 
 	print('------------------ ERROR MEASUREMENT ------------------ ')
 
@@ -55,6 +55,8 @@ def main(scan_date):
 	print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
 	print('NEW SI: {0}'.format(np.mean(new_RMSE[:,3])))
 
+	field.draw_and_save_field(is_old=False)
+
 def get_args():
 
 	parser = argparse.ArgumentParser(description='Geo-correction on HPC.')
@@ -65,6 +67,7 @@ def get_args():
 	parser.add_argument('-c','--config_file', type=str, help='the name of the config file to use.')
 	parser.add_argument('-l','--lid_address', type=str, help='the address of the lid file.')
 	parser.add_argument('-u','--uav_lettuce_address', type=str, help='the address of the uav lettuce coordinates file.')
+	parser.add_argument('-r','--repository_address', type=str, help='the address of the geocorrection repository.')
 
 	args = parser.parse_args()
 
@@ -81,6 +84,7 @@ lid_file_address = args.lid_address
 uav_lettuce_address = args.uav_lettuce_address
 bin2tiff_address = args.bin_2tif
 gps_coord_file = args.gps_coord
+repository_address = args.repository_address
 
 os.mkdir('{0}/{1}'.format(destination,scan_date))
 os.mkdir('{0}/{1}/SIFT'.format(destination,scan_date))
@@ -92,7 +96,7 @@ original = sys.stdout
 
 sys.stdout = open('{0}/{1}/{2}.txt'.format(destination,scan_date,'geo_correction_output'), 'w')
 
-settings.initialize_settings_HPC(scan_date,config_file,destination,lid_file_address,uav_lettuce_address,bin2tiff_address,gps_coord_file)
+settings.initialize_settings_HPC(scan_date,config_file,destination,lid_file_address,uav_lettuce_address,bin2tiff_address,gps_coord_file,repository_address)
 
 print_settings()
 main(scan_date)

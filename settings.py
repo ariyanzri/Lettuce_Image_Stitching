@@ -78,7 +78,7 @@ def initialize_settings(scan_date,config_file,local_address):
 		lettuce_coords = None
 
 
-def initialize_settings_HPC(scan_date,config_file,destination,lid_add,uav_add,bin2tif_address,gps_coord_file):
+def initialize_settings_HPC(scan_date,config_file,destination,lid_add,uav_add,bin2tif_address,gps_coord_file,repository_address):
 	global method,no_of_cores_to_use,no_of_cores_to_use_max,SCALE,PATCH_SIZE,LID_SIZE_AT_SCALE,PATCH_SIZE_GPS,\
 	GPS_TO_IMAGE_RATIO,HEIGHT_RATIO_FOR_ROW_SEPARATION,PERCENTAGE_OF_GOOD_MATCHES,MINIMUM_PERCENTAGE_OF_INLIERS,\
 	MINIMUM_NUMBER_OF_MATCHES,RANSAC_MAX_ITER,RANSAC_ERROR_THRESHOLD,PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES,\
@@ -140,7 +140,7 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,uav_add,bi
 		GPS_ERROR_STD = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
 		LID_ERR_STD = float(lines[31].split(':')[1])
 
-		temp_lid_image_address = '{0}/{1}/lid_temp.png'.format(destination,scan_date)
+		temp_lid_image_address = '{0}/lid_temp.png'.format(repository_address)
 
 		patch_folder = '{0}'.format(bin2tif_address)
 		SIFT_folder = '{0}/{1}/SIFT'.format(destination,scan_date)
