@@ -29,12 +29,12 @@ This repository contains all the necessary codes for running geo-correcting the 
 
   * '-r' --> '--repository_address', type=str, help='the address of the geocorrection repository.'
 
-* Dockerized_Ortho_Save.py
+* Dockerized_Ortho_Save.py: The entry point for generating and saving the orhtos. Same parameters as above. 
 
-* GPS_image_stitching.py
+* GPS_image_stitching.py: The old file where all the untidy codes for testing are placed in. 
 
-* geo_correction_config.txt
+* geo_correction_config.txt: A sample of a good config file with all the field.
 
-* settings.py
+* settings.py: The file that is responsible for reading the config file and configuring the platform. 
 
-* test_main.py 
+* test_main.py: A development test file for testing the code in debuge mode. 
