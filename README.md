@@ -39,6 +39,7 @@ This repository contains all the necessary codes for running geo-correcting the 
 
 * test_main.py: A development test file for testing the code in debuge mode. 
 
+* lid_temp.png: The template used in lid detection. This can be changed from season to season or even scan to scan. 
 
 ## Notes
 
