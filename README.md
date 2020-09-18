@@ -38,3 +38,9 @@ This repository contains all the necessary codes for running geo-correcting the 
 * settings.py: The file that is responsible for reading the config file and configuring the platform. 
 
 * test_main.py: A development test file for testing the code in debuge mode. 
+
+
+## Notes
+
+The local repository must contain all the above files (specially the main skeleton of the code and the temp image of the lid).
+
