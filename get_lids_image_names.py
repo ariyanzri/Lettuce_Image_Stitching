@@ -18,15 +18,15 @@ for scan in scan_coords_csv:
 		lid_lat = lid['lat']
 		lid_long = lid['lon']
 
-		print('{0} - {1} - {2}'.format(lid_name,lid_lat,lid_long))
+		# print('{0} - {1} - {2}'.format(lid_name,lid_lat,lid_long))
 
 		for img_index,img_data in scan_data.iterrows():
 
 			img_name = img_data['Filename']
-			img_UL = img_data['Upper left']
-			img_UR = img_data['Upper right']
-			img_LL = img_data['Lower left']
-			img_LR = img_data['Lower right']
-			img_C = img_data['Center']
+			img_UL = img_data['Upper left'].replace('"','').split(',')
+			img_UR = img_data['Upper right'].replace('"','').split(',')
+			img_LL = img_data['Lower left'].replace('"','').split(',')
+			img_LR = img_data['Lower right'].replace('"','').split(',')
+			img_C = img_data['Center'].replace('"','').split(',')
 
 			print('\t {0} - {1} - {2} - {3} - {4} - {5}'.format(img_name,img_UL,img_UR,img_LL,img_LR,img_C))
