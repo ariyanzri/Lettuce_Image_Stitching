@@ -28,8 +28,6 @@ for scan_name in scans:
 		lid_name = lid['lid_id']
 		lid_loc = {'lat':float(lid['lat']),'lon':float(lid['lon'])}
 
-		print(scan_name,lid_name)
-		
 		for img_data in scan_data:
 
 			img_name = img_data['Filename']
@@ -44,8 +42,6 @@ for scan_name in scans:
 			img_LL = {'lat':float(LL[1]),'lon':float(LL[0])}
 			img_LR = {'lat':float(LR[1]),'lon':float(LR[0])}
 			img_C = {'lat':float(C[1]),'lon':float(C[0])}
-
-			print('\t {0} - {1} - {2} - {3} - {4} - {5}'.format(img_name,img_UL,img_UR,img_LL,img_LR,img_C))
 
 			if lid_loc['lon']>=img_UL['lon'] and lid_loc['lon']<=img_UR['lon'] and lid_loc['lat']<=img_UL['lat'] and lid_loc['lat']>=img_LL['lat']:
 				final_list_associated.append((scan_name,lid_name,img_name))
