@@ -13,9 +13,9 @@ final_list_associated = []
 
 for scan in scan_coords_csv:
 	scan_name = scan.replace('_coordinates.csv','')
-	scan_data = pd.read_csv('{0}/{1}'.format(csv_locations_path,scan))
+	scan_data = pd.read_csv('{0}/{1}'.format(csv_locations_path,scan)).values.todict()
 
-	print(scan_name)
+	print(scan_data)
 	# for lid_index,lid in lid_locations.iterrows():
 		
 	# 	lid_name = lid['lid_id']
