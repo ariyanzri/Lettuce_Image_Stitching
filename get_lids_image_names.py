@@ -71,6 +71,9 @@ print('>>> Associated images with lids have been detected.')
 
 for scan_name in final_list_associated:
 
+	if scan_name != "2019-12-12":
+		continue
+
 	param1 = final_list_associated[scan_name]['path']
 	param2 = path_to_download
 	param3 = '{0}_tarfile.tar.gz'.format(scan_name)
