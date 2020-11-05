@@ -18,7 +18,7 @@ for scan in scan_coords_csv:
 	for lid_index,lid in lid_locations.iterrows():
 		
 		lid_name = lid['lid_id']
-		lid_loc = {'lat':lid['lat'],'lon':lid['lon']}
+		lid_loc = {'lat':float(lid['lat']),float('lon':lid['lon'])}
 
 		# print('{0} - {1} - {2}'.format(lid_name,lid_loc['lat'],lid_loc['lon']))
 
@@ -31,11 +31,11 @@ for scan in scan_coords_csv:
 			LR = img_data['Lower right'].replace('"','').split(',')
 			C = img_data['Center'].replace('"','').split(',')
 
-			img_UL = {'lat':UL[1],'lon':UL[0]}
-			img_UR = {'lat':UR[1],'lon':UR[0]}
-			img_LL = {'lat':LL[1],'lon':LL[0]}
-			img_LR = {'lat':LR[1],'lon':LR[0]}
-			img_C = {'lat':C[1],'lon':C[0]}
+			img_UL = {'lat':float(UL[1]),'lon':float(UL[0])}
+			img_UR = {'lat':float(UR[1]),'lon':float(UR[0])}
+			img_LL = {'lat':float(LL[1]),'lon':float(LL[0])}
+			img_LR = {'lat':float(LR[1]),'lon':float(LR[0])}
+			img_C = {'lat':float(C[1]),'lon':float(C[0])}
 
 			# print('\t {0} - {1} - {2} - {3} - {4} - {5}'.format(img_name,img_UL,img_UR,img_LL,img_LR,img_C))
 
