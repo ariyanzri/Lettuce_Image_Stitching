@@ -19,6 +19,8 @@ for scan in scan_coords_csv:
 
 	scans[scan_name] = scan_data
 
+print([n for n in scans])
+
 for scan_name in scans:
 
 	scan_data = scans[scan_name]
