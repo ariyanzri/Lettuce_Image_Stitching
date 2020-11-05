@@ -86,7 +86,10 @@ for scan_name in final_list_associated:
 	for i,img_name in enumerate(final_list_associated[scan_name]['images']):
 		src = '{0}/bin2tif_out/{1}'.format(path_to_download,img_name)
 		dst = '{0}/{1}_{2}.tif'.format(path_final_original,scan_name,img_name)
-		copyfile(src, dst)
+		
+		if os.path.exists(src):
+			
+			copyfile(src, dst)
 
 	print('>>> Lid images successfully moved to the proper directories.')
 
