@@ -3,13 +3,22 @@ import os
 import csv
 import subprocess
 from shutil import copyfile,rmtree
+import cv2
 
-csv_locations_path = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/season10_scans'
-csv_lids_locations_path = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/season10_lids.csv'
-path_to_download = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/temp'
-path_final_down_scaled = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/final_down_scaled'
-path_final_original = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/final_original'
-base_path = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection'
+# csv_locations_path = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/season10_scans'
+# csv_lids_locations_path = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/season10_lids.csv'
+# path_to_download = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/temp'
+# path_final_down_scaled = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/final_down_scaled'
+# path_final_original = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/final_original'
+# base_path = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection'
+
+base_path = '/storage/ariyanzarei/image_coords_per_scan'
+
+csv_locations_path = '{0}/season_10_scans'.format(base_path)
+csv_lids_locations_path = '{0}/season_10_lids.csv'.format(base_path)
+path_to_download = '{0}/temp'.format(base_path)
+path_final_down_scaled = '{0}/final_down_scaled'.format(base_path)
+path_final_original = '{0}/final_original'.format(base_path)
 
 def read_csv_to_dict(path):
 	dict_data = []
@@ -86,10 +95,16 @@ for scan_name in final_list_associated:
 	for i,img_name in enumerate(final_list_associated[scan_name]['images']):
 		src = '{0}/bin2tif_out/{1}'.format(path_to_download,img_name)
 		dst = '{0}/{1}_{2}.tif'.format(path_final_original,scan_name,img_name)
+		dst2 = '{0}/{1}_{2}.tif'.format(path_final_down_scaled,scan_name,img_name)
 		
 		if os.path.exists(src):
 			
 			copyfile(src, dst)
+
+			image_large = cv2.imread(src)
+			image_small = cv2.resize(image_large,(int(0.2*image_large.shape[1]),int(0.2*image_large.shape[0])))
+
+			cv2.imwrite(dst2,image_small)
 
 	print('>>> Lid images successfully moved to the proper directories.')
 
