@@ -58,35 +58,25 @@ print('>>> Associated images with lids have been detected.')
 
 for scan_name in final_list_associated:
 
-	param1 = '-rKVPT'
-	param2 = final_list_associated[scan_name]['path']
-	param3 = '{0}/.'.format(path_to_download)
+	param1 = final_list_associated[scan_name]['path']
+	param2 = path_to_download
+	param3 = '{0}_tarfile.tar.gz'.format(scan_name)
 
-	process = subprocess.Popen(['iget',param1,param2,param3])
+	process = subprocess.Popen(['./xdisk/ericlyons/big_data/ariyanzarei/lid_detection/download_untar.sh',param1,param2,param3])
 	process.wait()
 
-	print('>>> Raw images successfully downloaded form iRods.')
+	print('>>> Raw images download and the tar file successfully untarred.')
 
-	param1 = '-C'
-	param2 = '{0}'.format(path_to_download)
-	param3 = '-xvf'
-	param4 = '{0}/{1}_bin2tif.tar.gz'.format(path_to_download,scan_name)
+	# for i,img_name in enumerate(final_list_associated[scan_name]['images']):
+	# 	src = '{0}/bin2tif_out/{1}'.format(path_to_download,img_name)
+	# 	dst = '{0}/{1}_{2}.tif'.format(path_final_original,scan_name,img_name)
+	# 	copyfile(src, dst)
 
-	process = subprocess.Popen(['tar',param1,param2,param3,param4])
-	process.wait()
+	# print('>>> Lid images successfully moved to the proper directories.')
 
-	print('>>> Raw image folder successfully untarred.')
+	# process = subprocess.Popen(['rm','-r','{0}/*'.format(path_to_download)])
+	# process.wait()
 
-	for i,img_name in enumerate(final_list_associated[scan_name]['images']):
-		src = '{0}/bin2tif_out/{1}'.format(path_to_download,img_name)
-		dst = '{0}/{1}_{2}.tif'.format(path_final_original,scan_name,img_name)
-		copyfile(src, dst)
-
-	print('>>> Lid images successfully moved to the proper directories.')
-
-	process = subprocess.Popen(['rm','-r','{0}/*'.format(path_to_download)])
-	process.wait()
-
-	print('>>> Downloaded files deleted successfully.')
+	# print('>>> Downloaded files deleted successfully.')
 
 	break
