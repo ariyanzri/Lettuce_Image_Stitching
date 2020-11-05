@@ -54,6 +54,8 @@ for scan_name in scans:
 			if lid_loc['lon']>=img_UL['lon'] and lid_loc['lon']<=img_UR['lon'] and lid_loc['lat']<=img_UL['lat'] and lid_loc['lat']>=img_LL['lat']:
 				final_list_associated[scan_name]['images'].append(img_name)
 
+print('>>> Associated images with lids have been detected.')
+
 for scan_name in final_list_associated:
 
 	param1 = '-rKVPT'
