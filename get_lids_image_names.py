@@ -22,6 +22,7 @@ for scan in scan_coords_csv:
 
 		# print('{0} - {1} - {2}'.format(lid_name,lid_loc['lat'],lid_loc['lon']))
 
+		print(scan_name,lid_name)
 		for img_index,img_data in scan_data.iterrows():
 
 			img_name = img_data['Filename']
