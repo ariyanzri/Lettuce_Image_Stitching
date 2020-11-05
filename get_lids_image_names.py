@@ -9,6 +9,7 @@ csv_lids_locations_path = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/s
 path_to_download = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/temp'
 path_final_down_scaled = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/final_down_scaled'
 path_final_original = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/final_original'
+base_path = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection'
 
 lid_locations = pd.read_csv(csv_lids_locations_path).T.to_dict().values()
 
@@ -62,7 +63,7 @@ for scan_name in final_list_associated:
 	param2 = path_to_download
 	param3 = '{0}_tarfile.tar.gz'.format(scan_name)
 
-	process = subprocess.Popen(['./xdisk/ericlyons/big_data/ariyanzarei/lid_detection/download_untar.sh',param1,param2,param3])
+	process = subprocess.Popen(['.{0}/download_untar.sh'.format(base_path),param1,param2,param3])
 	process.wait()
 
 	print('>>> Raw images download and the tar file successfully untarred.')
