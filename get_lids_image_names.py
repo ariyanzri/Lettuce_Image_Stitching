@@ -39,8 +39,8 @@ for scan in scan_coords_csv:
 
 			# print('\t {0} - {1} - {2} - {3} - {4} - {5}'.format(img_name,img_UL,img_UR,img_LL,img_LR,img_C))
 
-			if lid_loc['lon']>=img_UL['lon'] and lid_loc['lon']<=img_UR['lon'] and lid_loc['lat']<=img_UL['lat'] and lid_loc['lat']>=img_LL['lat']:
-				final_list_associated.append((scan_name,lid_name,img_name))
+			# if lid_loc['lon']>=img_UL['lon'] and lid_loc['lon']<=img_UR['lon'] and lid_loc['lat']<=img_UL['lat'] and lid_loc['lat']>=img_LL['lat']:
+			# 	final_list_associated.append((scan_name,lid_name,img_name))
 
 for item in final_list_associated:
 	print(item)
