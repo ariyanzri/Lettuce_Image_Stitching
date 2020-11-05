@@ -29,7 +29,7 @@ for scan_name in scans:
 
 	scan_data = scans[scan_name]
 	final_list_associated[scan_name] = {}
-	final_list_associated[scan_name]['path'] = '/iplant/home/shared/terraref/ua-mac/level_1/season_10_yr_2020/stereoTop/{0}_bin2tif.tar.gz'.format(scan_name)
+	final_list_associated[scan_name]['path'] = '/iplant/home/shared/terraref/ua-mac/level_1/season_10_yr_2020/stereoTop/{0}/{0}_bin2tif.tar.gz'.format(scan_name)
 	final_list_associated[scan_name]['images'] = []
 
 	for lid in lid_locations:
