@@ -14,13 +14,13 @@ base_path = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection'
 def read_csv_to_dict(path):
 
 	with open(path, mode='r') as csvfile:
-		rows = csv.DictReader(csvfile)
-		
-		for row in rows:
-			print(row)
+		data_dict = csv.DictReader(csvfile)
+
+	return data_dict
 			
 
 lid_locations = read_csv_to_dict(csv_lids_locations_path)
+print(lid_locations)
 
 # scan_coords_csv = os.listdir(csv_locations_path)
 
