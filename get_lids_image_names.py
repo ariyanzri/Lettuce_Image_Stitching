@@ -50,4 +50,4 @@ for scan_name in scans:
 				final_list_associated[scan_name]['images'].append(img_name)
 
 for item in final_list_associated:
-	print(item)
+	print(item,final_list_associated[item])
