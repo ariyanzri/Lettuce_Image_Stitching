@@ -15,28 +15,29 @@ for scan in scan_coords_csv:
 	scan_name = scan.replace('_coordinates.csv','')
 	scan_data = pd.read_csv('{0}/{1}'.format(csv_locations_path,scan))
 
-	for lid_index,lid in lid_locations.iterrows():
+	print(scan_name)
+	# for lid_index,lid in lid_locations.iterrows():
 		
-		lid_name = lid['lid_id']
-		lid_loc = {'lat':float(lid['lat']),'lon':float(lid['lon'])}
+	# 	lid_name = lid['lid_id']
+	# 	lid_loc = {'lat':float(lid['lat']),'lon':float(lid['lon'])}
 
-		# print('{0} - {1} - {2}'.format(lid_name,lid_loc['lat'],lid_loc['lon']))
+	# 	# print('{0} - {1} - {2}'.format(lid_name,lid_loc['lat'],lid_loc['lon']))
 
-		print(scan_name,lid_name)
-		for img_index,img_data in scan_data.iterrows():
+	# 	print(scan_name,lid_name)
+	# 	for img_index,img_data in scan_data.iterrows():
 
-			img_name = img_data['Filename']
-			UL = img_data['Upper left'].replace('"','').split(',')
-			UR = img_data['Upper right'].replace('"','').split(',')
-			LL = img_data['Lower left'].replace('"','').split(',')
-			LR = img_data['Lower right'].replace('"','').split(',')
-			C = img_data['Center'].replace('"','').split(',')
+	# 		img_name = img_data['Filename']
+	# 		UL = img_data['Upper left'].replace('"','').split(',')
+	# 		UR = img_data['Upper right'].replace('"','').split(',')
+	# 		LL = img_data['Lower left'].replace('"','').split(',')
+	# 		LR = img_data['Lower right'].replace('"','').split(',')
+	# 		C = img_data['Center'].replace('"','').split(',')
 
-			img_UL = {'lat':float(UL[1]),'lon':float(UL[0])}
-			img_UR = {'lat':float(UR[1]),'lon':float(UR[0])}
-			img_LL = {'lat':float(LL[1]),'lon':float(LL[0])}
-			img_LR = {'lat':float(LR[1]),'lon':float(LR[0])}
-			img_C = {'lat':float(C[1]),'lon':float(C[0])}
+	# 		img_UL = {'lat':float(UL[1]),'lon':float(UL[0])}
+	# 		img_UR = {'lat':float(UR[1]),'lon':float(UR[0])}
+	# 		img_LL = {'lat':float(LL[1]),'lon':float(LL[0])}
+	# 		img_LR = {'lat':float(LR[1]),'lon':float(LR[0])}
+	# 		img_C = {'lat':float(C[1]),'lon':float(C[0])}
 
 			# print('\t {0} - {1} - {2} - {3} - {4} - {5}'.format(img_name,img_UL,img_UR,img_LL,img_LR,img_C))
 
