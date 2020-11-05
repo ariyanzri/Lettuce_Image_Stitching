@@ -9,7 +9,7 @@ lid_locations = pd.read_csv(csv_lids_locations_path).T.to_dict().values()
 
 scan_coords_csv = os.listdir(csv_locations_path)
 
-final_list_associated = []
+final_list_associated = {}
 
 scans = {}
 
