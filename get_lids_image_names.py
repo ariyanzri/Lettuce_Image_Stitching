@@ -63,7 +63,7 @@ for scan_name in final_list_associated:
 	param2 = path_to_download
 	param3 = '{0}_tarfile.tar.gz'.format(scan_name)
 
-	process = subprocess.Popen(['. {0}/download_untar.sh'.format(base_path),param1,param2,param3])
+	process = subprocess.Popen(['. {0}/download_untar.sh'.format(base_path),param1,param2,param3],shell=True)
 	process.wait()
 
 	print('>>> Raw images download and the tar file successfully untarred.')
