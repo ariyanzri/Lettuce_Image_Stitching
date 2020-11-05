@@ -1,6 +1,6 @@
 import numpy as np
 import os
-import pandas as pd
+import csv
 import subprocess
 from shutil import copyfile
 
@@ -11,73 +11,82 @@ path_final_down_scaled = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/fi
 path_final_original = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/final_original'
 base_path = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection'
 
-lid_locations = pd.read_csv(csv_lids_locations_path).T.to_dict().values()
+def read_csv_to_dict(path):
 
-scan_coords_csv = os.listdir(csv_locations_path)
-
-final_list_associated = {}
-
-scans = {}
-
-for scan in scan_coords_csv:
-	scan_name = scan.replace('_coordinates.csv','')
-	scan_data = pd.read_csv('{0}/{1}'.format(csv_locations_path,scan)).T.to_dict().values()
-
-	scans[scan_name] = scan_data
-
-for scan_name in scans:
-
-	scan_data = scans[scan_name]
-	final_list_associated[scan_name] = {}
-	final_list_associated[scan_name]['path'] = '/iplant/home/shared/terraref/ua-mac/level_1/season_10_yr_2020/stereoTop/{0}/{0}_bin2tif.tar.gz'.format(scan_name)
-	final_list_associated[scan_name]['images'] = []
-
-	for lid in lid_locations:
+	with open(path, mode='r') as csvfile:
+		rows = csv.DictReader(csvfile)
 		
-		lid_name = lid['lid_id']
-		lid_loc = {'lat':float(lid['lat']),'lon':float(lid['lon'])}
+		for row in rows:
+			print(row)
+			
 
-		for img_data in scan_data:
+lid_locations = read_csv_to_dict(csv_lids_locations_path)
 
-			img_name = img_data['Filename']
-			UL = img_data['Upper left'].replace('"','').split(',')
-			UR = img_data['Upper right'].replace('"','').split(',')
-			LL = img_data['Lower left'].replace('"','').split(',')
-			LR = img_data['Lower right'].replace('"','').split(',')
-			C = img_data['Center'].replace('"','').split(',')
+# scan_coords_csv = os.listdir(csv_locations_path)
 
-			img_UL = {'lat':float(UL[1]),'lon':float(UL[0])}
-			img_UR = {'lat':float(UR[1]),'lon':float(UR[0])}
-			img_LL = {'lat':float(LL[1]),'lon':float(LL[0])}
-			img_LR = {'lat':float(LR[1]),'lon':float(LR[0])}
-			img_C = {'lat':float(C[1]),'lon':float(C[0])}
+# final_list_associated = {}
 
-			if lid_loc['lon']>=img_UL['lon'] and lid_loc['lon']<=img_UR['lon'] and lid_loc['lat']<=img_UL['lat'] and lid_loc['lat']>=img_LL['lat']:
-				final_list_associated[scan_name]['images'].append(img_name)
+# scans = {}
 
-print('>>> Associated images with lids have been detected.')
+# for scan in scan_coords_csv:
+# 	scan_name = scan.replace('_coordinates.csv','')
+# 	scan_data = read_csv_to_dict('{0}/{1}'.format(csv_locations_path,scan))
 
-for scan_name in final_list_associated:
+# 	scans[scan_name] = scan_data
 
-	param1 = final_list_associated[scan_name]['path']
-	param2 = path_to_download
-	param3 = '{0}_tarfile.tar.gz'.format(scan_name)
+# for scan_name in scans:
 
-	process = subprocess.Popen(['. {0}/download_untar.sh'.format(base_path),param1,param2,param3],shell=True)
-	process.wait()
+# 	scan_data = scans[scan_name]
+# 	final_list_associated[scan_name] = {}
+# 	final_list_associated[scan_name]['path'] = '/iplant/home/shared/terraref/ua-mac/level_1/season_10_yr_2020/stereoTop/{0}/{0}_bin2tif.tar.gz'.format(scan_name)
+# 	final_list_associated[scan_name]['images'] = []
 
-	print('>>> Raw images download and the tar file successfully untarred.')
+# 	for lid in lid_locations:
+		
+# 		lid_name = lid['lid_id']
+# 		lid_loc = {'lat':float(lid['lat']),'lon':float(lid['lon'])}
 
-	for i,img_name in enumerate(final_list_associated[scan_name]['images']):
-		src = '{0}/bin2tif_out/{1}'.format(path_to_download,img_name)
-		dst = '{0}/{1}_{2}.tif'.format(path_final_original,scan_name,img_name)
-		copyfile(src, dst)
+# 		for img_data in scan_data:
 
-	print('>>> Lid images successfully moved to the proper directories.')
+# 			img_name = img_data['Filename']
+# 			UL = img_data['Upper left'].replace('"','').split(',')
+# 			UR = img_data['Upper right'].replace('"','').split(',')
+# 			LL = img_data['Lower left'].replace('"','').split(',')
+# 			LR = img_data['Lower right'].replace('"','').split(',')
+# 			C = img_data['Center'].replace('"','').split(',')
 
-	process = subprocess.Popen(['rm','-r','{0}/*'.format(path_to_download)])
-	process.wait()
+# 			img_UL = {'lat':float(UL[1]),'lon':float(UL[0])}
+# 			img_UR = {'lat':float(UR[1]),'lon':float(UR[0])}
+# 			img_LL = {'lat':float(LL[1]),'lon':float(LL[0])}
+# 			img_LR = {'lat':float(LR[1]),'lon':float(LR[0])}
+# 			img_C = {'lat':float(C[1]),'lon':float(C[0])}
 
-	print('>>> Downloaded files deleted successfully.')
+# 			if lid_loc['lon']>=img_UL['lon'] and lid_loc['lon']<=img_UR['lon'] and lid_loc['lat']<=img_UL['lat'] and lid_loc['lat']>=img_LL['lat']:
+# 				final_list_associated[scan_name]['images'].append(img_name)
 
-	break
+# print('>>> Associated images with lids have been detected.')
+
+# for scan_name in final_list_associated:
+
+# 	param1 = final_list_associated[scan_name]['path']
+# 	param2 = path_to_download
+# 	param3 = '{0}_tarfile.tar.gz'.format(scan_name)
+
+# 	process = subprocess.Popen(['. {0}/download_untar.sh'.format(base_path),param1,param2,param3],shell=True)
+# 	process.wait()
+
+# 	print('>>> Raw images download and the tar file successfully untarred.')
+
+# 	for i,img_name in enumerate(final_list_associated[scan_name]['images']):
+# 		src = '{0}/bin2tif_out/{1}'.format(path_to_download,img_name)
+# 		dst = '{0}/{1}_{2}.tif'.format(path_final_original,scan_name,img_name)
+# 		copyfile(src, dst)
+
+# 	print('>>> Lid images successfully moved to the proper directories.')
+
+# 	process = subprocess.Popen(['rm','-r','{0}/*'.format(path_to_download)])
+# 	process.wait()
+
+# 	print('>>> Downloaded files deleted successfully.')
+
+# 	break
