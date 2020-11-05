@@ -2,7 +2,7 @@ import numpy as np
 import os
 import csv
 import subprocess
-from shutil import copyfile
+from shutil import copyfile,rmtree
 
 csv_locations_path = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/season10_scans'
 csv_lids_locations_path = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/season10_lids.csv'
@@ -74,14 +74,14 @@ for scan_name in final_list_associated:
 	if scan_name != "2019-12-12":
 		continue
 
-	# param1 = final_list_associated[scan_name]['path']
-	# param2 = path_to_download
-	# param3 = '{0}_tarfile.tar.gz'.format(scan_name)
+	param1 = final_list_associated[scan_name]['path']
+	param2 = path_to_download
+	param3 = '{0}_tarfile.tar'.format(scan_name)
 
-	# process = subprocess.Popen(['. {0}/download_untar.sh'.format(base_path),param1,param2,param3],shell=True)
-	# process.wait()
+	process = subprocess.Popen(['. {0}/download_untar.sh'.format(base_path),param1,param2,param3],shell=True)
+	process.wait()
 
-	# print('>>> Raw images download and the tar file successfully untarred.')
+	print('>>> Raw images download and the tar file successfully untarred.')
 
 	for i,img_name in enumerate(final_list_associated[scan_name]['images']):
 		src = '{0}/bin2tif_out/{1}'.format(path_to_download,img_name)
@@ -93,8 +93,8 @@ for scan_name in final_list_associated:
 
 	print('>>> Lid images successfully moved to the proper directories.')
 
-	process = subprocess.Popen(['rm','-r','{0}/*'.format(path_to_download)])
-	process.wait()
+	rmtree(path_to_download)
+	os.mkdir(path_to_download)
 
 	print('>>> Downloaded files deleted successfully.')
 
