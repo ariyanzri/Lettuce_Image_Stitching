@@ -80,8 +80,7 @@ print('>>> Associated images with lids have been detected.')
 
 for scan_name in final_list_associated:
 
-	if scan_name != "2019-12-12":
-		continue
+	print('>>> Start processing scan date {0}'.format(scan_name))
 
 	param1 = final_list_associated[scan_name]['path']
 	param2 = path_to_download
@@ -94,8 +93,8 @@ for scan_name in final_list_associated:
 
 	for i,img_name in enumerate(final_list_associated[scan_name]['images']):
 		src = '{0}/bin2tif_out/{1}'.format(path_to_download,img_name)
-		dst = '{0}/{1}_{2}.tif'.format(path_final_original,scan_name,img_name)
-		dst2 = '{0}/{1}_{2}.tif'.format(path_final_down_scaled,scan_name,img_name)
+		dst = '{0}/{1}_{2}'.format(path_final_original,scan_name,img_name)
+		dst2 = '{0}/{1}_{2}'.format(path_final_down_scaled,scan_name,img_name)
 		
 		if os.path.exists(src):
 			
@@ -113,4 +112,6 @@ for scan_name in final_list_associated:
 
 	print('>>> Downloaded files deleted successfully.')
 
-	break
+	print('>>> Finished processing scan date {0}'.format(scan_name))
+
+	print('--------------------------------------------------------------')
