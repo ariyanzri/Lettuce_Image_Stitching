@@ -19,11 +19,12 @@ for scan in scan_coords_csv:
 
 	scans[scan_name] = scan_data
 
-print([n for n in scans])
-
 for scan_name in scans:
 
 	scan_data = scans[scan_name]
+	final_list_associated[scan_name] = {}
+	final_list_associated[scan_name]['path'] = 'iget -rKVPT /iplant/home/shared/terraref/ua-mac/level_1/season_10_yr_2020/stereoTop/{0}_bin2tif.tar.gz'.format(scan_name)
+	final_list_associated[scan_name]['images'] = []
 
 	for lid in lid_locations:
 		
@@ -46,7 +47,7 @@ for scan_name in scans:
 			img_C = {'lat':float(C[1]),'lon':float(C[0])}
 
 			if lid_loc['lon']>=img_UL['lon'] and lid_loc['lon']<=img_UR['lon'] and lid_loc['lat']<=img_UL['lat'] and lid_loc['lat']>=img_LL['lat']:
-				final_list_associated.append((scan_name,lid_name,img_name))
+				final_list_associated[scan_name]['images'].append(img_name)
 
 for item in final_list_associated:
 	print(item)
