@@ -12,11 +12,15 @@ path_final_original = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/final
 base_path = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection'
 
 def read_csv_to_dict(path):
+	dict_data = []
 
 	with open(path, mode='r') as csvfile:
-		data_dict = csv.DictReader(csvfile)
+		rows = csv.DictReader(csvfile)
+		
+		for row in rows:
+			dict_data.append(row)
 
-	return data_dict
+	return dict_data
 			
 
 lid_locations = read_csv_to_dict(csv_lids_locations_path)
