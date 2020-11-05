@@ -16,17 +16,23 @@ for scan in scan_coords_csv:
 		
 		lid_name = lid['lid_id']
 		lid_lat = lid['lat']
-		lid_long = lid['lon']
+		lid_lon = lid['lon']
 
-		# print('{0} - {1} - {2}'.format(lid_name,lid_lat,lid_long))
+		# print('{0} - {1} - {2}'.format(lid_name,lid_lat,lid_lon))
 
 		for img_index,img_data in scan_data.iterrows():
 
 			img_name = img_data['Filename']
-			img_UL = img_data['Upper left'].replace('"','').split(',')
-			img_UR = img_data['Upper right'].replace('"','').split(',')
-			img_LL = img_data['Lower left'].replace('"','').split(',')
-			img_LR = img_data['Lower right'].replace('"','').split(',')
-			img_C = img_data['Center'].replace('"','').split(',')
+			UL = img_data['Upper left'].replace('"','').split(',')
+			UR = img_data['Upper right'].replace('"','').split(',')
+			LL = img_data['Lower left'].replace('"','').split(',')
+			LR = img_data['Lower right'].replace('"','').split(',')
+			C = img_data['Center'].replace('"','').split(',')
+
+			img_UL = {'lat':UL[1],'lon':UL[0]}
+			img_UR = {'lat':UR[1],'lon':UR[0]}
+			img_LL = {'lat':LL[1],'lon':LL[0]}
+			img_LR = {'lat':LR[1],'lon':LR[0]}
+			img_C = {'lat':C[1],'lon':C[0]}
 
 			print('\t {0} - {1} - {2} - {3} - {4} - {5}'.format(img_name,img_UL,img_UR,img_LL,img_LR,img_C))
