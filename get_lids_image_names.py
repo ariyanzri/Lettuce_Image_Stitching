@@ -1,9 +1,14 @@
 import numpy as np
 import os
 import pandas as pd
+import subprocess
+from shutil import copyfile
 
-csv_locations_path = '/storage/ariyanzarei/image_coords_per_scan/season_10_scans'
-csv_lids_locations_path = '/storage/ariyanzarei/image_coords_per_scan/season_10_lids.csv'
+csv_locations_path = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/season10_scans'
+csv_lids_locations_path = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/season10_lids.csv'
+path_to_download = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/temp'
+path_final_down_scaled = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/final_down_scaled'
+path_final_original = '/xdisk/ericlyons/big_data/ariyanzarei/lid_detection/final_original'
 
 lid_locations = pd.read_csv(csv_lids_locations_path).T.to_dict().values()
 
@@ -23,7 +28,7 @@ for scan_name in scans:
 
 	scan_data = scans[scan_name]
 	final_list_associated[scan_name] = {}
-	final_list_associated[scan_name]['path'] = 'iget -rKVPT /iplant/home/shared/terraref/ua-mac/level_1/season_10_yr_2020/stereoTop/{0}_bin2tif.tar.gz'.format(scan_name)
+	final_list_associated[scan_name]['path'] = '/iplant/home/shared/terraref/ua-mac/level_1/season_10_yr_2020/stereoTop/{0}_bin2tif.tar.gz'.format(scan_name)
 	final_list_associated[scan_name]['images'] = []
 
 	for lid in lid_locations:
@@ -49,5 +54,26 @@ for scan_name in scans:
 			if lid_loc['lon']>=img_UL['lon'] and lid_loc['lon']<=img_UR['lon'] and lid_loc['lat']<=img_UL['lat'] and lid_loc['lat']>=img_LL['lat']:
 				final_list_associated[scan_name]['images'].append(img_name)
 
-for item in final_list_associated:
-	print(item,final_list_associated[item])
+for scan_name in final_list_associated:
+
+	param1 = '-rKVPT'
+	param2 = final_list_associated[scan_name]['path']
+	param3 = '{0}/.'.format(path_to_download)
+
+	process = subprocess.Popen(['iget',param1,param2,param3])
+	process.wait()
+
+	param1 = '-C'
+	param2 = '{0}'.format(path_to_download)
+	param3 = '-xvf'
+	param4 = '{0}/{1}_bin2tif.tar.gz'.format(path_to_download,scan_name)
+
+	process = subprocess.Popen(['tar',param1,param2,param3,param4])
+	process.wait()
+
+	for i,img_name in enumerate(final_list_associated[scan_name]['images']):
+		src = '{0}/bin2tif_out/{1}'.format(path_to_download,img_name)
+		dst = '{0}/{1}_{2}.tif'.format(path_final_original,scan_name,img_name)
+		copyfile(src, dst)
+
+	break
