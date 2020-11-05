@@ -18,7 +18,7 @@ for scan in scan_coords_csv:
 	for lid_index,lid in lid_locations.iterrows():
 		
 		lid_name = lid['lid_id']
-		lid_loc = {'lat':float(lid['lat']),float('lon':lid['lon'])}
+		lid_loc = {'lat':float(lid['lat']),'lon':float(lid['lon'])}
 
 		# print('{0} - {1} - {2}'.format(lid_name,lid_loc['lat'],lid_loc['lon']))
 
