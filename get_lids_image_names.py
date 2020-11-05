@@ -12,13 +12,13 @@ scan_coords_csv = os.listdir(csv_locations_path)
 final_list_associated = []
 
 scans = {}
-
+print(lid_locations)
 for scan in scan_coords_csv:
 	scan_name = scan.replace('_coordinates.csv','')
 	scan_data = pd.read_csv('{0}/{1}'.format(csv_locations_path,scan)).T.to_dict().values()
 
 	scans[scan_name] = scan_data
-print(scans)
+
 # for lid_index,lid in lid_locations.iterrows():
 	
 # 	lid_name = lid['lid_id']
