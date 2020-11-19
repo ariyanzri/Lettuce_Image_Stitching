@@ -33,20 +33,20 @@ RUN add-apt-repository ppa:ubuntugis/ppa
 RUN export CPLUS_INCLUDE_PATH=/usr/include/gdal
 RUN export C_INCLUDE_PATH=/usr/include/gdal
 
-RUN pip3 install ExifRead==2.3.1
-RUN pip3 install gpsphoto==2.2.3
-RUN pip3 install imageio==2.8.0
-RUN pip3 install networkx==2.4
-RUN pip3 install opencv-python==3.4.2.16
-RUN pip3 install opencv-contrib-python==3.4.2.16
-RUN pip3 install piexif==1.1.3
-RUN pip3 install Pillow==7.1.2
-RUN pip3 install pytz==2020.1
-RUN pip3 install PyWavelets==1.1.1
-RUN pip3 install scikit-image==0.17.2
-RUN pip3 install scikit-learn==0.22.2.post1
-RUN pip3 install scipy==1.4.1
-RUN pip3 install six==1.14.0
-RUN pip3 install sklearn==0.0
-RUN pip3 install tifffile==2020.6.3
+# RUN pip3 install ExifRead==2.3.1
+# RUN pip3 install gpsphoto==2.2.3
+# RUN pip3 install imageio==2.8.0
+# RUN pip3 install networkx==2.4
+# RUN pip3 install opencv-python==3.4.2.16
+# RUN pip3 install opencv-contrib-python==3.4.2.16
+# RUN pip3 install piexif==1.1.3
+# RUN pip3 install Pillow==7.1.2
+# RUN pip3 install pytz==2020.1
+# RUN pip3 install PyWavelets==1.1.1
+# RUN pip3 install scikit-image==0.17.2
+# RUN pip3 install scikit-learn==0.22.2.post1
+# RUN pip3 install scipy==1.4.1
+# RUN pip3 install six==1.14.0
+# RUN pip3 install sklearn==0.0
+# RUN pip3 install tifffile==2020.6.3
 
