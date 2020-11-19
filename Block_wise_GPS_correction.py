@@ -12,6 +12,7 @@ import threading
 import socket
 import statistics
 import datetime
+import shutil 
 
 # from sklearn.linear_model import RANSACRegressor
 # from sklearn.datasets import make_regression
@@ -847,7 +848,8 @@ def get_name_of_patches_with_lids(lids,use_not_corrected=False):
 			coord = GPS_Coordinate(upper_left,upper_right,lower_left,lower_right,center)
 			
 			for l in lids:
-				if coord.is_coord_inside(lids[l]) or coord.is_point_near(lids[l],2*settings.PATCH_SIZE_GPS[0]):
+				# if coord.is_coord_inside(lids[l]) or coord.is_point_near(lids[l],2*settings.PATCH_SIZE_GPS[0]):
+				if coord.is_coord_inside(lids[l]):
 					patches_names_with_lid.append((l,filename,coord))
 
 	return patches_names_with_lid
@@ -1054,63 +1056,6 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 			# cv2.putText(rgb_img, str(max_val), (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA) 
 			# cv2.imwrite('/storage/ariyanzarei/test/{0}.jpg'.format(img_name.split('.')[0]),rgb_img)
 			return x,y,r,l,pname,coord,max_val
-
-			# lid_img = cv2.imread(settings.temp_lid_image_address,0)
-			# gray=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-
-			# result=cv2.matchTemplate(gray,lid_img,cv2.TM_CCOEFF)
-			# sin_val, max_val, min_loc, max_loc=cv2.minMaxLoc(result)
-			# top_left=max_loc
-			# bottom_right=(top_left[0]+int(1.5*settings.LID_SIZE_AT_SCALE[1]),top_left[1]+int(1.5*settings.LID_SIZE_AT_SCALE[1]))
-			# mask = np.zeros(settings.PATCH_SIZE)
-			# mask[top_left[1]:bottom_right[1],top_left[0]:bottom_right[0]] = 1
-
-			# img[mask==0]=0
-			# img[mask==1] = histogram_equalization(img[mask==1])
-
-			# img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)[:,:,1]
-
-			# img[mask==1] = 255-img[mask==1]
-
-			# t = np.quantile(img[mask==1],np.array([0.9]))
-			
-			# (thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
-
-			# kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.LID_SIZE_AT_SCALE[0]), int(settings.LID_SIZE_AT_SCALE[0])))
-			# img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)	
-
-			# shp = np.shape(img)
-
-			# img, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-			
-			# new_contours = []
-
-			# for c in contours:
-			# 	for p in c:
-			# 		new_contours.append([p[0][0],p[0][1]])
-			
-			# new_contours = np.array(new_contours)
-
-			# if np.shape(new_contours)[0]<ransac_min_num_fit:
-			# 	return -1,-1,-1,-1,-1,-1
-
-			# xs = np.array(new_contours[:,0])
-			# ys = np.array(new_contours[:,1])
-
-			# xs,ys = get_unique_lists(xs,ys)
-
-			# if np.shape(xs)[0]<ransac_min_num_fit:
-			# 	return -1,-1,-1,-1,-1,-1
-
-			# x,y,r,err = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
-
-			# if err <=settings.circle_error and r >= settings.LID_SIZE_AT_SCALE[0] and r <= settings.LID_SIZE_AT_SCALE[1]:
-			# 	# cv2.putText(img, str(err), (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA) 
-			# 	cv2.circle(rgb_img,(int(x),int(y)),r,(0,0,255),thickness=8)
-			# 	cv2.imwrite('/storage/ariyanzarei/test/{0}.jpg'.format(img_name.split('.')[0]),rgb_img)
-			# 	return x,y,r,l,pname,coord
-			# else:
-			# 	return -1,-1,-1,-1,-1,-1
 
 		else:
 
@@ -4267,34 +4212,49 @@ class Field:
 		lids = get_lids()
 		possible_patches = self.get_patches_with_possible_lids()
 
-		args_list = []
+		if not settings.use_lid_detection:
 
-		for p,l in possible_patches:
-			args_list.append((p.name,l,p.name,p.gps))
+			args_list = []
 
-		processes = MyPool(settings.no_of_cores_to_use_max)
+			for p,l in possible_patches:
+				args_list.append((p.name,l,p.name,p.gps))
 
-		results = processes.map(get_lid_in_patch_helper,args_list)
-		processes.close()
+			processes = MyPool(settings.no_of_cores_to_use_max)
 
-		final_list_patches = []
+			results = processes.map(get_lid_in_patch_helper,args_list)
+			processes.close()
 
-		if settings.use_temp_matching:
-			results_sorted = sorted(results, reverse=True, key=lambda tup: tup[6])
-			max_count_lids = max(int(len(results_sorted)/5),20)
-			results = [(x,y,r,l,pn,crd) for x,y,r,l,pn,crd,score in results_sorted[:max_count_lids]]
+			final_list_patches = []
 
-		for x,y,r,l,pn,crd in results:
-			if r!=-1:
-				
-				patch = [p[0] for p in possible_patches if p[0].name == pn]
-				patch = patch[0]
+			if settings.use_temp_matching:
+				results_sorted = sorted(results, reverse=True, key=lambda tup: tup[6])
+				max_count_lids = max(int(len(results_sorted)/5),20)
+				results = [(x,y,r,l,pn,crd) for x,y,r,l,pn,crd,score in results_sorted[:max_count_lids]]
 
-				if patch not in [f[0] for f in final_list_patches]:
-					final_list_patches.append((patch,l,x,y))
+			for x,y,r,l,pn,crd in results:
+				if r!=-1:
+					
+					patch = [p[0] for p in possible_patches if p[0].name == pn]
+					patch = patch[0]
 
-				# print(r/settings.SCALE,(r/settings.SCALE)*settings.GPS_TO_IMAGE_RATIO[0])
-				# print('scp coge:/storage/ariyanzarei/season_11/2020-08-19/bin2tif_out/{0} .'.format(patch.name))
+					if patch not in [f[0] for f in final_list_patches]:
+						final_list_patches.append((patch,l,x,y))
+
+		else:
+
+			path_tmp = settings.SIFT_folder.replace('/SIFT','/tmp_lid')
+
+			if not os.path.exists(path_tmp):
+				os.mkdir(path_tmp)
+
+
+			for p,l in possible_patches:
+				shutil.copyfile('{0}/{1}'.format(settings.patch_folder,p),'{0}/{1}'.format(path_tmp,p))
+
+			command = 'singularity'
+
+			process = subprocess.Popen([command,'run',path_tmp,'-m',settings.path_to_model,'-d', settings.scan_date_stng,'-t','RGB','-o',path_tmp.replace('/tmp_lid','')])
+			process.wait()
 
 		print('Detected {0} lid patches in the field.'.format(len(final_list_patches)))
 		sys.stdout.flush()
