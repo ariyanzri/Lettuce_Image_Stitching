@@ -104,25 +104,26 @@ def get_patch_coord_dict_from_name(image_name):
 	for line in lines:
 		if 'Upper Left' in line:
 			u_l = line.split()[2:4]
-			u_l = ' '.join(u_l).strip('()')
+			u_l = u_l.replace('(','').replace(')','').split(',')
 
 		if 'Lower Left' in line:
 			l_l = line.split()[2:4]
-			l_l = ' '.join(l_l).strip('()')
+			l_l = l_l.replace('(','').replace(')','').split(',')
 
 		if 'Upper Right' in line: 
 			u_r = line.split()[2:4]
-			u_r = ' '.join(u_r).strip('()')
+			u_r = u_r.replace('(','').replace(')','').split(',')
 
 		if 'Lower Right' in line:
 			l_r = line.split()[2:4]
-			l_r = ' '.join(l_r).strip('()')
+			l_r = l_r.replace('(','').replace(')','').split(',')
 
 		if 'Center' in line:
 			c = line.split()[1:3]
-			c = ' '.join(c).strip('()')
+			c = c.replace('(','').replace(')','').split(',')
 
-
+	print(u_l)
+	
 	upper_left = (float(u_l[0]),float(u_l[1]))
 	lower_left = (float(l_l[0]),float(l_l[1]))
 	upper_right = (float(u_r[0]),float(u_r[1]))
