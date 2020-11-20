@@ -27,7 +27,7 @@ def main(scan_date):
 
 	field = Field(is_single_group=settings.is_single_group)
 
-	field.save_lid_patches()
+	# field.save_lid_patches()
 
 	# field.save_plot()
 
@@ -35,13 +35,13 @@ def main(scan_date):
 
 	# old_RMSE = get_approximate_random_RMSE_overlap(field,50,settings.no_of_cores_to_use_max)
 
-	# field.create_patches_SIFT_files()
+	field.create_patches_SIFT_files()
 	
 	# # field.draw_and_save_field(is_old=True)
 
-	# field.correct_field()
+	field.correct_field()
 
-	# field.save_new_coordinate()
+	field.save_new_coordinate()
 
 	# # field.draw_and_save_field(is_old=False)
 
@@ -78,7 +78,7 @@ config_file = sys.argv[2]
 local_address = sys.argv[3]
 
 
-settings.initialize_settings_test(scan_date,config_file,local_address,None,None)
+settings.initialize_settings_test(scan_date,config_file,local_address,4,15)
 
 print_settings()
 main(scan_date)
