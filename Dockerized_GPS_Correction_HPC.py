@@ -53,11 +53,9 @@ def get_args():
 	parser = argparse.ArgumentParser(description='Geo-correction on HPC.')
 	parser.add_argument('-d','--destination', type=str, help='address of the destination folder on HPC (usually on xdisk where everything is stored).')
 	parser.add_argument('-b','--bin_2tif', type=str, help='the address of the bin_2tif folder.')
-	parser.add_argument('-g','--gps_coord', type=str, help='the address of the GPS coordinates csv file.')
 	parser.add_argument('-s','--scan_date', type=str, help='the name of the specific scan to work on.')
 	parser.add_argument('-c','--config_file', type=str, help='the name of the config file to use.')
 	parser.add_argument('-l','--lid_address', type=str, help='the address of the lid file.')
-	parser.add_argument('-u','--uav_lettuce_address', type=str, help='the address of the uav lettuce coordinates file.')
 	parser.add_argument('-r','--repository_address', type=str, help='the address of the geocorrection repository.')
 
 	args = parser.parse_args()
@@ -72,9 +70,7 @@ scan_date = args.scan_date
 config_file = args.config_file
 destination = args.destination
 lid_file_address = args.lid_address
-uav_lettuce_address = args.uav_lettuce_address
 bin2tiff_address = args.bin_2tif
-gps_coord_file = args.gps_coord
 repository_address = args.repository_address
 
 os.mkdir('{0}/{1}'.format(destination,scan_date))
@@ -87,7 +83,7 @@ original = sys.stdout
 
 sys.stdout = open('{0}/{1}/{2}.txt'.format(destination,scan_date,'geo_correction_output'), 'w')
 
-settings.initialize_settings_HPC(scan_date,config_file,destination,lid_file_address,uav_lettuce_address,bin2tiff_address,gps_coord_file,repository_address)
+settings.initialize_settings_HPC(scan_date,config_file,destination,lid_file_address,bin2tiff_address,repository_address)
 
 print_settings()
 main(scan_date)

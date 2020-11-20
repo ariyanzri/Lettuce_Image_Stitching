@@ -80,7 +80,7 @@ def initialize_settings(scan_date,config_file,local_address):
 		lettuce_coords = None
 
 
-def initialize_settings_HPC(scan_date,config_file,destination,lid_add,uav_add,bin2tif_address,gps_coord_file,repository_address):
+def initialize_settings_HPC(scan_date,config_file,destination,lid_add,bin2tif_address,repository_address):
 	global method,no_of_cores_to_use,no_of_cores_to_use_max,SCALE,PATCH_SIZE,LID_SIZE_AT_SCALE,PATCH_SIZE_GPS,\
 	GPS_TO_IMAGE_RATIO,HEIGHT_RATIO_FOR_ROW_SEPARATION,PERCENTAGE_OF_GOOD_MATCHES,MINIMUM_PERCENTAGE_OF_INLIERS,\
 	MINIMUM_NUMBER_OF_MATCHES,RANSAC_MAX_ITER,RANSAC_ERROR_THRESHOLD,PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES,\
@@ -149,12 +149,10 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,uav_add,bi
 		patch_folder = '{0}'.format(bin2tif_address)
 		SIFT_folder = '{0}/{1}/SIFT'.format(destination,scan_date)
 		lid_file = '{0}'.format(lid_add)
-		coordinates_file = '{0}'.format(gps_coord_file)
 		CORRECTED_coordinates_file = '{0}/{1}/{2}_coordinates_CORRECTED.csv'.format(destination,scan_date,scan_date)
 		plot_npy_file = '{0}/{1}/plt.npy'.format(destination,scan_date)
 		field_image_path = '{0}/{1}'.format(destination,scan_date)
 		correction_log_file = '{0}/{1}/logs/log_{2}_at_{3}.csv'.format(destination,scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
-		lettuce_heads_coordinates_file = '{0}'.format(uav_add)
 		scan_date_stng = scan_date
 		lettuce_coords = None
 
