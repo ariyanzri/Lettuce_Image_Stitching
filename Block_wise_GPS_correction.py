@@ -26,6 +26,7 @@ from heapq import heappush, heappop, heapify
 from collections import OrderedDict,Counter
 from scipy.optimize import lsq_linear
 from scipy.sparse.linalg import lsqr
+from osgeo import gdal
 
 # from PIL import Image
 # from PIL.TiffTags import TAGS
@@ -92,6 +93,79 @@ def histogram_equalization(img):
 		img[:,:,2] = channel_2
 
 	return img
+
+def get_patch_coord_dict_from_name(image_name):
+
+	ds = gdal.Open('{0}/{1}'.format(settings.patch_folder,image_name))
+	meta = gdal.Info(ds)
+
+	lines = meta.splitlines()
+
+	for line in lines:
+		if 'Upper Left' in line:
+			u_l = line.split()[2:4]
+			u_l = ' '.join(u_l).strip('()')
+
+		if 'Lower Left' in line:
+			l_l = line.split()[2:4]
+			l_l = ' '.join(l_l).strip('()')
+
+		if 'Upper Right' in line: 
+			u_r = line.split()[2:4]
+			u_r = ' '.join(u_r).strip('()')
+
+		if 'Lower Right' in line:
+			l_r = line.split()[2:4]
+			l_r = ' '.join(l_r).strip('()')
+
+		if 'Center' in line:
+			c = line.split()[1:3]
+			c = ' '.join(c).strip('()')
+
+
+	upper_left = (float(u_l[0]),float(u_l[1]))
+	lower_left = (float(l_l[0]),float(l_l[1]))
+	upper_right = (float(u_r[0]),float(u_r[1]))
+	lower_right = (float(l_r[0]),float(l_r[1]))
+	center = (float(c[0]),float(c[1]))
+	
+	coord = {'name':image_name,'UL':upper_left,'LL':lower_left,'UR':upper_right,'LR':lower_right,'C':center}
+
+	return coord
+
+def get_all_patches():
+
+	image_names = os.listdir(settings.patch_folder)
+
+	args = []
+
+	for img_name in image_names:
+
+		args.append(img_name)
+
+	processes = MyPool(settings.no_of_cores_to_use_max)
+	results = processes.map(get_patch_coord_dict_from_name,args)
+	processes.close()
+
+	patches = []
+
+	for r in results:
+
+		coord = GPS_Coordinate(r['UL'],r['UR'],r['LL'],r['LR'],r['C'])
+		patch = Patch(r['name'],coord)
+		patches.append(patch)
+
+	return patches
+
+def set_all_patches(patches):
+
+	args = []
+
+	for p in patches:
+
+		coord = {'name':p.name,'UL':p.gps.UL_coord,'LL':p.gps.LL_coord,'UR':p.gps.UR_coord,'LR':p.gps.LR_coord,'C':p.gps.Center}
+
+		args.append(coord)
 
 
 
@@ -1700,17 +1774,17 @@ def jitter_and_calculate_fft(p1,neighbors,jx,jy):
 def jitter_and_calculate_fft_helper(args):
 	return jitter_and_calculate_fft(*args)
 
-def read_lettuce_heads_coordinates():
-	# global lettuce_heads_coordinates_file
-	from numpy import genfromtxt
+# def read_lettuce_heads_coordinates():
+# 	# global lettuce_heads_coordinates_file
+# 	from numpy import genfromtxt
 
-	lettuce_coords = genfromtxt(settings.lettuce_heads_coordinates_file, delimiter=',',skip_header=1)
+# 	lettuce_coords = genfromtxt(settings.lettuce_heads_coordinates_file, delimiter=',',skip_header=1)
 
-	col1 = lettuce_coords[:,0].copy()
-	lettuce_coords[:,0] = lettuce_coords[:,1].copy()
-	lettuce_coords[:,1] = col1
+# 	col1 = lettuce_coords[:,0].copy()
+# 	lettuce_coords[:,0] = lettuce_coords[:,1].copy()
+# 	lettuce_coords[:,1] = col1
 
-	return lettuce_coords
+# 	return lettuce_coords
 
 def count_matched_lettuce_heads_to_UAV(contour_centers,inside_lettuce_heads,T,inside_radious):
 	matched_count = 0
@@ -1888,32 +1962,32 @@ def get_best_neighbor_hybrid_method(p1,corrected):
 	return best_p,best_params
 
 
-def hybrid_method_UAV_lettuce_matching_step(patches,gid,percetage_matched=0.75):
-	# global lettuce_coords
+# def hybrid_method_UAV_lettuce_matching_step(patches,gid,percetage_matched=0.75):
+# 	# global lettuce_coords
 
-	not_corrected = []
-	corrected = []
-	step = 0
+# 	not_corrected = []
+# 	corrected = []
+# 	step = 0
 
-	for p in patches:
+# 	for p in patches:
 		
-		old_gps = p.gps
+# 		old_gps = p.gps
 
-		total_matched,total_contours = p.correct_based_on_contours_and_lettuce_heads(settings.lettuce_coords)
+# 		total_matched,total_contours = p.correct_based_on_contours_and_lettuce_heads(settings.lettuce_coords)
 
-		if total_matched <settings.CONTOUR_MATCHING_MIN_MATCH or total_matched/total_contours <percetage_matched:
-			not_corrected.append(p)
-		else:
-			print('Group ID {0}: patch {1} corrected with {2} number of matches ({3}).'.format(gid,p.name,total_matched,total_matched/total_contours))
-			sys.stdout.flush()
-			corrected.append(p)
+# 		if total_matched <settings.CONTOUR_MATCHING_MIN_MATCH or total_matched/total_contours <percetage_matched:
+# 			not_corrected.append(p)
+# 		else:
+# 			print('Group ID {0}: patch {1} corrected with {2} number of matches ({3}).'.format(gid,p.name,total_matched,total_matched/total_contours))
+# 			sys.stdout.flush()
+# 			corrected.append(p)
 
-			gps_diff = (old_gps.UL_coord[0]-p.gps.UL_coord[0],old_gps.UL_coord[1]-p.gps.UL_coord[1])
-			params = Neighbor_Parameters(None,None,None,None,None,None,None,None)
-			logger(p,gps_diff,params,gid,step)
-			step+=1
+# 			gps_diff = (old_gps.UL_coord[0]-p.gps.UL_coord[0],old_gps.UL_coord[1]-p.gps.UL_coord[1])
+# 			params = Neighbor_Parameters(None,None,None,None,None,None,None,None)
+# 			logger(p,gps_diff,params,gid,step)
+# 			step+=1
 
-	return corrected,not_corrected,step
+# 	return corrected,not_corrected,step
 
 def get_best_pop(not_corrected,corrected):
 	
@@ -3996,57 +4070,57 @@ class Group:
 			
 			self.delete_all_patches_SIFT_points()
 
-		elif settings.method == 'Hybrid':
+		# elif settings.method == 'Hybrid':
 			
-			self.load_all_patches_SIFT_points()
-			# self.load_all_patches_images()
+		# 	self.load_all_patches_SIFT_points()
+		# 	# self.load_all_patches_images()
 
-			corrected,not_corrected,step = hybrid_method_UAV_lettuce_matching_step(self.patches,self.group_id)
+		# 	corrected,not_corrected,step = hybrid_method_UAV_lettuce_matching_step(self.patches,self.group_id)
 			
-			final_patches = hybrid_method_sift_correction_step(corrected,not_corrected,self.group_id,step)
+		# 	final_patches = hybrid_method_sift_correction_step(corrected,not_corrected,self.group_id,step)
 
-			string_res = get_corrected_string(self.patches)
+		# 	string_res = get_corrected_string(self.patches)
 
-			# self.delete_all_patches_SIFT_points()
-			# self.delete_all_patches_images()
+		# 	# self.delete_all_patches_SIFT_points()
+		# 	# self.delete_all_patches_images()
 
-		elif settings.method == 'HybridMST':
+		# elif settings.method == 'HybridMST':
 
-			self.load_all_patches_SIFT_points()
-			# self.load_all_patches_images()
+		# 	self.load_all_patches_SIFT_points()
+		# 	# self.load_all_patches_images()
 
-			settings.CONTOUR_MATCHING_MIN_MATCH = 3
+		# 	settings.CONTOUR_MATCHING_MIN_MATCH = 3
 
-			corrected,not_corrected,step = hybrid_method_UAV_lettuce_matching_step(self.patches,self.group_id,1)
+		# 	corrected,not_corrected,step = hybrid_method_UAV_lettuce_matching_step(self.patches,self.group_id,1)
 			
-			self.pre_calculate_internal_neighbors_and_transformation_parameters()
+		# 	self.pre_calculate_internal_neighbors_and_transformation_parameters()
 
-			connected_patches = self.connected_component_patches()
+		# 	connected_patches = self.connected_component_patches()
 
-			G = Graph(len(connected_patches),[p.name for p in connected_patches],self.group_id)
-			G.initialize_edge_weights(connected_patches)
+		# 	G = Graph(len(connected_patches),[p.name for p in connected_patches],self.group_id)
+		# 	G.initialize_edge_weights(connected_patches)
 
-			try:
-				starting_patch = connected_patches[0]
-				for p in corrected:
-					if p in connected_patches:
-						starting_patch = p
-						break
+		# 	try:
+		# 		starting_patch = connected_patches[0]
+		# 		for p in corrected:
+		# 			if p in connected_patches:
+		# 				starting_patch = p
+		# 				break
 
-				parents = G.generate_MST_prim(starting_patch.name)
-				string_res = G.revise_GPS_from_generated_MST_for_Hybrid(connected_patches,parents,corrected)
-			except Exception as e:
-				print(e)	
-				string_res = get_corrected_string(self.patches)
+		# 		parents = G.generate_MST_prim(starting_patch.name)
+		# 		string_res = G.revise_GPS_from_generated_MST_for_Hybrid(connected_patches,parents,corrected)
+		# 	except Exception as e:
+		# 		print(e)	
+		# 		string_res = get_corrected_string(self.patches)
 
-			self.delete_all_patches_SIFT_points()
+		# 	self.delete_all_patches_SIFT_points()
 
-			print('Group {0} - Not corrected patches (Left over in disconnected Graph:'.format(self.group_id))
-			for lp in self.patches:
-				if lp not in connected_patches:
-					print('\t{0}'.format(lp.name))
+		# 	print('Group {0} - Not corrected patches (Left over in disconnected Graph:'.format(self.group_id))
+		# 	for lp in self.patches:
+		# 		if lp not in connected_patches:
+		# 			print('\t{0}'.format(lp.name))
 
-			string_res = get_corrected_string(self.patches)
+		# 	string_res = get_corrected_string(self.patches)
 
 		elif settings.method == 'Merge':
 			
@@ -4066,17 +4140,17 @@ class Group:
 			
 			string_res = self.correct_row_by_row()
 
-		elif settings.method == 'UAVmatching':
-			for p in self.patches:
-				total_matched,total_contours = p.correct_based_on_contours_and_lettuce_heads(settings.lettuce_coords)
-				if total_matched <settings.CONTOUR_MATCHING_MIN_MATCH or total_matched/total_contours <=0.5:
-					print('Group ID {0}: patch {1} not corrected. '.format(self.group_id,p.name))
-					sys.stdout.flush()
-				else:
-					print('Group ID {0}: patch {1} corrected with {2} number of matches ({3}).'.format(self.group_id,p.name,total_matched,total_matched/total_contours))
-					sys.stdout.flush()
+		# elif settings.method == 'UAVmatching':
+		# 	for p in self.patches:
+		# 		total_matched,total_contours = p.correct_based_on_contours_and_lettuce_heads(settings.lettuce_coords)
+		# 		if total_matched <settings.CONTOUR_MATCHING_MIN_MATCH or total_matched/total_contours <=0.5:
+		# 			print('Group ID {0}: patch {1} not corrected. '.format(self.group_id,p.name))
+		# 			sys.stdout.flush()
+		# 		else:
+		# 			print('Group ID {0}: patch {1} corrected with {2} number of matches ({3}).'.format(self.group_id,p.name,total_matched,total_matched/total_contours))
+		# 			sys.stdout.flush()
 
-			string_res = get_corrected_string(self.patches)
+		# 	string_res = get_corrected_string(self.patches)
 
 		elif settings.method == 'Old_method':
 
@@ -4341,7 +4415,8 @@ class Field:
 	def initialize_field(self,use_corrected,is_single_group):
 		# global coordinates_file, number_of_rows_in_groups, groups_to_use
 
-		rows = self.get_rows(use_corrected)
+		# rows = self.get_rows(use_corrected)
+		rows = self.get_rows_no_csv()
 
 		groups = []
 
@@ -4408,6 +4483,61 @@ class Field:
 			sys.stdout.flush()
 
 		return groups[settings.groups_to_use]
+
+	def get_rows_no_csv(self):
+		
+		initial_patches = get_all_patches()
+
+		center_of_rows = []
+		patches = []
+		
+		for patch in initial_patches:
+
+			patches.append(patch)
+			
+			if settings.PATCH_SIZE_GPS[0] == -1:
+				self.initialize_GPS_size(patch)
+
+			is_new = True
+
+			center = patch.gps.Center
+
+			for c in center_of_rows:
+				if abs(center[1]-c[1]) < settings.PATCH_SIZE_GPS[1]*settings.HEIGHT_RATIO_FOR_ROW_SEPARATION:
+					is_new = False
+
+			if is_new:
+				center_of_rows.append(center)
+
+		patches_groups_by_rows = OrderedDict({})
+
+		center_of_rows = sorted(center_of_rows, key=lambda x: x[1])
+
+		for c in center_of_rows:
+			patches_groups_by_rows[c] = []
+
+		for p in patches:
+			min_distance = settings.PATCH_SIZE_GPS[1]*2
+			min_row = None
+
+			for c in center_of_rows:
+				distance = abs(p.gps.Center[1]-c[1])
+				if distance<min_distance:
+					min_distance = distance
+					min_row = c
+
+			patches_groups_by_rows[min_row].append(p)
+
+		rows = []
+		
+		for g in patches_groups_by_rows:
+			newlist = sorted(patches_groups_by_rows[g], key=lambda x: x.gps.Center[0], reverse=False)
+			
+			rows.append(newlist[settings.patches_to_use])
+
+		print('Rows calculated and created completely.')
+
+		return rows
 
 	def get_rows(self,use_corrected=False):
 		# global coordinates_file, CORRECTED_coordinates_file, patches_to_use, use_camera,PATCH_SIZE_GPS
