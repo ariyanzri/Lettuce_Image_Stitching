@@ -145,6 +145,11 @@ def get_all_patches():
 
 	for img_name in image_names:
 
+		if settings.use_camera == 'Left' and '_right' in filename:
+			continue
+		if settings.use_camera == 'Right' and '_left' in filename:
+			continue
+
 		args.append(img_name)
 
 	processes = MyPool(settings.no_of_cores_to_use_max)
