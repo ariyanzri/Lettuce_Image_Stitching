@@ -145,9 +145,9 @@ def get_all_patches():
 
 	for img_name in image_names:
 
-		if settings.use_camera == 'Left' and '_right' in filename:
+		if settings.use_camera == 'Left' and '_right' in img_name:
 			continue
-		if settings.use_camera == 'Right' and '_left' in filename:
+		if settings.use_camera == 'Right' and '_left' in img_name:
 			continue
 
 		args.append(img_name)
