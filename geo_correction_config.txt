@@ -30,4 +30,4 @@ lid_search_surrounding_patch_number:0
 TRANSFORMATION_ERR_STD:9.32e-6,10.56e-6
 GPS_ERR_STD:9.02e-6,10.48e-6
 LID_ERR_STD:1e-9
-use_lid_detection:True
+use_lid_detection:False
