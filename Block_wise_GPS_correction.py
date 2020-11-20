@@ -127,8 +127,6 @@ def get_patch_coord_dict_from_name(image_name):
 			c[0] = c[0].replace('(','').replace(',','')
 			c[1] = c[1].replace(')','')
 
-	print(u_l)
-
 	upper_left = (float(u_l[0]),float(u_l[1]))
 	lower_left = (float(l_l[0]),float(l_l[1]))
 	upper_right = (float(u_r[0]),float(u_r[1]))
