@@ -73,9 +73,12 @@ lid_file_address = args.lid_address
 bin2tiff_address = args.bin_2tif
 repository_address = args.repository_address
 
-os.mkdir('{0}/{1}'.format(destination,scan_date))
-os.mkdir('{0}/{1}/SIFT'.format(destination,scan_date))
-os.mkdir('{0}/{1}/logs'.format(destination,scan_date))
+if not os.path.exists('{0}/{1}'.format(destination,scan_date)):
+	os.mkdir('{0}/{1}'.format(destination,scan_date))
+if not os.path.exists('{0}/{1}/SIFT'.format(destination,scan_date)):
+	os.mkdir('{0}/{1}/SIFT'.format(destination,scan_date))
+if not os.path.exists('{0}/{1}/logs'.format(destination,scan_date)):
+	os.mkdir('{0}/{1}/logs'.format(destination,scan_date))
 
 print('Geo-correction started. Log is being saved in {0}'.format(destination))
 
