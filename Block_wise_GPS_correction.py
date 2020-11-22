@@ -4362,7 +4362,10 @@ class Field:
 
 			i = 0
 
-			for _,coords,score in top_predictions:
+			for _,c,s in top_predictions:
+
+				coords = c.numpy()
+				score = s.numpy()
 
 				if score[0] < 0.9:
 					continue
