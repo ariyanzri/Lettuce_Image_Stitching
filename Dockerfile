@@ -5,6 +5,16 @@ COPY . /opt
 
 USER root
 
+RUN apt-get update 
+RUN apt-get install -y python3.6-dev \
+                       python3-pip \
+                       wget \
+                       gdal-bin \
+                       libgdal-dev \
+                       libspatialindex-dev \
+                       build-essential \
+                       software-properties-common \
+                       apt-utils
 
 
 RUN wget https://github.com/singularityware/singularity/releases/download/3.6.4/singularity-3.6.4.tar.gz
