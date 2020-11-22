@@ -30,6 +30,7 @@ from scipy.optimize import lsq_linear
 from scipy.sparse.linalg import lsqr
 from osgeo import gdal
 from detecto.core import Model
+from detecto import core, utils, visualize
 
 # from PIL import Image
 # from PIL.TiffTags import TAGS
