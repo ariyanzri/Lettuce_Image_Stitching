@@ -53,7 +53,7 @@ RUN apt-get install -y python3.6-dev \
 #RUN pip3 install sklearn==0.0
 #RUN pip3 install tifffile==2020.6.3
 
-RUN sudo apt-get update && sudo apt-get install -y \
+RUN apt-get update && apt-get install -y \
     build-essential \
     libssl-dev \
     uuid-dev \
@@ -64,7 +64,7 @@ RUN sudo apt-get update && sudo apt-get install -y \
 
 RUN export VERSION=1.11 OS=linux ARCH=amd64 && \
     wget https://dl.google.com/go/go$VERSION.$OS-$ARCH.tar.gz && \
-    sudo tar -C /usr/local -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
+    tar -C /usr/local -xzvf go$VERSION.$OS-$ARCH.tar.gz && \
     rm go$VERSION.$OS-$ARCH.tar.gz
 
 RUN echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
@@ -90,4 +90,4 @@ RUN export VERSION=3.6.4 && \
 
 RUN ./mconfig && \
     make -C ./builddir && \
-    sudo make -C ./builddir install
+    make -C ./builddir install
