@@ -68,8 +68,9 @@ RUN export VERSION=1.11 OS=linux ARCH=amd64 && \
     rm go$VERSION.$OS-$ARCH.tar.gz
 
 RUN echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
-    echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc && \
-    source ~/.bashrc
+    echo 'export PATH=/usr/local/go/bin:${PATH}:${GOPATH}/bin' >> ~/.bashrc
+
+RUN /bin/bash -c "source ~/.bashrc"
 
 RUN go get -u github.com/golang/dep/cmd/dep
 
