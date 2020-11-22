@@ -4381,7 +4381,7 @@ class Field:
 
 				print(x,y)
 
-				final_list_patches.append(possible_patches[i][0],possible_patches[i][1],x,y)
+				final_list_patches.append((possible_patches[i][0],possible_patches[i][1],x,y))
 
 				i+=1
 
