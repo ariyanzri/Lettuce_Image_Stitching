@@ -4381,7 +4381,7 @@ class Field:
 				w = x2-x1
 				h = y2-y1
 
-				if w<settings.LID_SIZE[0] or w>settings.LID_SIZE[1] or h<settings.LID_SIZE[0] or h>settings.LID_SIZE[1]:
+				if w<settings.LID_SIZE[0]/2 or w>settings.LID_SIZE[1] or h<settings.LID_SIZE[0]/2 or h>settings.LID_SIZE[1]:
 					continue
 
 				final_list_patches.append((possible_patches[i][0],possible_patches[i][1],x,y))
