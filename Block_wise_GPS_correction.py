@@ -4345,43 +4345,33 @@ class Field:
 
 		else:
 
-			path_tmp = settings.SIFT_folder.replace('/SIFT','/tmp_lid')
-			out_path = path_tmp.replace('/tmp_lid','')
-
-			if not os.path.exists(path_tmp):
-				os.mkdir(path_tmp)
-
-			for p,l in possible_patches:
-				shutil.copyfile('{0}/{1}'.format(settings.patch_folder,p),'{0}/{1}'.format(path_tmp,p))
-
-			command = 'singularity'
-
-			process = subprocess.Popen([command,'run',settings.lid_detection_simg_path,path_tmp,'-m',settings.lid_detection_model_path,\
-				'-c', str(settings.no_of_cores_to_use_max),'-o',out_path])
-
-			process.wait()
-
+			images = []
+			results = {}
 			final_list_patches = []
 
-			with open('{0}/lid_detection.csv'.format(out_path), mode='r') as infile:
-				reader = csv.reader(infile)
-				
-				for rows in reader:
+			for p,l in possible_patches:
+				p.load_img()
+				images.append(p.rgb_img)
+				results[p.name] = l
 
-					patch = None
-					lid_id = None
+			top_predictions = model.predict_top(images)	
 
-					for p,l in possible_patches:
-						if rows[0] == p.name:
-							patch = p
-							lid_id = l
+			print(top_predictions)
 
-					x = float(rows[1])
-					y = float(rows[2])
+			# patch = None
+			# lid_id = None
 
-					# if size diff correct x,y
+			# for p,l in possible_patches:
+			# 	if rows[0] == p.name:
+			# 		patch = p
+			# 		lid_id = l
 
-					final_list_patches.append((patch,lid_id,x,y))
+			# x = float(rows[1])
+			# y = float(rows[2])
+
+			# # if size diff correct x,y
+
+			# final_list_patches.append((patch,lid_id,x,y))
 
 
 		print('Detected {0} lid patches in the field.'.format(len(final_list_patches)))
