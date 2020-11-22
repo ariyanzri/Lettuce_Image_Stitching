@@ -4356,7 +4356,7 @@ class Field:
 				images.append(p.rgb_img)
 				results[p.name] = l
 
-			model = core.Model.load(settings.lid_detection_model_path)
+			model = core.Model.load(settings.lid_detection_model_path,['lid'])
 
 			top_predictions = model.predict_top(images)	
 
