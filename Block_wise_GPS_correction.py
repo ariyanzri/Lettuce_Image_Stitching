@@ -29,6 +29,7 @@ from collections import OrderedDict,Counter
 from scipy.optimize import lsq_linear
 from scipy.sparse.linalg import lsqr
 from osgeo import gdal
+from detecto.core import Model
 
 # from PIL import Image
 # from PIL.TiffTags import TAGS
