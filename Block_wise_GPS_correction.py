@@ -4370,19 +4370,19 @@ class Field:
 				if score[0] < 0.9:
 					continue
 
-				print(score[0])
-
 				x1 = coords[0][0]
 				y1 = coords[0][1]
 				x2 = coords[0][2]
 				y2 = coords[0][3]
 
-				print(x1,y1,x2,y2)
-
 				x = int((x1+x2)/2)
 				y = int((y1+y2)/2)
 
-				print(x,y)
+				w = x2-x1
+				h = y2-y1
+
+				if w<settings.LID_SIZE[0] or w>settings.LID_SIZE[1] or h<settings.LID_SIZE[0] or h>settings.LID_SIZE[1]:
+					continue
 
 				final_list_patches.append((possible_patches[i][0],possible_patches[i][1],x,y))
 
