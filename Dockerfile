@@ -52,3 +52,10 @@ RUN pip3 install scipy==1.4.1
 RUN pip3 install six==1.14.0
 RUN pip3 install sklearn==0.0
 RUN pip3 install tifffile==2020.6.3
+
+RUN wget https://github.com/singularityware/singularity/releases/download/2.5.2/singularity-2.5.2.tar.gz
+RUN tar xvf singularity-2.5.2.tar.gz
+RUN cd singularity-2.5.2
+RUN ./configure --prefix=/usr/local
+RUN make
+RUN sudo make install
