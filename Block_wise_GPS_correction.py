@@ -14,6 +14,7 @@ import statistics
 import datetime
 import shutil 
 import csv
+import subprocess
 
 # from sklearn.linear_model import RANSACRegressor
 # from sklearn.datasets import make_regression
