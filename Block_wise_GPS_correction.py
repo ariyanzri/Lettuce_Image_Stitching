@@ -4360,23 +4360,30 @@ class Field:
 
 			top_predictions = model.predict_top(images)	
 
-			print(top_predictions)
+			i = 0
 
-			# patch = None
-			# lid_id = None
+			for _,coords,score in top_predictions:
 
-			# for p,l in possible_patches:
-			# 	if rows[0] == p.name:
-			# 		patch = p
-			# 		lid_id = l
+				if score[0] < 0.9:
+					continue
 
-			# x = float(rows[1])
-			# y = float(rows[2])
+				print(score[0])
 
-			# # if size diff correct x,y
+				x1 = coords[0][0]
+				y1 = coords[0][1]
+				x2 = coords[0][2]
+				y2 = coords[0][3]
 
-			# final_list_patches.append((patch,lid_id,x,y))
+				print(x1,y1,x2,y2)
 
+				x = int((x1+x2)/2)
+				y = int((y1+y2)/2)
+
+				print(x,y)
+
+				final_list_patches.append(possible_patches[i][0],possible_patches[i][1],x,y)
+
+				i+=1
 
 		print('Detected {0} lid patches in the field.'.format(len(final_list_patches)))
 		sys.stdout.flush()
