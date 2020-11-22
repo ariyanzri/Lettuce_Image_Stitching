@@ -54,5 +54,6 @@ RUN pip3 install six==1.14.0
 RUN pip3 install sklearn==0.0
 RUN pip3 install tifffile==2020.6.3
 
+RUN pip3 install tqdm
 RUN pip3 install detecto
 
