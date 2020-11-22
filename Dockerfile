@@ -72,9 +72,9 @@ RUN echo 'export GOPATH=${HOME}/go' >> ~/.bashrc && \
 
 RUN /bin/bash -c "source ~/.bashrc"
 
-RUN go get -u github.com/golang/dep/cmd/dep
+RUN /bin/bash -c "go get -u github.com/golang/dep/cmd/dep"
 
-RUN go get -d github.com/sylabs/singularity
+RUN /bin/bash -c "go get -d github.com/sylabs/singularity"
 
 RUN export VERSION=v3.6.4 && \
     cd $GOPATH/src/github.com/sylabs/singularity && \
