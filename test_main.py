@@ -78,7 +78,7 @@ config_file = sys.argv[2]
 local_address = sys.argv[3]
 
 
-settings.initialize_settings_test(scan_date,config_file,local_address,4,15)
+settings.initialize_settings_test(scan_date,config_file,local_address,10,10)
 
 print_settings()
 main(scan_date)
