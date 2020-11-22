@@ -33,7 +33,7 @@ This repository contains all the necessary codes for running geo-correcting the 
 
 * GPS_image_stitching.py: The old file where all the untidy codes for testing are placed in. 
 
-* geo_correction_config.txt: A sample of a good config file with all the field.
+* geo_correction_config.txt: A sample of a good config file with all the field. (Lid Detection Method options: ML (for faster RCNN), TMP (for Template Matching) and Other)
 
 * settings.py: The file that is responsible for reading the config file and configuring the platform. 
 

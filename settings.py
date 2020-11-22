@@ -10,8 +10,8 @@ def initialize_settings(scan_date,config_file,local_address):
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
-	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE,use_lid_detection
+	lid_detection_method,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE,lid_detection_model_path,lid_detection_simg_path
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -55,14 +55,15 @@ def initialize_settings(scan_date,config_file,local_address):
 		patches_to_use = slice(0,None)
 		is_single_group = (True if lines[23].split(':')[1] == 'true' or lines[23].split(':')[1] == 'True' else False)
 		is_flir = False
-		use_temp_matching = (True if lines[26].split(':')[1] == 'true' or lines[26].split(':')[1] == 'True' else False)
+		lid_detection_method = lines[26].split(':')[1]
 		circle_error = int(lines[27].split(':')[1])
 		lid_search_surrounding_patch_number = int(lines[28].split(':')[1])
 		TRANSFORMATION_ERR_STD = float(lines[29].split(':')[1].split(',')[0]),float(lines[29].split(':')[1].split(',')[1])
 		GPS_ERROR_STD = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
 		LID_ERR_STD = float(lines[31].split(':')[1])
 
-		use_lid_detection = (True if lines[32].split(':')[1] == 'true' or lines[32].split(':')[1] == 'True' else False)
+		lid_detection_model_path = lines[32].split(':')[1]
+		lid_detection_simg_path = lines[33].split(':')[1]
 
 		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
 
@@ -90,8 +91,8 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,bin2tif_ad
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
 	field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
-	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE,use_lid_detection
+	lid_detection_method,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE,lid_detection_model_path,lid_detection_simg_path
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -135,14 +136,15 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,bin2tif_ad
 		patches_to_use = slice(0,None)
 		is_single_group = (True if lines[23].split(':')[1] == 'true' or lines[23].split(':')[1] == 'True' else False)
 		is_flir = False
-		use_temp_matching = (True if lines[26].split(':')[1] == 'true' or lines[26].split(':')[1] == 'True' else False)
+		lid_detection_method = lines[26].split(':')[1]
 		circle_error = int(lines[27].split(':')[1])
 		lid_search_surrounding_patch_number = int(lines[28].split(':')[1])
 		TRANSFORMATION_ERR_STD = float(lines[29].split(':')[1].split(',')[0]),float(lines[29].split(':')[1].split(',')[1])
 		GPS_ERROR_STD = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
 		LID_ERR_STD = float(lines[31].split(':')[1])
 
-		use_lid_detection = (True if lines[32].split(':')[1] == 'true' or lines[32].split(':')[1] == 'True' else False)
+		lid_detection_model_path = lines[32].split(':')[1]
+		lid_detection_simg_path = lines[33].split(':')[1]
 
 		temp_lid_image_address = '{0}/lid_temp.png'.format(repository_address)
 
@@ -167,8 +169,8 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
-	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE,use_lid_detection
+	lid_detection_method,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE,lid_detection_model_path,lid_detection_simg_path
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -212,14 +214,15 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 		patches_to_use = slice(0,patch_n)
 		is_single_group = (True if lines[23].split(':')[1] == 'true' or lines[23].split(':')[1] == 'True' else False)
 		is_flir = False
-		use_temp_matching = (True if lines[26].split(':')[1] == 'true' or lines[26].split(':')[1] == 'True' else False)
+		lid_detection_method = lines[26].split(':')[1]
 		circle_error = int(lines[27].split(':')[1])
 		lid_search_surrounding_patch_number = int(lines[28].split(':')[1])
 		TRANSFORMATION_ERR_STD = float(lines[29].split(':')[1].split(',')[0]),float(lines[29].split(':')[1].split(',')[1])
 		GPS_ERROR_STD = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
 		LID_ERR_STD = float(lines[31].split(':')[1])
 
-		use_lid_detection = (True if lines[32].split(':')[1] == 'true' or lines[32].split(':')[1] == 'True' else False)
+		lid_detection_model_path = lines[32].split(':')[1]
+		lid_detection_simg_path = lines[33].split(':')[1]
 
 		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
 		
@@ -247,8 +250,8 @@ def initialize_settings_FLIR(scan_date,config_file,local_address):
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
-	use_temp_matching,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE,use_lid_detection
+	lid_detection_method,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE,lid_detection_model_path,lid_detection_simg_path
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -292,14 +295,15 @@ def initialize_settings_FLIR(scan_date,config_file,local_address):
 		patches_to_use = slice(0,None)
 		is_single_group = (True if lines[23].split(':')[1] == 'true' or lines[23].split(':')[1] == 'True' else False)
 		is_flir = True
-		use_temp_matching = (True if lines[26].split(':')[1] == 'true' or lines[26].split(':')[1] == 'True' else False)
+		lid_detection_method = lines[26].split(':')[1]
 		circle_error = int(lines[27].split(':')[1])
 		lid_search_surrounding_patch_number = int(lines[28].split(':')[1])
 		TRANSFORMATION_ERR_STD = float(lines[29].split(':')[1].split(',')[0]),float(lines[29].split(':')[1].split(',')[1])
 		GPS_ERROR_STD = float(lines[30].split(':')[1].split(',')[0]),float(lines[30].split(':')[1].split(',')[1])
 		LID_ERR_STD = float(lines[31].split(':')[1])
 
-		use_lid_detection = (True if lines[32].split(':')[1] == 'true' or lines[32].split(':')[1] == 'True' else False)
+		lid_detection_model_path = lines[32].split(':')[1]
+		lid_detection_simg_path = lines[33].split(':')[1]
 		
 		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
 

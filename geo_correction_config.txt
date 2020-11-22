@@ -24,10 +24,11 @@ number_of_rows_in_groups:12
 is_single_group:True
 Initial_Size:3296,2472
 LID_SIZE_MIN_MAX:170,230
-use_temp_matching:True
+LID_METHOD:ML
 circle_error:30
 lid_search_surrounding_patch_number:0
 TRANSFORMATION_ERR_STD:9.32e-6,10.56e-6
 GPS_ERR_STD:9.02e-6,10.48e-6
 LID_ERR_STD:1e-9
-use_lid_detection:False
+LID_MODEL_PATH:/storage/ariyanzarei/model_weights_rgb_lid.pth
+LID_SIMG_PATH:/storage/ariyanzarei/lid_detection.simg

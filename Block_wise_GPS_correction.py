@@ -13,6 +13,7 @@ import socket
 import statistics
 import datetime
 import shutil 
+import csv
 
 # from sklearn.linear_model import RANSACRegressor
 # from sklearn.datasets import make_regression
@@ -93,6 +94,24 @@ def histogram_equalization(img):
 		img[:,:,2] = channel_2
 
 	return img
+
+def get_nearest_lid_id(patch):
+
+	lids = get_lids()
+
+	min_distance = sys.maxsize
+	min_lid = None
+
+	for l in lids:
+		lat,lon = lids[l]
+
+		d = math.sqrt((patch.gps.Center[0]-lon)**2 + (patch.gps.Center[1]-lat)**2)
+		
+		if d<min_distance:
+			min_distance = d
+			min_lid = l
+
+	return min_lid
 
 def get_patch_coord_dict_from_name(image_name):
 
@@ -1104,7 +1123,7 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 		rgb_img = img.copy()
 		# img = histogram_equalization(img)
 
-		if settings.use_temp_matching:
+		if settings.lid_detection_method == 'TMP':
 
 			lid_img = cv2.imread(settings.temp_lid_image_address)
 			# print(lid_img.shape)
@@ -4295,7 +4314,7 @@ class Field:
 		lids = get_lids()
 		possible_patches = self.get_patches_with_possible_lids()
 
-		if not settings.use_lid_detection:
+		if settings.lid_detection_method != 'ML':
 
 			args_list = []
 
@@ -4309,7 +4328,7 @@ class Field:
 
 			final_list_patches = []
 
-			if settings.use_temp_matching:
+			if settings.lid_detection_method == 'TMP':
 				results_sorted = sorted(results, reverse=True, key=lambda tup: tup[6])
 				max_count_lids = max(int(len(results_sorted)/5),20)
 				results = [(x,y,r,l,pn,crd) for x,y,r,l,pn,crd,score in results_sorted[:max_count_lids]]
@@ -4326,18 +4345,43 @@ class Field:
 		else:
 
 			path_tmp = settings.SIFT_folder.replace('/SIFT','/tmp_lid')
+			out_path = path_tmp.replace('/tmp_lid','')
 
 			if not os.path.exists(path_tmp):
 				os.mkdir(path_tmp)
-
 
 			for p,l in possible_patches:
 				shutil.copyfile('{0}/{1}'.format(settings.patch_folder,p),'{0}/{1}'.format(path_tmp,p))
 
 			command = 'singularity'
 
-			process = subprocess.Popen([command,'run',path_tmp,'-m',settings.path_to_model,'-d', settings.scan_date_stng,'-t','RGB','-o',path_tmp.replace('/tmp_lid','')])
+			process = subprocess.Popen([command,'run',settings.lid_detection_simg_path,path_tmp,'-m',settings.lid_detection_model_path,\
+				'-c', settings.no_of_cores_to_use_max,'-o',out_path])
+
 			process.wait()
+
+			final_list_patches = []
+
+			with open('{0}/lid_detection.csv'.format(out_path), mode='r') as infile:
+				reader = csv.reader(infile)
+				
+				for rows in reader:
+
+					patch = None
+					lid_id = None
+
+					for p,l in possible_patches:
+						if rows[0] == p.name:
+							patch = p
+							lid_id = l
+
+					x = float(rows[1])
+					y = float(rows[2])
+
+					# if size diff correct x,y
+
+					final_list_patches.append((patch,lid_id,x,y))
+
 
 		print('Detected {0} lid patches in the field.'.format(len(final_list_patches)))
 		sys.stdout.flush()
