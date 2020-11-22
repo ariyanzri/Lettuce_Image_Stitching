@@ -4357,7 +4357,7 @@ class Field:
 			command = 'singularity'
 
 			process = subprocess.Popen([command,'run',settings.lid_detection_simg_path,path_tmp,'-m',settings.lid_detection_model_path,\
-				'-c', settings.no_of_cores_to_use_max,'-o',out_path])
+				'-c', str(settings.no_of_cores_to_use_max),'-o',out_path])
 
 			process.wait()
 
