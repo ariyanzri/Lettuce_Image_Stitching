@@ -4366,8 +4366,9 @@ class Field:
 
 				coords = c.numpy()
 				score = s.numpy()
-
-				if score[0] < 0.9:
+				print(score[0])
+				if score[0] < 0.9998:
+					print('dropped.')
 					continue
 
 				x1 = coords[0][0]
