@@ -4354,8 +4354,9 @@ class Field:
 			i = 0
 			for p,l in possible_patches:
 				p.load_img()
-				images.append(p.rgb_img)
-				possible_patches_dict[i] = p
+				img = p.rgb_img.copy()
+				images.append(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+				possible_patches_dict[i] = (p,l)
 				i+=1
 
 			model = core.Model.load(settings.lid_detection_model_path,['lid'])
