@@ -4367,7 +4367,7 @@ class Field:
 				coords = c.numpy()
 				score = s.numpy()
 				print('------------------------------------------------------')
-				print('Image {0} is candidated for having a lid.'.format(possible_patches[i][0].name))
+				print('Image {0} probably has a lid.'.format(possible_patches[i][0].name))
 				print('Score of lid detection: ',score[0])
 				if score[0] < 0.99:
 					print('Image dropped.')
