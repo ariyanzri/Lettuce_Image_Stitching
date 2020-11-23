@@ -4371,6 +4371,7 @@ class Field:
 				print(score[0])
 				if score[0] < 0.9998:
 					print('dropped.')
+					i+=1
 					continue
 
 				x1 = coords[0][0]
