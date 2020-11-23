@@ -1,6 +1,6 @@
 METHOD:TransformationOnly
-NO_CORES:23
-NO_CORES_MAX:60
+NO_CORES:40
+NO_CORES_MAX:90
 SCALE:0.2
 HEIGHT_RATIO_FOR_ROW_SEPARATION:0.1
 PERCENTAGE_OF_GOOD_MATCHES:0.5
@@ -30,4 +30,4 @@ lid_search_surrounding_patch_number:0
 TRANSFORMATION_ERR_STD:9.32e-6,10.56e-6
 GPS_ERR_STD:9.02e-6,10.48e-6
 LID_ERR_STD:1e-9
-LID_MODEL_PATH:/storage/ariyanzarei/model_weights_rgb_lid.pth
+LID_MODEL_PATH:/xdisk/kobus/ariyan/model_weights_rgb_lid.pth
