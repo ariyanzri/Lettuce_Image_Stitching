@@ -4366,6 +4366,8 @@ class Field:
 
 				coords = c.numpy()
 				score = s.numpy()
+				print('------------------------------------------------------')
+				print('image {0}.'.format(possible_patches[i][0].name))
 				print(score[0])
 				if score[0] < 0.9998:
 					print('dropped.')
