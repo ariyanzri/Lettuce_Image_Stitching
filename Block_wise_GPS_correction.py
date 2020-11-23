@@ -4348,13 +4348,15 @@ class Field:
 		else:
 
 			images = []
-			results = {}
 			final_list_patches = []
+			possible_patches_dict = {}
 
+			i = 0
 			for p,l in possible_patches:
 				p.load_img()
 				images.append(p.rgb_img)
-				results[p.name] = l
+				possible_patches_dict[i] = p
+				i+=1
 
 			model = core.Model.load(settings.lid_detection_model_path,['lid'])
 
@@ -4367,12 +4369,8 @@ class Field:
 				coords = c.numpy()
 				score = s.numpy()
 				print('------------------------------------------------------')
-				print('Image {0} probably has a lid.'.format(possible_patches[i][0].name))
+				print('Image {0} probably has a lid.'.format(possible_patches_dict[i][0].name))
 				print('Score of lid detection: ',score[0])
-				if score[0] < 0.99:
-					print('Image dropped.')
-					i+=1
-					continue
 
 				x1 = coords[0][0]
 				y1 = coords[0][1]
@@ -4385,10 +4383,17 @@ class Field:
 				w = x2-x1
 				h = y2-y1
 
-				if w<settings.LID_SIZE[0]/2 or w>settings.LID_SIZE[1] or h<settings.LID_SIZE[0]/2 or h>settings.LID_SIZE[1]:
+				if score[0] < 0.99:
+					print('Image dropped due to low score.')
+					i+=1
 					continue
 
-				final_list_patches.append((possible_patches[i][0],possible_patches[i][1],x,y))
+				if w<settings.LID_SIZE[0]/2 or w>settings.LID_SIZE[1] or h<settings.LID_SIZE[0]/2 or h>settings.LID_SIZE[1]:
+					print('Image dropped due to incorrect size of lid.')
+					i+=1
+					continue
+
+				final_list_patches.append((possible_patches_dict[i][0],possible_patches_dict[i][1],x,y))
 
 				i+=1
 
