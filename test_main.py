@@ -35,13 +35,13 @@ def main(scan_date):
 
 	# old_RMSE = get_approximate_random_RMSE_overlap(field,50,settings.no_of_cores_to_use_max)
 
-	field.create_patches_SIFT_files()
+	# field.create_patches_SIFT_files()
 	
 	# # field.draw_and_save_field(is_old=True)
 
-	field.correct_field()
+	# field.correct_field()
 
-	field.save_new_coordinate()
+	# field.save_new_coordinate()
 
 	field.draw_and_save_field(is_old=False)
 
