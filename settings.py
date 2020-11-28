@@ -239,8 +239,8 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
 		
 
-		patch_folder = '{0}/{1}-rgb/bin2tif_out'.format(local_address,scan_date)
-		# patch_folder = '{0}/{1}-rgb/output_tiffs'.format(local_address,scan_date)
+		# patch_folder = '{0}/{1}-rgb/bin2tif_out'.format(local_address,scan_date)
+		patch_folder = '{0}/{1}-rgb/output_tiffs'.format(local_address,scan_date)
 		SIFT_folder = '{0}/{1}-rgb/SIFT'.format(local_address,scan_date)
 		lid_file = '{0}/{1}-rgb/lids.txt'.format(local_address,scan_date)
 		coordinates_file = '{0}/{1}-rgb/{2}_coordinates.csv'.format(local_address,scan_date,scan_date)
