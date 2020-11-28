@@ -205,7 +205,7 @@ def update_single_coordinate_gdal(patch_dict):
 
 	u_l = patch_dict['UL']
 	l_r = patch_dict['LR']
-
+	print(u_l,u_r)
 	ds = gdal.Warp(out_path, ds, outputBounds = [u_l[0], u_l[1], l_r[0], l_r[1]])
 	ds = None
 
@@ -4614,7 +4614,7 @@ class Field:
 		for p in patches:
 			min_distance = settings.PATCH_SIZE_GPS[1]*2
 			min_row = None
-			print(center_of_rows)
+
 			for c in center_of_rows:
 				distance = abs(p.gps.Center[1]-c[1])
 				if distance<min_distance:
