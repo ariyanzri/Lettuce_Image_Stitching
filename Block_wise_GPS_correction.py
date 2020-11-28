@@ -4614,7 +4614,7 @@ class Field:
 		for p in patches:
 			min_distance = settings.PATCH_SIZE_GPS[1]*2
 			min_row = None
-			print(p.gps)
+			print(p.gps.UL_coord)
 			for c in center_of_rows:
 				distance = abs(p.gps.Center[1]-c[1])
 				if distance<min_distance:
