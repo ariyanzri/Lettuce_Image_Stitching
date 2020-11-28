@@ -201,7 +201,6 @@ def update_single_coordinate_gdal(patch_dict):
 		out_path = '{0}/{1}'.format(settings.patch_folder,patch_dict['name'])
 
 	ds = gdal.Open(path)
-	u_l, l_r = get_coordinates(ds)
 
 	out_name = os.path.basename(ds.GetDescription()).replace('.tif', '_corrected.tif')
 
