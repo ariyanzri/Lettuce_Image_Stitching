@@ -188,17 +188,46 @@ def get_all_patches():
 
 	return patches
 
-def set_all_patches(patches):
+def update_single_coordinate_gdal(patch_dict):
+
+	path = '{0}/{1}'.format(settings.new_tiffs_path,patch_dict['name'])
+
+	if settings.save_new_tiffs:
+
+		out_path = '{0}/{1}'.format(settings.new_tiffs_path,patch_dict['name'])
+
+	else:
+
+		out_path = '{0}/{1}'.format(settings.patch_folder,patch_dict['name'])
+
+	ds = gdal.Open(path)
+	u_l, l_r = get_coordinates(ds)
+
+	out_name = os.path.basename(ds.GetDescription()).replace('.tif', '_corrected.tif')
+
+	u_l = patch_dict['UL']
+	l_r = patch_dict['LR']
+
+	ds = gdal.Warp(out_path, ds, outputBounds = [u_l[0], u_l[1], l_r[0], l_r[1]])
+	ds = None
+
+def update_coordinates(patches):
+
+	if settings.save_new_tiffs and not os.path.exists(settings.new_tiffs_path):
+		os.mkdir(settings.new_tiffs_path)
 
 	args = []
 
 	for p in patches:
 
-		coord = {'name':p.name,'UL':p.gps.UL_coord,'LL':p.gps.LL_coord,'UR':p.gps.UR_coord,'LR':p.gps.LR_coord,'C':p.gps.Center}
+		patch_dict = {'name':p.name,'UL':p.gps.UL_coord,'LL':p.gps.LL_coord,'UR':p.gps.UR_coord,'LR':p.gps.LR_coord,'C':p.gps.Center}
 
-		args.append(coord)
+		args.append(patch_dict)
 
 
+	processes = multiprocessing.Pool(settings.no_of_cores_to_use_max)
+	processes.map(update_single_coordinate_gdal,args)
+	processes.close()
 
 def load_preprocess_image(address,hist_eq=False):
 	
@@ -5153,23 +5182,29 @@ class Field:
 
 			all_patches+=[p for p in group.patches if (p not in all_patches)]
 
-		final_results = 'Filename,Upper left,Lower left,Upper right,Lower right,Center\n'
+		if settings.save_coords_on_csv:
 
-		for p in all_patches:
-			p.gps.UL_coord = (round(p.gps.UL_coord[0],14),round(p.gps.UL_coord[1],14))
-			p.gps.LL_coord = (round(p.gps.LL_coord[0],14),round(p.gps.LL_coord[1],14))
-			p.gps.UR_coord = (round(p.gps.UR_coord[0],14),round(p.gps.UR_coord[1],14))
-			p.gps.LR_coord = (round(p.gps.LR_coord[0],14),round(p.gps.LR_coord[1],14))
-			p.gps.Center = (round(p.gps.Center[0],14),round(p.gps.Center[1],14))
+			final_results = 'Filename,Upper left,Lower left,Upper right,Lower right,Center\n'
 
-			final_results += '{:s},"{:.14f},{:.14f}","{:.14f},{:.14f}","{:.14f},{:.14f}","{:.14f},{:.14f}","{:.14f},{:.14f}"\n'\
-			.format(p.name,p.gps.UL_coord[0],p.gps.UL_coord[1],p.gps.LL_coord[0],p.gps.LL_coord[1],p.gps.UR_coord[0],p.gps.UR_coord[1]\
-				,p.gps.LR_coord[0],p.gps.LR_coord[1],p.gps.Center[0],p.gps.Center[1])
+			for p in all_patches:
+				p.gps.UL_coord = (round(p.gps.UL_coord[0],14),round(p.gps.UL_coord[1],14))
+				p.gps.LL_coord = (round(p.gps.LL_coord[0],14),round(p.gps.LL_coord[1],14))
+				p.gps.UR_coord = (round(p.gps.UR_coord[0],14),round(p.gps.UR_coord[1],14))
+				p.gps.LR_coord = (round(p.gps.LR_coord[0],14),round(p.gps.LR_coord[1],14))
+				p.gps.Center = (round(p.gps.Center[0],14),round(p.gps.Center[1],14))
 
-		final_results = final_results.replace('(','"').replace(')','"')
+				final_results += '{:s},"{:.14f},{:.14f}","{:.14f},{:.14f}","{:.14f},{:.14f}","{:.14f},{:.14f}","{:.14f},{:.14f}"\n'\
+				.format(p.name,p.gps.UL_coord[0],p.gps.UL_coord[1],p.gps.LL_coord[0],p.gps.LL_coord[1],p.gps.UR_coord[0],p.gps.UR_coord[1]\
+					,p.gps.LR_coord[0],p.gps.LR_coord[1],p.gps.Center[0],p.gps.Center[1])
 
-		with open(settings.CORRECTED_coordinates_file,'w') as f:
-			f.write(final_results)
+			final_results = final_results.replace('(','"').replace(')','"')
+
+			with open(settings.CORRECTED_coordinates_file,'w') as f:
+				f.write(final_results)
+
+		else:
+
+			update_coordinates(all_patches)
 
 		print('Coordinates saved.')
 		sys.stdout.flush()

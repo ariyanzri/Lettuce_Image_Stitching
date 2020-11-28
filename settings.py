@@ -11,7 +11,8 @@ def initialize_settings(scan_date,config_file,local_address):
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
 	lid_detection_method,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE,lid_detection_model_path
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE,lid_detection_model_path,\
+	save_coords_on_csv,save_new_tiffs,new_tiffs_path
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -63,6 +64,10 @@ def initialize_settings(scan_date,config_file,local_address):
 		LID_ERR_STD = float(lines[31].split(':')[1])
 
 		lid_detection_model_path = lines[32].split(':')[1]
+
+		save_coords_on_csv = (True if lines[33].split(':')[1] == 'true' or lines[33].split(':')[1] == 'True' else False)
+		save_new_tiffs = (True if lines[34].split(':')[1] == 'true' or lines[34].split(':')[1] == 'True' else False)
+		new_tiffs_path = '{0}/{1}-rgb/output_tiffs'.format(local_address,scan_date)
 
 		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
 
@@ -91,7 +96,8 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,bin2tif_ad
 	field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
 	lid_detection_method,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE,lid_detection_model_path
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE,lid_detection_model_path,\
+	save_coords_on_csv,save_new_tiffs,new_tiffs_path
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -144,6 +150,10 @@ def initialize_settings_HPC(scan_date,config_file,destination,lid_add,bin2tif_ad
 
 		lid_detection_model_path = lines[32].split(':')[1]
 
+		save_coords_on_csv = (True if lines[33].split(':')[1] == 'true' or lines[33].split(':')[1] == 'True' else False)
+		save_new_tiffs = (True if lines[34].split(':')[1] == 'true' or lines[34].split(':')[1] == 'True' else False)
+		new_tiffs_path = '{0}/{1}/output_tiffs'.format(destination,scan_date)
+
 		temp_lid_image_address = '{0}/lid_temp.png'.format(repository_address)
 
 		patch_folder = '{0}'.format(bin2tif_address)
@@ -168,7 +178,8 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
 	lid_detection_method,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE,lid_detection_model_path
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE,lid_detection_model_path,\
+	save_coords_on_csv,save_new_tiffs,new_tiffs_path
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -221,6 +232,10 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 
 		lid_detection_model_path = lines[32].split(':')[1]
 
+		save_coords_on_csv = (True if lines[33].split(':')[1] == 'true' or lines[33].split(':')[1] == 'True' else False)
+		save_new_tiffs = (True if lines[34].split(':')[1] == 'true' or lines[34].split(':')[1] == 'True' else False)
+		new_tiffs_path = '{0}/{1}-rgb/output_tiffs'.format(local_address,scan_date)
+
 		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
 		
 
@@ -248,7 +263,8 @@ def initialize_settings_FLIR(scan_date,config_file,local_address):
 	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
 	lid_detection_method,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
-	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE,lid_detection_model_path
+	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE,lid_detection_model_path,\
+	save_coords_on_csv,save_new_tiffs,new_tiffs_path
 
 	with open(config_file,'r') as f:
 		lines = f.read().split('\n')
@@ -300,6 +316,10 @@ def initialize_settings_FLIR(scan_date,config_file,local_address):
 		LID_ERR_STD = float(lines[31].split(':')[1])
 
 		lid_detection_model_path = lines[32].split(':')[1]
+
+		save_coords_on_csv = (True if lines[33].split(':')[1] == 'true' or lines[33].split(':')[1] == 'True' else False)
+		save_new_tiffs = (True if lines[34].split(':')[1] == 'true' or lines[34].split(':')[1] == 'True' else False)
+		new_tiffs_path = '{0}/{1}_out/output_tiffs'.format(local_address,scan_date)
 		
 		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
 
