@@ -195,15 +195,12 @@ def update_single_coordinate_gdal(patch_dict):
 	if settings.save_new_tiffs:
 		
 		out_path = '{0}/{1}'.format(settings.new_tiffs_path,patch_dict['name'])
-		# shutil.copyfile(original_path,out_path)
 
 	else:
 
 		out_path = '{0}/{1}'.format(settings.patch_folder,patch_dict['name'])
 
 	ds = gdal.Open(original_path)
-
-	out_name = os.path.basename(ds.GetDescription()).replace('.tif', '_corrected.tif')
 
 	u_l = patch_dict['UL']
 	l_r = patch_dict['LR']

@@ -39,9 +39,9 @@ def main(scan_date):
 	
 	# # field.draw_and_save_field(is_old=True)
 
-	# field.correct_field()
+	field.correct_field()
 
-	# field.save_new_coordinate()
+	field.save_new_coordinate()
 
 	field.draw_and_save_field(is_old=False)
 
