@@ -206,7 +206,7 @@ def update_single_coordinate_gdal(patch_dict):
 	u_l = patch_dict['UL']
 	l_r = patch_dict['LR']
 	
-	ds = gdal.Warp(out_path, ds, outputBounds = [u_l[0], l_r[1], l_r[0], u_l[1]])
+	ds = gdal.Translate(out_path, ds, outputBounds = [u_l[0], u_l[1], l_r[0], l_r[1]])
 	ds = None
 
 def update_coordinates(patches):
