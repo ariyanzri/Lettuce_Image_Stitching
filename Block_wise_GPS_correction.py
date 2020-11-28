@@ -190,23 +190,25 @@ def get_all_patches():
 
 def update_single_coordinate_gdal(patch_dict):
 
+	original_path = '{0}/{1}'.format(settings.patch_folder,patch_dict['name'])
+
 	if settings.save_new_tiffs:
-		original_path = '{0}/{1}'.format(settings.patch_folder,patch_dict['name'])
+		
 		out_path = '{0}/{1}'.format(settings.new_tiffs_path,patch_dict['name'])
-		shutil.copyfile(original_path,out_path)
+		# shutil.copyfile(original_path,out_path)
 
 	else:
 
 		out_path = '{0}/{1}'.format(settings.patch_folder,patch_dict['name'])
 
-	ds = gdal.Open(out_path)
+	ds = gdal.Open(original_path)
 
 	out_name = os.path.basename(ds.GetDescription()).replace('.tif', '_corrected.tif')
 
 	u_l = patch_dict['UL']
 	l_r = patch_dict['LR']
 	
-	ds = gdal.Translate(out_path, ds, outputBounds = [u_l[0], u_l[1], l_r[0], l_r[1]])
+	ds = gdal.Warp(out_path, ds, outputBounds = [u_l[0], u_l[1], l_r[0], l_r[1]])
 	ds = None
 
 def update_coordinates(patches):
