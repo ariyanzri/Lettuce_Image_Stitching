@@ -226,7 +226,7 @@ def update_coordinates(patches):
 	processes.map(update_single_coordinate_gdal,args)
 	processes.close()
 
-def load_preprocess_image(address,hist_eq=False):
+def load_preprocess_image(address,hist_eq=True):
 	
 	if settings.is_flir:
 		img = cv2.imread(address,cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
