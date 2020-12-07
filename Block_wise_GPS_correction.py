@@ -4395,6 +4395,12 @@ class Field:
 
 				coords = c.numpy()
 				score = s.numpy()
+				if score is None or score.shape[0] == 0:
+					print('------------------------------------------------------')
+					print('Image {0} no detected lid.'.format(possible_patches_dict[i][0].name))
+					i+=1
+					continue
+
 				print('------------------------------------------------------')
 				print('Image {0} probably has a lid.'.format(possible_patches_dict[i][0].name))
 				print('Score of lid detection: ',score[0])
