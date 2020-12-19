@@ -57,3 +57,4 @@ RUN pip3 install tifffile==2020.6.3
 RUN pip3 install tqdm
 RUN pip3 install detecto
 
+RUN pip3 install open3d
