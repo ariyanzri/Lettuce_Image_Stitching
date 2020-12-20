@@ -60,3 +60,4 @@ RUN pip3 install detecto
 RUN apt-get install -y libgl1-mesa-dev
 
 RUN pip3 install open3d
+RUN pip3 install utm
