@@ -252,7 +252,7 @@ def initialize_settings_test(scan_date,config_file,local_address,rows_n,patch_n)
 		scan_date_stng = scan_date
 		lettuce_coords = None
 
-def initialize_settings_FLIR(scan_date,config_file,local_address):
+def initialize_settings_FLIR(scan_date,config_file,destination,lid_add,bin2tif_address,repository_address):
 	global method,no_of_cores_to_use,no_of_cores_to_use_max,SCALE,PATCH_SIZE,LID_SIZE_AT_SCALE,PATCH_SIZE_GPS,\
 	GPS_TO_IMAGE_RATIO,HEIGHT_RATIO_FOR_ROW_SEPARATION,PERCENTAGE_OF_GOOD_MATCHES,MINIMUM_PERCENTAGE_OF_INLIERS,\
 	MINIMUM_NUMBER_OF_MATCHES,RANSAC_MAX_ITER,RANSAC_ERROR_THRESHOLD,PERCENTAGE_NEXT_NEIGHBOR_FOR_MATCHES,\
@@ -260,7 +260,7 @@ def initialize_settings_FLIR(scan_date,config_file,local_address):
 	LETTUCE_AREA_THRESHOLD,CONTOUR_MATCHING_MIN_MATCH,ORTHO_SCALE,REDUCTION_FACTOR,OPEN_MORPH_LID_SIZE,\
 	CLOSE_MORPH_LID_SIZE,FFT_PARALLEL_CORES_TO_USE,use_camera,override_sifts,\
 	patch_folder,SIFT_folder,lid_file,coordinates_file,CORRECTED_coordinates_file,plot_npy_file,\
-	row_save_path,field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
+	field_image_path,lettuce_heads_coordinates_file,correction_log_file,inside_radius_lettuce_matching_threshold,\
 	number_of_rows_in_groups,groups_to_use,patches_to_use,scan_date_stng,is_single_group,is_flir,\
 	lid_detection_method,temp_lid_image_address,circle_error,lid_search_surrounding_patch_number,\
 	TRANSFORMATION_ERR_STD,GPS_ERROR_STD,LID_ERR_STD,lines,Height_Scale,LID_SIZE,lid_detection_model_path,\
@@ -319,19 +319,16 @@ def initialize_settings_FLIR(scan_date,config_file,local_address):
 
 		save_coords_on_csv = (True if lines[33].split(':')[1] == 'true' or lines[33].split(':')[1] == 'True' else False)
 		save_new_tiffs = (True if lines[34].split(':')[1] == 'true' or lines[34].split(':')[1] == 'True' else False)
-		new_tiffs_path = '{0}/{1}_out/output_tiffs'.format(local_address,scan_date)
-		
-		temp_lid_image_address = '{0}/{1}-rgb/lid_temp.png'.format(local_address,scan_date)
+		new_tiffs_path = '{0}/{1}/output_tiffs'.format(destination,scan_date)
 
-		patch_folder = '{0}/{1}_out/bin2tif_out'.format(local_address,scan_date)
-		SIFT_folder = '{0}/{1}_out/SIFT'.format(local_address,scan_date)
-		lid_file = '{0}/{1}_out/lids.txt'.format(local_address,scan_date)
-		coordinates_file = '{0}/{1}_out/{2}_coordinates.csv'.format(local_address,scan_date,scan_date)
-		CORRECTED_coordinates_file = '{0}/{1}_out/{2}_coordinates_CORRECTED.csv'.format(local_address,scan_date,scan_date)
-		plot_npy_file = '{0}/{1}_out/plt.npy'.format(local_address,scan_date)
-		row_save_path = '{0}/{1}_out/rows'.format(local_address,scan_date)
-		field_image_path = '{0}/{1}_out'.format(local_address,scan_date)
-		correction_log_file = '{0}/{1}_out/logs/log_{2}_at_{3}.csv'.format(local_address,scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
-		lettuce_heads_coordinates_file = '{0}/{1}_out/season10_ind_lettuce_2020-05-27.csv'.format(local_address,scan_date)
+		temp_lid_image_address = '{0}/lid_temp.png'.format(repository_address)
+
+		patch_folder = '{0}'.format(bin2tif_address)
+		SIFT_folder = '{0}/{1}/SIFT'.format(destination,scan_date)
+		lid_file = '{0}'.format(lid_add)
+		CORRECTED_coordinates_file = '{0}/{1}/{2}_coordinates_CORRECTED.csv'.format(destination,scan_date,scan_date)
+		plot_npy_file = '{0}/{1}/plt.npy'.format(destination,scan_date)
+		field_image_path = '{0}/{1}'.format(destination,scan_date)
+		correction_log_file = '{0}/{1}/logs/log_{2}_at_{3}.csv'.format(destination,scan_date,method,datetime.datetime.now().strftime("%d-%m-%y_%H:%M"))
 		scan_date_stng = scan_date
 		lettuce_coords = None
