@@ -116,9 +116,16 @@ def get_nearest_lid_id(patch):
 
 	return min_lid
 
-def get_patch_coord_dict_from_name(image_name):
+def get_patch_coord_dict_from_name(args):
 
-	ds = gdal.Open('{0}/{1}'.format(settings.patch_folder,image_name))
+	image_name = args[0]
+	use_corrected = args[1]
+
+	if use_corrected:
+		ds = gdal.Open('{0}/{1}'.format(settings.new_tiffs_path,image_name))
+	else:
+		ds = gdal.Open('{0}/{1}'.format(settings.patch_folder,image_name))
+	
 	meta = gdal.Info(ds)
 
 	lines = meta.splitlines()
@@ -159,7 +166,7 @@ def get_patch_coord_dict_from_name(image_name):
 
 	return coord
 
-def get_all_patches():
+def get_all_patches(use_corrected=False):
 
 	image_names = os.listdir(settings.patch_folder)
 
@@ -172,7 +179,7 @@ def get_all_patches():
 		if settings.use_camera == 'Right' and '_left' in img_name:
 			continue
 
-		args.append(img_name)
+		args.append(img_name,use_corrected)
 
 	processes = MyPool(settings.no_of_cores_to_use_max)
 	results = processes.map(get_patch_coord_dict_from_name,args)
@@ -4516,7 +4523,7 @@ class Field:
 		# global coordinates_file, number_of_rows_in_groups, groups_to_use
 
 		# rows = self.get_rows(use_corrected)
-		rows = self.get_rows_no_csv()
+		rows = self.get_rows_no_csv(use_corrected)
 
 		groups = []
 
@@ -4584,9 +4591,9 @@ class Field:
 
 		return groups[settings.groups_to_use]
 
-	def get_rows_no_csv(self):
+	def get_rows_no_csv(self,use_corrected=False):
 		
-		initial_patches = get_all_patches()
+		initial_patches = get_all_patches(use_corrected)
 
 		center_of_rows = []
 		patches = []
