@@ -87,7 +87,7 @@ original = sys.stdout
 
 sys.stdout = open('{0}/{1}/{2}.txt'.format(destination,scan_date,'geo_correction_output'), 'w')
 
-settings.initialize_settings_HPC(scan_date,config_file,destination,lid_file_address,bin2tiff_address,repository_address)
+settings.initialize_settings_FLIR(scan_date,config_file,destination,lid_file_address,bin2tiff_address,repository_address)
 
 print_settings()
 
