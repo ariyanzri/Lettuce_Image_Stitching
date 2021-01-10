@@ -10,7 +10,41 @@ This repository contains all the necessary codes for running geo-correcting the 
 
 * Dockerized_GPS_Correction.py: The main entry point for running the geo-correction on Lab Servers. Arguments are: {scan date}, {address of the config file}, {address of the directory where all the files exist and the results will be saved}. 
 
-* Dockerized_GPS_Correction_FLIR.py: The main entry point for running the geo-correction for FLIR on either HPC or Lab Servers (TBC). Same arguments as above.
+* Dockerized_GPS_Correction_FLIR.py: The main entry point for running the geo-correction for FLIR on either HPC or Lab Servers (TBC). Same arguments as above. Following are the list of parameters:
+  * '-d' --> '--destination', type=str, help='address of the destination folder on HPC (usually on xdisk where everything is stored).' 
+
+  * '-b' --> '--bin_2tif', type=str, help='the address of the bin_2tif folder.'
+
+  * '-g' --> '--gps_coord', type=str, help='the address of the GPS coordinates csv file.'
+
+  * '-s' --> '--scan_date', type=str, help='the name of the specific scan to work on.'
+
+  * '-c' --> '--config_file', type=str, help='the name of the config file to use.'
+
+  * '-l' --> '--lid_address', type=str, help='the address of the lid file.'
+
+  * '-u' --> '--uav_lettuce_address', type=str, help='the address of the uav lettuce coordinates file.'
+
+  * '-r' --> '--repository_address', type=str, help='the address of the geocorrection repository.'
+
+* Dockerized_Mosaicing_FLIR.py: The main entry point for running the mosaicing for FLIR on either HPC or Lab Servers (TBC). It generates corrected and uncorrected mosaics. It needs to be run after running the geo-correction code. It takes the same parameters, same arguments as above. Following are the list of parameters:
+
+  * '-d' --> '--destination', type=str, help='address of the destination folder on HPC (usually on xdisk where everything is stored).' 
+
+  * '-b' --> '--bin_2tif', type=str, help='the address of the bin_2tif folder.'
+
+  * '-g' --> '--gps_coord', type=str, help='the address of the GPS coordinates csv file.'
+
+  * '-s' --> '--scan_date', type=str, help='the name of the specific scan to work on.'
+
+  * '-c' --> '--config_file', type=str, help='the name of the config file to use.'
+
+  * '-l' --> '--lid_address', type=str, help='the address of the lid file.'
+
+  * '-u' --> '--uav_lettuce_address', type=str, help='the address of the uav lettuce coordinates file.'
+
+  * '-r' --> '--repository_address', type=str, help='the address of the geocorrection repository.'
+
 
 * Dockerized_GPS_Correction_HPC.py: The main entry ponit for running the geo-correction on HPC inside the pipeline. Following are the list of parameters:
   * '-d' --> '--destination', type=str, help='address of the destination folder on HPC (usually on xdisk where everything is stored).' 
