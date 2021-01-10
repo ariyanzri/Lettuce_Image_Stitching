@@ -179,7 +179,7 @@ def get_all_patches(use_corrected=False):
 		if settings.use_camera == 'Right' and '_left' in img_name:
 			continue
 
-		args.append(img_name,use_corrected)
+		args.append((img_name,use_corrected))
 
 	processes = MyPool(settings.no_of_cores_to_use_max)
 	results = processes.map(get_patch_coord_dict_from_name,args)
