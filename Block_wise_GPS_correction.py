@@ -4343,7 +4343,7 @@ class Field:
 		lids = get_lids()
 		possible_patches = self.get_patches_with_possible_lids()
 
-		if settings.lid_detection_method != 'ML':
+		if not settings.is_flir and settings.lid_detection_method != 'ML':
 
 			args_list = []
 
