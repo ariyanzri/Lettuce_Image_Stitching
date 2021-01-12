@@ -25,9 +25,10 @@ def main(scan_date):
 	sys.setrecursionlimit(10**8)
 
 	field = Field(is_single_group=settings.is_single_group)
-	
 	field.draw_and_save_field(is_old=True)
-	field.draw_and_save_field(is_old=False)
+
+	new_field = Field(is_single_group=settings.is_single_group,use_corrected=True)
+	new_field.draw_and_save_field(is_old=False)
 
 def get_args():
 
