@@ -1103,7 +1103,7 @@ def get_unique_lists(xs,ys):
 
 def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=10):
 
-	if settings.is_flir:
+	if settings.lid_detection_method == 'FLIR':
 		img = cv2.imread('{0}/{1}'.format(settings.patch_folder,img_name),cv2.IMREAD_ANYCOLOR | cv2.IMREAD_ANYDEPTH)
 		img = cv2.normalize(img, None, 255,0, cv2.NORM_MINMAX, cv2.CV_8UC1)
 		img = cv2.resize(img,(int(img.shape[1]*settings.SCALE),int(img.shape[0]*settings.SCALE)))
@@ -1153,95 +1153,94 @@ def get_lid_in_patch(img_name,l,pname,coord,ransac_iter=500,ransac_min_num_fit=1
 		else:
 			return -1,-1,-1,-1,-1,-1
 
-	else:
+	elif settings.lid_detection_method == 'TMP':
+
 		img = cv2.imread('{0}/{1}'.format(settings.patch_folder,img_name))
 		img = cv2.resize(img,(int(img.shape[1]*settings.SCALE),int(img.shape[0]*settings.SCALE)))
 		rgb_img = img.copy()
 		# img = histogram_equalization(img)
 
-		if settings.lid_detection_method == 'TMP':
+		lid_img = cv2.imread(settings.temp_lid_image_address)
+		# print(lid_img.shape)
 
-			lid_img = cv2.imread(settings.temp_lid_image_address)
-			# print(lid_img.shape)
+		lid_img = cv2.resize(lid_img,(int(lid_img.shape[1]*settings.SCALE/settings.Height_Scale),int(lid_img.shape[0]*settings.SCALE/settings.Height_Scale)))
+		
+		HSV_lid_img = cv2.cvtColor(lid_img,cv2.COLOR_BGR2HSV)
+		Final_lid_img = np.zeros((HSV_lid_img.shape[0],HSV_lid_img.shape[1],2))
+		Final_lid_img[:,:,0] = 255-HSV_lid_img[:,:,1]
+		Final_lid_img[:,:,1] = HSV_lid_img[:,:,2]
+		Final_lid_img = np.mean(Final_lid_img,axis=-1).astype('uint8')
+		# Final_lid_img = cv2.cvtColor(lid_img,cv2.COLOR_BGR2GRAY)
 
-			lid_img = cv2.resize(lid_img,(int(lid_img.shape[1]*settings.SCALE/settings.Height_Scale),int(lid_img.shape[0]*settings.SCALE/settings.Height_Scale)))
+		HSV_img=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+		Final_img = np.zeros((HSV_img.shape[0],HSV_img.shape[1],2))
+		Final_img[:,:,0] = 255-HSV_img[:,:,1]
+		Final_img[:,:,1] = HSV_img[:,:,2]
+		Final_img = np.mean(Final_img,axis=-1).astype('uint8')
+		# Final_img=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+
+		result=cv2.matchTemplate(Final_img,Final_lid_img,cv2.TM_CCOEFF)
+		sin_val, max_val, min_loc, max_loc=cv2.minMaxLoc(result)
+		top_left=max_loc
+		bottom_right=(top_left[0]+int(settings.LID_SIZE_AT_SCALE[1]*2),top_left[1]+int(settings.LID_SIZE_AT_SCALE[1]*2))
+		
+		x = int(abs(top_left[0]+bottom_right[0])/2)
+		y = int(abs(top_left[1]+bottom_right[1])/2)
+		r = int(abs(top_left[0]-bottom_right[0])/2)
+
+		# cv2.circle(rgb_img,(int(x),int(y)),r,(0,0,255),thickness=8)
+		# # cv2.rectangle(rgb_img,top_left,bottom_right,(255,0,0),10)
+		# cv2.putText(rgb_img, str(max_val), (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA) 
+		# cv2.imwrite('/storage/ariyanzarei/test/{0}.jpg'.format(img_name.split('.')[0]),rgb_img)
+		return x,y,r,l,pname,coord,max_val
+
+	else:
+
+		img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)[:,:,1]
+
+		MB_size = int(77*settings.SCALE) if int(77*settings.SCALE) % 2 == 1 else int(77*settings.SCALE)+1
+		img  = cv2.medianBlur(img,MB_size)
+		img = 255-img
+
+		t = 240			
+		(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
+
+		kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.LID_SIZE_AT_SCALE[0]), int(settings.LID_SIZE_AT_SCALE[0])))
+		img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
+
+		shp = np.shape(img)
+
+		img, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+		
+		new_contours = []
+
+		for c in contours:
+			for p in c:
+				new_contours.append([p[0][0],p[0][1]])
+		
+		new_contours = np.array(new_contours)
+
+		if np.shape(new_contours)[0]<ransac_min_num_fit:
+			return -1,-1,-1,-1,-1,-1
+
+		xs = np.array(new_contours[:,0])
+		ys = np.array(new_contours[:,1])
+
+		xs,ys = get_unique_lists(xs,ys)
+
+		if np.shape(xs)[0]<ransac_min_num_fit:
+			return -1,-1,-1,-1,-1,-1
+
+		x,y,r,err = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
+
+
+		if r >= settings.LID_SIZE_AT_SCALE[0] and r <= settings.LID_SIZE_AT_SCALE[1]:
 			
-			HSV_lid_img = cv2.cvtColor(lid_img,cv2.COLOR_BGR2HSV)
-			Final_lid_img = np.zeros((HSV_lid_img.shape[0],HSV_lid_img.shape[1],2))
-			Final_lid_img[:,:,0] = 255-HSV_lid_img[:,:,1]
-			Final_lid_img[:,:,1] = HSV_lid_img[:,:,2]
-			Final_lid_img = np.mean(Final_lid_img,axis=-1).astype('uint8')
-			# Final_lid_img = cv2.cvtColor(lid_img,cv2.COLOR_BGR2GRAY)
-
-			HSV_img=cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
-			Final_img = np.zeros((HSV_img.shape[0],HSV_img.shape[1],2))
-			Final_img[:,:,0] = 255-HSV_img[:,:,1]
-			Final_img[:,:,1] = HSV_img[:,:,2]
-			Final_img = np.mean(Final_img,axis=-1).astype('uint8')
-			# Final_img=cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
-
-			result=cv2.matchTemplate(Final_img,Final_lid_img,cv2.TM_CCOEFF)
-			sin_val, max_val, min_loc, max_loc=cv2.minMaxLoc(result)
-			top_left=max_loc
-			bottom_right=(top_left[0]+int(settings.LID_SIZE_AT_SCALE[1]*2),top_left[1]+int(settings.LID_SIZE_AT_SCALE[1]*2))
-			
-			x = int(abs(top_left[0]+bottom_right[0])/2)
-			y = int(abs(top_left[1]+bottom_right[1])/2)
-			r = int(abs(top_left[0]-bottom_right[0])/2)
-
-			# cv2.circle(rgb_img,(int(x),int(y)),r,(0,0,255),thickness=8)
-			# # cv2.rectangle(rgb_img,top_left,bottom_right,(255,0,0),10)
-			# cv2.putText(rgb_img, str(max_val), (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA) 
-			# cv2.imwrite('/storage/ariyanzarei/test/{0}.jpg'.format(img_name.split('.')[0]),rgb_img)
-			return x,y,r,l,pname,coord,max_val
-
+			cv2.circle(rgb_img,(int(x),int(y)),r,(0,0,255),thickness=8)
+			cv2.imwrite('/storage/ariyanzarei/test/{0}.jpg'.format(img_name.split('.')[0]),rgb_img)
+			return x,y,r,l,pname,coord
 		else:
-
-			img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)[:,:,1]
-
-			MB_size = int(77*settings.SCALE) if int(77*settings.SCALE) % 2 == 1 else int(77*settings.SCALE)+1
-			img  = cv2.medianBlur(img,MB_size)
-			img = 255-img
-
-			t = 240			
-			(thresh, img) = cv2.threshold(img, t, 255, cv2.THRESH_BINARY)
-
-			kernel =  cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (int(settings.LID_SIZE_AT_SCALE[0]), int(settings.LID_SIZE_AT_SCALE[0])))
-			img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
-
-			shp = np.shape(img)
-
-			img, contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-			
-			new_contours = []
-
-			for c in contours:
-				for p in c:
-					new_contours.append([p[0][0],p[0][1]])
-			
-			new_contours = np.array(new_contours)
-
-			if np.shape(new_contours)[0]<ransac_min_num_fit:
-				return -1,-1,-1,-1,-1,-1
-
-			xs = np.array(new_contours[:,0])
-			ys = np.array(new_contours[:,1])
-
-			xs,ys = get_unique_lists(xs,ys)
-
-			if np.shape(xs)[0]<ransac_min_num_fit:
-				return -1,-1,-1,-1,-1,-1
-
-			x,y,r,err = ransac(xs,ys,ransac_iter,ransac_min_num_fit)
-
-
-			if r >= settings.LID_SIZE_AT_SCALE[0] and r <= settings.LID_SIZE_AT_SCALE[1]:
-				
-				cv2.circle(rgb_img,(int(x),int(y)),r,(0,0,255),thickness=8)
-				cv2.imwrite('/storage/ariyanzarei/test/{0}.jpg'.format(img_name.split('.')[0]),rgb_img)
-				return x,y,r,l,pname,coord
-			else:
-				return -1,-1,-1,-1,-1,-1
+			return -1,-1,-1,-1,-1,-1
 
 
 def get_lid_in_patch_helper(args):
@@ -4350,7 +4349,7 @@ class Field:
 		lids = get_lids()
 		possible_patches = self.get_patches_with_possible_lids()
 
-		if settings.lid_detection_method != 'ML' or settings.is_flir:
+		if settings.lid_detection_method != 'ML':
 
 			args_list = []
 
@@ -4422,7 +4421,7 @@ class Field:
 
 				w = x2-x1
 				h = y2-y1
-
+				thresh = (0.99 if not settings.is_flir else 0.999)
 				if score[0] < 0.99:
 					print('Image dropped due to low score.')
 					i+=1
