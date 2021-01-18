@@ -31,5 +31,5 @@ TRANSFORMATION_ERR_STD:9.32e-6,10.56e-6
 GPS_ERR_STD:9.02e-6,10.48e-6
 LID_ERR_STD:1e-9
 LID_MODEL_PATH:/storage/ariyanzarei/model_weights_flir_lid.pth:/xdisk/kobus/ariyan/model_weights_rgb_lid.pth
-SAVE_COORDS_ON_CSV:False
+SAVE_COORDS_ON_CSV:True
 SAVE_NEW_TIFF_FILES:True
