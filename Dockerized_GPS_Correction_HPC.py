@@ -26,27 +26,27 @@ def main(scan_date):
 
 	field = Field(is_single_group=settings.is_single_group)
 	
-	# field.save_plot()
+	field.save_plot()
 
-	# old_lid_base_error = field.calculate_lid_based_error()
+	old_lid_base_error = field.calculate_lid_based_error()
 
-	# field.create_patches_SIFT_files()
+	field.create_patches_SIFT_files()
 	
 	field.draw_and_save_field(is_old=True)
 
-	# field.correct_field()
+	field.correct_field()
 
-	# field.save_new_coordinate()
+	field.save_new_coordinate()
 
-	# new_lid_base_error = field.calculate_lid_based_error()
+	new_lid_base_error = field.calculate_lid_based_error()
 
-	# print('------------------ ERROR MEASUREMENT ------------------ ')
+	print('------------------ ERROR MEASUREMENT ------------------ ')
 
-	# print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
+	print('OLD Lid base Mean and Stdev: {0}'.format(old_lid_base_error))
 
-	# print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
+	print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
 
-	# field.draw_and_save_field(is_old=False)
+	field.draw_and_save_field(is_old=False)
 
 def get_args():
 
