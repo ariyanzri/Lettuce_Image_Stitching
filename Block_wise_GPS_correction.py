@@ -4236,7 +4236,7 @@ class Group:
 		print('Group {0} was corrected internally. '.format(self.group_id))
 		sys.stdout.flush()
 
-		self.get_overlap_averages()
+		# self.get_overlap_averages()
 		self.save_transformations()
 
 		return string_res
