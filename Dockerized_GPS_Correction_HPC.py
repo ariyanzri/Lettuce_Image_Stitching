@@ -32,7 +32,7 @@ def main(scan_date):
 
 	field.create_patches_SIFT_files()
 	
-	field.draw_and_save_field(is_old=True)
+	# field.draw_and_save_field(is_old=True)
 
 	field.correct_field()
 
@@ -46,7 +46,7 @@ def main(scan_date):
 
 	print('NEW Lid base Mean and Stdev: {0}'.format(new_lid_base_error))
 
-	field.draw_and_save_field(is_old=False)
+	# field.draw_and_save_field(is_old=False)
 
 def get_args():
 
