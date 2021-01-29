@@ -2566,8 +2566,8 @@ class Global_Optimizer:
 				b.append(GPS_coef_y*p.gps.UL_coord[1])
 
 
-		A=np.array(A)
-		b=np.array(b)
+		# A=np.array(A)
+		# b=np.array(b)
 
 		# X = np.matmul(np.matmul(np.linalg.inv(np.matmul(np.transpose(A),A)),np.transpose(A)),b)
 		
