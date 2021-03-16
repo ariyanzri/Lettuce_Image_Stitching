@@ -61,3 +61,5 @@ RUN apt-get install -y libgl1-mesa-dev
 
 RUN pip3 install open3d
 RUN pip3 install utm
+RUN pip3 install tensorflow
+RUN pip3 install keras
