@@ -4392,8 +4392,16 @@ class Field:
 				i+=1
 
 			model = core.Model.load(settings.lid_detection_model_path,['lid'])
+			
+			# possible_patches = possible_patches[:70]
+			# print(model)
+			# print(possible_patches)
+			# print(len(possible_patches))
+			# sys.stdout.flush()
 
 			top_predictions = model.predict_top(images)	
+			# print(top_predictions)
+			# sys.stdout.flush()
 
 			i = 0
 

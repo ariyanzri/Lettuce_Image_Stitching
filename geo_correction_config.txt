@@ -30,6 +30,6 @@ lid_search_surrounding_patch_number:0
 TRANSFORMATION_ERR_STD:9.32e-6,10.56e-6
 GPS_ERR_STD:9.02e-6,10.48e-6
 LID_ERR_STD:1e-9
-LID_MODEL_PATH:/xdisk/ericlyons/big_data/ariyanzarei/pipeline/PhytoOracle/stereoTopRGB/model_weights.pth
+LID_MODEL_PATH:/xdisk/kobus/ariyanzarei/Image_Stitching_Test/model_weights_rgb_lid_100epochs.pth
 SAVE_COORDS_ON_CSV:True
 SAVE_NEW_TIFF_FILES:True

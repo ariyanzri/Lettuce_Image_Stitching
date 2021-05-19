@@ -1,0 +1,13 @@
+nohup: ignoring input
+/usr/local/lib/python3.6/dist-packages/torch/cuda/__init__.py:52: UserWarning: CUDA initialization: Found no NVIDIA driver on your system. Please check that you have an NVIDIA GPU and installed a driver from http://www.nvidia.com/Download/index.aspx (Triggered internally at  /pytorch/c10/cuda/CUDAFunctions.cpp:100.)
+  return torch._C._cuda_getDeviceCount() > 0
+/home/u7/ariyanzarei/projects/image_stitching/Lettuce_Image_Stitching/Block_wise_GPS_correction.py:481: RuntimeWarning: invalid value encountered in double_scalars
+  theta = math.degrees(math.acos(H[0,0]/s))
+/home/u7/ariyanzarei/projects/image_stitching/Lettuce_Image_Stitching/Block_wise_GPS_correction.py:481: RuntimeWarning: invalid value encountered in double_scalars
+  theta = math.degrees(math.acos(H[0,0]/s))
+/home/u7/ariyanzarei/projects/image_stitching/Lettuce_Image_Stitching/Block_wise_GPS_correction.py:481: RuntimeWarning: invalid value encountered in double_scalars
+  theta = math.degrees(math.acos(H[0,0]/s))
+/home/u7/ariyanzarei/projects/image_stitching/Lettuce_Image_Stitching/Block_wise_GPS_correction.py:481: RuntimeWarning: invalid value encountered in double_scalars
+  theta = math.degrees(math.acos(H[0,0]/s))
+/home/u7/ariyanzarei/projects/image_stitching/Lettuce_Image_Stitching/Block_wise_GPS_correction.py:481: RuntimeWarning: invalid value encountered in double_scalars
+  theta = math.degrees(math.acos(H[0,0]/s))
