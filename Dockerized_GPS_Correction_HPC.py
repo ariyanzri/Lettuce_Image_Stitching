@@ -20,6 +20,18 @@ from collections import OrderedDict,Counter
 from Block_wise_GPS_correction import *
 import settings
 
+
+'''
+
+singularity exec /xdisk/cjfrost/ariyanzarei/3d_data/singularity_images/full_geocorrection.simg 
+python3 Dockerized_GPS_Correction_HPC.py -d /xdisk/kobus/ariyanzarei/Image_Stitching_Test/out 
+-b /xdisk/kobus/ariyanzarei/Image_Stitching_Test/bin2tif_out -s 2020-08-06 -c geo_correction_config.txt 
+-l /xdisk/kobus/ariyanzarei/Image_Stitching_Test/gcp_season_11.txt 
+-r /home/u7/ariyanzarei/projects/image_stitching/Lettuce_Image_Stitching
+
+'''
+
+
 def main(scan_date):
 
 	sys.setrecursionlimit(10**8)
