@@ -15,6 +15,7 @@ import datetime
 import shutil 
 import csv
 import subprocess
+import tifffile as tifi
 
 # from sklearn.linear_model import RANSACRegressor
 # from sklearn.datasets import make_regression
@@ -254,6 +255,10 @@ def load_preprocess_image(address,hist_eq=False):
 	else:
 		img = cv2.imread(address)
 		img = cv2.resize(img,(settings.PATCH_SIZE[1],settings.PATCH_SIZE[0]))
+		# img = tifi.imread(address)
+		# print(type(img))
+		# img = cv2.resize(img,(settings.PATCH_SIZE[1],settings.PATCH_SIZE[0]))
+
 		if hist_eq:
 			img = histogram_equalization(img)
 		img = img.astype('uint8')
@@ -271,6 +276,13 @@ def load_preprocess_image(address,hist_eq=False):
 	# cv2.waitKey(0)
 
 	return img, img_g
+
+def find_lid_single_image_detecto(image):
+
+	model = core.Model.load(settings.lid_detection_model_path,['lid'])
+	prediction = model.predict_top(image)
+
+	return prediction
 
 def choose_SIFT_key_points(patch,x1,y1,x2,y2):
 	# global SIFT_folder
@@ -4382,7 +4394,7 @@ class Field:
 			images = []
 			final_list_patches = []
 			possible_patches_dict = {}
-
+			
 			i = 0
 			for p,l in possible_patches:
 				p.load_img()
@@ -4392,7 +4404,11 @@ class Field:
 				possible_patches_dict[i] = (p,l)
 				i+=1
 
-			model = core.Model.load(settings.lid_detection_model_path,['lid'])
+			with multiprocessing.Pool(multiprocessing.cpu_count()-2) as p:
+				top_predictions = p.map(find_lid_single_image_detecto, images)
+
+			
+			# model = core.Model.load(settings.lid_detection_model_path,['lid'])
 			
 			# possible_patches = possible_patches[:1]
 			
@@ -4400,11 +4416,12 @@ class Field:
 			# print(possible_patches)
 			# print(len(possible_patches))
 			# sys.stdout.flush()
+			# print(images[0])
 
 			# top_predictions = model.predict(images)	
 
 
-			top_predictions = model.predict_top(images)	
+			# top_predictions = model.predict_top(images)	
 			# print(top_predictions)
 			# sys.stdout.flush()
 
